@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چارت تولد · Cosmic Oracle</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Vazirmatn', Tahoma, sans-serif; background: #0b0d1a; color: #e8e4f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; direction: rtl; }
+        .container { max-width: 820px; width: 100%; background: rgba(18,20,40,0.85); border-radius: 28px; padding: 30px 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.7); border: 1px solid rgba(200,180,255,0.08); }
+        h1 { text-align: center; font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #d9ceff, #8bbdff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-top: 0; margin-bottom: 8px; }
+        .sub { text-align: center; color: #8a82a0; font-size: 14px; margin-bottom: 22px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #b8aec8; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(180,165,255,0.15); background: rgba(6,7,24,0.6); color: #f0ecff; font-size: 14px; box-sizing: border-box; transition: 0.25s ease; }
+        input:focus, select:focus { outline: none; border-color: rgba(140,180,255,0.4); box-shadow: 0 0 20px rgba(100,140,255,0.08); }
+        .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 14px; background: linear-gradient(135deg, #6c8cff, #9c79ff); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s ease; margin-top: 8px; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(100,140,255,0.25); }
+        #result { margin-top: 24px; padding: 20px; border-radius: 18px; background: rgba(0,0,0,0.25); border: 1px solid rgba(200,185,248,0.06); display: none; font-size: 14px; line-height: 2; color: #d4cce8; }
+        .section-title { font-size: 16px; font-weight: 700; color: #e6dcff; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px; margin-top: 16px; margin-bottom: 10px; }
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; }
+        .planet-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .badge { display: inline-block; background: rgba(140,180,255,0.12); padding: 0 10px; border-radius: 30px; font-size: 12px; color: #b0caff; }
+        .footer { text-align: center; font-size: 11px; color: #5a526e; margin-top: 20px; }
+        .loading { color: #b0caff; text-align: center; padding: 20px; }
+        .error { color: #e87474; text-align: right; padding: 15px; background: rgba(200,50,50,0.1); border-radius: 12px; border: 1px solid rgba(200,50,50,0.2); }
+        .aspect-item { display: inline-block; background: rgba(200,180,255,0.06); padding: 2px 12px; border-radius: 20px; margin: 3px 4px 3px 0; font-size: 13px; border: 1px solid rgba(200,180,255,0.06); }
+        @media (max-width: 600px) { .row2 { grid-template-columns: 1fr; } .grid-2col { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌌 چارت تولد</h1>
+        <div class="sub">ارتباط با سرور Astrologer-API · آفلاین</div>
+        <div class="form-group">
+            <label>تاریخ تولد</label>
+            <input type="date" id="birthDate" value="2000-01-01" />
+        </div>
+        <div class="row2">
+            <div class="form-group">
+                <label>ساعت (۲۴)</label>
+                <input type="number" id="birthHour" value="12" min="0" max="23" />
+            </div>
+            <div class="form-group">
+                <label>دقیقه</label>
+                <input type="number" id="birthMinute" value="0" min="0" max="59" />
+            </div>
+        </div>
+        <div class="row2">
+            <div class="form-group">
+                <label>عرض جغرافیایی (deg)</label>
+                <input type="number" id="latitude" value="35.6892" step="0.001" />
+            </div>
+            <div class="form-group">
+                <label>طول جغرافیایی (deg)</label>
+                <input type="number" id="longitude" value="51.3890" step="0.001" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label>منطقه‌ی زمانی (UTC)</label>
+            <select id="timezone">
+                <option value="3.5" selected>ایران (UTC+3:30)</option>
+                <option value="0">UTC+0 (لندن)</option>
+                <option value="1">UTC+1 (اروپا)</option>
+                <option value="2">UTC+2 (آتن)</option>
+                <option value="3">UTC+3 (مسکو)</option>
+                <option value="5.5">UTC+5:30 (هند)</option>
+                <option value="-5">UTC-5 (نیویورک)</option>
+                <option value="-8">UTC-8 (لس‌آنجلس)</option>
+            </select>
+        </div>
+        <button id="calcBtn">🔮 محاسبه و دریافت چارت</button>
+        <div id="result"></div>
+        <div class="footer">✨ سرور روی http://localhost:8000 باید در حال اجرا باشد</div>
+    </div>
+
+    <script>
+        // ترجمه‌ها
+        const faMap = {
+            Sun: 'خورشید', Moon: 'ماه', Mercury: 'عطارد', Venus: 'ناهید', Mars: 'مریخ',
+            Jupiter: 'مشتری', Saturn: 'کیوان', Uranus: 'اورانوس', Neptune: 'نپتون', Pluto: 'پلوتون',
+            Ari: 'حمل', Tau: 'ثور', Gem: 'جوزا', Can: 'سرطان', Leo: 'اسد', Vir: 'سنبله',
+            Lib: 'میزان', Sco: 'عقرب', Sag: 'قوس', Cap: 'جدی', Aqu: 'دلو', Pis: 'حوت',
+            First_House: 'اول', Second_House: 'دوم', Third_House: 'سوم', Fourth_House: 'چهارم',
+            Fifth_House: 'پنجم', Sixth_House: 'ششم', Seventh_House: 'هفتم', Eighth_House: 'هشتم',
+            Ninth_House: 'نهم', Tenth_House: 'دهم', Eleventh_House: 'یازدهم', Twelfth_House: 'دوازدهم',
+            conjunction: 'مقارنه', opposition: 'مقابله', trine: 'تثلیث', square: 'تربیع', sextile: 'تسدیس', quintile: 'تخمیس',
+            'True_North_Lunar_Node': 'گره شمالی', 'True_South_Lunar_Node': 'گره جنوبی',
+            'Mean_Lilith': 'لیلیت', Ascendant: 'ASC', Medium_Coeli: 'MC', Descendant: 'DSC', Imum_Coeli: 'IC'
+        };
+        function translate(text) { if (!text) return text; const trimmed = text.toString().trim(); return faMap[trimmed] || faMap[trimmed.toLowerCase()] || trimmed; }
+        function signEmoji(sign) { const map = { 'Ari': '♈', 'Tau': '♉', 'Gem': '♊', 'Can': '♋', 'Leo': '♌', 'Vir': '♍', 'Lib': '♎', 'Sco': '♏', 'Sag': '♐', 'Cap': '♑', 'Aqu': '♒', 'Pis': '♓' }; return map[sign] || ''; }
+
+        document.getElementById('calcBtn').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading">⏳ در حال محاسبه ... (این کار ممکن است چند ثانیه طول بکشد)</div>';
+
+            // دریافت داده‌ها
+            const dateVal = document.getElementById('birthDate').value;
+            if (!dateVal) { resultDiv.innerHTML = '<div class="error">⚠️ لطفاً تاریخ تولد را انتخاب کنید.</div>'; return; }
+            const parts = dateVal.split('-');
+            const year = parseInt(parts[0]), month = parseInt(parts[1]), day = parseInt(parts[2]);
+            const hour = parseInt(document.getElementById('birthHour').value) || 12;
+            const minute = parseInt(document.getElementById('birthMinute').value) || 0;
+            const lat = parseFloat(document.getElementById('latitude').value) || 35.6892;
+            const lng = parseFloat(document.getElementById('longitude').value) || 51.3890;
+
+            const payload = {
+                subject: {
+                    year, month, day, hour, minute, second: 0,
+                    longitude: lng, latitude: lat,
+                    timezone: "Asia/Tehran",
+                    city: "Tehran", nation: "IR",
+                    name: "کاربر"
+                }
+            };
+
+            // ارسال درخواست (بدون timeout، صبر می‌کند تا سرور پاسخ دهد)
+            fetch('http://127.0.0.1:8000/api/v5/chart-data/birth-chart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(errData => {
+                        let msg = 'خطا در سرور';
+                        if (errData.errors) msg = errData.errors.map(e => `${e.loc.join('.')}: ${e.msg}`).join(' | ');
+                        else if (errData.detail) msg = Array.isArray(errData.detail) ? errData.detail.map(e => e.msg).join(' ') : errData.detail;
+                        else if (errData.message) msg = errData.message;
+                        throw new Error(msg);
+                    });
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.status !== 'OK') throw new Error(data.message || 'خطای ناشناخته');
+
+                const chart = data.chart_data;
+                const subject = chart.subject;
+                let html = '';
+
+                // سیارات
+                html += `<div class="section-title">🪐 موقعیت سیارات</div><div class="grid-2col">`;
+                ['sun','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto'].forEach(key => {
+                    const obj = subject[key];
+                    if (obj && obj.name) {
+                        html += `<div class="planet-row"><span><strong>${translate(obj.name)}</strong></span><span>${signEmoji(obj.sign)} ${translate(obj.sign)} ${obj.position.toFixed(1)}° <span class="badge">خانه ${translate(obj.house)}</span></span></div>`;
+                    }
+                });
+                html += `</div>`;
+
+                // نقاط حساس
+                html += `<div class="section-title">🌅 نقاط حساس</div><div class="grid-2col">`;
+                ['ascendant','medium_coeli','descendant','imum_coeli'].forEach(key => {
+                    const obj = subject[key];
+                    if (obj && obj.name) {
+                        html += `<div class="planet-row"><span><strong>${translate(obj.name)}</strong></span><span>${signEmoji(obj.sign)} ${translate(obj.sign)} ${obj.position.toFixed(1)}°</span></div>`;
+                    }
+                });
+                html += `</div>`;
+
+                // جنبه‌ها
+                if (chart.aspects && chart.aspects.length > 0) {
+                    html += `<div class="section-title">⚡ جنبه‌ها</div><div>`;
+                    chart.aspects.slice(0, 10).forEach(a => {
+                        html += `<span class="aspect-item">${translate(a.p1_name)} ${translate(a.aspect)} ${translate(a.p2_name)} (orb ${a.orbit.toFixed(1)}°)</span> `;
+                    });
+                    if (chart.aspects.length > 10) html += `<span class="aspect-item">... و ${chart.aspects.length - 10} جنبه دیگر</span>`;
+                    html += `</div>`;
+                }
+
+                // عناصر و کیفیت‌ها
+                if (chart.element_distribution) {
+                    const el = chart.element_distribution;
+                    html += `<div class="section-title">🔥 توزیع عناصر</div><div class="grid-2col">`;
+                    html += `<div><span style="color:#ff6600;">🔥 آتش</span> ${el.fire_percentage || 0}%</div>`;
+                    html += `<div><span style="color:#6a2d04;">🌍 خاک</span> ${el.earth_percentage || 0}%</div>`;
+                    html += `<div><span style="color:#6f76d1;">💨 هوا</span> ${el.air_percentage || 0}%</div>`;
+                    html += `<div><span style="color:#630e73;">💧 آب</span> ${el.water_percentage || 0}%</div></div>`;
+                }
+                if (chart.quality_distribution) {
+                    const q = chart.quality_distribution;
+                    html += `<div class="section-title">🌀 کیفیت‌ها</div><div class="grid-2col">`;
+                    html += `<div>🔺 اصلی (Cardinal) ${q.cardinal_percentage || 0}%</div>`;
+                    html += `<div>📌 ثابت (Fixed) ${q.fixed_percentage || 0}%</div>`;
+                    html += `<div>🔄 متغیر (Mutable) ${q.mutable_percentage || 0}%</div></div>`;
+                }
+
+                if (subject.lunar_phase) {
+                    const lp = subject.lunar_phase;
+                    html += `<div class="section-title">🌙 فاز ماه</div><div>${lp.moon_emoji || ''} ${translate(lp.moon_phase_name) || 'نامشخص'} (مرحله ${lp.moon_phase || 0})</div>`;
+                }
+
+                html += `<br/><span style="font-size:11px;color:#7a7290;">⏱ ${subject.iso_formatted_local_datetime || ''} (محلی) · ${subject.day_of_week || ''}</span>`;
+                resultDiv.innerHTML = html;
+
+            })
+            .catch(err => {
+                resultDiv.innerHTML = `<div class="error">⚠️ <strong>خطا:</strong> ${err.message}</div>`;
+                console.error(err);
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const y = today.getFullYear() - 20;
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('birthDate').value = `${y}-${m}-${d}`;
+        });
+    </script>
+</body>
+</html>
