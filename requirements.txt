@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+kerykeion==4.22.0
+libephemeris
+python-dotenv
+pydantic
+pytz
+requests
+simple-ascii-tables
+requests-cache
+scour
