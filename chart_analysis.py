@@ -1,5 +1,10 @@
+import os
 import requests
 from openai import OpenAI
+from dotenv import load_dotenv
+
+# بارگذاری متغیرهای محیطی از فایل .env (برای اجرای محلی)
+load_dotenv()
 
 # ============================================================
 # ۱. دریافت چارت از API محلی
@@ -36,9 +41,13 @@ def get_chart():
 # ۲. تحلیل چارت با DeepSeek (از طریق OpenRouter)
 # ============================================================
 def analyze_chart(context_text):
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        return "❌ کلید OPENROUTER_API_KEY در متغیرهای محیطی یافت نشد."
+
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
-        api_key="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",
+        api_key=api_key,
     )
 
     prompt = f"""
@@ -74,7 +83,7 @@ def analyze_chart(context_text):
 
     try:
         response = client.chat.completions.create(
-            model="deepseek/deepseek-chat",  # مدلی که تست کردیم
+            model="deepseek/deepseek-chat",
             messages=[
                 {"role": "system", "content": "شما یک اخترشناس حرفه‌ای هستید که به زبان فارسی تحلیل‌های دقیق و روان ارائه می‌دهید."},
                 {"role": "user", "content": prompt}
