@@ -1,4 +1,4 @@
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Union, Dict, Any
 
 from pydantic import BaseModel, Field
 
@@ -33,11 +33,22 @@ class SubjectResponseModel(StatusResponseModel):
     )
 
 
+# ============================================================
+# 🔮 اصلاح شده: اضافه کردن vedic_interpretations به خروجی
+# ============================================================
 class ChartDataResponseModel(StatusResponseModel):
-    """Response payload returning serialized chart data."""
+    """
+    Response payload returning serialized chart data.
+    شامل داده‌های چارت + تفسیرهای ودیک (Vedic)
+    """
 
     chart_data: Union[SingleChartDataModel, DualChartDataModel] = Field(
         description="Serialized chart data payload."
+    )
+
+    vedic_interpretations: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Vedic interpretations for each planet (Graha in Rashi + Bhava + Lordship)."
     )
 
 

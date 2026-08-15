@@ -1,0 +1,93 @@
+{
+  "uchcha": {
+    "Sun": { "sign": "Aries", "degree": 10 },
+    "Moon": { "sign": "Taurus", "degree": 3 },
+    "Mars": { "sign": "Capricorn", "degree": 28 },
+    "Mercury": { "sign": "Virgo", "degree": 15 },
+    "Jupiter": { "sign": "Cancer", "degree": 5 },
+    "Venus": { "sign": "Pisces", "degree": 27 },
+    "Saturn": { "sign": "Libra", "degree": 20 },
+    "Rahu": { "sign": "Taurus", "degree": null },
+    "Ketu": { "sign": "Scorpio", "degree": null }
+  },
+  "neecha": {
+    "Sun": { "sign": "Libra", "degree": 10 },
+    "Moon": { "sign": "Scorpio", "degree": 3 },
+    "Mars": { "sign": "Cancer", "degree": 28 },
+    "Mercury": { "sign": "Pisces", "degree": 15 },
+    "Jupiter": { "sign": "Capricorn", "degree": 5 },
+    "Venus": { "sign": "Virgo", "degree": 27 },
+    "Saturn": { "sign": "Aries", "degree": 20 },
+    "Rahu": { "sign": "Scorpio", "degree": null },
+    "Ketu": { "sign": "Taurus", "degree": null }
+  },
+  "moolatrikona": {
+    "Sun": { "sign": "Leo", "start": 0, "end": 20 },
+    "Moon": { "sign": "Taurus", "start": 4, "end": 30 },
+    "Mars": { "sign": "Aries", "start": 0, "end": 12 },
+    "Mercury": { "sign": "Virgo", "start": 16, "end": 20 },
+    "Jupiter": { "sign": "Sagittarius", "start": 0, "end": 10 },
+    "Venus": { "sign": "Libra", "start": 0, "end": 15 },
+    "Saturn": { "sign": "Aquarius", "start": 0, "end": 20 },
+    "Rahu": { "sign": "Gemini", "start": null, "end": null },
+    "Ketu": { "sign": "Sagittarius", "start": null, "end": null }
+  },
+  "own_signs": {
+    "Sun": ["Leo"],
+    "Moon": ["Cancer"],
+    "Mars": ["Aries", "Scorpio"],
+    "Mercury": ["Gemini", "Virgo"],
+    "Jupiter": ["Sagittarius", "Pisces"],
+    "Venus": ["Taurus", "Libra"],
+    "Saturn": ["Capricorn", "Aquarius"],
+    "Rahu": ["Aquarius"],
+    "Ketu": ["Scorpio"]
+  },
+  "natural_relationships": {
+    "Sun": {
+      "friends": ["Moon", "Mars", "Jupiter"],
+      "enemies": ["Venus", "Saturn"],
+      "neutral": ["Mercury"]
+    },
+    "Moon": {
+      "friends": ["Sun", "Mercury"],
+      "enemies": [],
+      "neutral": ["Mars", "Jupiter", "Venus", "Saturn"]
+    },
+    "Mars": {
+      "friends": ["Sun", "Moon", "Jupiter"],
+      "enemies": ["Mercury"],
+      "neutral": ["Venus", "Saturn"]
+    },
+    "Mercury": {
+      "friends": ["Sun", "Venus"],
+      "enemies": ["Moon"],
+      "neutral": ["Mars", "Jupiter", "Saturn"]
+    },
+    "Jupiter": {
+      "friends": ["Sun", "Moon", "Mars"],
+      "enemies": ["Mercury", "Venus"],
+      "neutral": ["Saturn"]
+    },
+    "Venus": {
+      "friends": ["Mercury", "Saturn"],
+      "enemies": ["Sun", "Moon"],
+      "neutral": ["Mars", "Jupiter"]
+    },
+    "Saturn": {
+      "friends": ["Mercury", "Venus"],
+      "enemies": ["Sun", "Moon", "Mars"],
+      "neutral": ["Jupiter"]
+    },
+    "Rahu": {
+      "friends": [],
+      "enemies": [],
+      "neutral": []
+    },
+    "Ketu": {
+      "friends": [],
+      "enemies": [],
+      "neutral": []
+    }
+  }
+}

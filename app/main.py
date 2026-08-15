@@ -3,21 +3,16 @@ This is part of Astrologer API (C) 2023 Giacomo Battaglia
 """
 # app/main.py
 import app.patch_ephemeris  # این خط را اول اضافه کنید
-
-# بقیه کدها
-from .routers import misc, charts, data, context, moon_phase
-# ...
-# app/main.py
-import app.ephemeris_loader  # این خط را اول اضافه کنید
-from .routers import misc, charts, data, context, moon_phase
-# ... بقیه کد
+import app.ephemeris_loader
 import logging
 import logging.config
+import os
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 
 from .routers import misc, charts, data, context, moon_phase
 from .config.settings import settings
@@ -54,6 +49,16 @@ app.include_router(data.router, tags=["Chart Data"])
 app.include_router(context.router, tags=["AI Context"])
 app.include_router(moon_phase.router, tags=["Moon Phase"])
 app.include_router(misc.router, tags=["Miscellaneous"])
+
+# ------------------------------------------------------------------------------
+# Serve static files (index.html, etc.)
+# ------------------------------------------------------------------------------
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
+# اگر خواستی خودِ ریشه (/) حتماً index.html رو برگردونه
+@app.get("/")
+async def root():
+    return FileResponse("index.html")
 
 
 @app.exception_handler(RequestValidationError)
@@ -120,7 +125,6 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Secret Key Checker Middleware
 if settings.debug is True:
     pass
-
 else:
     app.add_middleware(
         SecretKeyCheckerMiddleware,
@@ -132,7 +136,6 @@ else:
             settings.rapid_api_key,
         ],
     )
-
 
 # CORS Middleware
 app.add_middleware(

@@ -6,8 +6,11 @@ All endpoints that return AI context via /api/v5/context/*.
 
 from datetime import datetime, timezone
 from logging import getLogger
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
+import os
+import httpx
+from pydantic import BaseModel
 
 from ..types.request_models import (
     BirthDataRequestModel,
@@ -314,3 +317,86 @@ async def now_context(
 
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)
+
+# =============================================================================
+# DEEPSEEK ANALYSIS ENDPOINT
+# =============================================================================
+
+class DeepSeekRequest(BaseModel):
+    context: str
+    vedic_summary: str = ""
+
+@router.post("/api/v5/deepseek-analysis")
+async def deepseek_analysis(request: DeepSeekRequest):
+    """
+    دریافت context و vedic_summary از فرانت، ارسال به DeepSeek از طریق OpenRouter و برگرداندن تحلیل.
+    """
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OPENROUTER_API_KEY not set in environment")
+
+    prompt = f"""
+شما یک اخترشناس حرفه‌ای و با تجربه هستید که به طالع‌بینی ودیک (Vedic Astrology) مسلط هستید.
+
+بر اساس اطلاعات چارت تولد زیر، یک تحلیل کامل، دقیق و زیبا به زبان فارسی بنویسید.
+
+**مهم:** از زبان ساده و روان استفاده کنید تا همه بتوانند متوجه شوند.
+
+**اطلاعات چارت (خام):**
+{request.context}
+
+{request.vedic_summary}
+
+---
+
+## 📋 ساختار تحلیل (لطفاً دقیقاً به همین ترتیب):
+
+### ۱. شخصیت کلی و ویژگی‌های روانشناختی
+بر اساس خورشید (هویت)، ماه (احساسات) و برج طالع (نحوه برخورد با جهان)
+نقاط قوت و ضعف، تأثیر ناکشاترای ماه
+
+### ۲. حوزه‌های شغلی و تحصیلی
+بر اساس خورشید (اهداف)، مریخ (انرژی)، خانه‌های ۱۰، ۶، ۲
+استعدادها و زمینه‌های شغلی مناسب
+
+### ۳. روابط عاطفی و اجتماعی
+بر اساس ماه (نیازهای عاطفی)، ناهید (عشق)، خانه‌های ۷، ۵، ۱۲
+سبک ارتباطی و الگوهای رفتاری
+
+### ۴. چالش‌ها و فرصت‌ها
+بر اساس سیارات چالش‌برانگیز (Dusthana Lords، Marakas، Neecha)
+راه‌های تبدیل چالش به فرصت
+
+### ۵. توصیه‌های کاربردی و جمع‌بندی
+۵ توصیه عملی برای رشد شخصی
+جمع‌بندی کلی و پیام نهایی الهام‌بخش
+
+---
+
+**نکات نگارش:**
+- از تکرار خودداری کنید.
+- از HTML برای ساختاردهی استفاده کنید (<h2>، <h3>، <ul>، <li>، <hr>).
+- لحن گرم، دوستانه و الهام‌بخش باشد.
+"""
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "deepseek/deepseek-chat",
+                "messages": [
+                    {"role": "system", "content": "شما یک اخترشناس حرفه‌ای هستید که به زبان فارسی تحلیل‌های دقیق و روان ارائه می‌دهید. از HTML برای ساختاردهی خروجی استفاده کنید."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.75,
+                "max_tokens": 4000,
+            }
+        )
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="خطا در ارتباط با OpenRouter")
+        data = response.json()
+        return {"analysis": data["choices"][0]["message"]["content"]}

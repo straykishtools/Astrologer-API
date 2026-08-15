@@ -1,5 +1,6 @@
 {
     "black-formatter.args": [
         "--line-length 180"
-    ]
+    ],
+    "liveServer.settings.port": 5501
 }

@@ -3,207 +3,1808 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>چارت تولد · Cosmic Oracle</title>
+    <title>Cosmic Oracle · چارت تولد حرفه‌ای</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Vazirmatn', Tahoma, sans-serif; background: #0b0d1a; color: #e8e4f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; direction: rtl; }
-        .container { max-width: 820px; width: 100%; background: rgba(18,20,40,0.85); border-radius: 28px; padding: 30px 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.7); border: 1px solid rgba(200,180,255,0.08); }
-        h1 { text-align: center; font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #d9ceff, #8bbdff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-top: 0; margin-bottom: 8px; }
-        .sub { text-align: center; color: #8a82a0; font-size: 14px; margin-bottom: 22px; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-size: 13px; font-weight: 600; color: #b8aec8; margin-bottom: 4px; }
-        input, select { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(180,165,255,0.15); background: rgba(6,7,24,0.6); color: #f0ecff; font-size: 14px; box-sizing: border-box; transition: 0.25s ease; }
-        input:focus, select:focus { outline: none; border-color: rgba(140,180,255,0.4); box-shadow: 0 0 20px rgba(100,140,255,0.08); }
-        .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        button { width: 100%; padding: 14px; border: none; border-radius: 14px; background: linear-gradient(135deg, #6c8cff, #9c79ff); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s ease; margin-top: 8px; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(100,140,255,0.25); }
-        #result { margin-top: 24px; padding: 20px; border-radius: 18px; background: rgba(0,0,0,0.25); border: 1px solid rgba(200,185,248,0.06); display: none; font-size: 14px; line-height: 2; color: #d4cce8; }
-        .section-title { font-size: 16px; font-weight: 700; color: #e6dcff; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px; margin-top: 16px; margin-bottom: 10px; }
-        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; }
-        .planet-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .badge { display: inline-block; background: rgba(140,180,255,0.12); padding: 0 10px; border-radius: 30px; font-size: 12px; color: #b0caff; }
-        .footer { text-align: center; font-size: 11px; color: #5a526e; margin-top: 20px; }
-        .loading { color: #b0caff; text-align: center; padding: 20px; }
-        .error { color: #e87474; text-align: right; padding: 15px; background: rgba(200,50,50,0.1); border-radius: 12px; border: 1px solid rgba(200,50,50,0.2); }
-        .aspect-item { display: inline-block; background: rgba(200,180,255,0.06); padding: 2px 12px; border-radius: 20px; margin: 3px 4px 3px 0; font-size: 13px; border: 1px solid rgba(200,180,255,0.06); }
-        @media (max-width: 600px) { .row2 { grid-template-columns: 1fr; } .grid-2col { grid-template-columns: 1fr; } }
+        /* ===== Reset & Base ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+            background: #07080f;
+            color: #e8e4f0;
+            min-height: 100vh;
+            direction: rtl;
+            overflow-x: hidden;
+        }
+
+        /* ===== Animated Space Background ===== */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== Glassmorphism Container ===== */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== Header ===== */
+        .main-header {
+            text-align: center;
+            padding: 30px 0 20px;
+            background: rgba(10, 12, 30, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 50% 30%, rgba(100, 140, 255, 0.04), transparent 60%);
+            pointer-events: none;
+        }
+        .main-header .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .main-header .logo-icon {
+            font-size: 42px;
+            display: inline-block;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%,
+            100% {
+                filter: drop-shadow(0 0 10px rgba(140, 180, 255, 0.2));
+            }
+            50% {
+                filter: drop-shadow(0 0 30px rgba(140, 180, 255, 0.4));
+            }
+        }
+        .main-header h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 38px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d9ceff, #8bbdff, #7c83ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.06em;
+        }
+        .main-header .sub {
+            color: #8a82a0;
+            font-size: 15px;
+            margin-top: 4px;
+            letter-spacing: 0.1em;
+        }
+        .header-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .header-actions .btn-action {
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: #b8aec8;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.25s ease;
+            font-family: inherit;
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-actions .btn-action:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(140, 180, 255, 0.15);
+            color: #fff;
+        }
+        .header-actions .btn-action.primary {
+            background: linear-gradient(135deg, rgba(108, 140, 255, 0.2), rgba(156, 121, 255, 0.2));
+            border-color: rgba(108, 140, 255, 0.2);
+            color: #b0caff;
+        }
+        .header-actions .btn-action.primary:hover {
+            background: linear-gradient(135deg, rgba(108, 140, 255, 0.3), rgba(156, 121, 255, 0.3));
+            border-color: rgba(108, 140, 255, 0.35);
+        }
+
+        /* ===== Form ===== */
+        .form-card {
+            background: rgba(18, 20, 45, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 30px 28px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px;
+            transition: 0.3s ease;
+        }
+        .form-card:hover {
+            border-color: rgba(140, 180, 255, 0.15);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .form-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e6dcff;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-title span {
+            background: rgba(140, 180, 255, 0.12);
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #b0caff;
+            font-weight: 400;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #b8aec8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(180, 165, 255, 0.12);
+            background: rgba(6, 7, 24, 0.6);
+            color: #f0ecff;
+            font-size: 14px;
+            font-family: inherit;
+            transition: 0.25s ease;
+            width: 100%;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: rgba(140, 180, 255, 0.35);
+            box-shadow: 0 0 25px rgba(100, 140, 255, 0.08);
+        }
+        .form-group .hint {
+            font-size: 11px;
+            color: #5a526e;
+            margin-top: 2px;
+        }
+
+        /* ===== City Search ===== */
+        .city-search {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .city-search input {
+            flex: 1;
+        }
+        .city-search button {
+            padding: 12px 22px;
+            border-radius: 14px;
+            border: 1px solid rgba(100, 140, 255, 0.2);
+            background: rgba(100, 140, 255, 0.1);
+            color: #b0caff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .city-search button:hover {
+            background: rgba(100, 140, 255, 0.2);
+            border-color: rgba(100, 140, 255, 0.35);
+            box-shadow: 0 0 30px rgba(100, 140, 255, 0.08);
+        }
+
+        /* ===== Submit Button ===== */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #6c8cff, #9c79ff);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-family: inherit;
+            margin-top: 10px;
+            letter-spacing: 0.03em;
+            box-shadow: 0 6px 30px rgba(100, 140, 255, 0.15);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(100, 140, 255, 0.25);
+        }
+
+        /* ===== Status ===== */
+        #status {
+            text-align: center;
+            padding: 12px;
+            margin-top: 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            display: none;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== Results ===== */
+        #result {
+            margin-top: 30px;
+            display: none;
+        }
+
+        /* ===== Grid Cards ===== */
+        .section-card {
+            background: rgba(18, 20, 45, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 24px 26px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+            position: relative;
+            overflow: hidden;
+        }
+        .section-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .section-card.appearing::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            background: radial-gradient(ellipse at 50% 0%, rgba(140, 180, 255, 0.06), transparent 70%);
+            pointer-events: none;
+            animation: glowFade 1.2s ease forwards;
+        }
+        @keyframes glowFade {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e6dcff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .section-title .emoji-big {
+            font-size: 26px;
+        }
+        .section-title .badge-count {
+            background: rgba(140, 180, 255, 0.1);
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #b0caff;
+            font-weight: 400;
+        }
+
+        /* ===== Grid System ===== */
+        .grid-masonry {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        .grid-masonry-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 8px;
+        }
+        .grid-masonry-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .grid-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 10px;
+        }
+        .grid-flex .aspect-item {
+            flex: 1 1 auto;
+            min-width: 120px;
+            max-width: 100%;
+        }
+
+        .grid-item {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 14px;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: 0.25s ease;
+            opacity: 0;
+            transform: translateY(8px) scale(0.97);
+            transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .grid-item.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .grid-item.appearing {
+            animation: itemGlow 0.8s ease forwards;
+        }
+        @keyframes itemGlow {
+            0% {
+                filter: drop-shadow(0 0 8px rgba(140, 180, 255, 0.15));
+            }
+            100% {
+                filter: drop-shadow(0 0 0 transparent);
+            }
+        }
+        .grid-item .p-name {
+            font-weight: 600;
+            color: #f2d275;
+        }
+        .grid-item .p-detail {
+            color: #b0caff;
+            font-size: 13px;
+            direction: ltr;
+            text-align: left;
+        }
+        .grid-item .p-detail .badge-house {
+            background: rgba(140, 180, 255, 0.08);
+            padding: 1px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #8a82a0;
+            margin-right: 4px;
+        }
+
+        /* ===== Elements Grid ===== */
+        .element-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            transform: translateY(8px) scale(0.97);
+            transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+        }
+        .element-item.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .element-item.appearing {
+            animation: itemGlow 0.8s ease forwards;
+        }
+        .element-item .el-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .element-item .el-label {
+            font-size: 13px;
+            color: #8a82a0;
+            margin-top: 2px;
+        }
+        .element-item .el-desc {
+            font-size: 11px;
+            color: #6a607a;
+            margin-top: 4px;
+        }
+
+        /* ===== Moon Phase ===== */
+        .moon-phase-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            will-change: opacity, transform;
+        }
+        .moon-phase-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .moon-phase-box .mp-emoji {
+            font-size: 40px;
+        }
+        .moon-phase-box .mp-info {
+            flex: 1;
+        }
+        .moon-phase-box .mp-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e6dcff;
+        }
+        .moon-phase-box .mp-desc {
+            font-size: 13px;
+            color: #8a82a0;
+        }
+
+        /* ===== Vedic Items ===== */
+        .vedic-item {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            opacity: 0;
+            transform: translateY(8px) scale(0.97);
+            transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+        }
+        .vedic-item.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .vedic-item.appearing {
+            animation: itemGlow 0.8s ease forwards;
+        }
+        .vedic-item .planet-name {
+            color: #f2d275;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .vedic-item .vedic-detail {
+            color: #b0caff;
+            font-size: 13px;
+            display: block;
+            padding-right: 20px;
+            margin-top: 3px;
+        }
+        .nakshatra-box {
+            background: rgba(100, 200, 255, 0.04);
+            border: 1px solid rgba(100, 200, 255, 0.08);
+            border-radius: 10px;
+            padding: 6px 14px;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #b8d4e8;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+        }
+        .nature-benefic {
+            color: #5fbf5f;
+        }
+        .nature-malefic {
+            color: #e87474;
+        }
+        .nature-neutral {
+            color: #b0caff;
+        }
+
+        /* ===== Aspect item ===== */
+        .aspect-item {
+            background: rgba(140, 180, 255, 0.04);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            border: 1px solid rgba(140, 180, 255, 0.06);
+            transition: 0.25s ease;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.5s ease, transform 0.5s ease, background 0.25s;
+            will-change: opacity, transform;
+        }
+        .aspect-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .aspect-item:hover {
+            background: rgba(140, 180, 255, 0.08);
+            border-color: rgba(140, 180, 255, 0.12);
+        }
+
+        /* ===== DeepSeek Analysis ===== */
+        .analysis-box {
+            background: rgba(10, 12, 30, 0.5);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            line-height: 2;
+            color: #d4cce8;
+            font-size: 14px;
+            min-height: 80px;
+        }
+        .analysis-box h2,
+        .analysis-box h3 {
+            color: #e6dcff;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+        .analysis-box ul {
+            padding-right: 20px;
+        }
+        .analysis-box hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            margin: 12px 0;
+        }
+
+        /* ===== Spinner ===== */
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            border-top: 3px solid #8bbdff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== Footer ===== */
+        .footer-premium {
+            text-align: center;
+            padding: 30px 0 10px;
+            color: #5a526e;
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            margin-top: 30px;
+        }
+        .footer-premium a {
+            color: #8a82a0;
+            text-decoration: none;
+            transition: 0.25s;
+        }
+        .footer-premium a:hover {
+            color: #b0caff;
+        }
+
+        /* ===== YOGA ENGINE OVERLAY ===== */
+        .yoga-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .yoga-overlay.active {
+            display: flex;
+            pointer-events: auto;
+        }
+        .yoga-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(140,180,255,0.25), rgba(100,80,200,0.08));
+            border: 2px solid rgba(255,255,255,0.12);
+            box-shadow: 0 0 60px rgba(140,180,255,0.15);
+            transition: transform 4s ease-in-out, opacity 4s ease-in-out;
+            transform: scale(1);
+            opacity: 0.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 22px;
+            font-weight: 300;
+            text-shadow: 0 0 30px rgba(140,180,255,0.4);
+            user-select: none;
+        }
+        .yoga-circle.inhale {
+            transform: scale(1.9);
+            opacity: 0.9;
+            border-color: rgba(180,220,255,0.25);
+            box-shadow: 0 0 120px rgba(140,180,255,0.3);
+        }
+        .yoga-circle.exhale {
+            transform: scale(1);
+            opacity: 0.3;
+            border-color: rgba(255,255,255,0.04);
+            box-shadow: 0 0 30px rgba(140,180,255,0.05);
+        }
+        .yoga-text {
+            position: absolute;
+            bottom: 22%;
+            color: #b0caff;
+            font-size: 15px;
+            letter-spacing: 2px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 32px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: opacity 0.8s ease;
+            font-weight: 400;
+        }
+        .yoga-controls {
+            position: absolute;
+            bottom: 8%;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            pointer-events: auto;
+        }
+        .yoga-controls button,
+        .yoga-controls input {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #e8e4f0;
+            padding: 8px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+        .yoga-controls button:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(140,180,255,0.2);
+        }
+        .yoga-controls input[type="range"] {
+            width: 120px;
+            background: transparent;
+            accent-color: #8bbdff;
+        }
+        .yoga-controls label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #b0caff;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .grid-masonry {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            .grid-masonry-2 {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            .grid-masonry-3 {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+            .city-search {
+                flex-wrap: wrap;
+            }
+            .city-search button {
+                width: 100%;
+            }
+            .main-header h1 {
+                font-size: 28px;
+            }
+            .header-actions .btn-action {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+            .moon-phase-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            .yoga-circle {
+                width: 100px;
+                height: 100px;
+                font-size: 18px;
+            }
+            .yoga-controls {
+                gap: 10px;
+            }
+            .yoga-controls button,
+            .yoga-controls input {
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+        }
+        @media (max-width: 500px) {
+            .grid-masonry {
+                grid-template-columns: 1fr 1fr;
+            }
+            .grid-masonry-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .grid-masonry-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0d1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a3550;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a526e;
+        }
     </style>
 </head>
 <body>
+
+    <!-- ===== Animated Background ===== -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- ===== Main Container ===== -->
     <div class="container">
-        <h1>🌌 چارت تولد</h1>
-        <div class="sub">ارتباط با سرور Astrologer-API · آفلاین</div>
-        <div class="form-group">
-            <label>تاریخ تولد</label>
-            <input type="date" id="birthDate" value="2000-01-01" />
-        </div>
-        <div class="row2">
-            <div class="form-group">
-                <label>ساعت (۲۴)</label>
-                <input type="number" id="birthHour" value="12" min="0" max="23" />
+
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo">
+                <span class="logo-icon">🌌</span>
+                <h1>Cosmic Oracle</h1>
             </div>
-            <div class="form-group">
-                <label>دقیقه</label>
-                <input type="number" id="birthMinute" value="0" min="0" max="59" />
+            <div class="sub">رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای</div>
+            <div class="header-actions">
+                <button class="btn-action" id="saveBtn">💾 ذخیره</button>
+                <button class="btn-action" id="printBtn">🖨️ پرینت</button>
+                <button class="btn-action" id="shareBtn">📤 اشتراک‌گذاری</button>
+                <button class="btn-action primary" id="payBtn">⭐ خرید تحلیل کامل</button>
             </div>
-        </div>
-        <div class="row2">
-            <div class="form-group">
-                <label>عرض جغرافیایی (deg)</label>
-                <input type="number" id="latitude" value="35.6892" step="0.001" />
+        </header>
+
+        <!-- Form -->
+        <div class="form-card">
+            <div class="form-title">
+                🪐 اطلاعات تولد
+                <span>دقیق و حرفه‌ای</span>
             </div>
-            <div class="form-group">
-                <label>طول جغرافیایی (deg)</label>
-                <input type="number" id="longitude" value="51.3890" step="0.001" />
+
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>📅 تاریخ تولد</label>
+                    <input type="date" id="birthDate" value="2000-01-01" />
+                </div>
+
+                <div class="form-group">
+                    <label>🕒 ساعت (۲۴)</label>
+                    <input type="number" id="birthHour" value="12" min="0" max="23" />
+                </div>
+                <div class="form-group">
+                    <label>⏱ دقیقه</label>
+                    <input type="number" id="birthMinute" value="0" min="0" max="59" />
+                </div>
+
+                <div class="form-group full">
+                    <label>📍 مکان تولد</label>
+                    <div class="city-search">
+                        <input type="text" id="cityName" placeholder="نام شهر (مثلاً تهران، مشهد، لندن)" value="تهران" />
+                        <button id="getCityCoordsBtn">🔍 دریافت مختصات</button>
+                    </div>
+                    <div class="hint">نام شهر را وارد کنید و روی دکمه کلیک کنید تا مختصات و منطقه‌ی زمانی به‌طور خودکار پر شود.</div>
+                </div>
+
+                <div class="form-group">
+                    <label>🌐 عرض جغرافیایی</label>
+                    <input type="number" id="latitude" value="35.6892" step="0.0001" />
+                </div>
+                <div class="form-group">
+                    <label>🌐 طول جغرافیایی</label>
+                    <input type="number" id="longitude" value="51.3890" step="0.0001" />
+                </div>
+
+                <div class="form-group full">
+                    <label>⏳ منطقه‌ی زمانی (UTC)</label>
+                    <select id="timezone">
+                        <option value="3.5" selected>ایران (UTC+3:30)</option>
+                        <option value="0">UTC+0 (لندن)</option>
+                        <option value="1">UTC+1 (اروپا)</option>
+                        <option value="2">UTC+2 (آتن)</option>
+                        <option value="3">UTC+3 (مسکو)</option>
+                        <option value="5.5">UTC+5:30 (هند)</option>
+                        <option value="-5">UTC-5 (نیویورک)</option>
+                        <option value="-8">UTC-8 (لس‌آنجلس)</option>
+                    </select>
+                </div>
             </div>
+
+            <button class="btn-primary" id="calcBtn">🔮 دریافت چارت و تحلیل کامل</button>
+            <div id="status"></div>
         </div>
-        <div class="form-group">
-            <label>منطقه‌ی زمانی (UTC)</label>
-            <select id="timezone">
-                <option value="3.5" selected>ایران (UTC+3:30)</option>
-                <option value="0">UTC+0 (لندن)</option>
-                <option value="1">UTC+1 (اروپا)</option>
-                <option value="2">UTC+2 (آتن)</option>
-                <option value="3">UTC+3 (مسکو)</option>
-                <option value="5.5">UTC+5:30 (هند)</option>
-                <option value="-5">UTC-5 (نیویورک)</option>
-                <option value="-8">UTC-8 (لس‌آنجلس)</option>
-            </select>
-        </div>
-        <button id="calcBtn">🔮 محاسبه و دریافت چارت</button>
+
+        <!-- Results -->
         <div id="result"></div>
-        <div class="footer">✨ سرور روی http://localhost:8000 باید در حال اجرا باشد</div>
+
+        <!-- Footer -->
+        <div class="footer-premium">
+            ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
+            <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
+            <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
+        </div>
+    </div>
+
+    <!-- ===== YOGA ENGINE OVERLAY ===== -->
+    <div class="yoga-overlay" id="yogaOverlay">
+        <div class="yoga-circle" id="yogaCircle">
+            <span id="yogaPhase">🌬️</span>
+        </div>
+        <div class="yoga-text" id="yogaText">دم بکش...</div>
+        <div class="yoga-controls">
+            <button id="yogaToggle">⏸️ توقف</button>
+            <label>سرعت: <input type="range" id="yogaSpeed" min="3" max="10" value="4" step="0.5"></label>
+            <button id="yogaClose">✖ بستن</button>
+        </div>
     </div>
 
     <script>
-        // ترجمه‌ها
-        const faMap = {
-            Sun: 'خورشید', Moon: 'ماه', Mercury: 'عطارد', Venus: 'ناهید', Mars: 'مریخ',
-            Jupiter: 'مشتری', Saturn: 'کیوان', Uranus: 'اورانوس', Neptune: 'نپتون', Pluto: 'پلوتون',
-            Ari: 'حمل', Tau: 'ثور', Gem: 'جوزا', Can: 'سرطان', Leo: 'اسد', Vir: 'سنبله',
-            Lib: 'میزان', Sco: 'عقرب', Sag: 'قوس', Cap: 'جدی', Aqu: 'دلو', Pis: 'حوت',
-            First_House: 'اول', Second_House: 'دوم', Third_House: 'سوم', Fourth_House: 'چهارم',
-            Fifth_House: 'پنجم', Sixth_House: 'ششم', Seventh_House: 'هفتم', Eighth_House: 'هشتم',
-            Ninth_House: 'نهم', Tenth_House: 'دهم', Eleventh_House: 'یازدهم', Twelfth_House: 'دوازدهم',
-            conjunction: 'مقارنه', opposition: 'مقابله', trine: 'تثلیث', square: 'تربیع', sextile: 'تسدیس', quintile: 'تخمیس',
-            'True_North_Lunar_Node': 'گره شمالی', 'True_South_Lunar_Node': 'گره جنوبی',
-            'Mean_Lilith': 'لیلیت', Ascendant: 'ASC', Medium_Coeli: 'MC', Descendant: 'DSC', Imum_Coeli: 'IC'
+        // ================================================================
+        //   ANIMATED BACKGROUND (Canvas)
+        // ================================================================
+        (function initBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const stars = Array.from({ length: 260 }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: Math.random() * 1.8 + 0.3,
+                a: Math.random() * 0.6 + 0.2,
+                v: Math.random() * 0.008 + 0.004,
+                phase: Math.random() * Math.PI * 2
+            }));
+
+            const circles = Array.from({ length: 4 }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: Math.random() * 120 + 60,
+                dx: (Math.random() - 0.5) * 0.3,
+                dy: (Math.random() - 0.5) * 0.3,
+                color: `hsla(${Math.random() * 60 + 220}, 70%, 50%, 0.03)`
+            }));
+
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                for (const s of stars) {
+                    s.phase += s.v;
+                    const alpha = s.a * (0.6 + 0.4 * Math.sin(s.phase));
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(220, 230, 255, ${alpha})`;
+                    ctx.fill();
+                }
+                for (const c of circles) {
+                    c.x += c.dx;
+                    c.y += c.dy;
+                    if (c.x < -c.r || c.x > w + c.r) c.dx *= -1;
+                    if (c.y < -c.r || c.y > h + c.r) c.dy *= -1;
+                    const grad = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
+                    grad.addColorStop(0, c.color);
+                    grad.addColorStop(1, 'transparent');
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // ================================================================
+        //   CITY DATABASE & COORDINATES
+        // ================================================================
+        const CITY_DB = {
+            'تهران': { lat: 35.6892, lng: 51.3890, tz: 3.5 },
+            'مشهد': { lat: 36.2605, lng: 59.6168, tz: 3.5 },
+            'اصفهان': { lat: 32.6546, lng: 51.6680, tz: 3.5 },
+            'شیراز': { lat: 29.5918, lng: 52.5837, tz: 3.5 },
+            'تبریز': { lat: 38.0800, lng: 46.2919, tz: 3.5 },
+            'اهواز': { lat: 31.3183, lng: 48.6706, tz: 3.5 },
+            'کرج': { lat: 35.8400, lng: 50.9391, tz: 3.5 },
+            'قم': { lat: 34.6399, lng: 50.8759, tz: 3.5 },
+            'کرمانشاه': { lat: 34.3142, lng: 47.0650, tz: 3.5 },
+            'ارومیه': { lat: 37.5553, lng: 45.0725, tz: 3.5 },
+            'رشت': { lat: 37.2682, lng: 49.5891, tz: 3.5 },
+            'یزد': { lat: 31.8974, lng: 54.3569, tz: 3.5 },
+            'سنندج': { lat: 35.3024, lng: 46.9957, tz: 3.5 },
+            'بندرعباس': { lat: 27.1832, lng: 56.2669, tz: 3.5 },
+            'کرمان': { lat: 30.2839, lng: 57.0834, tz: 3.5 },
+            'زاهدان': { lat: 29.4964, lng: 60.8629, tz: 3.5 },
+            'همدان': { lat: 34.7608, lng: 48.3986, tz: 3.5 },
+            'اراک': { lat: 34.0954, lng: 49.6941, tz: 3.5 },
+            'لندن': { lat: 51.5074, lng: -0.1278, tz: 0 },
+            'نیویورک': { lat: 40.7128, lng: -74.0060, tz: -5 },
+            'دبی': { lat: 25.2048, lng: 55.2708, tz: 4 },
+            'استانبول': { lat: 41.0082, lng: 28.9784, tz: 3 },
         };
-        function translate(text) { if (!text) return text; const trimmed = text.toString().trim(); return faMap[trimmed] || faMap[trimmed.toLowerCase()] || trimmed; }
-        function signEmoji(sign) { const map = { 'Ari': '♈', 'Tau': '♉', 'Gem': '♊', 'Can': '♋', 'Leo': '♌', 'Vir': '♍', 'Lib': '♎', 'Sco': '♏', 'Sag': '♐', 'Cap': '♑', 'Aqu': '♒', 'Pis': '♓' }; return map[sign] || ''; }
 
-        document.getElementById('calcBtn').addEventListener('click', function() {
+        async function getCoordinates(cityName) {
+            if (!cityName) return null;
+            const trimmed = cityName.trim();
+            const found = Object.keys(CITY_DB).find(key => key.includes(trimmed) || trimmed.includes(key));
+            if (found) {
+                const d = CITY_DB[found];
+                return { lat: d.lat, lng: d.lng, tz: d.tz, city: found };
+            }
+            try {
+                const url =
+                    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmed)}&format=json&limit=1`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Nominatim error');
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lng = parseFloat(data[0].lon);
+                    const tz = lng >= -12.5 && lng < -7.5 ? -5 :
+                        lng >= -7.5 && lng < -2.5 ? -4 :
+                        lng >= -2.5 && lng < 2.5 ? 0 :
+                        lng >= 2.5 && lng < 7.5 ? 1 :
+                        lng >= 7.5 && lng < 12.5 ? 2 :
+                        lng >= 12.5 && lng < 17.5 ? 3 :
+                        lng >= 17.5 && lng < 22.5 ? 4 :
+                        lng >= 22.5 && lng < 27.5 ? 5 :
+                        lng >= 27.5 && lng < 32.5 ? 6 :
+                        lng >= 32.5 && lng < 37.5 ? 7 :
+                        lng >= 37.5 && lng < 42.5 ? 8 :
+                        lng >= 42.5 && lng < 47.5 ? 9 :
+                        lng >= 47.5 && lng < 52.5 ? 10 :
+                        lng >= 52.5 && lng < 57.5 ? 11 :
+                        lng >= 57.5 ? 12 : 0;
+                    return { lat, lng, tz, city: data[0].display_name.split(',')[0] };
+                }
+            } catch (_) {}
+            return null;
+        }
+
+        document.getElementById('getCityCoordsBtn').addEventListener('click', async function() {
+            const city = document.getElementById('cityName').value.trim();
+            if (!city) { alert('لطفاً نام شهر را وارد کنید.'); return; }
+            this.textContent = '⏳ جستجو...';
+            this.disabled = true;
+            try {
+                const result = await getCoordinates(city);
+                if (result) {
+                    document.getElementById('latitude').value = result.lat.toFixed(6);
+                    document.getElementById('longitude').value = result.lng.toFixed(6);
+                    const tzSelect = document.getElementById('timezone');
+                    const tzStr = result.tz.toString();
+                    for (let opt of tzSelect.options) {
+                        if (opt.value === tzStr) { opt.selected = true; break; }
+                    }
+                    const st = document.getElementById('status');
+                    st.style.display = 'block';
+                    st.textContent = `✅ مختصات شهر ${result.city} دریافت شد.`;
+                    st.style.color = '#5fbf5f';
+                } else {
+                    const st = document.getElementById('status');
+                    st.style.display = 'block';
+                    st.textContent = `⚠️ شهر "${city}" پیدا نشد. مختصات را دستی وارد کنید.`;
+                    st.style.color = '#f2d275';
+                }
+            } catch (_) { alert('خطا در دریافت مختصات.'); }
+            this.textContent = '🔍 دریافت مختصات';
+            this.disabled = false;
+        });
+
+        // ================================================================
+        //   TRANSLATIONS & HELPERS
+        // ================================================================
+        const faMap = {
+            Sun: 'خورشید',
+            Moon: 'ماه',
+            Mercury: 'عطارد',
+            Venus: 'ناهید',
+            Mars: 'مریخ',
+            Jupiter: 'مشتری',
+            Saturn: 'کیوان',
+            Uranus: 'اورانوس',
+            Neptune: 'نپتون',
+            Pluto: 'پلوتون',
+            Ari: 'حمل',
+            Tau: 'ثور',
+            Gem: 'جوزا',
+            Can: 'سرطان',
+            Leo: 'اسد',
+            Vir: 'سنبله',
+            Lib: 'میزان',
+            Sco: 'عقرب',
+            Sag: 'قوس',
+            Cap: 'جدی',
+            Aqu: 'دلو',
+            Pis: 'حوت',
+            First_House: 'اول',
+            Second_House: 'دوم',
+            Third_House: 'سوم',
+            Fourth_House: 'چهارم',
+            Fifth_House: 'پنجم',
+            Sixth_House: 'ششم',
+            Seventh_House: 'هفتم',
+            Eighth_House: 'هشتم',
+            Ninth_House: 'نهم',
+            Tenth_House: 'دهم',
+            Eleventh_House: 'یازدهم',
+            Twelfth_House: 'دوازدهم',
+            conjunction: 'مقارنه',
+            opposition: 'مقابله',
+            trine: 'تثلیث',
+            square: 'تربیع',
+            sextile: 'تسدیس',
+            quintile: 'تخمیس',
+            'True_North_Lunar_Node': 'گره شمالی',
+            'True_South_Lunar_Node': 'گره جنوبی',
+            'Mean_Lilith': 'لیلیت',
+            Ascendant: 'ASC',
+            Medium_Coeli: 'MC',
+            Descendant: 'DSC',
+            Imum_Coeli: 'IC',
+            Chiron: 'کایرون',
+            Ketu: 'کیتو',
+            Rahu: 'راهو',
+        };
+
+        function translate(text) {
+            if (!text) return text;
+            const trimmed = text.toString().trim();
+            return faMap[trimmed] || faMap[trimmed.toLowerCase()] || trimmed;
+        }
+
+        function signEmoji(sign) {
+            const map = {
+                'Ari': '♈',
+                'Tau': '♉',
+                'Gem': '♊',
+                'Can': '♋',
+                'Leo': '♌',
+                'Vir': '♍',
+                'Lib': '♎',
+                'Sco': '♏',
+                'Sag': '♐',
+                'Cap': '♑',
+                'Aqu': '♒',
+                'Pis': '♓'
+            };
+            return map[sign] || '';
+        }
+
+        function getNatureClass(nature) {
+            if (!nature) return '';
+            const n = nature.toLowerCase();
+            if (n.includes('benefic')) return 'nature-benefic';
+            if (n.includes('malefic')) return 'nature-malefic';
+            return 'nature-neutral';
+        }
+
+        function simpleFunctionalNature(nature, type) {
+            const nm = {
+                'Benefic (Yoga Karaka)': '🍀 بسیار خوش‌یمن و شانس‌آور',
+                'Benefic': '☀️ خوش‌یمن',
+                'Malefic': '⚠️ چالش‌برانگیز',
+                'Neutral': '⚖️ خنثی',
+                'Mixed / Neutral': '⚖️ ترکیبی'
+            };
+            const tm = {
+                'Yoga Karaka': 'موفقیت‌آور',
+                'Kendra Lord': 'در جایگاه قدرت',
+                'Trikona Lord': 'شانس‌آور',
+                'Dusthana Lord': 'چالش‌زا',
+                'Maraka': 'تأثیرگذار در تصمیمات',
+                'Mixed': 'ترکیبی'
+            };
+            let r = nm[nature] || nature;
+            if (type && tm[type]) r += ` — ${tm[type]}`;
+            return r;
+        }
+
+        function simplePlanetaryStrength(status) {
+            const map = {
+                'Uchcha': '🌟 شرف (بسیار قوی)',
+                'Moolatrikona': '🌟 مولاتریکونا (بسیار قوی)',
+                'Own Sign': '✅ برج خود',
+                'Friend': '🤝 برج دوست',
+                'Neutral': '⚖️ برج بی‌طرف',
+                'Enemy': '⚠️ برج دشمن',
+                'Neecha': '🌙 هبوط (ضعیف)',
+                'Unknown': '❓ نامشخص'
+            };
+            return map[status] || status;
+        }
+
+        function getElementInterpretation(element, percentage) {
+            const map = {
+                'fire': {
+                    name: 'آتش',
+                    desc: 'انرژی، اشتیاق، خلاقیت و رهبری. شما فردی پرشور و الهام‌بخش هستید.'
+                },
+                'earth': {
+                    name: 'خاک',
+                    desc: 'عملگرایی، پایداری، مسئولیت‌پذیری. شما فردی عملی و قابل‌اعتماد هستید.'
+                },
+                'air': {
+                    name: 'هوا',
+                    desc: 'ارتباطات، تفکر، اجتماع. شما فردی اجتماعی و اهل تعامل هستید.'
+                },
+                'water': {
+                    name: 'آب',
+                    desc: 'احساسات، شهود، همدلی. شما فردی حساس و عمیقاً شهودی هستید.'
+                }
+            };
+            const el = map[element] || { name: element, desc: '' };
+            return `${el.name} ${percentage}% — ${el.desc}`;
+        }
+
+        function getMoonPhaseInterpretation(phaseName) {
+            const map = {
+                'New Moon': '🌑 شروع تازه، آغاز پروژه‌ها، انرژی نهفته',
+                'Waxing Crescent': '🌒 رشد، برنامه‌ریزی، حرکت به سمت اهداف',
+                'First Quarter': '🌓 تصمیم‌گیری، اقدام، غلبه بر موانع',
+                'Waxing Gibbous': '🌔 تکمیل، صیقل دادن، آماده‌سازی برای نمایش',
+                'Full Moon': '🌕 اوج، روشنایی، تکمیل، شفافیت',
+                'Waning Gibbous': '🌖 قدردانی، اشتراک‌گذاری، انتشار',
+                'Last Quarter': '🌗 بازنگری، رها کردن، پایان‌بندی',
+                'Waning Crescent': '🌘 استراحت، تأمل، جمع‌آوری انرژی'
+            };
+            return map[phaseName] || phaseName;
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ================================================================
+        //   HEADER ACTIONS
+        // ================================================================
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            const content = document.getElementById('result');
+            if (!content || content.style.display === 'none') {
+                alert('لطفاً ابتدا چارت را محاسبه کنید.');
+                return;
+            }
+            const blob = new Blob([content.innerHTML], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `cosmic-oracle-chart-${new Date().toISOString().slice(0,10)}.html`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        });
+
+        document.getElementById('printBtn').addEventListener('click', () => {
+            const content = document.getElementById('result');
+            if (!content || content.style.display === 'none') {
+                alert('لطفاً ابتدا چارت را محاسبه کنید.');
+                return;
+            }
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html><head><title>Cosmic Oracle - چارت</title>
+                <style>
+                    body { font-family: 'Tahoma', sans-serif; direction: rtl; padding: 20px; background: #0b0d1a; color: #e8e4f0; }
+                    ${document.querySelector('style').innerHTML}
+                    .container { max-width: 1100px; margin: auto; }
+                </style>
+                </head><body>
+                <div class="container">${content.innerHTML}</div>
+                <script>
+                    window.onload = function() { window.print(); }
+                <\/script>
+                </body></html>
+            `);
+            win.document.close();
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            const content = document.getElementById('result');
+            if (!content || content.style.display === 'none') {
+                alert('لطفاً ابتدا چارت را محاسبه کنید.');
+                return;
+            }
+            if (navigator.share) {
+                navigator.share({
+                    title: 'چارت تولد من - Cosmic Oracle',
+                    text: 'چارت تولد من رو ببین!',
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                alert('📋 لینک این صفحه را کپی کنید و با دوستان خود به اشتراک بگذارید.');
+                navigator.clipboard?.writeText(window.location.href).then(() => {
+                    alert('✅ لینک کپی شد!');
+                }).catch(() => {});
+            }
+        });
+
+        document.getElementById('payBtn').addEventListener('click', () => {
+            alert('🌟 نسخه‌ی کامل با تفسیر پیشرفته، یوگاها و داشاها به‌زودی در دسترس خواهد بود.');
+        });
+
+        // ================================================================
+        //   MAIN APPLICATION (FULL VERSION)
+        // ================================================================
+        let currentData = null;
+        let currentContext = null;
+
+        document.getElementById('calcBtn').addEventListener('click', async function() {
             const resultDiv = document.getElementById('result');
+            const statusDiv = document.getElementById('status');
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = '<div class="loading">⏳ در حال محاسبه ... (این کار ممکن است چند ثانیه طول بکشد)</div>';
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '<span class="spinner"></span> ⏳ در حال دریافت چارت...';
+            statusDiv.style.color = '#b0caff';
 
-            // دریافت داده‌ها
             const dateVal = document.getElementById('birthDate').value;
-            if (!dateVal) { resultDiv.innerHTML = '<div class="error">⚠️ لطفاً تاریخ تولد را انتخاب کنید.</div>'; return; }
+            if (!dateVal) {
+                statusDiv.innerHTML = '⚠️ لطفاً تاریخ تولد را انتخاب کنید.';
+                statusDiv.style.color = '#e87474';
+                return;
+            }
             const parts = dateVal.split('-');
-            const year = parseInt(parts[0]), month = parseInt(parts[1]), day = parseInt(parts[2]);
+            const year = parseInt(parts[0]),
+                month = parseInt(parts[1]),
+                day = parseInt(parts[2]);
             const hour = parseInt(document.getElementById('birthHour').value) || 12;
             const minute = parseInt(document.getElementById('birthMinute').value) || 0;
             const lat = parseFloat(document.getElementById('latitude').value) || 35.6892;
             const lng = parseFloat(document.getElementById('longitude').value) || 51.3890;
+            const tz = parseFloat(document.getElementById('timezone').value);
 
-            const payload = {
+            const payloadData = {
                 subject: {
-                    year, month, day, hour, minute, second: 0,
-                    longitude: lng, latitude: lat,
+                    year,
+                    month,
+                    day,
+                    hour,
+                    minute,
+                    second: 0,
+                    longitude: lng,
+                    latitude: lat,
                     timezone: "Asia/Tehran",
-                    city: "Tehran", nation: "IR",
+                    city: "Tehran",
+                    nation: "IR",
                     name: "کاربر"
                 }
             };
 
-            // ارسال درخواست (بدون timeout، صبر می‌کند تا سرور پاسخ دهد)
-            fetch('http://127.0.0.1:8000/api/v5/chart-data/birth-chart', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(res => {
-                if (!res.ok) {
-                    return res.json().then(errData => {
-                        let msg = 'خطا در سرور';
-                        if (errData.errors) msg = errData.errors.map(e => `${e.loc.join('.')}: ${e.msg}`).join(' | ');
-                        else if (errData.detail) msg = Array.isArray(errData.detail) ? errData.detail.map(e => e.msg).join(' ') : errData.detail;
-                        else if (errData.message) msg = errData.message;
-                        throw new Error(msg);
-                    });
-                }
-                return res.json();
-            })
-            .then(data => {
+            // ✅ اصلاح payloadSvg با فیلدهای درست
+            const payloadSvg = {
+    subject: {
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: 0,
+        longitude: lng,
+        latitude: lat,
+        timezone: "Asia/Tehran",
+        city: "Tehran",
+        nation: "IR",
+        name: "User"
+    }
+};
+
+            try {
+                // 1. دریافت داده‌های چارت
+                const respData = await fetch('/api/v5/chart-data/birth-chart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payloadData)
+                });
+                if (!respData.ok) { const err = await respData.json(); throw new Error(err.message || 'خطا در دریافت داده'); }
+                const data = await respData.json();
                 if (data.status !== 'OK') throw new Error(data.message || 'خطای ناشناخته');
+                currentData = data;
 
-                const chart = data.chart_data;
-                const subject = chart.subject;
-                let html = '';
-
-                // سیارات
-                html += `<div class="section-title">🪐 موقعیت سیارات</div><div class="grid-2col">`;
-                ['sun','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto'].forEach(key => {
-                    const obj = subject[key];
-                    if (obj && obj.name) {
-                        html += `<div class="planet-row"><span><strong>${translate(obj.name)}</strong></span><span>${signEmoji(obj.sign)} ${translate(obj.sign)} ${obj.position.toFixed(1)}° <span class="badge">خانه ${translate(obj.house)}</span></span></div>`;
-                    }
+                // 2. دریافت context
+                const ctxResp = await fetch('/api/v5/context/birth-chart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payloadData)
                 });
-                html += `</div>`;
+                if (ctxResp.ok) {
+                    const ctxData = await ctxResp.json();
+                    currentContext = ctxData.context || '';
+                } else {
+                    currentContext = null;
+                }
 
-                // نقاط حساس
-                html += `<div class="section-title">🌅 نقاط حساس</div><div class="grid-2col">`;
-                ['ascendant','medium_coeli','descendant','imum_coeli'].forEach(key => {
-                    const obj = subject[key];
-                    if (obj && obj.name) {
-                        html += `<div class="planet-row"><span><strong>${translate(obj.name)}</strong></span><span>${signEmoji(obj.sign)} ${translate(obj.sign)} ${obj.position.toFixed(1)}°</span></div>`;
+                // 3. دریافت SVG
+                let svgText = '';
+                try {
+                    const respSvg = await fetch('/api/v5/chart/svg-from-subject', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payloadData)   // دقیقاً همان payloadData
+});
+                    if (respSvg.ok) {
+                        svgText = await respSvg.text();
+                    } else {
+                        svgText = '';
                     }
-                });
-                html += `</div>`;
-
-                // جنبه‌ها
-                if (chart.aspects && chart.aspects.length > 0) {
-                    html += `<div class="section-title">⚡ جنبه‌ها</div><div>`;
-                    chart.aspects.slice(0, 10).forEach(a => {
-                        html += `<span class="aspect-item">${translate(a.p1_name)} ${translate(a.aspect)} ${translate(a.p2_name)} (orb ${a.orbit.toFixed(1)}°)</span> `;
-                    });
-                    if (chart.aspects.length > 10) html += `<span class="aspect-item">... و ${chart.aspects.length - 10} جنبه دیگر</span>`;
-                    html += `</div>`;
+                } catch (svgErr) {
+                    console.warn('خطا در دریافت SVG:', svgErr);
+                    svgText = '';
                 }
 
-                // عناصر و کیفیت‌ها
-                if (chart.element_distribution) {
-                    const el = chart.element_distribution;
-                    html += `<div class="section-title">🔥 توزیع عناصر</div><div class="grid-2col">`;
-                    html += `<div><span style="color:#ff6600;">🔥 آتش</span> ${el.fire_percentage || 0}%</div>`;
-                    html += `<div><span style="color:#6a2d04;">🌍 خاک</span> ${el.earth_percentage || 0}%</div>`;
-                    html += `<div><span style="color:#6f76d1;">💨 هوا</span> ${el.air_percentage || 0}%</div>`;
-                    html += `<div><span style="color:#630e73;">💧 آب</span> ${el.water_percentage || 0}%</div></div>`;
-                }
-                if (chart.quality_distribution) {
-                    const q = chart.quality_distribution;
-                    html += `<div class="section-title">🌀 کیفیت‌ها</div><div class="grid-2col">`;
-                    html += `<div>🔺 اصلی (Cardinal) ${q.cardinal_percentage || 0}%</div>`;
-                    html += `<div>📌 ثابت (Fixed) ${q.fixed_percentage || 0}%</div>`;
-                    html += `<div>🔄 متغیر (Mutable) ${q.mutable_percentage || 0}%</div></div>`;
-                }
+                // 4. نمایش
+                await displayResult(data, currentContext, svgText);
+                statusDiv.innerHTML = '✅ تحلیل کامل شد!';
+                statusDiv.style.color = '#5fbf5f';
 
-                if (subject.lunar_phase) {
-                    const lp = subject.lunar_phase;
-                    html += `<div class="section-title">🌙 فاز ماه</div><div>${lp.moon_emoji || ''} ${translate(lp.moon_phase_name) || 'نامشخص'} (مرحله ${lp.moon_phase || 0})</div>`;
-                }
-
-                html += `<br/><span style="font-size:11px;color:#7a7290;">⏱ ${subject.iso_formatted_local_datetime || ''} (محلی) · ${subject.day_of_week || ''}</span>`;
-                resultDiv.innerHTML = html;
-
-            })
-            .catch(err => {
-                resultDiv.innerHTML = `<div class="error">⚠️ <strong>خطا:</strong> ${err.message}</div>`;
+            } catch (err) {
+                statusDiv.innerHTML = `⚠️ خطا: ${err.message}`;
+                statusDiv.style.color = '#e87474';
                 console.error(err);
-            });
+            }
         });
 
+        // ================================================================
+        //   DISPLAY RESULT (FULL)
+        // ================================================================
+        async function displayResult(data, context, svgContent) {
+            const resultDiv = document.getElementById('result');
+            const chart = data.chart_data;
+            const subject = chart.subject;
+            const vedic = data.vedic_interpretations || {};
+
+            let html = '';
+
+            // ---- SVG (اصلاح شده با img برای ریسپانسیو بودن) ----
+            if (svgContent && svgContent.trim()) {
+                html += `<div class="section-card" id="section-svg">
+                    <div class="section-title"><span class="emoji-big">🖼️</span> چارت نجومی</div>
+                    <div style="text-align:center; overflow:auto; max-width:100%;">
+                        <img src="data:image/svg+xml;utf8,${encodeURIComponent(svgContent)}" style="max-width:100%; height:auto; display:block; margin:0 auto;" />
+                    </div>
+                </div>`;
+            }
+
+            // ---- Planets ----
+            html += `<div class="section-card" id="section-planets"><div class="section-title"><span class="emoji-big">🪐</span> موقعیت سیارات <span class="badge-count">${Object.keys(subject).filter(k => ['sun','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto'].includes(k)).length}</span></div><div class="grid-masonry" id="planets-grid">`;
+            const planetKeys = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+            planetKeys.forEach(key => {
+                const obj = subject[key];
+                if (obj && obj.name) {
+                    const nameFa = translate(obj.name);
+                    const signFa = translate(obj.sign);
+                    const emoji = signEmoji(obj.sign);
+                    const pos = obj.position ? obj.position.toFixed(1) : '?';
+                    const house = translate(obj.house);
+                    html += `<div class="grid-item stagger-item">${emoji} <span class="p-name">${nameFa}</span><span class="p-detail">${signFa} ${pos}° <span class="badge-house">خانه ${house}</span></span></div>`;
+                }
+            });
+            html += `</div></div>`;
+
+            // ---- Angles ----
+            html += `<div class="section-card" id="section-angles"><div class="section-title"><span class="emoji-big">🌅</span> نقاط حساس</div><div class="grid-masonry-2" id="angles-grid">`;
+            const angles = ['ascendant', 'medium_coeli', 'descendant', 'imum_coeli'];
+            angles.forEach(key => {
+                const obj = subject[key];
+                if (obj && obj.name) {
+                    const nameFa = translate(obj.name);
+                    const signFa = translate(obj.sign);
+                    const emoji = signEmoji(obj.sign);
+                    const pos = obj.position ? obj.position.toFixed(1) : '?';
+                    html += `<div class="grid-item stagger-item">${emoji} <span class="p-name">${nameFa}</span><span class="p-detail">${signFa} ${pos}°</span></div>`;
+                }
+            });
+            html += `</div></div>`;
+
+            // ---- Aspects ----
+            if (chart.aspects && chart.aspects.length > 0) {
+                html += `<div class="section-card" id="section-aspects"><div class="section-title"><span class="emoji-big">⚡</span> جنبه‌ها <span class="badge-count">${chart.aspects.length}</span></div><div class="grid-flex" id="aspects-container">`;
+                chart.aspects.forEach(a => {
+                    const p1 = translate(a.p1_name);
+                    const p2 = translate(a.p2_name);
+                    const aspect = translate(a.aspect);
+                    const orb = a.orbit ? a.orbit.toFixed(1) : '?';
+                    html += `<span class="aspect-item stagger-item">${p1} ${aspect} ${p2} (${orb}°)</span>`;
+                });
+                html += `</div></div>`;
+            }
+
+            // ---- Elements ----
+            if (chart.element_distribution) {
+                const el = chart.element_distribution;
+                html += `<div class="section-card" id="section-elements"><div class="section-title"><span class="emoji-big">🔥</span> توزیع عناصر</div><div class="grid-masonry-3" id="elements-grid">`;
+                const items = [
+                    { key: 'fire', p: el.fire_percentage, color: '#ff6600' },
+                    { key: 'earth', p: el.earth_percentage, color: '#6a2d04' },
+                    { key: 'air', p: el.air_percentage, color: '#6f76d1' },
+                    { key: 'water', p: el.water_percentage, color: '#630e73' }
+                ];
+                items.forEach(item => {
+                    const info = getElementInterpretation(item.key, item.p || 0);
+                    html += `<div class="element-item stagger-item">
+                        <div class="el-value" style="color:${item.color};">${item.p || 0}%</div>
+                        <div class="el-label" style="color:${item.color};">${translate(item.key)}</div>
+                        <div class="el-desc">${info.split('—')[1] || ''}</div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            // ---- Moon Phase ----
+            if (subject.lunar_phase) {
+                const lp = subject.lunar_phase;
+                const phaseName = translate(lp.moon_phase_name) || 'نامشخص';
+                const phaseDesc = getMoonPhaseInterpretation(lp.moon_phase_name);
+                html += `<div class="section-card" id="section-moon"><div class="section-title"><span class="emoji-big">🌙</span> فاز ماه</div>
+                    <div class="moon-phase-box stagger-item">
+                        <div class="mp-emoji">${lp.moon_emoji || '🌙'}</div>
+                        <div class="mp-info">
+                            <div class="mp-name">${phaseName}</div>
+                            <div class="mp-desc">${phaseDesc}</div>
+                        </div>
+                        <div class="mp-degree">مرحله ${lp.moon_phase || 0}</div>
+                    </div>
+                </div>`;
+            }
+
+            // ---- Vedic ----
+            if (Object.keys(vedic).length > 0) {
+                html += `<div class="section-card" id="section-vedic"><div class="section-title"><span class="emoji-big">📜</span> تفسیر ودیک (Vedic) <span class="badge-count">${Object.keys(vedic).length}</span></div><div class="grid-masonry-3" id="vedic-container">`;
+                const planetOrder = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu'];
+                const sorted = Object.keys(vedic).sort((a, b) => {
+                    const ia = planetOrder.indexOf(a);
+                    const ib = planetOrder.indexOf(b);
+                    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+                });
+                for (const planet of sorted) {
+                    const interp = vedic[planet];
+                    if (!interp) continue;
+                    const planetFa = translate(planet);
+                    const signFa = translate(interp.sign) || '';
+                    const house = interp.house || '?';
+                    const lordship = interp.lordship || [];
+                    const fn = interp.functional_nature || {};
+                    const nature = fn.nature || 'Neutral';
+                    const type = fn.type || '';
+                    const drishti = interp.drishti || [];
+                    const nakshatra = interp.nakshatra;
+                    const strength = interp.planetary_strength || {};
+
+                    const simpleNature = simpleFunctionalNature(nature, type);
+                    const simpleStrength = strength.status ? simplePlanetaryStrength(strength.status) : '';
+
+                    html += `<div class="vedic-item stagger-item">
+                        <span class="planet-name">${planetFa}</span>
+                        <span style="color:#b0caff;"> در برج ${signFa} · خانه ${house}</span>
+                        ${lordship.length ? `<span class="badge" style="background:rgba(255,200,50,0.08);padding:1px 12px;border-radius:20px;font-size:11px;color:#f2d275;margin-right:6px;">صاحب خانه‌های ${lordship.join('، ')}</span>` : ''}
+                        <span class="vedic-detail ${getNatureClass(nature)}">⭐ ${simpleNature}</span>
+                        ${drishti.length ? `<span class="vedic-detail">👁️ نگاه به خانه‌های ${drishti.join('، ')}</span>` : ''}
+                        ${simpleStrength ? `<span class="vedic-detail" style="color:#f2d275;">💪 ${simpleStrength}</span>` : ''}
+                        ${nakshatra ? `<div class="nakshatra-box"><span>⭐ <strong>ناکشاترا:</strong> ${nakshatra.name_fa || nakshatra.name}</span><span>🌙 حاکم: ${translate(nakshatra.lord) || nakshatra.lord}</span>${nakshatra.interpretation ? `<span style="color:#d4c8a0;">📖 ${nakshatra.interpretation}</span>` : ''}</div>` : ''}
+                    </div>`;
+                }
+                html += `</div></div>`;
+            }
+
+            // ---- DeepSeek ----
+            if (context) {
+                html += `<div class="section-card" id="section-deepseek"><div class="section-title"><span class="emoji-big">🧠</span> تحلیل تکمیلی DeepSeek</div>
+                    <div class="analysis-box" id="deepseek-box">
+                        <span style="color:#5a526e;">⏳ در حال دریافت تحلیل...</span>
+                    </div>
+                </div>`;
+                resultDiv.innerHTML = html;
+                await showStaggered();
+                try {
+                    const analysis = await getDeepSeekAnalysisFromBackend(context, vedic);
+                    document.getElementById('deepseek-box').innerHTML = analysis;
+                } catch (err) {
+                    document.getElementById('deepseek-box').innerHTML =
+                        `<div style="color:#e87474;">⚠️ خطا: ${err.message}</div>`;
+                }
+            } else {
+                html += `<div class="section-card" id="section-deepseek"><div class="section-title"><span class="emoji-big">🧠</span> تحلیل تکمیلی DeepSeek</div>
+                    <div class="analysis-box" style="color:#5a526e;">⚠️ متن context در دسترس نیست.</div>
+                </div>`;
+                resultDiv.innerHTML = html;
+                await showStaggered();
+            }
+
+            async function showStaggered() {
+                const sections = resultDiv.querySelectorAll('.section-card');
+                for (let i = 0; i < sections.length; i++) {
+                    const section = sections[i];
+                    section.classList.add('visible');
+                    section.classList.add('appearing');
+                    const items = section.querySelectorAll('.stagger-item');
+                    if (items.length) {
+                        for (let j = 0; j < items.length; j++) {
+                            await sleep(180);
+                            items[j].classList.add('visible');
+                            items[j].classList.add('appearing');
+                        }
+                    } else {
+                        await sleep(400);
+                    }
+                    if (i < sections.length - 1) {
+                        await sleep(900);
+                    }
+                }
+            }
+        }
+
+        // ================================================================
+        //   DEEPSEEK FROM BACKEND
+        // ================================================================
+        async function getDeepSeekAnalysisFromBackend(contextText, vedicData) {
+            let vedicSummary = "";
+            if (vedicData && Object.keys(vedicData).length > 0) {
+                vedicSummary = "\n\n**📜 اطلاعات تکمیلی ودیک (Vedic):**\n";
+                const planetOrder = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu'];
+                const sorted = Object.keys(vedicData).sort((a, b) => {
+                    const ia = planetOrder.indexOf(a);
+                    const ib = planetOrder.indexOf(b);
+                    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+                });
+                for (const planet of sorted) {
+                    const d = vedicData[planet];
+                    if (!d) continue;
+                    const pf = translate(planet);
+                    const sf = translate(d.sign) || '';
+                    const hs = d.house || '?';
+                    const ls = d.lordship || [];
+                    const fn = d.functional_nature || {};
+                    const nature = fn.nature || 'Neutral';
+                    const st = d.planetary_strength || {};
+                    const nk = d.nakshatra || {};
+                    vedicSummary += `\n- **${pf}** در برج ${sf}، خانه ${hs}`;
+                    if (ls.length) vedicSummary += `\n  🏠 صاحب خانه‌های ${ls.join('، ')}`;
+                    vedicSummary += `\n  ⭐ طبیعت: ${nature}`;
+                    if (st.status) vedicSummary += `\n  💪 قدرت: ${st.status}`;
+                    if (nk.name_fa) vedicSummary += `\n  🌙 ناکشاترا: ${nk.name_fa} — ${nk.interpretation || ''}`;
+                }
+            }
+
+            try {
+                const resp = await fetch('/api/v5/deepseek-analysis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ context: contextText, vedic_summary: vedicSummary })
+                });
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    throw new Error(err.detail || 'خطا در دریافت تحلیل');
+                }
+                const data = await resp.json();
+                return data.analysis;
+            } catch (error) {
+                console.error('DeepSeek Error:', error);
+                return `❌ خطا در ارتباط با DeepSeek: ${error.message}`;
+            }
+        }
+
+        // ================================================================
+        //   YOGA ENGINE
+        // ================================================================
+        (function initYoga() {
+            const overlay = document.getElementById('yogaOverlay');
+            const circle = document.getElementById('yogaCircle');
+            const phaseText = document.getElementById('yogaPhase');
+            const textDisplay = document.getElementById('yogaText');
+            const toggleBtn = document.getElementById('yogaToggle');
+            const speedSlider = document.getElementById('yogaSpeed');
+            const closeBtn = document.getElementById('yogaClose');
+
+            let isRunning = false;
+            let inhaleDuration = 4000;
+            let exhaleDuration = 4000;
+            let animFrame = null;
+            let startTime = 0;
+            let currentPhase = 'inhale';
+            let paused = false;
+
+            const headerActions = document.querySelector('.header-actions');
+            const yogaBtn = document.createElement('button');
+            yogaBtn.className = 'btn-action primary';
+            yogaBtn.innerHTML = '🧘 Yoga Engine';
+            yogaBtn.style.marginRight = 'auto';
+            yogaBtn.addEventListener('click', () => {
+                if (!overlay.classList.contains('active')) {
+                    overlay.classList.add('active');
+                    startYoga();
+                } else {
+                    stopYoga();
+                    overlay.classList.remove('active');
+                }
+            });
+            headerActions.prepend(yogaBtn);
+
+            function startYoga() {
+                if (isRunning) return;
+                isRunning = true;
+                paused = false;
+                currentPhase = 'inhale';
+                circle.className = 'yoga-circle';
+                textDisplay.textContent = 'دم بکش...';
+                phaseText.textContent = '🌬️';
+                startTime = performance.now();
+                toggleBtn.textContent = '⏸️ توقف';
+                if (animFrame) cancelAnimationFrame(animFrame);
+                updateYoga();
+            }
+
+            function stopYoga() {
+                isRunning = false;
+                if (animFrame) {
+                    cancelAnimationFrame(animFrame);
+                    animFrame = null;
+                }
+                circle.className = 'yoga-circle';
+                textDisplay.textContent = '';
+                phaseText.textContent = '⏸️';
+            }
+
+            function updateYoga() {
+                if (!isRunning || paused) {
+                    animFrame = requestAnimationFrame(updateYoga);
+                    return;
+                }
+
+                const now = performance.now();
+                const elapsed = now - startTime;
+                const totalDuration = currentPhase === 'inhale' ? inhaleDuration : exhaleDuration;
+                const progress = Math.min(elapsed / totalDuration, 1);
+                const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+                if (currentPhase === 'inhale') {
+                    const scale = 1 + ease * 0.9;
+                    const opacity = 0.3 + ease * 0.6;
+                    circle.style.transform = `scale(${scale})`;
+                    circle.style.opacity = opacity;
+                    circle.className = 'yoga-circle inhale';
+                    textDisplay.textContent = 'دم بکش...';
+                    phaseText.textContent = '🌬️';
+                } else {
+                    const scale = 1.9 - ease * 0.9;
+                    const opacity = 0.9 - ease * 0.6;
+                    circle.style.transform = `scale(${scale})`;
+                    circle.style.opacity = opacity;
+                    circle.className = 'yoga-circle exhale';
+                    textDisplay.textContent = 'بازدم...';
+                    phaseText.textContent = '🌊';
+                }
+
+                if (progress >= 1) {
+                    currentPhase = currentPhase === 'inhale' ? 'exhale' : 'inhale';
+                    startTime = performance.now();
+                }
+
+                animFrame = requestAnimationFrame(updateYoga);
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                if (!isRunning) return;
+                paused = !paused;
+                toggleBtn.textContent = paused ? '▶️ ادامه' : '⏸️ توقف';
+                if (!paused) {
+                    startTime = performance.now();
+                }
+            });
+
+            speedSlider.addEventListener('input', () => {
+                const val = parseFloat(speedSlider.value);
+                inhaleDuration = val * 1000;
+                exhaleDuration = val * 1000;
+                if (isRunning) {
+                    startTime = performance.now();
+                }
+            });
+
+            closeBtn.addEventListener('click', () => {
+                stopYoga();
+                overlay.classList.remove('active');
+            });
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    stopYoga();
+                    overlay.classList.remove('active');
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'y' || e.key === 'Y') {
+                    if (!overlay.classList.contains('active')) {
+                        overlay.classList.add('active');
+                        startYoga();
+                    } else {
+                        stopYoga();
+                        overlay.classList.remove('active');
+                    }
+                }
+            });
+        })();
+
+        // ================================================================
+        //   INIT
+        // ================================================================
         window.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
             const y = today.getFullYear() - 20;

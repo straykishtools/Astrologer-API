@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چارت تولد + تحلیل DeepSeek</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            background: #0b0d1a;
+            color: #e8e4f0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 950px;
+            width: 100%;
+            background: rgba(18, 20, 40, 0.85);
+            border-radius: 28px;
+            padding: 30px 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(200, 180, 255, 0.08);
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d9ceff, #8bbdff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+        .sub {
+            text-align: center;
+            color: #8a82a0;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #b8aec8;
+            margin-bottom: 4px;
+        }
+        input,
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(180, 165, 255, 0.15);
+            background: rgba(6, 7, 24, 0.6);
+            color: #f0ecff;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: 0.25s ease;
+        }
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: rgba(140, 180, 255, 0.4);
+            box-shadow: 0 0 20px rgba(100, 140, 255, 0.08);
+        }
+        .row2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6c8cff, #9c79ff);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s ease;
+            margin-top: 8px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(100, 140, 255, 0.25);
+        }
+        #status {
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            color: #b0caff;
+            margin-top: 10px;
+            display: none;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 18px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(200, 185, 248, 0.06);
+            display: none;
+            font-size: 14px;
+            line-height: 2;
+            color: #d4cce8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e6dcff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 6px;
+            margin-top: 16px;
+            margin-bottom: 10px;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 20px;
+        }
+        .planet-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(140, 180, 255, 0.12);
+            padding: 0 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #b0caff;
+        }
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: #5a526e;
+            margin-top: 20px;
+        }
+        .loading {
+            color: #b0caff;
+            text-align: center;
+            padding: 20px;
+        }
+        .error {
+            color: #e87474;
+            text-align: right;
+            padding: 15px;
+            background: rgba(200, 50, 50, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(200, 50, 50, 0.2);
+        }
+        .analysis-box {
+            background: rgba(10, 12, 30, 0.5);
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(200, 180, 255, 0.08);
+            line-height: 2.2;
+            font-size: 14px;
+            color: #e0d8f0;
+        }
+        .analysis-box h2,
+        .analysis-box h3 {
+            color: #e6dcff;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+        .analysis-box ul {
+            padding-right: 20px;
+        }
+        .analysis-box li {
+            margin-bottom: 4px;
+        }
+        @media (max-width: 600px) {
+            .row2 {
+                grid-template-columns: 1fr;
+            }
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌌 چارت تولد + تحلیل</h1>
+        <div class="sub">ارتباط با سرور محلی · http://127.0.0.1:8000</div>
+
+        <!-- فرم ورودی -->
+        <div class="form-group">
+            <label>تاریخ تولد</label>
+            <input type="date" id="birthDate" value="2000-01-01" />
+        </div>
+
+        <div class="row2">
+            <div class="form-group">
+                <label>ساعت (۲۴)</label>
+                <input type="number" id="birthHour" value="12" min="0" max="23" />
+            </div>
+            <div class="form-group">
+                <label>دقیقه</label>
+                <input type="number" id="birthMinute" value="0" min="0" max="59" />
+            </div>
+        </div>
+
+        <div class="row2">
+            <div class="form-group">
+                <label>عرض جغرافیایی (deg)</label>
+                <input type="number" id="latitude" value="35.6892" step="0.001" />
+            </div>
+            <div class="form-group">
+                <label>طول جغرافیایی (deg)</label>
+                <input type="number" id="longitude" value="51.3890" step="0.001" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>منطقه‌ی زمانی (UTC)</label>
+            <select id="timezone">
+                <option value="3.5" selected>ایران (UTC+3:30)</option>
+                <option value="0">UTC+0 (لندن)</option>
+                <option value="1">UTC+1 (اروپا)</option>
+                <option value="2">UTC+2 (آتن)</option>
+                <option value="3">UTC+3 (مسکو)</option>
+                <option value="5.5">UTC+5:30 (هند)</option>
+                <option value="-5">UTC-5 (نیویورک)</option>
+                <option value="-8">UTC-8 (لس‌آنجلس)</option>
+            </select>
+        </div>
+
+        <button id="calcBtn">🔮 دریافت چارت و تحلیل</button>
+
+        <div id="status"></div>
+        <div id="result"></div>
+        <div class="footer">✨ سرور محلی باید روی http://127.0.0.1:8000 در حال اجرا باشد</div>
+    </div>
+
+    <script>
+        // ================================================================
+        //   ترجمه‌ی فارسی
+        // ================================================================
+        const faMap = {
+            Sun: 'خورشید',
+            Moon: 'ماه',
+            Mercury: 'عطارد',
+            Venus: 'ناهید',
+            Mars: 'مریخ',
+            Jupiter: 'مشتری',
+            Saturn: 'کیوان',
+            Uranus: 'اورانوس',
+            Neptune: 'نپتون',
+            Pluto: 'پلوتون',
+            Ari: 'حمل',
+            Tau: 'ثور',
+            Gem: 'جوزا',
+            Can: 'سرطان',
+            Leo: 'اسد',
+            Vir: 'سنبله',
+            Lib: 'میزان',
+            Sco: 'عقرب',
+            Sag: 'قوس',
+            Cap: 'جدی',
+            Aqu: 'دلو',
+            Pis: 'حوت',
+            First_House: 'اول',
+            Second_House: 'دوم',
+            Third_House: 'سوم',
+            Fourth_House: 'چهارم',
+            Fifth_House: 'پنجم',
+            Sixth_House: 'ششم',
+            Seventh_House: 'هفتم',
+            Eighth_House: 'هشتم',
+            Ninth_House: 'نهم',
+            Tenth_House: 'دهم',
+            Eleventh_House: 'یازدهم',
+            Twelfth_House: 'دوازدهم',
+            conjunction: 'مقارنه',
+            opposition: 'مقابله',
+            trine: 'تثلیث',
+            square: 'تربیع',
+            sextile: 'تسدیس',
+            quintile: 'تخمیس',
+            'True_North_Lunar_Node': 'گره شمالی',
+            'True_South_Lunar_Node': 'گره جنوبی',
+            'Mean_Lilith': 'لیلیت',
+            Ascendant: 'ASC',
+            Medium_Coeli: 'MC',
+            Descendant: 'DSC',
+            Imum_Coeli: 'IC',
+            Chiron: 'کایرون'
+        };
+
+        function translate(text) {
+            if (!text) return text;
+            const trimmed = text.toString().trim();
+            return faMap[trimmed] || faMap[trimmed.toLowerCase()] || trimmed;
+        }
+
+        function signEmoji(sign) {
+            const map = {
+                'Ari': '♈',
+                'Tau': '♉',
+                'Gem': '♊',
+                'Can': '♋',
+                'Leo': '♌',
+                'Vir': '♍',
+                'Lib': '♎',
+                'Sco': '♏',
+                'Sag': '♐',
+                'Cap': '♑',
+                'Aqu': '♒',
+                'Pis': '♓'
+            };
+            return map[sign] || '';
+        }
+
+        // ================================================================
+        //   تابع اصلی
+        // ================================================================
+        document.getElementById('calcBtn').addEventListener('click', async function() {
+            const resultDiv = document.getElementById('result');
+            const statusDiv = document.getElementById('status');
+            resultDiv.style.display = 'block';
+            statusDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading">⏳ در حال دریافت داده از سرور...</div>';
+            statusDiv.textContent = '⏳ مرحله ۱: دریافت چارت از سرور محلی...';
+            statusDiv.style.color = '#b0caff';
+
+            // دریافت ورودی‌ها
+            const dateVal = document.getElementById('birthDate').value;
+            if (!dateVal) {
+                resultDiv.innerHTML = '<div class="error">⚠️ لطفاً تاریخ تولد را انتخاب کنید.</div>';
+                statusDiv.style.display = 'none';
+                return;
+            }
+            const parts = dateVal.split('-');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]);
+            const day = parseInt(parts[2]);
+            const hour = parseInt(document.getElementById('birthHour').value) || 12;
+            const minute = parseInt(document.getElementById('birthMinute').value) || 0;
+            const lat = parseFloat(document.getElementById('latitude').value) || 35.6892;
+            const lng = parseFloat(document.getElementById('longitude').value) || 51.3890;
+
+            const payload = {
+                subject: {
+                    year: year,
+                    month: month,
+                    day: day,
+                    hour: hour,
+                    minute: minute,
+                    second: 0,
+                    longitude: lng,
+                    latitude: lat,
+                    timezone: "Asia/Tehran",
+                    city: "Tehran",
+                    nation: "IR",
+                    name: "کاربر"
+                }
+            };
+
+            try {
+                // ============================================================
+                //  مرحله ۱: دریافت context از سرور محلی
+                // ============================================================
+                const response = await fetch('http://127.0.0.1:8000/api/v5/context/birth-chart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    let msg = 'خطا در سرور';
+                    if (errData.errors) {
+                        msg = errData.errors.map(e => `${e.loc.join('.')}: ${e.msg}`).join(' | ');
+                    } else if (errData.detail) {
+                        if (Array.isArray(errData.detail)) {
+                            msg = errData.detail.map(e => e.msg).join(' ');
+                        } else {
+                            msg = errData.detail;
+                        }
+                    } else if (errData.message) {
+                        msg = errData.message;
+                    }
+                    throw new Error(msg);
+                }
+
+                const data = await response.json();
+                if (data.status !== 'OK') {
+                    throw new Error(data.message || 'خطای ناشناخته');
+                }
+
+                const contextXml = data.context || 'هیچ متنی موجود نیست';
+                const chart = data.chart_data;
+                const subject = chart.subject;
+
+                // ============================================================
+                //  نمایش داده‌های خام چارت
+                // ============================================================
+                let html = '<div class="section-title">🪐 موقعیت سیارات</div>';
+                html += `<div class="grid-2col">`;
+                const planetKeys = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune',
+                    'pluto'
+                ];
+                planetKeys.forEach(key => {
+                    const obj = subject[key];
+                    if (obj && obj.name) {
+                        const nameFa = translate(obj.name);
+                        const signFa = translate(obj.sign);
+                        const emoji = signEmoji(obj.sign);
+                        const pos = obj.position ? obj.position.toFixed(1) : '?';
+                        const house = translate(obj.house);
+                        html += `
+                            <div class="planet-row">
+                                <span><strong>${nameFa}</strong></span>
+                                <span>${emoji} ${signFa} ${pos}° <span class="badge">خانه ${house}</span></span>
+                            </div>
+                        `;
+                    }
+                });
+                html += `</div>`;
+
+                // نقاط حساس
+                html += `<div class="section-title">🌅 نقاط حساس</div>`;
+                html += `<div class="grid-2col">`;
+                const angles = ['ascendant', 'medium_coeli', 'descendant', 'imum_coeli'];
+                angles.forEach(key => {
+                    const obj = subject[key];
+                    if (obj && obj.name) {
+                        const nameFa = translate(obj.name);
+                        const signFa = translate(obj.sign);
+                        const emoji = signEmoji(obj.sign);
+                        const pos = obj.position ? obj.position.toFixed(1) : '?';
+                        html += `
+                            <div class="planet-row">
+                                <span><strong>${nameFa}</strong></span>
+                                <span>${emoji} ${signFa} ${pos}°</span>
+                            </div>
+                        `;
+                    }
+                });
+                html += `</div>`;
+
+                // جنبه‌ها (خلاصه)
+                if (chart.aspects && chart.aspects.length > 0) {
+                    html += `<div class="section-title">⚡ جنبه‌ها</div>`;
+                    html += `<div>`;
+                    chart.aspects.slice(0, 8).forEach(a => {
+                        const p1 = translate(a.p1_name);
+                        const p2 = translate(a.p2_name);
+                        const aspect = translate(a.aspect);
+                        const orb = a.orbit ? a.orbit.toFixed(1) : '?';
+                        html += `<span class="badge" style="margin:2px;">${p1} ${aspect} ${p2} (${orb}°)</span> `;
+                    });
+                    if (chart.aspects.length > 8) {
+                        html += `<span class="badge" style="margin:2px;">... و ${chart.aspects.length - 8} جنبه دیگر</span>`;
+                    }
+                    html += `</div>`;
+                }
+
+                // توزیع عناصر
+                if (chart.element_distribution) {
+                    const el = chart.element_distribution;
+                    html += `<div class="section-title">🔥 توزیع عناصر</div>`;
+                    html += `<div class="grid-2col">`;
+                    html += `<div><span style="color:#ff6600;">🔥 آتش</span> ${el.fire_percentage || 0}%</div>`;
+                    html += `<div><span style="color:#6a2d04;">🌍 خاک</span> ${el.earth_percentage || 0}%</div>`;
+                    html += `<div><span style="color:#6f76d1;">💨 هوا</span> ${el.air_percentage || 0}%</div>`;
+                    html += `<div><span style="color:#630e73;">💧 آب</span> ${el.water_percentage || 0}%</div>`;
+                    html += `</div>`;
+                }
+
+                // فاز ماه
+                if (subject.lunar_phase) {
+                    const lp = subject.lunar_phase;
+                    html += `<div class="section-title">🌙 فاز ماه</div>`;
+                    html +=
+                        `<div>${lp.moon_emoji || ''} ${translate(lp.moon_phase_name) || 'نامشخص'} (مرحله ${lp.moon_phase || 0})</div>`;
+                }
+
+                html +=
+                    `<br/><span style="font-size:11px;color:#7a7290;">⏱ ${subject.iso_formatted_local_datetime || ''} (محلی) · ${subject.day_of_week || ''}</span>`;
+
+                // ============================================================
+                //  مرحله ۲: ارسال به DeepSeek برای تحلیل
+                // ============================================================
+                statusDiv.textContent = '⏳ مرحله ۲: ارسال به DeepSeek برای تحلیل... (حدود ۱۰-۲۰ ثانیه)';
+                statusDiv.style.color = '#f2d275';
+
+                const analysis = await getAnalysisFromDeepSeek(contextXml);
+
+                // ============================================================
+                //  نمایش تحلیل
+                // ============================================================
+                html += `<div class="section-title" style="margin-top:24px;">📜 تحلیل چارت توسط DeepSeek</div>`;
+                html += `<div class="analysis-box">${analysis}</div>`;
+
+                resultDiv.innerHTML = html;
+                statusDiv.textContent = '✅ تحلیل کامل شد!';
+                statusDiv.style.color = '#5fbf5f';
+
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="error">⚠️ <strong>خطا:</strong> ${err.message}</div>`;
+                statusDiv.textContent = '❌ خطا در پردازش';
+                statusDiv.style.color = '#e87474';
+                console.error(err);
+            }
+        });
+
+        // ================================================================
+        //  تابع ارسال به DeepSeek از طریق OpenRouter
+        // ================================================================
+        async function getAnalysisFromDeepSeek(contextText) {
+            const OPENROUTER_API_KEY = "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";
+
+            const prompt = `
+شما یک اخترشناس حرفه‌ای و با تجربه هستید. بر اساس اطلاعات چارت تولد زیر، یک تحلیل کامل و دقیق به زبان فارسی بنویسید.
+
+لطفاً به این موارد بپردازید:
+
+1. **شخصیت کلی و ویژگی‌های روانشناختی**:
+   - نقاط قوت اصلی شخصیت
+   - نقاط ضعف و چالش‌های درونی
+   - انگیزه‌ها و اهداف زندگی
+
+2. **حوزه‌های شغلی و تحصیلی**:
+   - استعدادها و توانایی‌های طبیعی
+   - زمینه‌های شغلی مناسب
+   - رویکرد به یادگیری و تحصیل
+
+3. **روابط عاطفی و اجتماعی**:
+   - سبک ارتباطی با دیگران
+   - نیازهای عاطفی
+   - الگوهای رفتاری در روابط
+
+4. **توصیه‌های کاربردی**:
+   - راه‌های رشد شخصی
+   - مدیریت چالش‌ها
+   - نکات کلیدی برای موفقیت
+
+اطلاعات چارت (به‌صورت XML):
+${contextText}
+
+تحلیل خود را به‌صورت روان و خوانا بنویسید و از اصطلاحات تخصصی بیش از حد استفاده نکنید.
+`;
+
+            try {
+                const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "deepseek/deepseek-chat",
+                        messages: [
+                            { role: "system", content: "شما یک اخترشناس حرفه‌ای هستید که به زبان فارسی تحلیل‌های دقیق و روان ارائه می‌دهید." },
+                            { role: "user", content: prompt }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 3000,
+                    })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error?.message || 'خطا در ارتباط با OpenRouter');
+                }
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+
+            } catch (error) {
+                console.error('OpenRouter Error:', error);
+                return `❌ خطا در ارتباط با OpenRouter: ${error.message}`;
+            }
+        }
+
+        // ================================================================
+        //   مقداردهی اولیه
+        // ================================================================
+        window.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const y = today.getFullYear() - 20;
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('birthDate').value = `${y}-${m}-${d}`;
+        });
+    </script>
+</body>
+</html>

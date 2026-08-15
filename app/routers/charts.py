@@ -7,7 +7,7 @@ All endpoints that return rendered SVG charts via /api/v5/chart/*.
 from datetime import datetime, timezone
 from logging import getLogger
 from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from ..types.request_models import (
     BirthChartRequestModel,
@@ -34,7 +34,7 @@ from ..utils.router_utils import (
 )
 from ..utils.logging_utils import log_request_with_body
 from ..utils.get_time_from_google import get_time_from_google
-from kerykeion import AstrologicalSubjectFactory, ChartDataFactory
+from kerykeion import AstrologicalSubjectFactory, ChartDataFactory, ChartDrawer
 
 logger = getLogger(__name__)
 router = APIRouter()
@@ -46,32 +46,24 @@ async def now_chart(request_body: NowChartRequestModel, request: Request) -> JSO
     **POST** `/api/v5/now/chart`
 
     Returns chart data and SVG for the current UTC time at Greenwich.
-
-    **Parameters:**
-    - `name`, configuration, rendering options
-
-    **Returns:**
-    - `status`: "OK"
-    - `chart_data`: ChartDataModel
-    - `chart`: SVG (or `chart_wheel` + `chart_grid`)
     """
     log_request_with_body(logger, request, "Current time chart request", request_body.model_dump_json())
 
     try:
         try:
             utc_datetime = get_time_from_google()
-        except Exception as time_exc:  # pragma: no cover - fallback path
+        except Exception as time_exc:
             logger.warning("Falling back to system UTC time: %s", time_exc)
             utc_datetime = datetime.now(timezone.utc)
 
         subject = AstrologicalSubjectFactory.from_birth_data(
             name=request_body.name,
-            year=utc_datetime.year,  # type: ignore[arg-type]
-            month=utc_datetime.month,  # type: ignore[arg-type]
-            day=utc_datetime.day,  # type: ignore[arg-type]
-            hour=utc_datetime.hour,  # type: ignore[arg-type]
-            minute=utc_datetime.minute,  # type: ignore[arg-type]
-            seconds=utc_datetime.second,  # type: ignore[arg-type]
+            year=utc_datetime.year,
+            month=utc_datetime.month,
+            day=utc_datetime.day,
+            hour=utc_datetime.hour,
+            minute=utc_datetime.minute,
+            seconds=utc_datetime.second,
             city="Greenwich",
             nation="GB",
             lng=-0.001545,
@@ -110,7 +102,7 @@ async def now_chart(request_body: NowChartRequestModel, request: Request) -> JSO
         )
         return JSONResponse(content=payload, status_code=200)
 
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -120,20 +112,6 @@ async def natal_chart(request_body: BirthChartRequestModel, request: Request) ->
     **POST** `/api/v5/chart/birth-chart`
 
     Returns birth chart data and rendered SVG chart.
-
-    **Parameters:**
-    - `theme`, `language`, `style`, `split_chart`, `transparent_background`
-    - `show_house_position_comparison`, `show_cusp_position_comparison`
-    - `show_degree_indicators`, `show_aspect_icons`
-    - `show_zodiac_background_ring` (modern style only)
-    - `double_chart_aspect_grid_type` ('list' or 'table', dual charts)
-    - `custom_title` (temporary title override, max 40 chars)
-
-    **Returns:**
-    - `status`: "OK"
-    - `chart_data`: ChartDataModel
-    - `chart`: SVG (when split_chart=false)
-    - `chart_wheel`, `chart_grid`: SVGs (when split_chart=true)
     """
     log_request_with_body(logger, request, "Birth chart request", request_body.model_dump_json())
 
@@ -155,7 +133,7 @@ async def natal_chart(request_body: BirthChartRequestModel, request: Request) ->
             request_body.double_chart_aspect_grid_type,
         )
         return JSONResponse(content=payload, status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -165,15 +143,6 @@ async def synastry_chart(request_body: SynastryChartRequestModel, request: Reque
     **POST** `/api/v5/chart/synastry`
 
     Returns synastry chart data and a dual-wheel SVG chart.
-
-    **Parameters:**
-    - `theme`, `language`, `style`, `split_chart`, `transparent_background`
-    - `show_house_position_comparison`, `show_cusp_position_comparison`, `show_degree_indicators`
-    - `show_zodiac_background_ring`, `double_chart_aspect_grid_type`, `custom_title`
-
-    **Returns:**
-    - `chart` (or `chart_wheel` + `chart_grid` when split_chart=true)
-    - `chart_data`
     """
     log_request_with_body(logger, request, "Synastry chart request", request_body.model_dump_json())
 
@@ -195,7 +164,7 @@ async def synastry_chart(request_body: SynastryChartRequestModel, request: Reque
             request_body.double_chart_aspect_grid_type,
         )
         return JSONResponse(content=payload, status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -205,15 +174,6 @@ async def composite_chart(request_body: CompositeChartRequestModel, request: Req
     **POST** `/api/v5/chart/composite`
 
     Returns composite chart data and rendered SVG chart.
-
-    **Parameters:**
-    - `theme`, `language`, `style`, `split_chart`, `transparent_background`
-    - `show_house_position_comparison`, `show_cusp_position_comparison`, `show_degree_indicators`
-    - `show_zodiac_background_ring`, `double_chart_aspect_grid_type`, `custom_title`
-
-    **Returns:**
-    - `chart` (or `chart_wheel` + `chart_grid`)
-    - `chart_data`
     """
     log_request_with_body(logger, request, "Composite chart request", request_body.model_dump_json())
 
@@ -235,7 +195,7 @@ async def composite_chart(request_body: CompositeChartRequestModel, request: Req
             request_body.double_chart_aspect_grid_type,
         )
         return JSONResponse(content=payload, status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -245,15 +205,6 @@ async def transit_chart(request_body: TransitChartRequestModel, request: Request
     **POST** `/api/v5/chart/transit`
 
     Returns transit data and rendered SVG chart.
-
-    **Parameters:**
-    - `theme`, `language`, `style`, `split_chart`, `transparent_background`
-    - `show_house_position_comparison`, `show_cusp_position_comparison`, `show_degree_indicators`
-    - `show_zodiac_background_ring`, `double_chart_aspect_grid_type`, `custom_title`
-
-    **Returns:**
-    - `chart` (or `chart_wheel` + `chart_grid`)
-    - `chart_data`
     """
     log_request_with_body(logger, request, "Transit chart request", request_body.model_dump_json())
 
@@ -275,7 +226,7 @@ async def transit_chart(request_body: TransitChartRequestModel, request: Request
             request_body.double_chart_aspect_grid_type,
         )
         return JSONResponse(content=payload, status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -285,16 +236,6 @@ async def solar_return_chart(request_body: PlanetaryReturnRequestModel, request:
     **POST** `/api/v5/chart/solar-return`
 
     Returns solar return data and rendered SVG chart.
-
-    **Parameters:**
-    - `theme`, `language`, `style`, `split_chart`, `transparent_background`
-    - `show_house_position_comparison`, `show_cusp_position_comparison`, `show_degree_indicators`
-    - `show_zodiac_background_ring`, `double_chart_aspect_grid_type`, `custom_title`
-
-    **Returns:**
-    - `return_type`: "Solar"
-    - `wheel_type`: "dual" | "single"
-    - `chart` (or `chart_wheel` + `chart_grid`)
     """
     log_request_with_body(logger, request, "Solar return chart request", request_body.model_dump_json())
 
@@ -318,7 +259,7 @@ async def solar_return_chart(request_body: PlanetaryReturnRequestModel, request:
         payload["return_type"] = "Solar"
         payload["wheel_type"] = request_body.wheel_type
         return JSONResponse(content=payload, status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -328,16 +269,6 @@ async def lunar_return_chart(request_body: PlanetaryReturnRequestModel, request:
     **POST** `/api/v5/chart/lunar-return`
 
     Returns lunar return data and rendered SVG chart.
-
-    **Parameters:**
-    - `theme`, `language`, `style`, `split_chart`, `transparent_background`
-    - `show_house_position_comparison`, `show_cusp_position_comparison`, `show_degree_indicators`
-    - `show_zodiac_background_ring`, `double_chart_aspect_grid_type`, `custom_title`
-
-    **Returns:**
-    - `return_type`: "Lunar"
-    - `wheel_type`: "dual" | "single"
-    - `chart` (or `chart_wheel` + `chart_grid`)
     """
     log_request_with_body(logger, request, "Lunar return chart request", request_body.model_dump_json())
 
@@ -361,5 +292,41 @@ async def lunar_return_chart(request_body: PlanetaryReturnRequestModel, request:
         payload["return_type"] = "Lunar"
         payload["wheel_type"] = request_body.wheel_type
         return JSONResponse(content=payload, status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
+
+
+# =============================================================================
+# NEW ENDPOINT: SVG from Subject (using BirthChartRequestModel)
+# =============================================================================
+@router.post("/api/v5/chart/svg-from-subject")
+async def get_chart_svg(request_body: BirthChartRequestModel):
+    try:
+        # 1. ایجاد chart_data با استفاده از تابع موجود (که با مدل‌های Pydantic کار می‌کند)
+        chart_data = create_natal_chart_data(request_body)
+        
+        # 2. تولید payload کامل که شامل SVG است
+        payload = chart_payload(
+            chart_data,
+            theme="dark",
+            language="fa",
+            split_chart=False,
+            transparent_background=False,
+            show_house_position_comparison=False,
+            show_cusp_position_comparison=False,
+            show_degree_indicators=True,
+            show_aspect_icons=True,
+            custom_title=None,
+            style="modern",
+            show_zodiac_background_ring=True,
+            double_chart_aspect_grid_type="list"
+        )
+        
+        # 3. استخراج SVG از payload
+        svg_string = payload.get("chart")
+        if not svg_string:
+            raise ValueError("SVG not found in payload")
+        
+        return Response(content=svg_string, media_type="image/svg+xml")
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"status": "ERROR", "message": str(e)})

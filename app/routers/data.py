@@ -39,6 +39,11 @@ from ..utils.router_utils import (
 from ..utils.logging_utils import log_request_with_body
 from kerykeion import AstrologicalSubjectFactory
 
+# ============================================================
+# 🔮 افزودن سرویس Vedic
+# ============================================================
+from ..services.vedic_service import VedicDB
+
 logger = getLogger(__name__)
 router = APIRouter()
 
@@ -163,6 +168,9 @@ async def compatibility_score(request_body: SynastryChartDataRequestModel, reque
         return await handle_exception(exc, request)
 
 
+# ============================================================
+# 🔮 اصلاح شده: اضافه کردن تفسیرهای Vedic + Nakshatra + Drishti
+# ============================================================
 @router.post("/api/v5/chart-data/birth-chart", response_model=ChartDataResponseModel)
 async def natal_chart_data(request_body: BirthChartDataRequestModel, request: Request) -> JSONResponse:
     """
@@ -178,12 +186,58 @@ async def natal_chart_data(request_body: BirthChartDataRequestModel, request: Re
     **Returns:**
     - `status`: "OK"
     - `chart_data`: ChartDataModel
+    - `vedic_interpretations`: تفسیرهای ودیک + ناکشاترا + دریشتی
     """
     log_request_with_body(logger, request, "Natal chart data request", request_body.model_dump_json())
 
     try:
+        # ۱. ایجاد چارت اصلی
         chart_data = create_natal_chart_data(request_body)
-        return JSONResponse(content=chart_data_payload(chart_data), status_code=200)
+
+        # ۲. ایجاد نمونه از دیتابیس Vedic (Singleton)
+        vedic_db = VedicDB()
+
+        # ۳. استخراج Lagna از چارت
+        lagna_sign = None
+        if hasattr(chart_data, 'subject') and chart_data.subject:
+            asc_data = getattr(chart_data.subject, 'ascendant', None)
+            if asc_data:
+                lagna_sign = getattr(asc_data, 'sign', None)
+                print(f"🔍 Lagna استخراج شد: {lagna_sign}")
+
+        vedic_interpretations = {}
+
+        # ۴. اگر Lagna وجود داشت، برای هر سیاره تفسیر بگیر
+        if lagna_sign:
+            # لیست سیارات (۹ سیاره)
+            planets = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu']
+
+            for planet in planets:
+                # داده‌های سیاره را از subject بگیر
+                planet_data = getattr(chart_data.subject, planet.lower(), None)
+                if planet_data:
+                    sign = getattr(planet_data, 'sign', None)
+                    house = getattr(planet_data, 'house', None)
+                    position = getattr(planet_data, 'position', None)  # درجه در برج
+                    
+                    if sign and house:
+                        # تبدیل house به عدد (مثلاً "Tenth_House" -> "10")
+                        house_num = house.replace('_House', '')
+                        vedic_interpretations[planet] = vedic_db.get_full_interpretation(
+                            planet=planet,
+                            sign=sign,
+                            house=house_num,  # 👈 به‌عنوان رشته ارسال می‌شود، ولی در تابع به عدد تبدیل می‌شود
+                            lagna_sign=lagna_sign,
+                            sign_degree=position
+                        )
+                        print(f"🔍 تفسیر برای {planet} در {sign} خانه {house_num} با Lagna {lagna_sign}")
+
+        # ۵. ساخت payload و اضافه کردن تفسیرهای Vedic
+        payload = chart_data_payload(chart_data)
+        payload['vedic_interpretations'] = vedic_interpretations
+
+        return JSONResponse(content=payload, status_code=200)
+
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)
 
