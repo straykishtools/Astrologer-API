@@ -203,7 +203,7 @@ async def natal_chart_data(request_body: BirthChartDataRequestModel, request: Re
             asc_data = getattr(chart_data.subject, 'ascendant', None)
             if asc_data:
                 lagna_sign = getattr(asc_data, 'sign', None)
-                print(f"🔍 Lagna استخراج شد: {lagna_sign}")
+                print(f"[DEBUG] Lagna استخراج شد: {lagna_sign}")
 
         vedic_interpretations = {}
 
@@ -230,7 +230,7 @@ async def natal_chart_data(request_body: BirthChartDataRequestModel, request: Re
                             lagna_sign=lagna_sign,
                             sign_degree=position
                         )
-                        print(f"🔍 تفسیر برای {planet} در {sign} خانه {house_num} با Lagna {lagna_sign}")
+                        print(f"[DEBUG] تفسیر برای {planet} در {sign} خانه {house_num} با Lagna {lagna_sign}")
 
         # ۵. ساخت payload و اضافه کردن تفسیرهای Vedic
         payload = chart_data_payload(chart_data)

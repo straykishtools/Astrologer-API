@@ -39,7 +39,7 @@ async def health() -> JSONResponse:
 
 
 @router.get(
-    "/",
+    "/api/status",
     response_description="Status of the API",
     include_in_schema=False,
     response_model=ApiStatusResponseModel,

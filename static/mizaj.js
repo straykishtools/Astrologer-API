@@ -1,0 +1,99 @@
+// Mizaj Questionnaire
+var MIZAJ_MMQ_QS = ["وقتی اطرافیان دست شما را لمس می‌کنند، در مورد گرمی و سردی آن چه می‌گویند؟", "اندازه کف دست شما در چه حد می‌باشد؟", "سرعت تأثیرپذیری شما از سرما و گرما چگونه است؟", "هنگام صحبت کردن چند جمله متوالی را چگونه ادا می‌کنید؟", "سرعت خصم و عصبانیت شما چگونه است؟", "سرعت تأثیرپذیری شما از غذاهای با طبع گرم یا سرد چگونه است؟", "قوت صدای شما نسبت به اطرافیان چگونه است؟", "سرعت حرکات جسمی شما نسبت به اطرافیان چگونه است؟", "موضعیت چاقی و لاغری شما نسبت به سایرین چگونه است؟", "موضعیت نرمی و خشکی پوست شما چگونه است؟"];
+var MIZAJ_SMQ_QS = ["راه رفتن شما چگونه است؟", "میزان نشاط خود را چگونه می‌دانید؟", "وقتی اطرافیان دست شما را لمس می‌کنند در مورد گرمی و سردی آن چه می‌گویند؟", "در مجموع روابط اجتماعی خود را سرد می‌دانید یا گرم؟", "در جمع دوستان و آشنایان، پرحرفید یا کم‌حرف؟", "بلندی صدای شما چگونه است؟", "در انجام کارهای روزمره در تصمیم می‌گیرید یا زود؟", "انرجی شما در انجام کارهای روزمره، چگونه می‌باشد؟", "سرما را بهتر تحمل می‌کنید یا گرما را؟", "هنگام صحبت کردن، جملات متوالی را چگونه بیان می‌کنید؟", "چه غذاهایی معمولا شما را اذیت می‌کند؟", "اندازه قفصه سینه شما نسبت به دیگران چگونه است؟", "بین اطرافیان، بعنوانی ترسو معروفید یا نترس؟", "سرعت عمل شما در انجام کارهای روزمره، چگونه میباشد؟", "پهنایی کف دست شما چگونه است؟", "معمولایی پرخواب هستید یا کم‌خواب؟", "خود را از نظر چاقی و لاغری چگونه می‌دانید؟", "رنگ پوست شما در محدوده کدامیک از گزینه‌ها است؟", "استعداد چاقی شما چگونه است؟", "موی سر شما از نظر کم‌پستی و پریشتی چگونه است؟"];
+
+function getMizajForm() {
+    var h = '<div class="mizaj-container" style="max-width:800px;margin:0 auto;">';
+    h += '<h3 style="color:#a29bfe;text-align:center;">\u{1f9ec} \u062a\u0639\u06cc\u06cc\u0646 \u0645\u0632\u0627\u062c \u0628\u0627 \u067e\u0631\u0633\u0634\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0645\u0639\u062a\u0628\u0631</h3>';
+    h += '<div style="display:flex;justify-content:center;gap:20px;margin:20px 0;background:rgba(255,255,255,0.03);padding:15px;border-radius:12px;border:1px solid rgba(255,255,255,0.05);">';
+    h += '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 16px;border-radius:30px;background:rgba(108,92,231,0.2);border:1px solid #6c5ce7;" id="lbl_mmq">';
+    h += '<input type="radio" name="mizaj_type" value="mmq" checked onchange="toggleMizajForms()"> \u06f1\u06f0 \u0633\u0648\u0627\u0644\u06cc (\u0645\u062c\u0627\u0647\u062f)</label>';
+    h += '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 16px;border-radius:30px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);" id="lbl_smq">';
+    h += '<input type="radio" name="mizaj_type" value="smq" onchange="toggleMizajForms()"> \u06f2\u06f0 \u0633\u0648\u0627\u0644\u06cc (\u0633\u0644\u0645\u0627\u0646\u200c\u0646\u0698\u0627\u062f)</label>';
+    h += '</div>';
+    h += '<div id="mmq-questions">' + getMmqQuestions() + '</div>';
+    h += '<div id="smq-questions" style="display:none;">' + getSmqQuestions() + '</div>';
+    h += '<button onclick="submitMizaj()" style="width:100%;padding:14px;background:#6c5ce7;border:none;border-radius:30px;color:#fff;font-size:1.1rem;cursor:pointer;font-weight:bold;transition:all 0.3s;margin-top:20px;">🧬 حسابه مزاج من</button>';
+    h += '<div id="mizaj-result" style="margin-top:25px;"></div>';
+    h += '</div>';
+    return h;
+}
+
+function toggleMizajForms() {
+    var type = document.querySelector('input[name="mizaj_type"]:checked').value;
+    document.getElementById('mmq-questions').style.display = (type === 'mmq') ? 'block' : 'none';
+    document.getElementById('smq-questions').style.display = (type === 'smq') ? 'block' : 'none';
+    document.getElementById('lbl_mmq').style.background = (type === 'mmq') ? 'rgba(108,92,231,0.2)' : 'rgba(255,255,255,0.05)';
+    document.getElementById('lbl_mmq').style.borderColor = (type === 'mmq') ? '#6c5ce7' : 'rgba(255,255,255,0.1)';
+    document.getElementById('lbl_smq').style.background = (type === 'smq') ? 'rgba(108,92,231,0.2)' : 'rgba(255,255,255,0.05)';
+    document.getElementById('lbl_smq').style.borderColor = (type === 'smq') ? '#6c5ce7' : 'rgba(255,255,255,0.1)';
+}
+
+function getMmqQuestions() {
+    var qs = MIZAJ_MMQ_QS;
+    var opts = '<option value="1">\u06f1 (\u0633\u0631\u062f / \u06a9\u0645)</option>' +
+        '<option value="2" selected>\u06f2 (\u0645\u0639\u062a\u062f\u0644 / \u0645\u062a\u0648\u0633\u0637)</option>' +
+        '<option value="3">\u06f3 (\u06af\u0631\u0645 / \u0632\u06cc\u0627\u062f)</option>';
+    var h = '<div style="background:rgba(255,255,255,0.03);padding:20px;border-radius:16px;border:1px solid rgba(255,255,255,0.05);">';
+    qs.forEach(function(q, i) {
+        h += '<div class="form-group" style="margin-bottom:15px;border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:12px;">' +
+            '<label style="display:block;margin-bottom:6px;font-weight:bold;color:#ddd;font-size:0.95rem;">' + (i+1) + '. ' + q + '</label>' +
+            '<select id="mmq_q' + (i+1) + '" style="width:100%;padding:10px;border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;border:1px solid rgba(255,255,255,0.1);">' + opts + '</select></div>';
+    });
+    return h + '</div>';
+}
+
+function getSmqQuestions() {
+    var qs = MIZAJ_SMQ_QS;
+    var h = '<div style="background:rgba(255,255,255,0.03);padding:20px;border-radius:16px;border:1px solid rgba(255,255,255,0.05);">';
+    qs.forEach(function(q, i) {
+        var opts = '';
+        for (var v = 1; v <= 5; v++) {
+            var sel = (v === 3) ? ' selected' : '';
+            opts += '<option value="' + v + '"' + sel + '>' + v + '</option>';
+        }
+        h += '<div class="form-group" style="margin-bottom:15px;border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:12px;">' +
+            '<label style="display:block;margin-bottom:6px;font-weight:bold;color:#ddd;font-size:0.95rem;">' + (i+1) + '. ' + q + '</label>' +
+            '<select id="smq_q' + (i+1) + '" style="width:100%;padding:10px;border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;border:1px solid rgba(255,255,255,0.1);">' + opts + '</select></div>';
+    });
+    return h + '</div>';
+}
+
+function submitMizaj() {
+    var type = document.querySelector('input[name="mizaj_type"]:checked').value;
+    var answers = {};
+    var prefix = (type === 'mmq') ? 'mmq_q' : 'smq_q';
+    var total = (type === 'mmq') ? 10 : 20;
+    for (var i = 1; i <= total; i++) {
+        var el = document.getElementById(prefix + i);
+        if (el) answers['q' + i] = parseInt(el.value);
+    }
+    document.getElementById('mizaj-result').innerHTML = '<p style="text-align:center;color:#aaa;">\u23f3 \u062f\u0631 \u062d\u0627\u0644 \u062d\u0633\u0627\u0628...</p>';
+    fetch('/api/v5/mizaj', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionnaire_type: type, answers: answers })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.status === 'success') displayMizajResult(data.data);
+        else document.getElementById('mizaj-result').innerHTML = '<p style="color:#ff6b6b;">\u274c \u062e\u0637\u0627: ' + (data.detail || '\u0633\u0631\u0648\u0631') + '</p>';
+    })
+    .catch(function() {
+        document.getElementById('mizaj-result').innerHTML = '<p style="color:#ff6b6b;">\u274c \u062e\u0637\u0627 \u062f\u0631 \u0627\u0631\u062a\u0628\u0627\u0637 \u0628\u0627 \u0633\u0631\u0648\u0631</p>';
+    });
+}
+
+function displayMizajResult(data) {
+    var recs = data.recommendations.map(function(r) { return '<li style="margin:8px 0;color:#ddd;list-style:none;">\u2705 ' + r + '</li>'; }).join('');
+    document.getElementById('mizaj-result').innerHTML =
+        '<div style="background:rgba(108,92,231,0.1);border:1px solid rgba(108,92,231,0.3);border-radius:16px;padding:25px;margin-top:20px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">' +
+        '<h4 style="color:#a29bfe;font-size:1.4rem;margin:0;">\u{1f9ec} \u0645\u0632\u0627\u062c: ' + data.temperament + '</h4>' +
+        '<span style="background:rgba(255,255,255,0.05);padding:4px 12px;border-radius:20px;font-size:0.8rem;color:#888;">' + data.questionnaire + '</span>' +
+        '</div>' +
+        '<p style="color:#ccc;text-align:center;border-top:1px solid rgba(255,255,255,0.1);padding-top:15px;">' + data.description + '</p>' +
+        '<div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:15px;margin-top:10px;">' +
+        '<h5 style="color:#fdcb6e;margin-bottom:10px;">\u{1f4a1} \u062a\u0648\u0635\u06cc\u0647\u200c\u0647\u0627:</h5>' +
+        '<ul style="padding:0;margin:0;">' + recs + '</ul></div></div>';
+}

@@ -53,18 +53,10 @@ async def subject_context(
     """
     **POST** `/api/v5/context/subject`
 
-    Builds and returns an astrological subject with AI-optimized context.
-
-    **Parameters:**
-    - `subject`: SubjectModel (offline preferred or GeoNames via geonames_username)
-
-    **Returns:**
-    - `status`: "OK"
-    - `subject_context`: AI-optimized context string
-    - `subject`: AstrologicalSubjectModel (serialized)
+    اطلاعات موضوع رو می‌سازه و یه متن آماده برای هوش مصنوعی برمی‌گردونه.
     """
     log_request_with_body(
-        logger, request, "Subject context request", birth_data_request.model_dump_json()
+        logger, request, "درخواست context موضوع", birth_data_request.model_dump_json()
     )
 
     try:
@@ -72,7 +64,7 @@ async def subject_context(
         subject = build_subject(birth_data_request.subject, active_points=active_points)
         return JSONResponse(content=subject_context_payload(subject), status_code=200)
 
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -83,26 +75,16 @@ async def natal_context(
     """
     **POST** `/api/v5/context/birth-chart`
 
-    Returns natal chart data with AI-optimized context.
-
-    **Parameters:**
-    - `subject`: SubjectModel
-    - `active_points` / `active_aspects` (optional overrides)
-    - `distribution_method`, `custom_distribution_weights` (optional)
-
-    **Returns:**
-    - `status`: "OK"
-    - `context`: AI-optimized context string
-    - `chart_data`: ChartDataModel
+    اطلاعات چارت تولد رو با یه متن آماده برای هوش مصنوعی برمی‌گردونه.
     """
     log_request_with_body(
-        logger, request, "Natal context request", request_body.model_dump_json()
+        logger, request, "درخواست context چارت تولد", request_body.model_dump_json()
     )
 
     try:
         chart_data = create_natal_chart_data(request_body)
         return JSONResponse(content=context_payload(chart_data), status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -113,26 +95,16 @@ async def synastry_context(
     """
     **POST** `/api/v5/context/synastry`
 
-    Returns synastry chart data with AI-optimized context.
-
-    **Parameters:**
-    - `first_subject`, `second_subject`: SubjectModel
-    - `include_house_comparison`, `include_relationship_score` (flags)
-    - `active_points` / `active_aspects` overrides
-
-    **Returns:**
-    - `status`: "OK"
-    - `context`: AI-optimized context string
-    - `chart_data`: ChartDataModel
+    اطلاعات چارت سیناستری (مقایسه دو نفر) رو با متن آماده برای هوش مصنوعی برمی‌گردونه.
     """
     log_request_with_body(
-        logger, request, "Synastry context request", request_body.model_dump_json()
+        logger, request, "درخواست context سیناستری", request_body.model_dump_json()
     )
 
     try:
         chart_data = create_synastry_chart_data(request_body)
         return JSONResponse(content=context_payload(chart_data), status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -143,25 +115,16 @@ async def composite_context(
     """
     **POST** `/api/v5/context/composite`
 
-    Returns composite chart data with AI-optimized context.
-
-    **Parameters:**
-    - `first_subject`, `second_subject`
-    - `active_points` / `active_aspects` overrides
-
-    **Returns:**
-    - `status`: "OK"
-    - `context`: AI-optimized context string
-    - `chart_data`: ChartDataModel
+    اطلاعات چارت کامپوزیت (ترکیبی) رو با متن آماده برای هوش مصنوعی برمی‌گردونه.
     """
     log_request_with_body(
-        logger, request, "Composite context request", request_body.model_dump_json()
+        logger, request, "درخواست context کامپوزیت", request_body.model_dump_json()
     )
 
     try:
         chart_data = create_composite_chart_data(request_body)
         return JSONResponse(content=context_payload(chart_data), status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -172,26 +135,16 @@ async def transit_context(
     """
     **POST** `/api/v5/context/transit`
 
-    Returns transit chart data with AI-optimized context.
-
-    **Parameters:**
-    - `first_subject`: SubjectModel (natal)
-    - `transit_subject`: SubjectModel (transit moment)
-    - `include_house_comparison` flag
-
-    **Returns:**
-    - `status`: "OK"
-    - `context`: AI-optimized context string
-    - `chart_data`: ChartDataModel
+    اطلاعات چارت ترانزیت رو با متن آماده برای هوش مصنوعی برمی‌گردونه.
     """
     log_request_with_body(
-        logger, request, "Transit context request", request_body.model_dump_json()
+        logger, request, "درخواست context ترانزیت", request_body.model_dump_json()
     )
 
     try:
         chart_data = create_transit_chart_data(request_body)
         return JSONResponse(content=context_payload(chart_data), status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -202,22 +155,10 @@ async def solar_return_context(
     """
     **POST** `/api/v5/context/solar-return`
 
-    Calculates the solar return and returns data with AI-optimized context.
-
-    **Parameters:**
-    - `subject`: SubjectModel (natal)
-    - `year` or `month`+`year` or `iso_datetime`
-    - `wheel_type`: "dual"|"single" (affects data model)
-
-    **Returns:**
-    - `status`: "OK"
-    - `context`: AI-optimized context string
-    - `chart_data`: ChartDataModel
-    - `return_type`: "Solar"
-    - `wheel_type`: "dual" | "single"
+    اطلاعات بازگشت خورشیدی رو با متن آماده برای هوش مصنوعی برمی‌گردونه.
     """
     log_request_with_body(
-        logger, request, "Solar return context request", request_body.model_dump_json()
+        logger, request, "درخواست context بازگشت خورشیدی", request_body.model_dump_json()
     )
 
     try:
@@ -226,7 +167,7 @@ async def solar_return_context(
         payload["return_type"] = "Solar"
         payload["wheel_type"] = request_body.wheel_type
         return JSONResponse(content=payload, status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -237,20 +178,10 @@ async def lunar_return_context(
     """
     **POST** `/api/v5/context/lunar-return`
 
-    Calculates the lunar return and returns data with AI-optimized context.
-
-    **Parameters:**
-    - Same as solar-return context.
-
-    **Returns:**
-    - `status`: "OK"
-    - `context`: AI-optimized context string
-    - `chart_data`: ChartDataModel
-    - `return_type`: "Lunar"
-    - `wheel_type`: "dual" | "single"
+    اطلاعات بازگشت قمری رو با متن آماده برای هوش مصنوعی برمی‌گردونه.
     """
     log_request_with_body(
-        logger, request, "Lunar return context request", request_body.model_dump_json()
+        logger, request, "درخواست context بازگشت قمری", request_body.model_dump_json()
     )
 
     try:
@@ -259,7 +190,7 @@ async def lunar_return_context(
         payload["return_type"] = "Lunar"
         payload["wheel_type"] = request_body.wheel_type
         return JSONResponse(content=payload, status_code=200)
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
 
@@ -270,35 +201,27 @@ async def now_context(
     """
     **POST** `/api/v5/now/context`
 
-    Returns an astrological subject with AI context for the current UTC time at Greenwich.
-
-    **Parameters:**
-    - `name`, `zodiac_type`, `sidereal_mode`, `perspective_type`, `houses_system_identifier`
-
-    **Returns:**
-    - `status`: "OK"
-    - `subject_context`: AI-optimized context string
-    - `subject`: AstrologicalSubjectModel (serialized)
+    اطلاعات لحظه‌ای فعلی رو با متن آماده برای هوش مصنوعی برمی‌گردونه.
     """
     log_request_with_body(
-        logger, request, "Current context request", request_body.model_dump_json()
+        logger, request, "درخواست context لحظه‌ای", request_body.model_dump_json()
     )
 
     try:
         try:
             utc_datetime = get_time_from_google()
-        except Exception as time_exc:  # pragma: no cover - fallback path
-            logger.warning("Falling back to system UTC time: %s", time_exc)
+        except Exception as time_exc:
+            logger.warning("افتادم رو زمان سیستم: %s", time_exc)
             utc_datetime = datetime.now(timezone.utc)
 
         subject = AstrologicalSubjectFactory.from_birth_data(
             name=request_body.name,
-            year=utc_datetime.year,  # type: ignore[arg-type]
-            month=utc_datetime.month,  # type: ignore[arg-type]
-            day=utc_datetime.day,  # type: ignore[arg-type]
-            hour=utc_datetime.hour,  # type: ignore[arg-type]
-            minute=utc_datetime.minute,  # type: ignore[arg-type]
-            seconds=utc_datetime.second,  # type: ignore[arg-type]
+            year=utc_datetime.year,
+            month=utc_datetime.month,
+            day=utc_datetime.day,
+            hour=utc_datetime.hour,
+            minute=utc_datetime.minute,
+            seconds=utc_datetime.second,
             city="Greenwich",
             nation="GB",
             lng=-0.001545,
@@ -315,88 +238,189 @@ async def now_context(
 
         return JSONResponse(content=subject_context_payload(subject), status_code=200)
 
-    except Exception as exc:  # pragma: no cover - defensive
+    except Exception as exc:
         return await handle_exception(exc, request)
 
-# =============================================================================
-# DEEPSEEK ANALYSIS ENDPOINT
-# =============================================================================
-
-class DeepSeekRequest(BaseModel):
+class AnalysisRequest(BaseModel):
     context: str
     vedic_summary: str = ""
 
+
+def _extract_analysis_content(response_text: str) -> str:
+    """
+    Extract the assistant content from an OpenAI-compatible response.
+    Handles both standard JSON and SSE (Server-Sent Events) streaming formats.
+    Accumulates all SSE chunks into a single string.
+    """
+    import json as _json
+    text = response_text.strip()
+
+    # 1) Standard JSON response
+    try:
+        data = _json.loads(text)
+        return data["choices"][0]["message"]["content"]
+    except Exception:
+        pass
+
+    # 2) SSE streaming format -- accumulate all chunk contents
+    if "data: " in text:
+        parts = []
+        for line in text.splitlines():
+            line = line.strip()
+            if not line.startswith("data: ") or "DONE" in line:
+                continue
+            try:
+                chunk = _json.loads(line[6:])
+                delta = chunk.get("choices", [{}])[0].get("delta", {})
+                content = delta.get("content") or ""
+                if not content:
+                    msg = chunk.get("choices", [{}])[0].get("message", {})
+                    content = msg.get("content", "")
+                if content:
+                    parts.append(content)
+            except Exception:
+                continue
+        if parts:
+            return "".join(parts)
+
+    return ""
+
+
+def _is_valid_analysis(content: str) -> bool:
+    """
+    Validate that the content is a real astrological analysis, not a
+    safety-classifier output or garbage response.
+    """
+    if not content or len(content.strip()) < 100:
+        return False
+    lower = content.lower()
+    garbage_patterns = [
+        "user safety:",
+        "response safety:",
+        "user safety :",
+        "response safety :",
+        "safety: safe",
+        "safety: unsafe",
+        "the content is",
+    ]
+    for pat in garbage_patterns:
+        if pat in lower:
+            return False
+    return True
+
+
+async def _call_model(client, api_key, prompt, model):
+    """Call a single model via the local proxy."""
+    return await client.post(
+        "http://localhost:20128/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": model["name"],
+            "messages": [
+                {"role": "system", "content": "You are a professional astrologer. Write detailed Persian astrological analysis using HTML."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.75,
+            "max_tokens": model["max_tokens"],
+            "stream": False,
+        }
+    )
+
+
 @router.post("/api/v5/deepseek-analysis")
-async def deepseek_analysis(request: DeepSeekRequest):
+async def analyze_chart(request: AnalysisRequest):
     """
-    دریافت context و vedic_summary از فرانت، ارسال به DeepSeek از طریق OpenRouter و برگرداندن تحلیل.
+    Sends chart context + Vedic summary to the local proxy and returns the AI analysis.
     """
-    api_key = os.getenv("OPENROUTER_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="OPENROUTER_API_KEY not set in environment")
+    api_key = os.getenv("DEEPSEEK_API_KEY", "sk-76422dc5ee03d9c3-j1m8he-be3fb0c5")
 
     prompt = f"""
-شما یک اخترشناس حرفه‌ای و با تجربه هستید که به طالع‌بینی ودیک (Vedic Astrology) مسلط هستید.
+You are an experienced astrologer specializing in Vedic astrology.
 
-بر اساس اطلاعات چارت تولد زیر، یک تحلیل کامل، دقیق و زیبا به زبان فارسی بنویسید.
+Based on the birth chart data below, write a complete, accurate, and readable analysis in Persian (Farsi).
 
-**مهم:** از زبان ساده و روان استفاده کنید تا همه بتوانند متوجه شوند.
+**IMPORTANT:** Write simply and clearly so everyone can understand.
 
-**اطلاعات چارت (خام):**
+**Raw Chart Data:**
 {request.context}
 
 {request.vedic_summary}
 
 ---
 
-## 📋 ساختار تحلیل (لطفاً دقیقاً به همین ترتیب):
+## Analysis Structure:
 
-### ۱. شخصیت کلی و ویژگی‌های روانشناختی
-بر اساس خورشید (هویت)، ماه (احساسات) و برج طالع (نحوه برخورد با جهان)
-نقاط قوت و ضعف، تأثیر ناکشاترای ماه
+### 1. General Personality and Psychological Traits
+Based on Sun, Moon, and Rising sign
 
-### ۲. حوزه‌های شغلی و تحصیلی
-بر اساس خورشید (اهداف)، مریخ (انرژی)، خانه‌های ۱۰، ۶، ۲
-استعدادها و زمینه‌های شغلی مناسب
+### 2. Career and Education
+Based on Sun, Mars, Houses 10, 6, 2
 
-### ۳. روابط عاطفی و اجتماعی
-بر اساس ماه (نیازهای عاطفی)، ناهید (عشق)، خانه‌های ۷، ۵، ۱۲
-سبک ارتباطی و الگوهای رفتاری
+### 3. Romantic and Social Relationships
+Based on Moon, Venus, Houses 7, 5, 12
 
-### ۴. چالش‌ها و فرصت‌ها
-بر اساس سیارات چالش‌برانگیز (Dusthana Lords، Marakas، Neecha)
-راه‌های تبدیل چالش به فرصت
+### 4. Challenges and Opportunities
+Challenging planets and ways to turn challenges into opportunities
 
-### ۵. توصیه‌های کاربردی و جمع‌بندی
-۵ توصیه عملی برای رشد شخصی
-جمع‌بندی کلی و پیام نهایی الهام‌بخش
+### 5. Practical Recommendations and Summary
+5 practical tips + inspiring conclusion
 
 ---
 
-**نکات نگارش:**
-- از تکرار خودداری کنید.
-- از HTML برای ساختاردهی استفاده کنید (<h2>، <h3>، <ul>، <li>، <hr>).
-- لحن گرم، دوستانه و الهام‌بخش باشد.
+**Notes:** Do not repeat. Use HTML. Keep the tone warm and friendly.
 """
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": "deepseek/deepseek-chat",
-                "messages": [
-                    {"role": "system", "content": "شما یک اخترشناس حرفه‌ای هستید که به زبان فارسی تحلیل‌های دقیق و روان ارائه می‌دهید. از HTML برای ساختاردهی خروجی استفاده کنید."},
-                    {"role": "user", "content": prompt}
-                ],
-                "temperature": 0.75,
-                "max_tokens": 4000,
-            }
+    models = [
+        {"name": "openrouter/nvidia/nemotron-3.5-lightning:free", "max_tokens": 16384},
+        {"name": "openrouter/nvidia/nemotron-3-super-120b-a12b:free", "max_tokens": 16384},
+        {"name": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "max_tokens": 16384},
+        {"name": "openrouter/openrouter/free", "max_tokens": 16384},
+        {"name": "openrouter/cohere/north-mini-code:free", "max_tokens": 16384},
+    ]
+
+    async with httpx.AsyncClient(timeout=180.0, follow_redirects=True) as client:
+        errors = []
+        for model in models:
+            try:
+                logger.info("[ANALYSIS] Trying model: %s", model["name"])
+                response = await _call_model(client, api_key, prompt, model)
+
+                if response.status_code != 200:
+                    err_msg = f"{model['name']} -> HTTP {response.status_code}"
+                    try:
+                        err_detail = response.json().get("error", {}).get("message", "")
+                        if err_detail:
+                            err_msg += f": {err_detail[:200]}"
+                    except Exception:
+                        pass
+                    logger.warning("[ANALYSIS] %s", err_msg)
+                    errors.append(err_msg)
+                    continue
+
+                content = _extract_analysis_content(response.text)
+
+                if _is_valid_analysis(content):
+                    logger.info("[ANALYSIS] Success with %s (%d chars)", model["name"], len(content))
+                    return {"analysis": content}
+
+                err_msg = f"{model['name']} -> invalid response ({len(content)} chars)"
+                logger.warning("[ANALYSIS] %s", err_msg)
+                errors.append(err_msg)
+
+            except httpx.TimeoutException:
+                err_msg = f"{model['name']} -> timeout"
+                logger.warning("[ANALYSIS] %s", err_msg)
+                errors.append(err_msg)
+            except Exception as e:
+                err_msg = f"{model['name']} -> {type(e).__name__}: {e}"
+                logger.warning("[ANALYSIS] %s", err_msg)
+                errors.append(err_msg)
+
+        raise HTTPException(
+            status_code=502,
+            detail=f"All models failed. Errors: {'; '.join(errors)}"
         )
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail="خطا در ارتباط با OpenRouter")
-        data = response.json()
-        return {"analysis": data["choices"][0]["message"]["content"]}
+

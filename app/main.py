@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 
-from .routers import misc, charts, data, context, moon_phase
+from .routers import misc, charts, data, context, moon_phase, mizaj, abjad_router, tarot_router
 from .config.settings import settings
 from .middleware.secret_key_checker_middleware import SecretKeyCheckerMiddleware
 from .utils.validation_helpers import format_extra_field_error
@@ -49,18 +49,14 @@ app.include_router(data.router, tags=["Chart Data"])
 app.include_router(context.router, tags=["AI Context"])
 app.include_router(moon_phase.router, tags=["Moon Phase"])
 app.include_router(misc.router, tags=["Miscellaneous"])
+app.include_router(mizaj.router, tags=["Mizaj"])
+app.include_router(abjad_router.router, tags=["Abjad"])
+app.include_router(tarot_router.router, tags=["Tarot"])
 
 # ------------------------------------------------------------------------------
 # Serve static files (index.html, etc.)
 # ------------------------------------------------------------------------------
 app.mount("/", StaticFiles(directory=".", html=True), name="static")
-
-# اگر خواستی خودِ ریشه (/) حتماً index.html رو برگردونه
-@app.get("/")
-async def root():
-    return FileResponse("index.html")
-
-
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """

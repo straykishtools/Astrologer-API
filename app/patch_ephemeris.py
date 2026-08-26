@@ -3,6 +3,6 @@ import sys
 try:
     import libephemeris as swe
     sys.modules['swisseph'] = swe
-    print("✅ Ephemeris patched successfully")
+    print("[OK] Ephemeris patched successfully")
 except ImportError:
-    print("❌ libephemeris not found!")
+    print("[WARN] libephemeris not found!")

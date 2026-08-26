@@ -43,7 +43,7 @@ class VedicDB:
             return
         self._initialized = True
         self.data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
-        print(f"📁 مسیر دیتابیس: {self.data_dir}")
+        print(f"[DATA] مسیر دیتابیس: {self.data_dir}")
         self._load_all_data()
     
     def _load_all_data(self):
@@ -76,7 +76,9 @@ class VedicDB:
         for file in bhava_files:
             data = self._load_json(file)
             if data:
-                self.graha_in_bhava.update(data)
+                # JSON files are wrapped: {"graha_in_bhava": {"Moon": {...}}}
+                inner = data.get('graha_in_bhava', data)
+                self.graha_in_bhava.update(inner)
         
         # ۳. Lagna
         self._load_json('lagna_ascendant_12_rashis.json', 'lagna')
@@ -95,14 +97,14 @@ class VedicDB:
         if lordship_data:
             if "Lagna" in lordship_data:
                 self.lordship = lordship_data["Lagna"]
-                print(f"✅ Lordship بارگذاری شد (از کلید Lagna): {len(self.lordship)} برج")
+                print(f"[OK] Lordship بارگذاری شد (از کلید Lagna): {len(self.lordship)} برج")
             else:
                 self.lordship = lordship_data
-                print(f"✅ Lordship بارگذاری شد: {len(self.lordship)} برج")
+                print(f"[OK] Lordship بارگذاری شد: {len(self.lordship)} برج")
             for sign in list(self.lordship.keys())[:3]:
-                print(f"   📍 {sign}: {len(self.lordship[sign])} سیاره")
+                print(f"     *  {sign}: {len(self.lordship[sign])} سیاره")
         else:
-            print("❌ Lordship بارگذاری نشد!")
+            print("[ERR] Lordship بارگذاری نشد!")
         
         # ۷. Nakshatra
         self._load_nakshatras()
@@ -111,19 +113,19 @@ class VedicDB:
         dignity_data = self._load_json('planetary_dignity.json')
         if dignity_data:
             self.planetary_dignity = dignity_data
-            print("✅ Planetary Dignity بارگذاری شد.")
+            print("[OK] Planetary Dignity بارگذاری شد.")
         else:
             self.planetary_dignity = {}
-            print("⚠️ Planetary Dignity بارگذاری نشد!")
+            print("[WARN] Planetary Dignity بارگذاری نشد!")
     
     def _load_nakshatras(self):
         data = self._load_json('nakshatras.json')
         if data:
             self.nakshatras = data.get('nakshatras', [])
-            print(f"✅ ناکشاتراها بارگذاری شد: {len(self.nakshatras)} عدد")
+            print(f"[OK] ناکشاتراها بارگذاری شد: {len(self.nakshatras)} عدد")
         else:
             self.nakshatras = []
-            print("⚠️ ناکشاتراها بارگذاری نشد!")
+            print("[WARN] ناکشاتراها بارگذاری نشد!")
     
     def _load_json(self, filename: str, target_attr: Optional[str] = None) -> Optional[Dict]:
         filepath = os.path.join(self.data_dir, filename)
@@ -134,10 +136,10 @@ class VedicDB:
                     setattr(self, target_attr, data)
                 return data
         except FileNotFoundError:
-            print(f"⚠️ فایل {filename} یافت نشد.")
+            print(f"[WARN] فایل {filename} یافت نشد.")
             return None
         except json.JSONDecodeError as e:
-            print(f"⚠️ خطا در خواندن {filename}: {e}")
+            print(f"[WARN] خطا در خواندن {filename}: {e}")
             return None
     
     # ============================================================
@@ -150,9 +152,17 @@ class VedicDB:
         except:
             return None
     
+    HOUSE_NAME_TO_NUM = {
+        'First': '1', 'Second': '2', 'Third': '3', 'Fourth': '4',
+        'Fifth': '5', 'Sixth': '6', 'Seventh': '7', 'Eighth': '8',
+        'Ninth': '9', 'Tenth': '10', 'Eleventh': '11', 'Twelfth': '12',
+    }
+
     def get_graha_in_bhava(self, planet: str, house: str) -> Optional[str]:
         try:
-            return self.graha_in_bhava.get(planet, {}).get(house)
+            # Convert house name (e.g. "Tenth") to number (e.g. "10")
+            house_key = self.HOUSE_NAME_TO_NUM.get(house, house)
+            return self.graha_in_bhava.get(planet, {}).get(house_key)
         except:
             return None
     
@@ -284,7 +294,7 @@ class VedicDB:
                 actual_houses.append(actual_house)
             return sorted(set(actual_houses))
         except Exception as e:
-            print(f"⚠️ خطا در محاسبه‌ی Drishti برای {planet}: {e}")
+            print(f"[WARN] خطا در محاسبه‌ی Drishti برای {planet}: {e}")
             return []
     
     # ============================================================
@@ -475,7 +485,7 @@ class VedicDB:
 # ================================================================
 if __name__ == "__main__":
     db = VedicDB()
-    print("\n🔍 تست Planetary Strength:")
+    print("\n[TEST] تست Planetary Strength:")
     test_cases = [
         ('Sun', 'Leo', 15),
         ('Sun', 'Aries', 10),
