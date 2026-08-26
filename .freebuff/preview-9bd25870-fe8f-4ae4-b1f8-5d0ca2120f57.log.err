@@ -1,0 +1,6 @@
+INFO:     Loading development config
+[2026-08-26 19:47:49] DEBUG:    Using proactor: IocpProactor - Module: asyncio
+[2026-08-26 19:47:49] INFO:     Started server process [26040] - Module: uvicorn.error
+[2026-08-26 19:47:49] INFO:     Waiting for application startup. - Module: uvicorn.error
+[2026-08-26 19:47:49] INFO:     Application startup complete. - Module: uvicorn.error
+[2026-08-26 19:47:49] INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit) - Module: uvicorn.error
