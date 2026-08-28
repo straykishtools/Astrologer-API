@@ -189,7 +189,7 @@ class HafezService:
             "date": date,
             "ghazal_number": ghazal_number,
             "ghazal_number_fa": self._to_persian_number(ghazal_number),
-            "title": selected_poem_meta.get("Title", f"غزل شمارهٔ {ghazal_number}"),
+            "title": selected_poem_meta.get("FullTitle""),
             "source": "گنجور (Ganjoor)",
             "raw": ghazal_data  # اطلاعات خام برای دیباگ (اختیاری)
         }
