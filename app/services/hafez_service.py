@@ -7,6 +7,7 @@ import json
 import random
 import logging
 import os
+import re
 from typing import Optional, Dict, Any
 
 logger = logging.getLogger(__name__)
@@ -46,15 +47,7 @@ class HafezService:
             self.ghazals = []
 
     def _load_ghazal_file(self, sh_number: int) -> Optional[Dict[str, Any]]:
-        """
-        بارگذاری یک فایل غزل با شماره مشخص
-
-        Args:
-            sh_number: شماره غزل (مثلاً 1 برای sh1.json)
-
-        Returns:
-            دیکشنری داده‌های غزل یا None در صورت خطا
-        """
+        """بارگذاری یک فایل غزل با شماره مشخص"""
         filename = f"sh{sh_number}.json"
         filepath = os.path.join(self.data_dir, filename)
 
@@ -69,11 +62,7 @@ class HafezService:
             return None
 
     def _extract_poem_text(self, ghazal_data: Dict[str, Any]) -> str:
-        """
-        استخراج متن کامل شعر از داده‌های غزل
-
-        اولویت: PlainText > ترکیب Verses
-        """
+        """استخراج متن کامل شعر از داده‌های غزل"""
         # ۱. بررسی PlainText
         sections = ghazal_data.get("Sections", [])
         for section in sections:
@@ -100,72 +89,105 @@ class HafezService:
         poem_summary = ghazal_data.get("PoemSummary", "")
         if poem_summary:
             return poem_summary
-
-        # اگر تفسیر نبود، از متن شعر یک جمله‌ی پیش‌فرض بساز
         return "🍃 فال حافظ دریافت شد. برای تفسیر کامل، به تفأل‌های دیگر مراجعه کنید."
+
+    def _extract_ghazal_number_from_meta(self, poem_meta: dict) -> int:
+        """
+        استخراج شماره‌ی واقعی غزل از meta data (FullUrl یا Title)
+        اولویت: FullUrl > Title > Id (fallback)
+        """
+        # ۱. از FullUrl: /hafez/ghazal/sh123 → 123
+        full_url = poem_meta.get("FullUrl", "")
+        if full_url and "sh" in full_url:
+            try:
+                sh_part = full_url.split("/")[-1]  # sh123
+                if sh_part.startswith("sh"):
+                    return int(sh_part.replace("sh", ""))
+            except (ValueError, IndexError):
+                pass
+
+        # ۲. از Title: "غزل شمارهٔ ۱۲۳" → 123
+        title = poem_meta.get("Title", "")
+        if "شمارهٔ" in title:
+            try:
+                match = re.search(r"شمارهٔ\s*(\d+)", title)
+                if match:
+                    return int(match.group(1))
+            except:
+                pass
+
+        # ۳. در نهایت از Id استفاده کن
+        return poem_meta.get("Id", 0)
 
     async def get_poem(self, question: Optional[str] = None) -> Dict[str, Any]:
         """
-        دریافت یک غزل تصادفی از حافظ
-
-        Args:
-            question: سوال اختیاری کاربر برای فال
+        دریافت یک غزل تصادفی از حافظ با خروجی دوستونه
 
         Returns:
-            dict: شامل شعر، تفسیر، شماره غزل، تاریخ و (اختیاری) سوال کاربر
+            dict: {
+                "poem": متن شعر,
+                "interpretation": تفسیر,
+                "metadata": { شماره غزل، عنوان، منبع، تاریخ },
+                "question": سوال کاربر (اختیاری)
+            }
         """
         # ============================================
         # ۱. بررسی وجود دیتاست
         # ============================================
         if not self.ghazals:
             return {
-                "error": "دیتاست فال حافظ در دسترس نیست. لطفاً پوشه‌ی hafez_ghazals را بررسی کنید.",
+                "error": "دیتاست فال حافظ در دسترس نیست.",
                 "detail": "فایل cat.json پیدا نشد یا خالی است."
             }
 
-        # ============================================
-        # ۲. انتخاب غزل تصادفی
-        # ============================================
-        # (تعداد غزل‌ها را از cat.json می‌گیریم)
         total_ghazals = len(self.ghazals)
         if total_ghazals == 0:
             return {"error": "هیچ غزلی در دیتاست یافت نشد."}
 
+        # ============================================
+        # ۲. انتخاب غزل تصادفی
+        # ============================================
         random_index = random.randint(0, total_ghazals - 1)
         selected_poem_meta = self.ghazals[random_index]
 
-        # استخراج شماره غزل از FullUrl
-        full_url = selected_poem_meta.get("FullUrl", "")
-        try:
-            sh_number = int(full_url.split("/")[-1].replace("sh", ""))
-        except (ValueError, IndexError):
-            # اگر شماره قابل استخراج نبود، از Id استفاده کن
-            sh_number = selected_poem_meta.get("Id", 0)
-            if not sh_number:
-                return {"error": "شماره غزل قابل تشخیص نیست."}
+        # استخراج شماره غزل از meta
+        ghazal_number = self._extract_ghazal_number_from_meta(selected_poem_meta)
+
+        # اگر شماره پیدا نشد، از FullUrl دوباره امتحان کن (fallback)
+        if not ghazal_number:
+            full_url = selected_poem_meta.get("FullUrl", "")
+            try:
+                ghazal_number = int(full_url.split("/")[-1].replace("sh", ""))
+            except (ValueError, IndexError):
+                ghazal_number = selected_poem_meta.get("Id", 0)
+
+        if not ghazal_number:
+            return {"error": "شماره غزل قابل تشخیص نیست."}
 
         # ============================================
         # ۳. بارگذاری فایل غزل
         # ============================================
-        ghazal_data = self._load_ghazal_file(sh_number)
+        ghazal_data = self._load_ghazal_file(ghazal_number)
         if ghazal_data is None:
             # اگر فایل خراب بود، یک غزل دیگر امتحان کن (حداکثر ۵ بار)
             for _ in range(5):
                 random_index = random.randint(0, total_ghazals - 1)
                 selected_poem_meta = self.ghazals[random_index]
-                full_url = selected_poem_meta.get("FullUrl", "")
-                try:
-                    sh_number = int(full_url.split("/")[-1].replace("sh", ""))
-                except (ValueError, IndexError):
-                    sh_number = selected_poem_meta.get("Id", 0)
-                ghazal_data = self._load_ghazal_file(sh_number)
+                ghazal_number = self._extract_ghazal_number_from_meta(selected_poem_meta)
+                if not ghazal_number:
+                    full_url = selected_poem_meta.get("FullUrl", "")
+                    try:
+                        ghazal_number = int(full_url.split("/")[-1].replace("sh", ""))
+                    except (ValueError, IndexError):
+                        ghazal_number = selected_poem_meta.get("Id", 0)
+                ghazal_data = self._load_ghazal_file(ghazal_number)
                 if ghazal_data is not None:
                     break
 
             if ghazal_data is None:
                 return {
-                    "error": "خطا در بارگذاری غزل تصادفی. لطفاً دوباره امتحان کنید.",
-                    "detail": f"فایل sh{sh_number}.json پیدا نشد یا خراب است."
+                    "error": "خطا در بارگذاری غزل تصادفی.",
+                    "detail": f"فایل sh{ghazal_number}.json پیدا نشد یا خراب است."
                 }
 
         # ============================================
@@ -173,33 +195,30 @@ class HafezService:
         # ============================================
         poem_text = self._extract_poem_text(ghazal_data)
         interpretation = self._extract_interpretation(ghazal_data)
-
-        # شماره غزل
-        ghazal_number = ghazal_data.get("Id", sh_number)
-
-        # تاریخ (از cat.json یا خود فایل)
         date = selected_poem_meta.get("Date", "")
 
         # ============================================
-        # ۵. ساختن نتیجه نهایی
+        # ۵. خروجی دوستونه (شعر | تفسیر + متادیتا)
         # ============================================
         result = {
-            "poem": poem_text,
+            # ----- بخش شعر (سمت راست / بالا) -----
+            "poem": poem_text if poem_text else "🍃 فال حافظ دریافت شد، اما متن شعر در دسترس نیست.",
+            
+            # ----- بخش تفسیر (سمت چپ / پایین) -----
             "interpretation": interpretation,
-            "date": date,
-            "ghazal_number": ghazal_number,
-            "ghazal_number_fa": self._to_persian_number(ghazal_number),
-            "title": selected_poem_meta.get("FullTitle"),
-            "source": "گنجور (Ganjoor)",
-            "raw": ghazal_data  # اطلاعات خام برای دیباگ (اختیاری)
+            
+            # ----- متادیتا (اطلاعات غزل) -----
+            "metadata": {
+                "ghazal_number": ghazal_number,
+                "ghazal_number_fa": self._to_persian_number(ghazal_number),
+                "title": selected_poem_meta.get("FullTitle", selected_poem_meta.get("Title", f"غزل شمارهٔ {ghazal_number}")),
+                "source": "گنجور (Ganjoor)",
+                "date": date,
+            },
+            
+            # ----- سوال کاربر (اگر وجود داشته باشد) -----
+            "question": question if question else None,
         }
-
-        if question:
-            result["question"] = question
-
-        # اگر شعر خالی بود، یک پیام جایگزین بگذاریم
-        if not result["poem"]:
-            result["poem"] = "🍃 فال حافظ دریافت شد، اما متن شعر در دسترس نیست."
 
         return result
 
