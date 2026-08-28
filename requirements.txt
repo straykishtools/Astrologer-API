@@ -9,3 +9,4 @@ requests
 simple-ascii-tables
 requests-cache
 scour
+pydantic-settings
