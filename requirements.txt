@@ -1,11 +1,11 @@
 fastapi
-uvicorn
-libephemeris
+uvicorn[standard]
+kerykeion>=5.12.9
 python-dotenv
 pydantic
 pytz
 requests
-simple-ascii-tables
 requests-cache
 scour
+simple-ascii-tables
 pydantic-settings
