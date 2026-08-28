@@ -29,6 +29,7 @@ from ..types.response_models import (
 from ..utils.get_time_from_google import get_time_from_google
 from ..utils.router_utils import (
     build_subject,
+    resolve_location_for_subject,
     calculate_return_chart_data,
     context_payload,
     create_natal_chart_data,
@@ -61,6 +62,7 @@ async def subject_context(
 
     try:
         active_points = resolve_active_points(birth_data_request.active_points)
+        await resolve_location_for_subject(birth_data_request.subject)
         subject = build_subject(birth_data_request.subject, active_points=active_points)
         return JSONResponse(content=subject_context_payload(subject), status_code=200)
 
@@ -82,7 +84,7 @@ async def natal_context(
     )
 
     try:
-        chart_data = create_natal_chart_data(request_body)
+        chart_data = await create_natal_chart_data(request_body)
         return JSONResponse(content=context_payload(chart_data), status_code=200)
     except Exception as exc:
         return await handle_exception(exc, request)
@@ -102,7 +104,7 @@ async def synastry_context(
     )
 
     try:
-        chart_data = create_synastry_chart_data(request_body)
+        chart_data = await create_synastry_chart_data(request_body)
         return JSONResponse(content=context_payload(chart_data), status_code=200)
     except Exception as exc:
         return await handle_exception(exc, request)
@@ -122,7 +124,7 @@ async def composite_context(
     )
 
     try:
-        chart_data = create_composite_chart_data(request_body)
+        chart_data = await create_composite_chart_data(request_body)
         return JSONResponse(content=context_payload(chart_data), status_code=200)
     except Exception as exc:
         return await handle_exception(exc, request)
@@ -142,7 +144,7 @@ async def transit_context(
     )
 
     try:
-        chart_data = create_transit_chart_data(request_body)
+        chart_data = await create_transit_chart_data(request_body)
         return JSONResponse(content=context_payload(chart_data), status_code=200)
     except Exception as exc:
         return await handle_exception(exc, request)
@@ -162,7 +164,7 @@ async def solar_return_context(
     )
 
     try:
-        chart_data = calculate_return_chart_data(request_body, "Solar")
+        chart_data = await calculate_return_chart_data(request_body, "Solar")
         payload = context_payload(chart_data)
         payload["return_type"] = "Solar"
         payload["wheel_type"] = request_body.wheel_type
@@ -185,7 +187,7 @@ async def lunar_return_context(
     )
 
     try:
-        chart_data = calculate_return_chart_data(request_body, "Lunar")
+        chart_data = await calculate_return_chart_data(request_body, "Lunar")
         payload = context_payload(chart_data)
         payload["return_type"] = "Lunar"
         payload["wheel_type"] = request_body.wheel_type

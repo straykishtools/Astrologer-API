@@ -1,14 +1,17 @@
 """
 Router: فال حافظ (Hafez Divination)
+ترکیب دریافت داده از API + پردازش و تکمیل اطلاعات
 """
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from app.services.hafez_service import HafezService
+from app.services.hafez_processor import HafezProcessor
 
 router = APIRouter(prefix="/api/v5", tags=["Hafez"])
 service = HafezService()
+processor = HafezProcessor()
 
 
 class HafezRequest(BaseModel):
@@ -17,14 +20,19 @@ class HafezRequest(BaseModel):
 
 @router.post("/hafez")
 async def get_hafez(data: HafezRequest):
-    """دریافت فال حافظ — غزل تصادفی با تفسیر"""
+    """دریافت فال حافظ با اطلاعات تکمیل‌شده"""
     try:
-        result = await service.get_poem(data.question)
-        if "error" in result:
-            raise HTTPException(status_code=502, detail=result["error"])
-        return {"status": "success", "data": result}
-    except HTTPException:
-        raise
+        # ۱. دریافت داده خام از API
+        raw_result = await service.get_poem(data.question)
+
+        # اگر خطا بود، همان خطا را برگردان
+        if raw_result.get("error"):
+            return {"status": "error", **raw_result}
+
+        # ۲. پردازش و تکمیل اطلاعات
+        enriched_result = processor.enrich(raw_result)
+
+        return {"status": "success", "data": enriched_result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -33,11 +41,12 @@ async def get_hafez(data: HafezRequest):
 async def get_hafez_get():
     """دریافت فال حافظ با GET (بدون سوال)"""
     try:
-        result = await service.get_poem()
-        if "error" in result:
-            raise HTTPException(status_code=502, detail=result["error"])
-        return {"status": "success", "data": result}
-    except HTTPException:
-        raise
+        raw_result = await service.get_poem()
+
+        if raw_result.get("error"):
+            return {"status": "error", **raw_result}
+
+        enriched_result = processor.enrich(raw_result)
+        return {"status": "success", "data": enriched_result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -146,7 +146,7 @@ async def compatibility_score(request_body: SynastryChartDataRequestModel, reque
     log_request_with_body(logger, request, "Compatibility score request", request_body.model_dump_json())
 
     try:
-        chart_data = create_synastry_chart_data(request_body)
+        chart_data = await create_synastry_chart_data(request_body)
 
         if not chart_data.relationship_score:  # pragma: no cover - defensive
             raise ValueError("Relationship score computation failed")
@@ -192,7 +192,7 @@ async def natal_chart_data(request_body: BirthChartDataRequestModel, request: Re
 
     try:
         # ۱. ایجاد چارت اصلی
-        chart_data = create_natal_chart_data(request_body)
+        chart_data = await create_natal_chart_data(request_body)
 
         # ۲. ایجاد نمونه از دیتابیس Vedic (Singleton)
         vedic_db = VedicDB()
@@ -261,7 +261,7 @@ async def synastry_chart_data(request_body: SynastryChartDataRequestModel, reque
     log_request_with_body(logger, request, "Synastry chart data request", request_body.model_dump_json())
 
     try:
-        chart_data = create_synastry_chart_data(request_body)
+        chart_data = await create_synastry_chart_data(request_body)
         return JSONResponse(content=chart_data_payload(chart_data), status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)
@@ -285,7 +285,7 @@ async def composite_chart_data(request_body: CompositeChartDataRequestModel, req
     log_request_with_body(logger, request, "Composite chart data request", request_body.model_dump_json())
 
     try:
-        chart_data = create_composite_chart_data(request_body)
+        chart_data = await create_composite_chart_data(request_body)
         return JSONResponse(content=chart_data_payload(chart_data), status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)
@@ -310,7 +310,7 @@ async def transit_chart_data(request_body: TransitChartDataRequestModel, request
     log_request_with_body(logger, request, "Transit chart data request", request_body.model_dump_json())
 
     try:
-        chart_data = create_transit_chart_data(request_body)
+        chart_data = await create_transit_chart_data(request_body)
         return JSONResponse(content=chart_data_payload(chart_data), status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)
@@ -335,7 +335,7 @@ async def solar_return_data(request_body: PlanetaryReturnDataRequestModel, reque
     log_request_with_body(logger, request, "Solar return data request", request_body.model_dump_json())
 
     try:
-        chart_data = calculate_return_chart_data(request_body, "Solar")
+        chart_data = await calculate_return_chart_data(request_body, "Solar")
         return JSONResponse(content=chart_data_payload(chart_data), status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)
@@ -358,7 +358,7 @@ async def lunar_return_data(request_body: PlanetaryReturnDataRequestModel, reque
     log_request_with_body(logger, request, "Lunar return data request", request_body.model_dump_json())
 
     try:
-        chart_data = calculate_return_chart_data(request_body, "Lunar")
+        chart_data = await calculate_return_chart_data(request_body, "Lunar")
         return JSONResponse(content=chart_data_payload(chart_data), status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)

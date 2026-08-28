@@ -116,7 +116,7 @@ async def natal_chart(request_body: BirthChartRequestModel, request: Request) ->
     log_request_with_body(logger, request, "Birth chart request", request_body.model_dump_json())
 
     try:
-        chart_data = create_natal_chart_data(request_body)
+        chart_data = await create_natal_chart_data(request_body)
         payload = chart_payload(
             chart_data,
             request_body.theme,
@@ -147,7 +147,7 @@ async def synastry_chart(request_body: SynastryChartRequestModel, request: Reque
     log_request_with_body(logger, request, "Synastry chart request", request_body.model_dump_json())
 
     try:
-        chart_data = create_synastry_chart_data(request_body)
+        chart_data = await create_synastry_chart_data(request_body)
         payload = chart_payload(
             chart_data,
             request_body.theme,
@@ -178,7 +178,7 @@ async def composite_chart(request_body: CompositeChartRequestModel, request: Req
     log_request_with_body(logger, request, "Composite chart request", request_body.model_dump_json())
 
     try:
-        chart_data = create_composite_chart_data(request_body)
+        chart_data = await create_composite_chart_data(request_body)
         payload = chart_payload(
             chart_data,
             request_body.theme,
@@ -209,7 +209,7 @@ async def transit_chart(request_body: TransitChartRequestModel, request: Request
     log_request_with_body(logger, request, "Transit chart request", request_body.model_dump_json())
 
     try:
-        chart_data = create_transit_chart_data(request_body)
+        chart_data = await create_transit_chart_data(request_body)
         payload = chart_payload(
             chart_data,
             request_body.theme,
@@ -240,7 +240,7 @@ async def solar_return_chart(request_body: PlanetaryReturnRequestModel, request:
     log_request_with_body(logger, request, "Solar return chart request", request_body.model_dump_json())
 
     try:
-        chart_data = calculate_return_chart_data(request_body, "Solar")
+        chart_data = await calculate_return_chart_data(request_body, "Solar")
         payload = chart_payload(
             chart_data,
             request_body.theme,
@@ -273,7 +273,7 @@ async def lunar_return_chart(request_body: PlanetaryReturnRequestModel, request:
     log_request_with_body(logger, request, "Lunar return chart request", request_body.model_dump_json())
 
     try:
-        chart_data = calculate_return_chart_data(request_body, "Lunar")
+        chart_data = await calculate_return_chart_data(request_body, "Lunar")
         payload = chart_payload(
             chart_data,
             request_body.theme,
@@ -303,7 +303,7 @@ async def lunar_return_chart(request_body: PlanetaryReturnRequestModel, request:
 async def get_chart_svg(request_body: BirthChartRequestModel):
     try:
         # 1. ایجاد chart_data با استفاده از تابع موجود (که با مدل‌های Pydantic کار می‌کند)
-        chart_data = create_natal_chart_data(request_body)
+        chart_data = await create_natal_chart_data(request_body)
         
         # 2. تولید payload کامل که شامل SVG است
         payload = chart_payload(

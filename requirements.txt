@@ -10,3 +10,4 @@ scour
 simple-ascii-tables
 pydantic-settings
 httpx>=0.28.0
+jdatetime

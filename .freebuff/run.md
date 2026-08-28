@@ -3,33 +3,39 @@
 ## How to reproduce the uncommitted artifacts
 
 1. The Python venv is already present at `venv/Scripts/python.exe`.
-2. No `.env.local` needed — env vars are set inline in the startup script.
-3. The `app/engines/` directory must exist with `__init__.py` and `abjad.py`.
+2. `libephemeris` is installed in the venv — it substitutes for `swisseph`.
+3. `.freebuff/server_wrapper.py` patches `sys.modules['swisseph']` with `libephemeris` before importing `app.main`. This is required because kerykeion directly imports `swisseph`.
+4. No `.env.local` needed — env vars are set in the wrapper script.
 
 ## How to run the server
 
-Default port is 8000. If that's held by another thread, pick a free port (check with `netstat`). Current free ports: try 8030, 8040, etc.
+### Port: 8003 (default; port 8000 is held by other processes)
 
+**Option A — Via PowerShell startup script (preferred for detached preview):**
 ```powershell
-# Port 8003 (if 8000 is busy)
-$env:KERYKEION_EPHEMERIS_BACKEND = "libephemris"
+powershell -NoProfile -ExecutionPolicy Bypass -File .freebuff\start-preview.ps1
+```
+This starts the server detached via `Start-Process`, logging to `.freebuff\preview-*.log`.
+
+**Option B — Direct invocation:**
+```powershell
+$env:KERYKEION_EPHEMERIS_BACKEND = "libephemeris"
 $env:PYTHONIOENCODING = "utf-8"
 $env:ENV_TYPE = "dev"
-& "venv\Scripts\python.exe" -m uvicorn app.main:app --host 127.0.0.1 --port 8003
+& "venv\Scripts\python.exe" .freebuff\server_wrapper.py
 ```
 
-Or via the startup script (defaults to 8000):
+**Option C — Via start.bat (port 8000, with --reload):**
 ```
-powershell -NoProfile -ExecutionPolicy Bypass -File .freebuff/start-server.ps1
+start.bat
 ```
 
 ## Route structure
 
-- `GET /` → `index.html` (served by StaticFiles with `html=True`)
-- `GET /api/status` → JSON status (moved from `/` in misc.py)
-- `GET /health` → JSON health check (unchanged)
+- `GET /` → `index.html` (served as FileResponse)
+- `GET /health` → `{"status": "OK"}`
 
-## Chart endpoints (frontend tabs)
+## Frontend tabs
 
 | Tab | API Endpoint | Input |
 |-----|-------------|-------|
@@ -39,50 +45,31 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .freebuff/start-server.ps1
 | ترانزیت | `POST /api/v5/chart-data/transit` | natal + transit date |
 | بازگشت خورشیدی | `POST /api/v5/chart-data/solar-return` | subject + year |
 | بازگشت ماهانه | `POST /api/v5/chart-data/lunar-return` | subject + year/month |
+| مزاج‌شناسی | `POST /api/v5/mizaj` | questionnaire answers |
+| ابجد | `POST /api/v5/abjad` | text + method |
+| تاروت | `GET /api/v5/tarot/daily`, `POST /api/v5/tarot/draw` | — / count |
+| عددشناسی | `POST /api/v5/numerology/life-path` | year/month/day |
+| بیوریتم | `POST /api/v5/biorhythm` | birth_date |
+| سال حیوانی | `POST /api/v5/chinese-zodiac` | year |
+| پرسش روزانه | `POST /api/v5/daily-question` | question/birth_date/birth_year |
+| فال حافظ | `POST /api/v5/hafez` | optional question |
 
-## Mizaj endpoints
+## Geo API Resolution (City → Coordinates)
 
-| Endpoint | Input | Description |
-|----------|-------|-------------|
-| `POST /api/v5/mizaj` | `{questionnaire_type: "mmq"|"smq", answers: {q1..q10 or q1..q20}}` | Calculate temperament |
+The system uses a **Geo API → GeoNames fallback** strategy for resolving city coordinates:
 
-- MMQ (10Q Mojahedi): Q1-Q8 hot/cold (1-3), Q9-Q10 wet/dry (1-3)
-- SMQ (20Q Salmannezhad): Q1-Q15 hot/cold (1-5), Q16-Q20 wet/dry (1-5)
+1. **Primary**: `GeoService` (apidevelopers.ir/api/v1/geo) resolves city → lat/lng/tz
+2. **Fallback**: If Geo API fails (timeout, 5xx, network error), falls back to GeoNames (kerykeion `online=True`)
+3. **Offline**: If all coords are provided directly, no API call is made
 
-## Abjad endpoints
-
-| Endpoint | Input | Description |
-|----------|-------|-------------|
-| `POST /api/v5/abjad` | `{text: "string", method: "kabir"|"saghir"}` | Abjad numerology calculation |
-| `POST /api/v5/abjad/compare` | `{name1: "string", name2: "string", method: "kabir"|"saghir"}` | Compare two names by abjad |
-
-### Abjad engine location
-- `app/engines/abjad.py` — calculation logic
-- `app/routers/abjad_router.py` — FastAPI router
-- Registered in `app/main.py` as `abjad_router`
-
-## Tarot endpoints
-
-| Endpoint | Input | Description |
-|----------|-------|-------------|
-| `GET /api/v5/tarot/cards` | — | All 78 cards (glossary) |
-| `GET /api/v5/tarot/daily` | — | Daily card (date-seeded, same card all day) |
-| `POST /api/v5/tarot/draw` | `{count: 1-78, with_reversed: true}` | Random card draw |
-| `GET /api/v5/tarot/spread/three` | — | Past/Present/Future 3-card spread |
-| `GET /api/v5/tarot/spread/celtic` | — | 10-card Celtic Cross spread |
-
-### Tarot engine location
-- `app/engines/tarot.py` — TarotEngine class
-- `app/routers/tarot_router.py` — FastAPI router
-- Registered in `app/main.py` as `tarot_router`
-- Card data: `app/cards.json` (78 Persian-translated tarot cards)
+Resolution is handled in `app/utils/router_utils.py` via:
+- `try_geo_api_resolution(city, nation)` — tries Geo API, returns coords or None
+- `resolve_location_for_subject(subject_request)` — fills in missing coords
+- All `create_*_chart_data()` functions call the resolver before building subjects
 
 ## Known issues
 
-- Port 8080 is held by other processes; 8030 was previously used by this thread
-
+- Port 8000 is held by other processes; 8003 is the current preview port
+- `swisseph` is not installed — `libephemeris` is used via `server_wrapper.py` patch
 - All OpenRouter free models share a daily rate limit (429 when exhausted)
 - `/api/v5/deepseek-analysis` needs a paid API key for reliable analysis
-- Vedic bhava filename mismatch was fixed (files renamed + unwrapping added)
-- All emoji in print() statements replaced with ASCII equivalents for Windows cp1252 compat
-- Port 8002 may be held by stale processes; use 8003 if needed

@@ -23,6 +23,7 @@ from kerykeion.settings.config_constants import (
 
 from kerykeion.schemas.kr_models import MoonPhaseOverviewModel
 
+from ..services.geo_service import GeoService
 from ..types.request_models import (
     BirthChartDataRequestModel,
     BirthChartRequestModel,
@@ -39,6 +40,9 @@ from ..types.request_models import (
 )
 
 logger = getLogger(__name__)
+
+# Shared Geo API service instance
+_geo_service = GeoService()
 
 GEONAMES_HINT = (
     "You can create a free GeoNames username at https://www.geonames.org/login/. "
@@ -134,6 +138,153 @@ def resolve_active_aspects(aspects: Optional[Sequence[ActiveAspect]]) -> list[di
     if aspects:
         return [dict(aspect) for aspect in aspects]
     return [dict(item) for item in DEFAULT_ACTIVE_ASPECTS]
+
+
+async def try_geo_api_resolution(
+    city: Optional[str],
+    nation: Optional[str],
+) -> Optional[dict]:
+    """
+    Try to resolve city coordinates using the Geo API (primary source).
+
+    Args:
+        city: City name.
+        nation: Optional ISO country code.
+
+    Returns:
+        Dict with lat, lng, timezone on success, or None on failure.
+    """
+    if not city:
+        return None
+
+    result = await _geo_service.get_coordinates(city, nation)
+    if "error" in result:
+        logger.warning("Geo API failed for city=%r, nation=%r: %s", city, nation, result["error"])
+        return None
+
+    lat = result.get("lat")
+    lng = result.get("lng")
+    tz = result.get("timezone")
+
+    if not all([lat, lng, tz]):
+        logger.warning("Geo API returned incomplete data for city=%r: %s", city, result)
+        return None
+
+    logger.info(
+        "Geo API resolved city=%r -> lat=%.4f, lng=%.4f, tz=%s",
+        city, lat, lng, tz,
+    )
+    return {"lat": lat, "lng": lng, "timezone": tz}
+
+
+async def resolve_location_for_subject(
+    subject_request: SubjectModel,
+) -> None:
+    """
+    Resolve missing location fields on a SubjectModel.
+
+    Strategy:
+      1. If lat, lng, and timezone are all provided → no resolution needed.
+      2. If coords are missing → try Geo API (primary).
+      3. If Geo API fails and geonames_username is set → fall back to GeoNames.
+      4. If Geo API fails and no geonames_username → raise an error.
+
+    This function mutates the subject_request in-place, filling in
+    latitude, longitude, and timezone from the Geo API when possible.
+    """
+    lat = subject_request.latitude
+    lng = subject_request.longitude
+    tz = subject_request.timezone
+    city = subject_request.city
+    nation = subject_request.nation
+    geonames = subject_request.geonames_username
+
+    # All coords already present — nothing to do
+    if lat is not None and lng is not None and tz is not None:
+        return
+
+    # Try Geo API first (primary source)
+    geo_result = await try_geo_api_resolution(city, nation)
+    if geo_result:
+        if subject_request.latitude is None:
+            subject_request.latitude = geo_result["lat"]
+        if subject_request.longitude is None:
+            subject_request.longitude = geo_result["lng"]
+        if subject_request.timezone is None:
+            subject_request.timezone = geo_result["timezone"]
+        # Geo API succeeded — clear geonames_username so kerykeion uses offline mode
+        subject_request.geonames_username = None
+        logger.info(
+            "Location resolved via Geo API for city=%r: lat=%.4f, lng=%.4f, tz=%s",
+            city, subject_request.latitude, subject_request.longitude, subject_request.timezone,
+        )
+        return
+
+    # Geo API failed — fall back to GeoNames if available
+    if geonames:
+        logger.info(
+            "Geo API failed for city=%r, falling back to GeoNames",
+            city,
+        )
+        # Clear any partial coords so kerykeion resolves everything via GeoNames
+        subject_request.latitude = None
+        subject_request.longitude = None
+        subject_request.timezone = None
+        return
+
+    # Geo API failed and no GeoNames username — raise a clear error
+    raise KerykeionException(
+        f"Could not resolve coordinates for city '{city}'. "
+        "The Geo API is currently unavailable and no GeoNames username was provided. "
+        "Please provide latitude, longitude, and timezone directly, "
+        "or include a geonames_username for fallback resolution."
+    )
+
+
+async def resolve_location_for_return_location(
+    location,
+) -> None:
+    """
+    Resolve missing location fields on a ReturnLocationModel.
+
+    Same strategy as resolve_location_for_subject but for return locations.
+    """
+    lat = location.latitude
+    lng = location.longitude
+    tz = location.timezone
+    city = location.city
+    nation = location.nation
+    geonames = location.geonames_username
+
+    if lat is not None and lng is not None and tz is not None:
+        return
+
+    geo_result = await try_geo_api_resolution(city, nation)
+    if geo_result:
+        if location.latitude is None:
+            location.latitude = geo_result["lat"]
+        if location.longitude is None:
+            location.longitude = geo_result["lng"]
+        if location.timezone is None:
+            location.timezone = geo_result["timezone"]
+        location.geonames_username = None
+        logger.info(
+            "Return location resolved via Geo API for city=%r",
+            city,
+        )
+        return
+
+    if geonames:
+        logger.info("Geo API failed for return city=%r, falling back to GeoNames", city)
+        location.latitude = None
+        location.longitude = None
+        location.timezone = None
+        return
+
+    raise KerykeionException(
+        f"Could not resolve coordinates for return city '{city}'. "
+        "The Geo API is currently unavailable and no GeoNames username was provided."
+    )
 
 
 def build_subject(
@@ -668,26 +819,19 @@ def build_return_factory(
     )
 
 
-def calculate_return_chart_data(
+async def calculate_return_chart_data(
     request_body: Union[PlanetaryReturnRequestModel, PlanetaryReturnDataRequestModel],
     return_type: str,
 ):
     """
     Calculate return chart data (Solar or Lunar).
-
-    Args:
-        request_body: The request body containing return parameters.
-        return_type (str): The type of return ("Solar" or "Lunar").
-
-    Returns:
-        The calculated chart data.
-
-    Raises:
-        KerykeionException: If required parameters (year/month) are missing.
     """
     active_points = resolve_active_points(request_body.active_points)
     active_aspects = resolve_active_aspects(request_body.active_aspects)
 
+    await resolve_location_for_subject(request_body.subject)
+    if request_body.return_location:
+        await resolve_location_for_return_location(request_body.return_location)
     natal_subject = build_subject(request_body.subject, active_points=active_points)
     return_factory = build_return_factory(natal_subject, request_body)
 
@@ -735,20 +879,18 @@ def calculate_return_chart_data(
     return chart_data
 
 
-def create_natal_chart_data(
+async def create_natal_chart_data(
     request_body: Union[BirthChartRequestModel, BirthChartDataRequestModel],
 ) -> SingleChartDataModel:
     """
     Create natal chart data from request.
 
-    Args:
-        request_body: The request body containing subject and calculation parameters.
-
-    Returns:
-        The calculated natal chart data.
+    Resolves missing location via Geo API (primary) or GeoNames (fallback)
+    before building the astrological subject.
     """
     active_points = resolve_active_points(request_body.active_points)
     active_aspects = resolve_active_aspects(request_body.active_aspects)
+    await resolve_location_for_subject(request_body.subject)
     subject = build_subject(request_body.subject, active_points=active_points)
     chart_data = ChartDataFactory.create_natal_chart_data(
         subject,
@@ -760,20 +902,16 @@ def create_natal_chart_data(
     return chart_data
 
 
-def create_synastry_chart_data(
+async def create_synastry_chart_data(
     request_body: Union[SynastryChartRequestModel, SynastryChartDataRequestModel],
 ) -> DualChartDataModel:
     """
     Create synastry chart data from request.
-
-    Args:
-        request_body: The request body containing two subjects and calculation parameters.
-
-    Returns:
-        The calculated synastry chart data.
     """
     active_points = resolve_active_points(request_body.active_points)
     active_aspects = resolve_active_aspects(request_body.active_aspects)
+    await resolve_location_for_subject(request_body.first_subject)
+    await resolve_location_for_subject(request_body.second_subject)
     first_subject = build_subject(
         request_body.first_subject, active_points=active_points
     )
@@ -793,20 +931,16 @@ def create_synastry_chart_data(
     return chart_data
 
 
-def create_transit_chart_data(
+async def create_transit_chart_data(
     request_body: Union[TransitChartRequestModel, TransitChartDataRequestModel],
 ) -> DualChartDataModel:
     """
     Create transit chart data from request.
-
-    Args:
-        request_body: The request body containing natal subject, transit subject, and parameters.
-
-    Returns:
-        The calculated transit chart data.
     """
     active_points = resolve_active_points(request_body.active_points)
     active_aspects = resolve_active_aspects(request_body.active_aspects)
+    await resolve_location_for_subject(request_body.first_subject)
+    await resolve_location_for_subject(request_body.transit_subject)
     natal_subject = build_subject(
         request_body.first_subject, active_points=active_points
     )
@@ -829,20 +963,16 @@ def create_transit_chart_data(
     return chart_data
 
 
-def create_composite_chart_data(
+async def create_composite_chart_data(
     request_body: Union[CompositeChartRequestModel, CompositeChartDataRequestModel],
 ) -> SingleChartDataModel:
     """
     Create composite chart data from request.
-
-    Args:
-        request_body: The request body containing two subjects and parameters.
-
-    Returns:
-        The calculated composite chart data.
     """
     active_points = resolve_active_points(request_body.active_points)
     active_aspects = resolve_active_aspects(request_body.active_aspects)
+    await resolve_location_for_subject(request_body.first_subject)
+    await resolve_location_for_subject(request_body.second_subject)
     first_subject = build_subject(
         request_body.first_subject, active_points=active_points
     )

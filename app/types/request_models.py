@@ -179,19 +179,42 @@ class AbstractBaseSubjectModel(BaseModel, ABC):
         lng = self.longitude
         tz = self.timezone
         geonames = self.geonames_username
+        city = self.city
 
         missing_coordinates = sum(field is None for field in (lat, lng, tz))
 
-        if missing_coordinates == 3 and not geonames:
-            raise ValueError("Provide latitude, longitude, timezone or specify geonames_username.")
+        # All coords provided — offline mode, no resolution needed
+        if missing_coordinates == 0:
+            if geonames:
+                self.latitude = None
+                self.longitude = None
+                self.timezone = None
+            return self
 
-        if 0 < missing_coordinates < 3 and not geonames:
-            raise ValueError("Provide all location fields (latitude, longitude, timezone) or geonames_username.")
+        # No coords at all
+        if missing_coordinates == 3:
+            # GeoNames username provided — let kerykeion resolve via GeoNames
+            if geonames:
+                return self
+            # City provided — will be resolved by Geo API (primary) or GeoNames (fallback)
+            if city:
+                return self
+            raise ValueError(
+                "Provide latitude, longitude, timezone, specify geonames_username, "
+                "or provide a city name for automatic resolution."
+            )
 
-        if geonames and (lat is not None or lng is not None or tz is not None):
-            self.latitude = None
-            self.longitude = None
-            self.timezone = None
+        # Partial coords — must have geonames_username or full city for resolution
+        if 0 < missing_coordinates < 3:
+            if geonames:
+                return self
+            if city:
+                # Will attempt Geo API resolution for missing fields
+                return self
+            raise ValueError(
+                "Provide all location fields (latitude, longitude, timezone) "
+                "or geonames_username, or provide a city name."
+            )
 
         return self
 
@@ -613,25 +636,38 @@ class ReturnLocationModel(BaseModel):
         lng = self.longitude
         tz = self.timezone
         geonames = self.geonames_username
+        city = self.city
 
         missing_coordinates = sum(field is None for field in (lat, lng, tz))
 
-        if missing_coordinates == 3 and not geonames and not (self.city and self.nation):
-            raise ValueError("Provide latitude, longitude, timezone, or supply geonames_username with city and nation.")
+        # All coords provided — use directly
+        if missing_coordinates == 0:
+            if geonames:
+                self.geonames_username = None
+            return self
 
-        if 0 < missing_coordinates < 3 and not geonames:
-            raise ValueError("Provide all location fields (latitude, longitude, timezone) or geonames_username.")
-
-        # If complete coordinates are provided, they take priority; clear geonames_username
-        if missing_coordinates == 0 and geonames:
-            logger.info(
-                "Complete coordinates provided (lat=%.4f, lng=%.4f, tz=%s), ignoring geonames_username '%s'",
-                lat,
-                lng,
-                tz,
-                geonames,
+        # No coords at all
+        if missing_coordinates == 3:
+            if geonames:
+                return self
+            if city:
+                # Will be resolved by Geo API or GeoNames fallback
+                return self
+            raise ValueError(
+                "Provide latitude, longitude, timezone, supply geonames_username, "
+                "or provide a city name for automatic resolution."
             )
-            self.geonames_username = None
+
+        # Partial coords
+        if 0 < missing_coordinates < 3:
+            if geonames:
+                return self
+            if city:
+                return self
+            raise ValueError(
+                "Provide all location fields (latitude, longitude, timezone) "
+                "or geonames_username, or provide a city name."
+            )
 
         return self
 
