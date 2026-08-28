@@ -79,6 +79,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .freebuff/start-server.ps1
 
 ## Known issues
 
+- Port 8080 is held by other processes; 8030 was previously used by this thread
+
 - All OpenRouter free models share a daily rate limit (429 when exhausted)
 - `/api/v5/deepseek-analysis` needs a paid API key for reliable analysis
 - Vedic bhava filename mismatch was fixed (files renamed + unwrapping added)

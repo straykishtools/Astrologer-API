@@ -1,0 +1,5 @@
+Set-Location "C:\Users\Lucid\Documents\GitHub\Astrologer-API"
+$env:KERYKEION_EPHEMERIS_BACKEND = "libephemris"
+$env:PYTHONIOENCODING = "utf-8"
+$env:ENV_TYPE = "dev"
+& "venv\Scripts\python.exe" -c "from app.engines.numerology import NumerologyEngine; e = NumerologyEngine(); print('Life path:', e.life_path_number(1990, 5, 15)); print('Expression:', e.expression_number('علی')); print('Soul urge:', e.soul_urge_number('علی')); print('Compat:', e.compatibility(1, 5))"

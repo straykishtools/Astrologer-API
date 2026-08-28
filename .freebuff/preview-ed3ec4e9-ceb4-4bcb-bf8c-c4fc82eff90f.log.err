@@ -1,6 +1,125 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\Lucid\\Documents\\GitHub\\Astrologer-API']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [12096] using StatReload
 INFO:     Loading development config
-[2026-08-26 22:24:05] DEBUG:    Using proactor: IocpProactor - Module: asyncio
-[2026-08-26 22:24:05] INFO:     Started server process [11368] - Module: uvicorn.error
-[2026-08-26 22:24:05] INFO:     Waiting for application startup. - Module: uvicorn.error
-[2026-08-26 22:24:05] INFO:     Application startup complete. - Module: uvicorn.error
-[2026-08-26 22:24:05] INFO:     Uvicorn running on http://127.0.0.1:8030 (Press CTRL+C to quit) - Module: uvicorn.error
+[2026-08-27 18:46:14] INFO:     Started server process [12116] - Module: uvicorn.error
+[2026-08-27 18:46:14] INFO:     Waiting for application startup. - Module: uvicorn.error
+[2026-08-27 18:46:14] INFO:     Application startup complete. - Module: uvicorn.error
+[2026-08-27 18:51:04] INFO:     GET /api/status | IP: 127.0.0.1 | Origin: 127.0.0.1:8000 | API status check - Module: app.routers.misc
+[2026-08-27 18:52:52] INFO:     POST /api/v5/chart-data/birth-chart | IP: 127.0.0.1 | Origin: http://127.0.0.1:8000 | Natal chart data request - Module: app.routers.data
+[2026-08-27 18:52:52] DEBUG:    Request body: {"active_points":null,"active_aspects":null,"distribution_method":"weighted","custom_distribution_weights":null,"subject":{"year":1995,"month":1,"day":1,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"کاربر","zodiac_type":"Tropical","sidereal_mode":null,"perspective_type":"Apparent Geocentric","houses_system_identifier":"P","custom_ayanamsa_t0":null,"custom_ayanamsa_ayan_t0":null}} - Module: app.routers.data
+[2026-08-27 18:52:52] DEBUG:    Calculating relevant aspects by filtering orbs... - Module: root
+[2026-08-27 18:52:52] INFO:     POST /api/v5/context/birth-chart | IP: 127.0.0.1 | Origin: http://127.0.0.1:8000 | درخواست context چارت تولد - Module: app.routers.context
+[2026-08-27 18:52:52] DEBUG:    Request body: {"active_points":null,"active_aspects":null,"distribution_method":"weighted","custom_distribution_weights":null,"subject":{"year":1995,"month":1,"day":1,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"کاربر","zodiac_type":"Tropical","sidereal_mode":null,"perspective_type":"Apparent Geocentric","houses_system_identifier":"P","custom_ayanamsa_t0":null,"custom_ayanamsa_ayan_t0":null}} - Module: app.routers.context
+[2026-08-27 18:52:52] DEBUG:    Calculating relevant aspects by filtering orbs... - Module: root
+[2026-08-27 18:52:53] DEBUG:    Calculating relevant aspects by filtering orbs... - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 12, degree: 14.796350372577423 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 17, degree: 43.238435973796186 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 16, degree: 59.84919290358859 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 15, degree: 98.65222216272855 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 4, degree: 152.65380833328533 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 11, degree: 176.36217524668177 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 14, degree: 194.79635037257742 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 10, degree: 223.23843597379616 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 3, degree: 234.18114156677467 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 9, degree: 239.53440028409292 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 5, degree: 244.80287514857693 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 13, degree: 278.65222216272855 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 1, degree: 279.04886858435736 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 0, degree: 280.45106677298196 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 2, degree: 291.00358543505234 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 8, degree: 292.5811630954004 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 7, degree: 295.4928807883251 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Planet index: 6, degree: 338.02020987709756 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Asc, distance_to_prev: 36.776140495479865, distance_to_next: 28.442085601218764 - Module: root
+[2026-08-27 18:52:53] DEBUG:    True_South_Lunar_Node, distance_to_prev: 28.442085601218764, distance_to_next: 16.6107569297924 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Mean_Lilith, distance_to_prev: 16.6107569297924, distance_to_next: 38.80302925913996 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Ic, distance_to_prev: 38.80302925913996, distance_to_next: 54.00158617055678 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Mars, distance_to_prev: 54.00158617055678, distance_to_next: 23.708366913396446 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Chiron, distance_to_prev: 23.708366913396446, distance_to_next: 18.43417512589565 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Dsc, distance_to_prev: 18.43417512589565, distance_to_next: 28.442085601218736 - Module: root
+[2026-08-27 18:52:53] DEBUG:    True_North_Lunar_Node, distance_to_prev: 28.442085601218736, distance_to_next: 10.942705592978513 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Venus, distance_to_prev: 10.942705592978513, distance_to_next: 5.353258717318255 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Pluto, distance_to_prev: 5.353258717318255, distance_to_next: 5.268474864484006 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Jupiter, distance_to_prev: 5.268474864484006, distance_to_next: 33.84934701415162 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Mc, distance_to_prev: 33.84934701415162, distance_to_next: 0.3966464216288159 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Moon, distance_to_prev: 0.3966464216288159, distance_to_next: 1.4021981886245953 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Sun, distance_to_prev: 1.4021981886245953, distance_to_next: 10.552518662070383 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Mercury, distance_to_prev: 10.552518662070383, distance_to_next: 1.5775776603480836 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Neptune, distance_to_prev: 1.5775776603480836, distance_to_next: 2.9117176929246966 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Uranus, distance_to_prev: 2.9117176929246966, distance_to_next: 42.52732908877243 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Saturn, distance_to_prev: 42.52732908877243, distance_to_next: 36.776140495479865 - Module: root
+[2026-08-27 18:52:53] DEBUG:    Template dictionary includes 139 fields - Module: kerykeion.charts.chart_drawer
+[2026-08-27 18:52:53] WARNING:  scour failed on SVG minification, falling back to string-based minification: could not convert string to float: 'var(--kerykeion-modern-zodiac-bg-opacity, 0.5)' - Module: root
+[2026-08-27 18:53:25] INFO:     [ANALYSIS] Trying model: openrouter/nvidia/nemotron-3.5-lightning:free - Module: app.routers.context
+[2026-08-27 18:53:25] DEBUG:    connect_tcp.started host='localhost' port=20128 local_address=None timeout=180.0 socket_options=None - Module: httpcore.connection
+[2026-08-27 18:53:25] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000001477EA8D6A0> - Module: httpcore.connection
+[2026-08-27 18:53:25] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 429, b'Too Many Requests', [(b'vary', b'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch'), (b'content-type', b'application/json'), (b'retry-after', b'24'), (b'Date', b'Thu, 27 Aug 2026 15:23:25 GMT'), (b'Connection', b'keep-alive'), (b'Keep-Alive', b'timeout=5'), (b'Transfer-Encoding', b'chunked')]) - Module: httpcore.http11
+[2026-08-27 18:53:25] INFO:     HTTP Request: POST http://localhost:20128/v1/chat/completions "HTTP/1.1 429 Too Many Requests" - Module: httpx
+[2026-08-27 18:53:25] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] WARNING:  [ANALYSIS] openrouter/nvidia/nemotron-3.5-lightning:free -> HTTP 429: [openrouter/nvidia/nemotron-3.5-lightning:free] [429]: {"error":{"message":"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000  (reset after 24s) - Module: app.routers.context
+[2026-08-27 18:53:25] INFO:     [ANALYSIS] Trying model: openrouter/nvidia/nemotron-3-super-120b-a12b:free - Module: app.routers.context
+[2026-08-27 18:53:25] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 429, b'Too Many Requests', [(b'vary', b'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch'), (b'content-type', b'application/json'), (b'retry-after', b'24'), (b'Date', b'Thu, 27 Aug 2026 15:23:25 GMT'), (b'Connection', b'keep-alive'), (b'Keep-Alive', b'timeout=5'), (b'Transfer-Encoding', b'chunked')]) - Module: httpcore.http11
+[2026-08-27 18:53:25] INFO:     HTTP Request: POST http://localhost:20128/v1/chat/completions "HTTP/1.1 429 Too Many Requests" - Module: httpx
+[2026-08-27 18:53:25] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] WARNING:  [ANALYSIS] openrouter/nvidia/nemotron-3-super-120b-a12b:free -> HTTP 429: [openrouter/nvidia/nemotron-3-super-120b-a12b:free] [429]: {"error":{"message":"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000  (reset after 24s) - Module: app.routers.context
+[2026-08-27 18:53:25] INFO:     [ANALYSIS] Trying model: openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free - Module: app.routers.context
+[2026-08-27 18:53:25] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:25] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 429, b'Too Many Requests', [(b'vary', b'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch'), (b'content-type', b'application/json'), (b'retry-after', b'20'), (b'Date', b'Thu, 27 Aug 2026 15:23:29 GMT'), (b'Connection', b'keep-alive'), (b'Keep-Alive', b'timeout=5'), (b'Transfer-Encoding', b'chunked')]) - Module: httpcore.http11
+[2026-08-27 18:53:29] INFO:     HTTP Request: POST http://localhost:20128/v1/chat/completions "HTTP/1.1 429 Too Many Requests" - Module: httpx
+[2026-08-27 18:53:29] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] WARNING:  [ANALYSIS] openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free -> HTTP 429: [openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free] [429]: {"error":{"message":"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day","code": - Module: app.routers.context
+[2026-08-27 18:53:29] INFO:     [ANALYSIS] Trying model: openrouter/openrouter/free - Module: app.routers.context
+[2026-08-27 18:53:29] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 429, b'Too Many Requests', [(b'vary', b'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch'), (b'content-type', b'application/json'), (b'retry-after', b'20'), (b'Date', b'Thu, 27 Aug 2026 15:23:29 GMT'), (b'Connection', b'keep-alive'), (b'Keep-Alive', b'timeout=5'), (b'Transfer-Encoding', b'chunked')]) - Module: httpcore.http11
+[2026-08-27 18:53:29] INFO:     HTTP Request: POST http://localhost:20128/v1/chat/completions "HTTP/1.1 429 Too Many Requests" - Module: httpx
+[2026-08-27 18:53:29] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] WARNING:  [ANALYSIS] openrouter/openrouter/free -> HTTP 429: [openrouter/openrouter/free] [429]: {"error":{"message":"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000  (reset after 20s) - Module: app.routers.context
+[2026-08-27 18:53:29] INFO:     [ANALYSIS] Trying model: openrouter/cohere/north-mini-code:free - Module: app.routers.context
+[2026-08-27 18:53:29] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 429, b'Too Many Requests', [(b'vary', b'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch'), (b'content-type', b'application/json'), (b'retry-after', b'20'), (b'Date', b'Thu, 27 Aug 2026 15:23:29 GMT'), (b'Connection', b'keep-alive'), (b'Keep-Alive', b'timeout=5'), (b'Transfer-Encoding', b'chunked')]) - Module: httpcore.http11
+[2026-08-27 18:53:29] INFO:     HTTP Request: POST http://localhost:20128/v1/chat/completions "HTTP/1.1 429 Too Many Requests" - Module: httpx
+[2026-08-27 18:53:29] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-27 18:53:29] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-27 18:53:29] WARNING:  [ANALYSIS] openrouter/cohere/north-mini-code:free -> HTTP 429: [openrouter/cohere/north-mini-code:free] [429]: {"error":{"message":"Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000  (reset after 20s) - Module: app.routers.context
+[2026-08-27 18:53:29] DEBUG:    close.started - Module: httpcore.connection
+[2026-08-27 18:53:29] DEBUG:    close.complete - Module: httpcore.connection
+WARNING:  StatReload detected changes in 'app\main.py'. Reloading...
+[2026-08-27 19:02:00] WARNING:  email-validator not installed, email fields will be treated as str.
+To install, run: pip install email-validator - Module: fastapi

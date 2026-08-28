@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 
-from .routers import misc, charts, data, context, moon_phase, mizaj, abjad_router, tarot_router
+from .routers import misc, charts, data, context, moon_phase, mizaj, abjad_router, tarot_router, numerology_router, biorhythm_router, chinese_zodiac_router
 from .config.settings import settings
 from .middleware.secret_key_checker_middleware import SecretKeyCheckerMiddleware
 from .utils.validation_helpers import format_extra_field_error
@@ -52,6 +52,9 @@ app.include_router(misc.router, tags=["Miscellaneous"])
 app.include_router(mizaj.router, tags=["Mizaj"])
 app.include_router(abjad_router.router, tags=["Abjad"])
 app.include_router(tarot_router.router, tags=["Tarot"])
+app.include_router(numerology_router.router, tags=["Numerology"])
+app.include_router(biorhythm_router.router, tags=["Biorhythm"])
+app.include_router(chinese_zodiac_router.router, tags=["Chinese Zodiac"])
 
 # ------------------------------------------------------------------------------
 # Serve static files (index.html, etc.)
