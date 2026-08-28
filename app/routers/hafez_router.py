@@ -26,6 +26,8 @@ async def get_hafez(data: HafezRequest):
         raw_result = await service.get_poem(data.question)
 
         # اگر خطا بود، همان خطا را برگردان
+        if not isinstance(raw_result, dict):
+            raise HTTPException(status_code=502, detail="Service returned invalid response")
         if raw_result.get("error"):
             return {"status": "error", **raw_result}
 
@@ -33,7 +35,11 @@ async def get_hafez(data: HafezRequest):
         enriched_result = processor.enrich(raw_result)
 
         return {"status": "success", "data": enriched_result}
+    except HTTPException:
+        raise
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 

@@ -1943,25 +1943,36 @@ function displayHafez(data, container) {
         html += `<div style="color:#fdcb6e;font-style:italic;margin-bottom:16px;font-size:15px;">📝 سوال: ${data.question}</div>`;
     }
     
-    // Poem
-    html += `<div class="hafez-poem">`;
+    // Poem (if available from API — most APIs only provide interpretation)
     if (data.poem) {
+        html += `<div class="hafez-poem">`;
         html += data.poem.replace(/\n/g, '<br>');
-    } else {
-        html += '<span style="color:#888;">متن غزل موجود نیست</span>';
-    }
-    html += `</div>`;
-    
-    // Interpretation
-    if (data.interpretation) {
+        html += `</div>`;
         html += `<div class="hafez-divider"></div>`;
-        html += `<div style="color:#a29bfe;font-weight:bold;margin-bottom:8px;">📖 تفسیر:</div>`;
-        html += `<div style="color:#ddd;line-height:2;">${data.interpretation}</div>`;
     }
     
-    // Date
-    if (data.date) {
-        html += `<div style="color:#888;font-size:0.8rem;margin-top:12px;">📅 ${data.date}</div>`;
+    // Interpretation (main content — always shown)
+    var interpText = data.interpretation || data.poem || '';
+    if (interpText) {
+        html += `<div style="color:#a29bfe;font-weight:bold;margin-bottom:8px;">📖 تفسیر:</div>`;
+        html += `<div style="color:#ddd;line-height:2;font-size:15px;">${interpText}</div>`;
+    }
+    
+    // Ghazal number
+    if (data.ghazal_number_fa) {
+        html += `<div style="color:#888;font-size:0.85rem;margin-top:12px;">📜 غزل شماره: ${data.ghazal_number_fa}</div>`;
+    }
+    
+    // Shamsi date
+    if (data.date_shamsi_fa) {
+        html += `<div style="color:#888;font-size:0.85rem;margin-top:4px;">📅 ${data.date_shamsi_fa}</div>`;
+    } else if (data.date) {
+        html += `<div style="color:#888;font-size:0.85rem;margin-top:4px;">📅 ${data.date}</div>`;
+    }
+    
+    // Source
+    if (data.source) {
+        html += `<div style="color:#666;font-size:0.8rem;margin-top:8px;">📚 ${data.source}</div>`;
     }
     
     html += `</div>`;

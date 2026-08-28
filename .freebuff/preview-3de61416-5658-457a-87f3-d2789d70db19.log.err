@@ -1,202 +1,110 @@
 INFO:     Loading development config
-[2026-08-28 07:46:58] INFO:     ✅ Server started successfully with libephemeris (no pyswisseph required). - Module: app.main
-[2026-08-28 07:46:58] INFO:     📌 All routes are active. - Module: app.main
-[2026-08-28 07:46:58] DEBUG:    Using proactor: IocpProactor - Module: asyncio
-[2026-08-28 07:46:58] INFO:     Started server process [25044] - Module: uvicorn.error
-[2026-08-28 07:46:58] INFO:     Waiting for application startup. - Module: uvicorn.error
-[2026-08-28 07:46:58] INFO:     Application startup complete. - Module: uvicorn.error
-[2026-08-28 07:46:58] INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit) - Module: uvicorn.error
-[2026-08-28 07:51:54] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
-[2026-08-28 07:51:54] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624AEC3770> - Module: httpcore.connection
-[2026-08-28 07:51:54] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x000002624BEF5130> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
-[2026-08-28 07:51:54] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF40E10> - Module: httpcore.connection
-[2026-08-28 07:51:54] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:51:54] DEBUG:    send_request_headers.complete - Module: httpcore.http11
-[2026-08-28 07:51:54] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:51:54] DEBUG:    send_request_body.complete - Module: httpcore.http11
-[2026-08-28 07:51:54] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:51:55] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 04:21:55 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::6zzqb-1787890915147-13a49c0217c1'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=DhOwRek%2BdL72Keh7Mui05OIv%2BS7pLJHV9p38oaMwZXk7YTheZueFEzuMgQcPEL1k0X%2BmZ9iCfZ3Pt7ql4fjCB7snOrQ5UJciAOcqzcV%2FR%2F5t4F3y1N%2F7CIvsX2ZkP%2F4N30ql"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a3208829afa47cd3-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
-[2026-08-28 07:51:55] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
-[2026-08-28 07:51:55] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:51:55] DEBUG:    receive_response_body.complete - Module: httpcore.http11
-[2026-08-28 07:51:55] DEBUG:    response_closed.started - Module: httpcore.http11
-[2026-08-28 07:51:55] DEBUG:    response_closed.complete - Module: httpcore.http11
-[2026-08-28 07:51:55] DEBUG:    close.started - Module: httpcore.connection
-[2026-08-28 07:51:55] DEBUG:    close.complete - Module: httpcore.connection
-[2026-08-28 07:51:59] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
-[2026-08-28 07:52:00] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF42AD0> - Module: httpcore.connection
-[2026-08-28 07:52:00] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x000002624BEF52E0> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
-[2026-08-28 07:52:00] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF7C510> - Module: httpcore.connection
-[2026-08-28 07:52:00] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    send_request_headers.complete - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    send_request_body.complete - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 04:22:01 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::f6vnv-1787890920838-044b264e7a87'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=jEk%2F3MyEJB%2Fy9ErEo1hG%2FQ5Z4WG4utZ24eKL%2BkpLfMZW6wN1n8kulTzAT3OzKcU1NAB44oxE0hfIJP78YgseSyhYYmfsuSPgXUw5y64MS4v7hMNpoAPMXim9sMZueqZnVV8Z"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a320884dcc6abb26-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
-[2026-08-28 07:52:00] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
-[2026-08-28 07:52:00] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    receive_response_body.complete - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    response_closed.started - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    response_closed.complete - Module: httpcore.http11
-[2026-08-28 07:52:00] DEBUG:    close.started - Module: httpcore.connection
-[2026-08-28 07:52:00] DEBUG:    close.complete - Module: httpcore.connection
-[2026-08-28 07:52:15] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
-[2026-08-28 07:52:15] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF7C2B0> - Module: httpcore.connection
-[2026-08-28 07:52:15] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x000002624AEBCEF0> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
-[2026-08-28 07:52:15] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF54830> - Module: httpcore.connection
-[2026-08-28 07:52:15] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    send_request_headers.complete - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    send_request_body.complete - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 04:22:15 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::zcg2w-1787890935743-a9892253920b'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=BkTa4PmE7Z%2Fd56p9ETJAAQ3mX7fPcWdUJ%2BPZeHNf27ThdOxyLlHlTdbnp%2BDItikOtNuE%2BCF3NC2novDZ9uS5ZPuV965fQprzBgNANfILUO7xYzrJHU1LGvqfwmSM93yWJvqP"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a32088ac2e4fbb26-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
-[2026-08-28 07:52:15] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
-[2026-08-28 07:52:15] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    receive_response_body.complete - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    response_closed.started - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    response_closed.complete - Module: httpcore.http11
-[2026-08-28 07:52:15] DEBUG:    close.started - Module: httpcore.connection
-[2026-08-28 07:52:15] DEBUG:    close.complete - Module: httpcore.connection
-[2026-08-28 07:52:45] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
-[2026-08-28 07:52:45] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF71150> - Module: httpcore.connection
-[2026-08-28 07:52:45] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x000002624AEBD090> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
-[2026-08-28 07:52:45] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF71260> - Module: httpcore.connection
-[2026-08-28 07:52:45] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:45] DEBUG:    send_request_headers.complete - Module: httpcore.http11
-[2026-08-28 07:52:45] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:45] DEBUG:    send_request_body.complete - Module: httpcore.http11
-[2026-08-28 07:52:45] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:46] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 04:22:46 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::642ft-1787890966362-c0edc829a451'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=LXsjce63Y%2BMg1Ibsf4Z%2FN2LfqRQh2dZ8xompF%2BuPJbN%2FdFGgJexM2X4HZQYYYnXJQ%2FOrh6Sz7anroCYwoUf1w69tzCbBddW1ZLkPUZR8M0ChTev86SfYIE7o8iVlfryOeleO"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a320896b7964244b-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
-[2026-08-28 07:52:46] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
-[2026-08-28 07:52:46] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:52:46] DEBUG:    receive_response_body.complete - Module: httpcore.http11
-[2026-08-28 07:52:46] DEBUG:    response_closed.started - Module: httpcore.http11
-[2026-08-28 07:52:46] DEBUG:    response_closed.complete - Module: httpcore.http11
-[2026-08-28 07:52:46] DEBUG:    close.started - Module: httpcore.connection
-[2026-08-28 07:52:46] DEBUG:    close.complete - Module: httpcore.connection
-[2026-08-28 07:55:19] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
-[2026-08-28 07:55:19] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF62750> - Module: httpcore.connection
-[2026-08-28 07:55:19] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x000002624BEBB250> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
-[2026-08-28 07:55:19] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF62650> - Module: httpcore.connection
-[2026-08-28 07:55:19] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    send_request_headers.complete - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    send_request_body.complete - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 04:25:20 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::6rpzb-1787891119860-7d0b11571424'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=5%2FW4S%2BbmGSMdbXGcjSTIMja1Jo%2Bigmd8AbGouBsoWRFjw0uR70wSbhj9Ft8g7YeJkt6terNhL5v2FG9svTqQ9a5chKoxzcRmEeRQM5Ymd%2FmWbeM29aNg1rr6fJQki3SVnhOs"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a3208d2a9dccea1a-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
-[2026-08-28 07:55:19] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
-[2026-08-28 07:55:19] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    receive_response_body.complete - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    response_closed.started - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    response_closed.complete - Module: httpcore.http11
-[2026-08-28 07:55:19] DEBUG:    close.started - Module: httpcore.connection
-[2026-08-28 07:55:19] DEBUG:    close.complete - Module: httpcore.connection
-[2026-08-28 07:55:24] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
-[2026-08-28 07:55:24] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF8B200> - Module: httpcore.connection
-[2026-08-28 07:55:24] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x000002624BF19630> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
-[2026-08-28 07:55:24] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF8B2F0> - Module: httpcore.connection
-[2026-08-28 07:55:24] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    send_request_headers.complete - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    send_request_body.complete - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 04:25:25 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::zcg2w-1787891124895-8c44cccbba31'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=B7a1Ad4fJs0msrvTc%2BqkeyFZmL0d38IqVcyf7iGDN97WWumh3xDKUJJ42bcsDx1gIC1aWjFWtNK9HHLUxxJHZeyQZJ4a27KkUn3YXS18mnuVrvVVlftjVs1We9TDDL9zsYYq"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a3208d4a48a84803-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
-[2026-08-28 07:55:24] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
-[2026-08-28 07:55:24] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    receive_response_body.complete - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    response_closed.started - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    response_closed.complete - Module: httpcore.http11
-[2026-08-28 07:55:24] DEBUG:    close.started - Module: httpcore.connection
-[2026-08-28 07:55:24] DEBUG:    close.complete - Module: httpcore.connection
-[2026-08-28 07:58:13] WARNING:  Validation error on http://127.0.0.1:8003/api/v5/chart-data/solar-return: [{'loc': ('body', 'year'), 'msg': 'Input should be less than or equal to 3000', 'type': 'less_than_equal'}] - Module: app.main
-[2026-08-28 07:58:18] INFO:     POST /api/v5/chart-data/solar-return | IP: 127.0.0.1 | Origin: http://127.0.0.1:8003 | Solar return data request - Module: app.routers.data
-[2026-08-28 07:58:18] DEBUG:    Request body: {"active_points":null,"active_aspects":null,"distribution_method":"weighted","custom_distribution_weights":null,"subject":{"year":1111,"month":11,"day":11,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"چارت تولد","zodiac_type":"Tropical","sidereal_mode":null,"perspective_type":"Apparent Geocentric","houses_system_identifier":"P","custom_ayanamsa_t0":null,"custom_ayanamsa_ayan_t0":null},"year":1993,"month":null,"day":1,"iso_datetime":null,"wheel_type":"dual","include_house_comparison":true,"return_location":null} - Module: app.routers.data
-[2026-08-28 07:58:18] WARNING:  Could not compute Sun altitude for sect classification: calc_ut: Cannot calculate Sun (ID 0) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp. Defaulting to diurnal (day chart). - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Sun: calc_ut: Cannot calculate Sun (ID 0) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Moon: calc_ut: Cannot calculate Moon (ID 1) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Mercury: calc_ut: Cannot calculate Mercury (ID 2) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Venus: calc_ut: Cannot calculate Venus (ID 3) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Mars: calc_ut: Cannot calculate Mars (ID 4) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Jupiter: calc_ut: Cannot calculate Jupiter (ID 5) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Saturn: calc_ut: Cannot calculate Saturn (ID 6) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Uranus: calc_ut: Cannot calculate Uranus (ID 7) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Neptune: calc_ut: Cannot calculate Neptune (ID 8) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Pluto: calc_ut: Cannot calculate Pluto (ID 9) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating True_North_Lunar_Node: Cannot calculate true Node (ID 11) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] ERROR:    Error calculating Mean_Lilith: Julian day 2127157.8706123563 is outside the active ephemeris range 2287184.5 to 2688976.5 - Module: root
-[libephemeris] WARNING: Auto SPK coverage miss for body 15: JD 2127157.9 outside SPK coverage [2396713.5, 2506376.5] for body 15
-[2026-08-28 07:58:18] ERROR:    Error calculating Chiron: Cannot calculate Chiron (ID 15) for JD 2127157.856944 (1111-11-11): date is outside ephemeris range.
-  Supported range: JD 2287184.5 to 2688976.5 (1549-12-31 to 2650-01-25)
-  Ephemeris file: de440.bsp - Module: root
-[2026-08-28 07:58:18] INFO:     Building return factory using natal subject location (offline mode): Unknown, GB - Module: app.utils.router_utils
-[2026-08-28 07:58:18] ERROR:    http://127.0.0.1:8003/api/v5/chart-data/solar-return: Sun position is required for Solar return but is not available in the subject. | Request body: {"subject":{"year":1111,"month":11,"day":11,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"timezone":"Asia/Tehran","city":"Unknown","nation":null,"name":"چارت تولد"},"year":1993} - Module: app.utils.router_utils
-Traceback (most recent call last):
-  File "C:\Users\Lucid\Documents\GitHub\Astrologer-API\app\routers\data.py", line 338, in solar_return_data
-    chart_data = await calculate_return_chart_data(request_body, "Solar")
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Lucid\Documents\GitHub\Astrologer-API\app\utils\router_utils.py", line 856, in calculate_return_chart_data
-    return_subject = return_factory.next_return_from_date(
-        request_body.year, 1, 1, return_type=return_type
-    )
-  File "C:\Users\Lucid\Documents\GitHub\Astrologer-API\venv\Lib\site-packages\kerykeion\planetary_return_factory.py", line 715, in next_return_from_date
-    return self.next_return_from_iso_formatted_time(start_date.isoformat(), return_type)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Lucid\Documents\GitHub\Astrologer-API\venv\Lib\site-packages\kerykeion\planetary_return_factory.py", line 506, in next_return_from_iso_formatted_time
-    raise KerykeionException(
-        "Sun position is required for Solar return but is not available in the subject."
-    )
-kerykeion.schemas.kerykeion_exception.KerykeionException: Sun position is required for Solar return but is not available in the subject.
-[2026-08-28 07:58:52] INFO:     POST /api/v5/chart-data/transit | IP: 127.0.0.1 | Origin: http://127.0.0.1:8003 | Transit chart data request - Module: app.routers.data
-[2026-08-28 07:58:52] DEBUG:    Request body: {"active_points":null,"active_aspects":null,"distribution_method":"weighted","custom_distribution_weights":null,"first_subject":{"year":1901,"month":12,"day":12,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"چارت تولد","zodiac_type":"Tropical","sidereal_mode":null,"perspective_type":"Apparent Geocentric","houses_system_identifier":"P","custom_ayanamsa_t0":null,"custom_ayanamsa_ayan_t0":null},"transit_subject":{"year":1912,"month":12,"day":12,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"Transit"},"include_house_comparison":true} - Module: app.routers.data
-[2026-08-28 07:58:52] DEBUG:    Calculating relevant aspects by filtering orbs... - Module: root
-[2026-08-28 07:58:59] INFO:     POST /api/v5/chart-data/transit | IP: 127.0.0.1 | Origin: http://127.0.0.1:8003 | Transit chart data request - Module: app.routers.data
-[2026-08-28 07:58:59] DEBUG:    Request body: {"active_points":null,"active_aspects":null,"distribution_method":"weighted","custom_distribution_weights":null,"first_subject":{"year":1901,"month":12,"day":12,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"چارت تولد","zodiac_type":"Tropical","sidereal_mode":null,"perspective_type":"Apparent Geocentric","houses_system_identifier":"P","custom_ayanamsa_t0":null,"custom_ayanamsa_ayan_t0":null},"transit_subject":{"year":1912,"month":12,"day":12,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"Transit"},"include_house_comparison":true} - Module: app.routers.data
-[2026-08-28 07:58:59] DEBUG:    Calculating relevant aspects by filtering orbs... - Module: root
-[2026-08-28 07:58:59] INFO:     POST /api/v5/chart-data/transit | IP: 127.0.0.1 | Origin: http://127.0.0.1:8003 | Transit chart data request - Module: app.routers.data
-[2026-08-28 07:58:59] DEBUG:    Request body: {"active_points":null,"active_aspects":null,"distribution_method":"weighted","custom_distribution_weights":null,"first_subject":{"year":1901,"month":12,"day":12,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"چارت تولد","zodiac_type":"Tropical","sidereal_mode":null,"perspective_type":"Apparent Geocentric","houses_system_identifier":"P","custom_ayanamsa_t0":null,"custom_ayanamsa_ayan_t0":null},"transit_subject":{"year":1912,"month":12,"day":12,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"Transit"},"include_house_comparison":true} - Module: app.routers.data
-[2026-08-28 07:59:00] DEBUG:    Calculating relevant aspects by filtering orbs... - Module: root
-[2026-08-28 07:59:00] INFO:     POST /api/v5/chart-data/transit | IP: 127.0.0.1 | Origin: http://127.0.0.1:8003 | Transit chart data request - Module: app.routers.data
-[2026-08-28 07:59:00] DEBUG:    Request body: {"active_points":null,"active_aspects":null,"distribution_method":"weighted","custom_distribution_weights":null,"first_subject":{"year":1901,"month":12,"day":12,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"چارت تولد","zodiac_type":"Tropical","sidereal_mode":null,"perspective_type":"Apparent Geocentric","houses_system_identifier":"P","custom_ayanamsa_t0":null,"custom_ayanamsa_ayan_t0":null},"transit_subject":{"year":1912,"month":12,"day":12,"hour":12,"minute":0,"second":0,"longitude":51.389,"latitude":35.6892,"altitude":null,"city":"Unknown","nation":"null","timezone":"Asia/Tehran","is_dst":null,"geonames_username":null,"name":"Transit"},"include_house_comparison":true} - Module: app.routers.data
-[2026-08-28 07:59:00] DEBUG:    Calculating relevant aspects by filtering orbs... - Module: root
-[2026-08-28 08:02:59] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
-[2026-08-28 08:02:59] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF233F0> - Module: httpcore.connection
-[2026-08-28 08:02:59] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x000002624BF09E50> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
-[2026-08-28 08:02:59] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002624BF22350> - Module: httpcore.connection
-[2026-08-28 08:02:59] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 08:02:59] DEBUG:    send_request_headers.complete - Module: httpcore.http11
-[2026-08-28 08:02:59] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 08:02:59] DEBUG:    send_request_body.complete - Module: httpcore.http11
-[2026-08-28 08:02:59] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 08:03:00] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 04:33:00 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::gzz7w-1787891580314-2e6ce1b06056'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=jYxpRGp%2BDCwQeO7aYGrvOn1rfbojdgEzJI5px30e30jVPJuGUVysFIk5PVz6DkIk%2FtS%2By1qHs9AL7TPWYMd6IsfeB6iG0q3yIJC7%2BR8t%2BSChQLkwrjdokCbEagb8y5O0W6jY"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a32098676a741f00-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
-[2026-08-28 08:03:00] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
-[2026-08-28 08:03:00] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
-[2026-08-28 08:03:00] DEBUG:    receive_response_body.complete - Module: httpcore.http11
-[2026-08-28 08:03:00] DEBUG:    response_closed.started - Module: httpcore.http11
-[2026-08-28 08:03:00] DEBUG:    response_closed.complete - Module: httpcore.http11
-[2026-08-28 08:03:00] DEBUG:    close.started - Module: httpcore.connection
-[2026-08-28 08:03:00] DEBUG:    close.complete - Module: httpcore.connection
-[2026-08-28 08:05:14] WARNING:  Validation error on http://127.0.0.1:8003/api/v5/hafez: [{'loc': ('body', 1), 'msg': 'JSON decode error', 'type': 'json_invalid'}] - Module: app.main
+[2026-08-28 09:16:33] INFO:     ✅ Server started successfully with libephemeris (no pyswisseph required). - Module: app.main
+[2026-08-28 09:16:33] INFO:     📌 All routes are active. - Module: app.main
+[2026-08-28 09:16:33] DEBUG:    Using proactor: IocpProactor - Module: asyncio
+[2026-08-28 09:16:33] INFO:     Started server process [16308] - Module: uvicorn.error
+[2026-08-28 09:16:33] INFO:     Waiting for application startup. - Module: uvicorn.error
+[2026-08-28 09:16:33] INFO:     Application startup complete. - Module: uvicorn.error
+[2026-08-28 09:16:33] INFO:     Uvicorn running on http://127.0.0.1:8003 (Press CTRL+C to quit) - Module: uvicorn.error
+[2026-08-28 09:18:00] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
+[2026-08-28 09:18:00] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDDCF770> - Module: httpcore.connection
+[2026-08-28 09:18:00] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022BBDE30C20> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
+[2026-08-28 09:18:00] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDDC65D0> - Module: httpcore.connection
+[2026-08-28 09:18:00] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:18:00] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-28 09:18:00] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:18:00] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-28 09:18:00] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:18:01] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 05:48:01 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::55xpb-1787896081247-1b618477ea6d'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=xqZggYhI2ywOmKcQ8Z4p0eS8JY%2FVPqXfCXfRSckEqT%2BpXyTcrSxmO%2FfSzBnwFdneHE%2B%2BD%2FEQmAPBxBY4ca1P6ZR%2BSoSwC3k5U6QXQxl3f6hUsBXDEzuLFFhQMLSvLv3sVB%2FB"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a321064a0d848ec8-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
+[2026-08-28 09:18:01] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
+[2026-08-28 09:18:01] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:18:01] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-28 09:18:01] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-28 09:18:01] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-28 09:18:01] DEBUG:    close.started - Module: httpcore.connection
+[2026-08-28 09:18:01] DEBUG:    close.complete - Module: httpcore.connection
+[2026-08-28 09:25:21] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
+[2026-08-28 09:25:24] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDED65D0> - Module: httpcore.connection
+[2026-08-28 09:25:24] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022BBD893140> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
+[2026-08-28 09:25:27] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDF20640> - Module: httpcore.connection
+[2026-08-28 09:25:27] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:25:27] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-28 09:25:27] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:25:27] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-28 09:25:27] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:25:30] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 05:55:30 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::nhl66-1787896528504-601f894f459f'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=4RDFin2P3aDcjclO4IeXfCP0MYDOsHVNSoWnbGnLszTWpJXokvP%2FwzGMAxHodmn9%2Bb9YHoeV1DKHRXC8izPXp7Sxi8orh%2B9%2B9CEB%2FjOMvVSL05PGKIuqSfwK8blzIegWQc4J"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a32111354fa77f68-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
+[2026-08-28 09:25:30] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
+[2026-08-28 09:25:30] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:25:30] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-28 09:25:30] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-28 09:25:30] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-28 09:25:30] DEBUG:    close.started - Module: httpcore.connection
+[2026-08-28 09:25:30] DEBUG:    close.complete - Module: httpcore.connection
+[2026-08-28 09:29:18] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
+[2026-08-28 09:29:18] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDF20B00> - Module: httpcore.connection
+[2026-08-28 09:29:18] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022BBDA4BE10> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
+[2026-08-28 09:29:19] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDEC1010> - Module: httpcore.connection
+[2026-08-28 09:29:19] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:29:19] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-28 09:29:19] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:29:19] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-28 09:29:19] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:29:20] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 05:59:20 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::vn69q-1787896760145-e42f0231988e'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=bH3XesN8B1aEYmKmw4EcHE74ct%2F2seMI9yojdB6RAhn16ve2ndnVDDCaAuuFq2u7r778ttJrf4za%2FmMneNZCsGPBSmbdkMQGBNo0iNyM2BPKrfuiY22nJZl%2BtvtgRKoWuDk2"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a32116de7f2816db-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
+[2026-08-28 09:29:20] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
+[2026-08-28 09:29:20] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:29:20] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-28 09:29:20] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-28 09:29:20] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-28 09:29:20] DEBUG:    close.started - Module: httpcore.connection
+[2026-08-28 09:29:20] DEBUG:    close.complete - Module: httpcore.connection
+[2026-08-28 09:33:10] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
+[2026-08-28 09:33:11] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDEC5260> - Module: httpcore.connection
+[2026-08-28 09:33:11] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022BBDA4AF70> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
+[2026-08-28 09:33:11] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDEC56A0> - Module: httpcore.connection
+[2026-08-28 09:33:11] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:33:11] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-28 09:33:11] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:33:11] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-28 09:33:11] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:33:13] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 06:03:13 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::5lg9r-1787896992777-9a9fba536504'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=bDI1629GAt4HmaBgr8ZjnT4Xhdn5pWHPrMTso59bzEzzCZ16Qz%2B3t4fK1o5hFEbPOvCbvjOB7YJXoOw02gRr6r9O4kDsV3PGDPQJakI1ORjz9L8EULhHfyUlfBnBBIu1E0eA"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a3211c8ace8b0c46-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
+[2026-08-28 09:33:13] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
+[2026-08-28 09:33:13] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 09:33:13] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-28 09:33:13] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-28 09:33:13] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-28 09:33:13] DEBUG:    close.started - Module: httpcore.connection
+[2026-08-28 09:33:13] DEBUG:    close.complete - Module: httpcore.connection
+[2026-08-28 10:00:07] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
+[2026-08-28 10:00:08] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDEBAB50> - Module: httpcore.connection
+[2026-08-28 10:00:08] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022BBDEEA5D0> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
+[2026-08-28 10:00:08] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBDEBA650> - Module: httpcore.connection
+[2026-08-28 10:00:08] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 10:00:08] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-28 10:00:08] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 10:00:08] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-28 10:00:08] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 10:00:10] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 06:30:10 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::6zzqb-1787898609673-8b5e11fcb14e'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=3rA68zYxrfMgKbcrS0xVoMeSILMwOuM8OgrtIsnTFa7WcJcayeomaw5LugbHNusllIGYpNVXJAyl3XM6TPRpjQ8jfsQ5lM2w5Fsqd9YCZL%2F6YHw9DgPSFS1XCr9IyFeoSd0o"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a32144048b9f2370-GYD'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
+[2026-08-28 10:00:10] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
+[2026-08-28 10:00:10] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 10:00:10] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-28 10:00:10] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-28 10:00:10] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-28 10:00:10] DEBUG:    close.started - Module: httpcore.connection
+[2026-08-28 10:00:10] DEBUG:    close.complete - Module: httpcore.connection
+[2026-08-28 10:02:07] DEBUG:    connect_tcp.started host='apidevelopers.ir' port=443 local_address=None timeout=15.0 socket_options=None - Module: httpcore.connection
+[2026-08-28 10:02:07] DEBUG:    connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBFC40C80> - Module: httpcore.connection
+[2026-08-28 10:02:07] DEBUG:    start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022BBDEEA760> server_hostname='apidevelopers.ir' timeout=15.0 - Module: httpcore.connection
+[2026-08-28 10:02:08] DEBUG:    start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022BBFC40D70> - Module: httpcore.connection
+[2026-08-28 10:02:08] DEBUG:    send_request_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    send_request_headers.complete - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    send_request_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    send_request_body.complete - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    receive_response_headers.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Fri, 28 Aug 2026 06:32:09 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'access-control-allow-headers', b'Content-Type, Authorization'), (b'access-control-allow-methods', b'POST'), (b'Cache-Control', b'no-store, no-cache, must-revalidate'), (b'x-xss-protection', b'1; mode=block'), (b'cross-origin-resource-policy', b'same-origin'), (b'permissions-policy', b'camera=(), microphone=(), geolocation=()'), (b'referrer-policy', b'same-origin'), (b'Server', b'cloudflare'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'vary', b'Accept-Encoding'), (b'x-content-type-options', b'nosniff'), (b'x-frame-options', b'SAMEORIGIN'), (b'x-matched-path', b'/api/v1/hafez-poem'), (b'x-vercel-cache', b'MISS'), (b'x-vercel-id', b'arn1::fra1::5fbk9-1787898728681-181fe905fdb1'), (b'cf-cache-status', b'DYNAMIC'), (b'Report-To', b'{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=hCEJ%2BZRQhG1S0sgrLdw4ggv3Jgc%2BfUTA19zK0XQllb2mm9%2Ba9ElGST7%2FLaJV35wdelmR9Y6yr08OHXazqiqDL52rUw%2FVizWaC%2F1OiVWXwpJIuNdW14dlR3jigVDtJcJCdvng"}]}'), (b'Nel', b'{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'), (b'expect-ct', b'max-age=86400, enforce'), (b'Content-Encoding', b'zstd'), (b'CF-RAY', b'a32146edfffc2d83-ARN'), (b'alt-svc', b'h3=":443"; ma=86400')]) - Module: httpcore.http11
+[2026-08-28 10:02:08] INFO:     HTTP Request: POST https://apidevelopers.ir/api/v1/hafez-poem "HTTP/1.1 200 OK" - Module: httpx
+[2026-08-28 10:02:08] DEBUG:    receive_response_body.started request=<Request [b'POST']> - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    receive_response_body.complete - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    response_closed.started - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    response_closed.complete - Module: httpcore.http11
+[2026-08-28 10:02:08] DEBUG:    close.started - Module: httpcore.connection
+[2026-08-28 10:02:08] DEBUG:    close.complete - Module: httpcore.connection
