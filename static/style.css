@@ -31,18 +31,23 @@ body {
     max-width: 100%;
     margin: 0;
     padding: 10px 20px;
+    overflow-x: hidden;
+}
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
 }
 
-/* ===== Header ===== */
+/* ===== Header (compressed) ===== */
 .main-header {
     text-align: center;
-    padding: 20px 0 15px;
+    padding: 12px 12px 10px;
     background: rgba(10, 12, 30, 0.5);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-radius: 20px;
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.06);
-    margin-bottom: 20px;
+    margin-bottom: 14px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     position: relative;
     overflow: hidden;
@@ -64,7 +69,7 @@ body {
     gap: 12px;
 }
 .main-header .logo-icon {
-    font-size: 42px;
+    font-size: 30px;
     display: inline-block;
     animation: pulseGlow 3s ease-in-out infinite;
 }
@@ -74,7 +79,7 @@ body {
 }
 .main-header h1 {
     font-family: 'Cinzel', serif;
-    font-size: 38px;
+    font-size: 26px;
     font-weight: 700;
     background: linear-gradient(135deg, #d9ceff, #8bbdff, #7c83ff);
     -webkit-background-clip: text;
@@ -91,25 +96,29 @@ body {
 .header-actions {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    margin-top: 14px;
+    gap: 8px;
+    margin-top: 10px;
     flex-wrap: wrap;
     align-items: center;
 }
 .header-actions .btn-action {
-    padding: 6px 18px;
+    padding: 5px 14px;
     border-radius: 30px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     background: rgba(255, 255, 255, 0.03);
     color: #b8aec8;
-    font-size: 12px;
+    font-size: 11px;
     cursor: pointer;
     transition: 0.25s ease;
     font-family: inherit;
     backdrop-filter: blur(4px);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    flex: 1 1 0;
+    justify-content: center;
+    min-width: 0;
+    max-width: 180px;
 }
 .header-actions .btn-action:hover {
     background: rgba(255, 255, 255, 0.06);
@@ -132,46 +141,45 @@ body {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 24px;
-    padding: 25px 20px;
+    border-radius: 20px;
+    padding: 18px 16px;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     transition: 0.3s ease;
+    overflow: hidden;
 }
 .form-card:hover {
     border-color: rgba(140, 180, 255, 0.15);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-/* ===== Tab Navigation ===== */
+/* ===== Tab Navigation (two-row) ===== */
 .tab-nav {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-    padding: 4px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-}
-.tab-nav::-webkit-scrollbar {
-    display: none;
+    margin-bottom: 16px;
+    padding: 4px 0;
+    overflow-x: hidden;
 }
 .tab-btn {
-    padding: 10px 18px;
+    padding: 8px 12px;
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
+    border-radius: 12px;
     background: rgba(255, 255, 255, 0.03);
     color: #8a82a0;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: 0.25s ease;
     font-family: inherit;
     white-space: nowrap;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
+    gap: 4px;
+    flex: 1 1 auto;
+    justify-content: center;
+    min-width: 0;
 }
 .tab-btn:hover {
     background: rgba(255, 255, 255, 0.06);
@@ -189,16 +197,31 @@ body {
 }
 
 /* ===== Second Person Form ===== */
+/* ===== Person Section Separators ===== */
+.person-section {
+    background: rgba(108, 140, 255, 0.04);
+    border: 1px solid rgba(108, 140, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+.person-section.p1 {
+    border-color: rgba(108, 140, 255, 0.15);
+}
+.person-section.p2 {
+    border-color: rgba(156, 121, 255, 0.15);
+    background: rgba(156, 121, 255, 0.04);
+}
 .person-divider {
     text-align: center;
-    padding: 12px 0;
+    padding: 10px 0;
     color: #5a526e;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin: 4px 0;
+    gap: 10px;
+    margin: 8px 0;
 }
 .person-divider::before,
 .person-divider::after {
@@ -208,10 +231,10 @@ body {
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
 }
 .person-label {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     color: #e6dcff;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -251,10 +274,41 @@ body {
     color: #b0caff;
     font-weight: 400;
 }
+/* ===== Form Grid (columnar layout for info) ===== */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 12px;
+}
+.form-grid.table-layout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 12px;
+    align-items: center;
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+.form-grid.table-layout .form-group {
+    display: contents;
+}
+.form-grid.table-layout label {
+    font-size: 12px;
+    color: #8a82a0;
+    text-align: right;
+    white-space: nowrap;
+}
+.form-grid.table-layout input,
+.form-grid.table-layout select {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(180, 165, 255, 0.12);
+    background: rgba(6, 7, 24, 0.6);
+    color: #f0ecff;
+    font-size: 13px;
+    font-family: inherit;
+    width: 100%;
+    min-width: 0;
 }
 .form-group {
     display: flex;
@@ -948,6 +1002,175 @@ body {
     transition: transform 0.1s ease;
 }
 
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0b0d1a;
+}
+::-webkit-scrollbar-thumb {
+    background: #3a3550;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #5a526e;
+}
+
+/* ===== Tarot Card Images ===== */
+.tarot-card-image {
+    transition: transform 0.3s ease;
+}
+.tarot-card-image.reversed {
+    transform: rotate(180deg);
+}
+
+/* ===== Tarot Card Flip Animation ===== */
+.tarot-flip-container {
+    perspective: 800px;
+    width: 140px;
+    height: 220px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.tarot-flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+.tarot-flip-container.flipped .tarot-flip-inner {
+    transform: rotateY(180deg);
+}
+.tarot-flip-front,
+.tarot-flip-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+}
+.tarot-flip-front {
+    background: linear-gradient(135deg, #1a1040, #2d1b69, #1a1040);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+}
+.tarot-flip-front .card-back-pattern {
+    width: 80%;
+    height: 80%;
+    border: 2px solid rgba(140, 180, 255, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    background: repeating-conic-gradient(
+        rgba(140, 180, 255, 0.06) 0% 25%,
+        rgba(100, 80, 200, 0.04) 0% 50%
+    ) 50% / 20px 20px;
+}
+.tarot-flip-back {
+    transform: rotateY(180deg);
+    background: #0a0c1e;
+}
+.tarot-flip-back img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.tarot-flip-back img.reversed {
+    transform: rotate(180deg);
+}
+.tarot-flip-container .flip-hint {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #5a526e;
+    white-space: nowrap;
+    transition: opacity 0.3s;
+}
+.tarot-flip-container.flipped .flip-hint {
+    opacity: 0;
+}
+
+/* Small variant for spread cards */
+.tarot-flip-container.small {
+    width: 80px;
+    height: 130px;
+}
+.tarot-flip-container.small .card-back-pattern {
+    font-size: 24px;
+}
+
+/* Auto-flip animation on load */
+@keyframes autoFlip {
+    0% { transform: rotateY(0deg); }
+    40% { transform: rotateY(0deg); }
+    100% { transform: rotateY(180deg); }
+}
+.tarot-flip-container.auto-flip .tarot-flip-inner {
+    animation: autoFlip 1.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+}
+
+/* ===== Daily Question Form ===== */
+.daily-question-form {
+    max-width: 700px;
+    margin: 0 auto;
+}
+.daily-question-form h3 {
+    color: #a29bfe;
+    text-align: center;
+    margin-bottom: 16px;
+}
+.daily-question-result {
+    background: rgba(108,92,231,0.1);
+    border: 1px solid rgba(108,92,231,0.3);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 16px;
+    color: #ddd;
+    line-height: 2;
+    white-space: pre-line;
+}
+.daily-question-result h4 {
+    color: #fdcb6e;
+    margin-top: 0;
+}
+
+/* ===== Hafez (Fal) ===== */
+.hafez-result-card {
+    background: linear-gradient(135deg, rgba(45, 106, 79, 0.1), rgba(64, 145, 108, 0.08));
+    border: 1px solid rgba(64, 145, 108, 0.25);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    animation: fadeInUp 0.6s ease forwards;
+}
+.hafez-poem {
+    font-size: 1.1rem;
+    line-height: 2.4;
+    color: #e0e0e0;
+    text-align: center;
+    direction: rtl;
+    padding: 16px 0;
+    font-family: 'Vazirmatn', serif;
+}
+.hafez-divider {
+    border-top: 1px solid rgba(64, 145, 108, 0.2);
+    margin: 16px 0;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .form-grid {
@@ -969,11 +1192,20 @@ body {
         width: 100%;
     }
     .main-header h1 {
-        font-size: 28px;
+        font-size: 22px;
+    }
+    .header-actions {
+        gap: 6px;
     }
     .header-actions .btn-action {
+        font-size: 10px;
+        padding: 4px 10px;
+        flex: 1 1 40%;
+        max-width: none;
+    }
+    .tab-btn {
+        padding: 6px 8px;
         font-size: 11px;
-        padding: 4px 12px;
     }
     .moon-phase-box {
         flex-direction: column;
@@ -994,6 +1226,14 @@ body {
     #map {
         height: 300px;
     }
+    .tarot-flip-container {
+        width: 110px;
+        height: 180px;
+    }
+    .tarot-flip-container.small {
+        width: 65px;
+        height: 105px;
+    }
 }
 @media (max-width: 500px) {
     .grid-masonry {
@@ -1005,25 +1245,16 @@ body {
     .grid-masonry-3 {
         grid-template-columns: 1fr;
     }
-}
-::-webkit-scrollbar {
-    width: 6px;
-}
-::-webkit-scrollbar-track {
-    background: #0b0d1a;
-}
-::-webkit-scrollbar-thumb {
-    background: #3a3550;
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #5a526e;
-}
-
-/* ===== Tarot Card Images ===== */
-.tarot-card-image {
-    transition: transform 0.3s ease;
-}
-.tarot-card-image.reversed {
-    transform: rotate(180deg);
+    .header-actions {
+        gap: 4px;
+    }
+    .header-actions .btn-action {
+        flex: 1 1 45%;
+        font-size: 10px;
+    }
+    .tab-btn {
+        flex: 1 1 calc(50% - 3px);
+        font-size: 10px;
+        padding: 5px 6px;
+    }
 }

@@ -12,7 +12,8 @@ from fastapi.staticfiles import StaticFiles
 from .routers import (
     misc, charts, data, context, moon_phase,
     mizaj, abjad_router, tarot_router,
-    numerology_router, biorhythm_router, chinese_zodiac_router
+    numerology_router, biorhythm_router, chinese_zodiac_router,
+    daily_question_router, hafez_router, geo_router
 )
 from .config.settings import settings
 from .middleware.secret_key_checker_middleware import SecretKeyCheckerMiddleware
@@ -60,6 +61,9 @@ app.include_router(tarot_router.router, tags=["Tarot"])
 app.include_router(numerology_router.router, tags=["Numerology"])
 app.include_router(biorhythm_router.router, tags=["Biorhythm"])
 app.include_router(chinese_zodiac_router.router, tags=["Chinese Zodiac"])
+app.include_router(daily_question_router.router, tags=["Daily Question"])
+app.include_router(hafez_router.router, tags=["Hafez"])
+app.include_router(geo_router.router, tags=["Geo"])
 
 # ============================================
 # سرویس فایل‌های استاتیک (فرانت‌اند)

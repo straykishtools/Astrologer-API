@@ -517,7 +517,10 @@ function buildBirthForm() {
 
 
 function buildPersonForm(id, label, badge) {
-    return '<div class="person-label">👤 '+label+' <span class="person-badge">'+badge+'</span></div>'+
+    var num = id.replace('p','');
+    var cls = 'person-section p'+num;
+    return '<div class="'+cls+'">'+
+        '<div class="person-label">👤 '+label+' <span class="person-badge">'+badge+'</span></div>'+
         '<div class="form-section"><div class="form-grid">'+
         '<div class="form-group"><label>👤</label><input type="text" id="'+id+'_name" value="'+label+'"></div>'+
         '<div class="form-group"><label>📅</label><input type="date" id="'+id+'_date"></div>'+
@@ -527,7 +530,8 @@ function buildPersonForm(id, label, badge) {
         '<div class="form-group"><label>🌍 lat</label><input type="number" id="'+id+'_lat" step="0.0001" value="35.6892"></div>'+
         '<div class="form-group"><label>🌍 lng</label><input type="number" id="'+id+'_lng" step="0.0001" value="51.3890"></div>'+
         '<div class="form-group"><label>🕐</label><select id="'+id+'_tz"><option value="3.5" selected>UTC+3:30</option><option value="0">UTC 0</option><option value="-5">UTC-5</option><option value="1">UTC+1</option><option value="8">UTC+8</option></select></div>'+
-        '</div></div>';
+        '</div></div>'+
+        '</div>';
 }
 
 var formBuilders = {
@@ -560,6 +564,8 @@ var formBuilders = {
     'numerology': function() { formTitle.innerHTML = '🔢 عددشناسی'; calcBtn.style.display = 'none'; return getNumerologyForm(); },
     'biorhythm': function() { formTitle.innerHTML = '🔬 بیوریتم'; calcBtn.style.display = 'none'; return getBiorhythmForm(); },
     'zodiac': function() { formTitle.innerHTML = '🐉 سال حیوانی'; calcBtn.style.display = 'none'; return getZodiacForm(); },
+    'daily-question': function() { formTitle.innerHTML = '❓ پرسش روزانه'; calcBtn.style.display = 'none'; return getDailyQuestionForm(); },
+    'hafez': function() { formTitle.innerHTML = '🍃 فال حافظ'; calcBtn.style.display = 'none'; return getHafezForm(); },
 
     'lunar-return': function() {
         formTitle.innerHTML = '🌙 بازگشت ماهانه'; calcBtn.innerHTML = '🌙 محاسبه';
@@ -1309,7 +1315,15 @@ function displayTarotCard(data, container) {
     container.innerHTML = `
         <div style="background: rgba(108,92,231,0.1); border: 1px solid rgba(108,92,231,0.3); border-radius: 16px; padding: 20px; margin-top: 10px;">
             <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
-                <img src="${imgUrl}" class="tarot-card-image${isReversed ? ' reversed' : ''}" style="width: 140px; height: auto; border-radius: 12px; border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0; transition: transform 0.3s ease;" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                <div class="tarot-flip-container auto-flip" onclick="this.classList.toggle('auto-flip');this.classList.toggle('flipped');" title="کلیک کنید">
+                    <div class="tarot-flip-inner">
+                        <div class="tarot-flip-front"><div class="card-back-pattern">🌟</div></div>
+                        <div class="tarot-flip-back">
+                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                        </div>
+                    </div>
+                    <span class="flip-hint">کلیک کنید</span>
+                </div>
                 <div style="flex: 1; min-width: 200px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                         <h4 style="color: #fdcb6e; margin: 0;">${card.name || 'بدون نام'}</h4>
@@ -1336,9 +1350,18 @@ function displayTarotCards(cards, container) {
         const isReversed = item.is_reversed || false;
         const status = isReversed ? '🔄 وارونه' : '⬆️ راست';
         const imgUrl = card.image || '/static/tarot/images/placeholder.webp';
+        const delay = index * 300;
         html += `
             <div style="background: rgba(108,92,231,0.08); border: 1px solid rgba(108,92,231,0.2); border-radius: 12px; padding: 15px; margin-top: 10px; display: flex; gap: 15px; align-items: flex-start;">
-                <img src="${imgUrl}" class="tarot-card-image${isReversed ? ' reversed' : ''}" style="width: 80px; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; transition: transform 0.3s ease;" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                <div class="tarot-flip-container small auto-flip" onclick="this.classList.toggle('auto-flip');this.classList.toggle('flipped');" style="animation-delay:${delay}ms;" title="کلیک کنید">
+                    <div class="tarot-flip-inner" style="animation-delay:${delay}ms;">
+                        <div class="tarot-flip-front"><div class="card-back-pattern">🌟</div></div>
+                        <div class="tarot-flip-back">
+                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                        </div>
+                    </div>
+                    <span class="flip-hint">کلیک</span>
+                </div>
                 <div style="flex: 1;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <h5 style="color: #fdcb6e; margin: 0;">#${index+1}: ${card.name || 'بدون نام'}</h5>
@@ -1359,9 +1382,18 @@ function displayTarotSpread(data, container) {
         const card = pos.card?.card || {};
         const isReversed = pos.card?.is_reversed || false;
         const imgUrl = card.image || '/static/tarot/images/placeholder.webp';
+        const delay = index * 400;
         html += `
             <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-top: 10px; display: flex; gap: 15px; align-items: flex-start;">
-                <img src="${imgUrl}" class="tarot-card-image${isReversed ? ' reversed' : ''}" style="width: 80px; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; transition: transform 0.3s ease;" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                <div class="tarot-flip-container small auto-flip" onclick="this.classList.toggle('auto-flip');this.classList.toggle('flipped');" style="animation-delay:${delay}ms;" title="کلیک کنید">
+                    <div class="tarot-flip-inner" style="animation-delay:${delay}ms;">
+                        <div class="tarot-flip-front"><div class="card-back-pattern">🌟</div></div>
+                        <div class="tarot-flip-back">
+                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                        </div>
+                    </div>
+                    <span class="flip-hint">کلیک</span>
+                </div>
                 <div style="flex: 1;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                         <h5 style="color: #fdcb6e; margin: 0;">${index+1}. ${pos.position || ''}</h5>
@@ -1859,6 +1891,189 @@ function displayZodiacCompat(data, container) {
                 ${data.animal2_sees_animal1 ? '✅ ' + data.animal2 + ' سازگار ' + data.animal1 + ' را می‌بیند' : ''}
             </div>
         </div>`;
+}
+
+// ================================================================
+// HAFEZ (فال حافظ)
+// ================================================================
+
+function getHafezForm() {
+    return `
+        <div style="max-width:600px;margin:0 auto;">
+            <h3 style="color:#a29bfe;text-align:center;">🍃 فال حافظ</h3>
+            <p style="color:#8a82a0;text-align:center;font-size:13px;margin-bottom:16px;">سوال خود را بنویسید و فال حافظ دریافت کنید</p>
+            
+            <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.05);">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="color:#b8aec8;">❓ سوال شما (اختیاری)</label>
+                    <input id="hafezQuestion" type="text" placeholder="مثلاً: آیا امروز روز خوبی است؟" style="width:100%;padding:12px;border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;border:1px solid rgba(255,255,255,0.1);font-size:14px;font-family:inherit;">
+                </div>
+                <button onclick="submitHafez()" style="width:100%;padding:14px;margin-top:8px;background:linear-gradient(135deg,#2d6a4f,#40916c);border:none;border-radius:30px;color:#fff;font-weight:bold;font-size:15px;cursor:pointer;font-family:inherit;">🍃 فال گرفتن</button>
+                <div id="hafezResult" style="margin-top:16px;"></div>
+            </div>
+        </div>
+    `;
+}
+
+async function submitHafez() {
+    const question = document.getElementById('hafezQuestion').value.trim();
+    const resultDiv = document.getElementById('hafezResult');
+    resultDiv.innerHTML = '<p style="color:#aaa;">⏳ در حال دریافت فال...</p>';
+    try {
+        const res = await fetch('/api/v5/hafez', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: question || null })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            displayHafez(data.data, resultDiv);
+        } else {
+            resultDiv.innerHTML = `<p style="color:#ff6b6b;">❌ ${data.detail || 'خطا'}</p>`;
+        }
+    } catch(e) {
+        resultDiv.innerHTML = '<p style="color:#ff6b6b;">❌ خطا در ارتباط با سرور</p>';
+    }
+}
+
+function displayHafez(data, container) {
+    let html = `<div class="hafez-result-card">`;
+    
+    if (data.question) {
+        html += `<div style="color:#fdcb6e;font-style:italic;margin-bottom:16px;font-size:15px;">📝 سوال: ${data.question}</div>`;
+    }
+    
+    // Poem
+    html += `<div class="hafez-poem">`;
+    if (data.poem) {
+        html += data.poem.replace(/\n/g, '<br>');
+    } else {
+        html += '<span style="color:#888;">متن غزل موجود نیست</span>';
+    }
+    html += `</div>`;
+    
+    // Interpretation
+    if (data.interpretation) {
+        html += `<div class="hafez-divider"></div>`;
+        html += `<div style="color:#a29bfe;font-weight:bold;margin-bottom:8px;">📖 تفسیر:</div>`;
+        html += `<div style="color:#ddd;line-height:2;">${data.interpretation}</div>`;
+    }
+    
+    // Date
+    if (data.date) {
+        html += `<div style="color:#888;font-size:0.8rem;margin-top:12px;">📅 ${data.date}</div>`;
+    }
+    
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+// ================================================================
+// DAILY QUESTION (پرسش روزانه)
+// ================================================================
+
+function getDailyQuestionForm() {
+    return `
+        <div class="daily-question-form">
+            <h3>❓ پرسش روزانه — پاسخ از ۳ موتور</h3>
+            <p style="color:#8a82a0;text-align:center;font-size:13px;margin-bottom:16px;">سوال خود را بنویسید و پاسخ ترکیبی از بیوریتم، سال حیوانی و تاروت دریافت کنید</p>
+            
+            <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.05);">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="color:#b8aec8;">❓ سوال شما</label>
+                    <input id="dqQuestion" type="text" placeholder="مثلاً: آیا امروز برای سفر خوب است؟" style="width:100%;padding:12px;border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;border:1px solid rgba(255,255,255,0.1);font-size:14px;font-family:inherit;">
+                </div>
+                <div class="form-grid" style="gap:10px;">
+                    <div class="form-group">
+                        <label style="color:#b8aec8;">📅 تاریخ تولد</label>
+                        <input id="dqBirthDate" type="date" value="1990-01-01" style="width:100%;padding:10px;border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;border:1px solid rgba(255,255,255,0.1);">
+                    </div>
+                    <div class="form-group">
+                        <label style="color:#b8aec8;">📅 سال تولد</label>
+                        <input id="dqBirthYear" type="number" value="1990" min="1900" max="2100" style="width:100%;padding:10px;border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;border:1px solid rgba(255,255,255,0.1);">
+                    </div>
+                </div>
+                <button onclick="submitDailyQuestion()" style="width:100%;padding:14px;margin-top:14px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);border:none;border-radius:30px;color:#fff;font-weight:bold;font-size:15px;cursor:pointer;font-family:inherit;">✨ دریافت پاسخ</button>
+                <div id="dqResult" style="margin-top:16px;"></div>
+            </div>
+        </div>
+    `;
+}
+
+async function submitDailyQuestion() {
+    const question = document.getElementById('dqQuestion').value.trim();
+    const birthDate = document.getElementById('dqBirthDate').value;
+    const birthYear = parseInt(document.getElementById('dqBirthYear').value);
+    const resultDiv = document.getElementById('dqResult');
+    
+    if (!question) {
+        resultDiv.innerHTML = '<p style="color:#ff6b6b;">❌ لطفاً سوال خود را بنویسید</p>';
+        return;
+    }
+    if (!birthDate || !birthYear) {
+        resultDiv.innerHTML = '<p style="color:#ff6b6b;">❌ لطفاً تاریخ تولد را وارد کنید</p>';
+        return;
+    }
+    
+    resultDiv.innerHTML = '<p style="color:#aaa;">⏳ در حال دریافت پاسخ از ۳ موتور...</p>';
+    
+    try {
+        const res = await fetch('/api/v5/daily-question', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question, birth_date: birthDate, birth_year: birthYear })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            displayDailyQuestion(data.data, resultDiv);
+        } else {
+            resultDiv.innerHTML = `<p style="color:#ff6b6b;">❌ ${data.detail || 'خطا'}</p>`;
+        }
+    } catch(e) {
+        resultDiv.innerHTML = '<p style="color:#ff6b6b;">❌ خطا در ارتباط با سرور</p>';
+    }
+}
+
+function displayDailyQuestion(data, container) {
+    const details = data.details || {};
+    const tarot = details.tarot || {};
+    const card = tarot.card || {};
+    const isReversed = tarot.is_reversed || false;
+    const imgUrl = card.image || '/static/tarot/images/placeholder.webp';
+    
+    // Build the tarot flip card HTML
+    const flipCardHtml = `\n        <div class="tarot-flip-container auto-flip" onclick="this.classList.toggle('auto-flip');this.classList.toggle('flipped');" title="کلیک کنید تا کارت برگردد">
+            <div class="tarot-flip-inner">
+                <div class="tarot-flip-front">
+                    <div class="card-back-pattern">🌟</div>
+                </div>
+                <div class="tarot-flip-back">
+                    <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                </div>
+            </div>
+            <span class="flip-hint">کلیک کنید</span>
+        </div>`;
+    
+    let html = '<div class="daily-question-result">';
+    html += `<h4>📝 سوال: ${data.question}</h4>`;
+    html += `<div style="color:#8a82a0;font-size:12px;margin-bottom:12px;">📅 ${data.date}</div>`;
+    
+    // Tarot card with flip animation
+    html += '<div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;">';
+    html += flipCardHtml;
+    html += `<div style="flex:1;min-width:200px;">
+        <div style="color:#a29bfe;font-weight:bold;font-size:15px;margin-bottom:8px;">🃏 کارت راهنما: ${card.name || 'ناشناس'}</div>
+        <div style="color:#aaa;font-size:13px;">${isReversed ? '🔄 وارونه' : '⬆️ راست'}</div>
+    </div>`;
+    html += '</div>';
+    
+    // Render the response text (with HTML support)
+    const responseText = data.response || '';
+    const formattedResponse = responseText.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+    html += `<div style="line-height:2.2;color:#ddd;">${formattedResponse}</div>`;
+    
+    html += '</div>';
+    container.innerHTML = html;
 }
 
 // ================================================================
