@@ -833,29 +833,54 @@ async def calculate_return_chart_data(
     if request_body.return_location:
         await resolve_location_for_return_location(request_body.return_location)
     natal_subject = build_subject(request_body.subject, active_points=active_points)
-    return_factory = build_return_factory(natal_subject, request_body)
 
-    if request_body.iso_datetime:
-        return_subject = return_factory.next_return_from_iso_formatted_time(
-            request_body.iso_datetime, return_type
-        )  # type: ignore[arg-type]
-    elif request_body.month:
-        if request_body.year is None:
-            raise KerykeionException("Year must be provided when month is specified.")
-        return_subject = return_factory.next_return_from_date(
-            request_body.year,
-            request_body.month,
-            request_body.day or 1,
-            return_type=return_type,
+    # Validate that the natal subject has required planetary positions
+    if not hasattr(natal_subject, 'sun') or natal_subject.sun is None:
+        raise KerykeionException(
+            f"Sun position is required for {return_type} return but is not available in the subject. "
+            "This can happen when the birth data (date, time, location) is invalid or incomplete. "
+            "Please verify the birth date, time, and location are correct."
         )
-    else:
-        if request_body.year is None:
-            raise KerykeionException(
-                "Year must be provided when iso_datetime is not set."
+
+    try:
+        return_factory = build_return_factory(natal_subject, request_body)
+    except Exception as exc:
+        logger.warning("Failed to build return factory: %s", exc)
+        raise KerykeionException(
+            f"Could not build {return_type} return factory: {exc}. "
+            "Please verify the birth data and return location."
+        ) from exc
+
+    try:
+        if request_body.iso_datetime:
+            return_subject = return_factory.next_return_from_iso_formatted_time(
+                request_body.iso_datetime, return_type
+            )  # type: ignore[arg-type]
+        elif request_body.month:
+            if request_body.year is None:
+                raise KerykeionException("Year must be provided when month is specified.")
+            return_subject = return_factory.next_return_from_date(
+                request_body.year,
+                request_body.month,
+                request_body.day or 1,
+                return_type=return_type,
             )
-        return_subject = return_factory.next_return_from_date(
-            request_body.year, 1, 1, return_type=return_type
-        )
+        else:
+            if request_body.year is None:
+                raise KerykeionException(
+                    "Year must be provided when iso_datetime is not set."
+                )
+            return_subject = return_factory.next_return_from_date(
+                request_body.year, 1, 1, return_type=return_type
+            )
+    except KerykeionException:
+        raise
+    except Exception as exc:
+        logger.warning("Failed to calculate %s return: %s", return_type, exc)
+        raise KerykeionException(
+            f"Failed to calculate {return_type} return: {exc}. "
+            "Please verify the birth data is correct."
+        ) from exc
 
     if request_body.wheel_type == "dual":
         chart_data = ChartDataFactory.create_return_chart_data(
@@ -918,17 +943,38 @@ async def create_synastry_chart_data(
     second_subject = build_subject(
         request_body.second_subject, active_points=active_points
     )
-    chart_data = ChartDataFactory.create_synastry_chart_data(
-        first_subject,
-        second_subject,
-        active_points=active_points,
-        active_aspects=active_aspects,
-        include_house_comparison=request_body.include_house_comparison,
-        include_relationship_score=request_body.include_relationship_score,
-        distribution_method=request_body.distribution_method,
-        custom_distribution_weights=request_body.custom_distribution_weights,
-    )
-    return chart_data
+    try:
+        chart_data = ChartDataFactory.create_synastry_chart_data(
+            first_subject,
+            second_subject,
+            active_points=active_points,
+            active_aspects=active_aspects,
+            include_house_comparison=request_body.include_house_comparison,
+            include_relationship_score=request_body.include_relationship_score,
+            distribution_method=request_body.distribution_method,
+            custom_distribution_weights=request_body.custom_distribution_weights,
+        )
+        return chart_data
+    except (TypeError, AttributeError, KerykeionException) as exc:
+        # Fallback: retry without relationship score if kerykeion fails
+        # (e.g. when sun/moon positions are None due to edge-case dates)
+        if request_body.include_relationship_score:
+            logger.warning(
+                "Synastry relationship scoring failed (%s), retrying without it.",
+                exc,
+            )
+            chart_data = ChartDataFactory.create_synastry_chart_data(
+                first_subject,
+                second_subject,
+                active_points=active_points,
+                active_aspects=active_aspects,
+                include_house_comparison=request_body.include_house_comparison,
+                include_relationship_score=False,
+                distribution_method=request_body.distribution_method,
+                custom_distribution_weights=request_body.custom_distribution_weights,
+            )
+            return chart_data
+        raise
 
 
 async def create_transit_chart_data(
@@ -979,17 +1025,43 @@ async def create_composite_chart_data(
     second_subject = build_subject(
         request_body.second_subject, active_points=active_points
     )
-    composite_subject = CompositeSubjectFactory(
-        first_subject, second_subject
-    ).get_midpoint_composite_subject_model()
-    chart_data = ChartDataFactory.create_composite_chart_data(
-        composite_subject,
-        active_points=active_points,
-        active_aspects=active_aspects,
-        distribution_method=request_body.distribution_method,
-        custom_distribution_weights=request_body.custom_distribution_weights,
-    )
-    return chart_data
+    try:
+        composite_subject = CompositeSubjectFactory(
+            first_subject, second_subject
+        ).get_midpoint_composite_subject_model()
+    except (TypeError, AttributeError, KerykeionException) as exc:
+        logger.warning(
+            "Composite subject creation failed (%s).", exc,
+        )
+        raise KerykeionException(
+            f"Could not create composite subject: {exc}. "
+            "This can happen with certain birth date/time/location combinations. "
+            "Please verify both persons' birth data is correct."
+        ) from exc
+    except Exception as exc:
+        logger.warning(
+            "Composite subject creation unexpected error (%s).", exc,
+        )
+        raise KerykeionException(
+            f"Unexpected error creating composite subject: {exc}"
+        ) from exc
+
+    try:
+        chart_data = ChartDataFactory.create_composite_chart_data(
+            composite_subject,
+            active_points=active_points,
+            active_aspects=active_aspects,
+            distribution_method=request_body.distribution_method,
+            custom_distribution_weights=request_body.custom_distribution_weights,
+        )
+        return chart_data
+    except Exception as exc:
+        logger.warning(
+            "Composite chart data creation failed (%s).", exc,
+        )
+        raise KerykeionException(
+            f"Composite chart data creation failed: {exc}"
+        ) from exc
 
 
 def create_moon_phase_overview(

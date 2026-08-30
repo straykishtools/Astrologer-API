@@ -53,6 +53,12 @@ start.bat
 | سال حیوانی | `POST /api/v5/chinese-zodiac` | year |
 | پرسش روزانه | `POST /api/v5/daily-question` | question/birth_date/birth_year |
 | فال حافظ | `POST /api/v5/hafez` | optional question |
+| ناسا (APOD) | `GET /api/v5/nasa/apod` | optional date |
+| ناسا (Planets) | `GET /api/v5/nasa/planets?date=` | date |
+| ناسا (Images) | `GET /api/v5/nasa/images?query=` | search query |
+| ناسا (Space Weather) | `GET /api/v5/nasa/space-weather?startDate=` | start/end date |
+| ناسا (Asteroids) | `GET /api/v5/nasa/asteroids?startDate=` | start/end date |
+| ناسا (Mars Weather) | `GET /api/v5/nasa/mars-weather` | — |
 
 ## Geo API Resolution (City → Coordinates)
 

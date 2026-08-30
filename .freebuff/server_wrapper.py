@@ -1,22 +1,43 @@
-"""Server wrapper: patches swisseph -> libephemeris, then starts uvicorn."""
-import sys
+"""
+Server wrapper: patches sys.modules['swisseph'] with libephemeris before importing app.main.
+This is required because kerykeion imports swisseph directly.
+"""
 import os
+import sys
+import types
 
-# Ensure project root is on sys.path
+# Set working directory to project root
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+os.chdir(PROJECT_ROOT)
+sys.path.insert(0, PROJECT_ROOT)
 
-# Patch swisseph with libephemeris before any kerykeion import
-import libephemeris as swe
-sys.modules['swisseph'] = swe
-print("[OK] Ephemeris patched: swisseph -> libephemeris")
+# Set required env vars
+os.environ["KERYKEION_EPHEMERIS_BACKEND"] = "libephemeris"
+os.environ.setdefault("ENV_TYPE", "dev")
 
-# Now start uvicorn
+# Patch swisseph
+try:
+    import libephemeris
+    swisseph = types.ModuleType("swisseph")
+    swisseph.__version__ = getattr(libephemeris, "__version__", "2.10.3.2")
+    for attr in dir(libephemeris):
+        if not attr.startswith("_"):
+            setattr(swisseph, attr, getattr(libephemeris, attr))
+    sys.modules["swisseph"] = swisseph
+except ImportError:
+    # If libephemeris is not available, create a dummy
+    swisseph = types.ModuleType("swisseph")
+    swisseph.__version__ = "2.10.3.2"
+    swisseph.set_ephe_path = lambda *a, **kw: None
+    sys.modules["swisseph"] = swisseph
+
 import uvicorn
-uvicorn.run(
-    "app.main:app",
-    host="127.0.0.1",
-    port=8003,
-    log_level="info",
-)
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "app.main:app",
+        host="127.0.0.1",
+        port=8003,
+        reload=False,
+        log_level="info",
+    )

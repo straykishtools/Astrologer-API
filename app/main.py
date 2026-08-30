@@ -1,7 +1,14 @@
 # app/main.py
+import io
+import sys
 import logging
 import logging.config
 import os
+
+# Fix Windows cp1252 encoding error for Persian/emoji output
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, FileResponse
@@ -13,7 +20,8 @@ from .routers import (
     misc, charts, data, context, moon_phase,
     mizaj, abjad_router, tarot_router,
     numerology_router, biorhythm_router, chinese_zodiac_router,
-    daily_question_router, hafez_router, geo_router
+    daily_question_router, hafez_router, geo_router,
+    nasa_router
 )
 from .config.settings import settings
 from .middleware.secret_key_checker_middleware import SecretKeyCheckerMiddleware
@@ -64,6 +72,7 @@ app.include_router(chinese_zodiac_router.router, tags=["Chinese Zodiac"])
 app.include_router(daily_question_router.router, tags=["Daily Question"])
 app.include_router(hafez_router.router, tags=["Hafez"])
 app.include_router(geo_router.router, tags=["Geo"])
+app.include_router(nasa_router.router, tags=["NASA"])
 
 # ============================================
 # سرویس فایل‌های استاتیک (فرانت‌اند)

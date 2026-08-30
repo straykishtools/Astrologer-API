@@ -3,7 +3,7 @@
 // ============================================
 
 function getAbjadForm() {
-    var h = '<div style="max-width:700px;margin:0 auto;">';
+    var h = '<div style="max-width:900px;margin:0 auto;">';
     h += '<h3 style="color:#a29bfe;text-align:center;">\u{1f522} \u0627\u0628\u062c\u062f - \u0645\u062d\u0627\u0633\u0628\u0647 \u0648 \u062a\u0637\u0628\u06cc\u0642</h3>';
 
     // --- Single word calculation ---
@@ -19,7 +19,7 @@ function getAbjadForm() {
     h += '<option value="kabir">\u06a9\u0628\u06cc\u0631</option>';
     h += '<option value="saghir">\u0635\u063a\u06cc\u0631</option>';
     h += '</select></div>';
-    h += '<button onclick="submitAbjadSingle()" style="width:100%;padding:12px;background:#6c5ce7;border:none;border-radius:30px;color:#fff;font-size:1.05rem;cursor:pointer;font-weight:bold;transition:all 0.3s;margin-top:10px;">\u{1f9ee} \u0645\u062d\u0627\u0633\u0628\u0647</button>';
+    h += '<button class="btn-primary" onclick="submitAbjadSingle()">\u{1f9ee} \u0645\u062d\u0627\u0633\u0628\u0647</button>';
     h += '<div id="abjadSingleResult" style="margin-top:15px;"></div>';
     h += '</div>';
 
@@ -40,7 +40,7 @@ function getAbjadForm() {
     h += '<option value="kabir">\u06a9\u0628\u06cc\u0631</option>';
     h += '<option value="saghir">\u0635\u063a\u06cc\u0631</option>';
     h += '</select></div>';
-    h += '<button onclick="submitAbjadCompare()" style="width:100%;padding:12px;background:#6c5ce7;border:none;border-radius:30px;color:#fff;font-size:1.05rem;cursor:pointer;font-weight:bold;transition:all 0.3s;margin-top:10px;">\u{1f50d} \u0645\u0642\u0627\u06cc\u0633\u0647</button>';
+    h += '<button class="btn-secondary" onclick="submitAbjadCompare()" style="width:100%;">\u{1f50d} \u0645\u0642\u0627\u06cc\u0633\u0647</button>';
     h += '<div id="abjadCompareResult" style="margin-top:15px;"></div>';
     h += '</div>';
 

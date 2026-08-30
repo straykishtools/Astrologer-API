@@ -59,7 +59,7 @@ function getMizajForm() {
         <div id="mmq-questions">${getMmqQuestions()}</div>
         <div id="smq-questions" style="display:none;">${getSmqQuestions()}</div>
 
-        <button class="mizaj-btn" onclick="submitMizaj()">🧬 حساب کن مزاج من را</button>
+        <button class="btn-primary" onclick="submitMizaj()">🧬 حساب کن مزاج من را</button>
         <div id="mizaj-result" class="mizaj-result-slot"></div>
     </div>`;
 }

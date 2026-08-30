@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/date-wheel-picker.css">
 </head>
 <body>
 
@@ -79,6 +80,15 @@
                 <button class="tab-btn" data-tab="hafez">
                     <span class="tab-emoji">🍃</span> فال حافظ
                 </button>
+                <button class="tab-btn" data-tab="nasa">
+                    <span class="tab-emoji">🌌</span> ناسا
+                </button>
+            </div>
+
+            <!-- Persistent Location Bar -->
+            <div class="location-bar" id="locationBar">
+                <span class="location-bar-icon">📍</span>
+                <span class="location-bar-text" id="locationBarText">مکان: در حال بارگذاری...</span>
             </div>
 
             <div class="form-title" id="formTitle">
@@ -103,6 +113,9 @@
             <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
         </div>
     </div>
+
+    <!-- ===== TOAST NOTIFICATION ===== -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <!-- ===== YOGA ENGINE OVERLAY ===== -->
     <div class="yoga-overlay" id="yogaOverlay">
@@ -133,8 +146,11 @@
 
     <!-- ===== Leaflet JS ===== -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="static/mizaj.js"></script>
-    <script src="static/abjad.js"></script>
-    <script src="static/script.js"></script>
+    <script src="static/mizaj.js?v=4"></script>
+    <script src="static/abjad.js?v=4"></script>
+    <script src="static/persian-provinces.js"></script>
+    <script src="static/date-wheel-picker.js?v=15"></script>
+    <script src="static/city-selector.js?v=9"></script>
+    <script src="static/script.js?v=11"></script>
 </body>
 </html>

@@ -131,10 +131,26 @@ class DailyQuestionEngine:
                 "element": zodiac["element"],
                 "emoji": zodiac["animal_emoji"],
                 "personality": zodiac.get("personality", "پر انرژی، اجتماعی و خوش‌بین"),
-                "compatibility": "، ".join(zodiac.get("compatibility", [])[:3]),
+                "compatibility": self._format_compatibility(zodiac.get("compatibility", {})),
                 "description": zodiac["description"],
             }
         }
+
+    def _format_compatibility(self, compatibility: dict) -> str:
+        """فرمت کردن دیکشنری سازگاری به رشته خوانا"""
+        if not compatibility or not isinstance(compatibility, dict):
+            return ""
+        parts = []
+        best = compatibility.get("best_matches", [])
+        good = compatibility.get("good_matches", [])
+        avoid = compatibility.get("avoid", [])
+        if best:
+            parts.append("بهترین: " + "، ".join(best[:3]))
+        if good:
+            parts.append("خوب: " + "، ".join(good[:3]))
+        if avoid:
+            parts.append("اجتناب: " + "، ".join(avoid[:3]))
+        return " | ".join(parts)
 
     def _build_tarot_section(self, tarot: dict) -> dict:
         """ساخت بخش تاروت"""
