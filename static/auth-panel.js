@@ -615,6 +615,7 @@ async function loadAdminUsers() {
         var allPlans = (plansData.plans || []).map(function(p) { return p.name; });
 
         var html = `
+            <button onclick="openCreateUserForm()" class="btn-action primary" style="margin-bottom:15px;padding:8px 20px;font-size:0.85rem;">➕ ساخت کاربر جدید</button>
             <div style="overflow-x:auto;">
                 <table style="width:100%;border-collapse:collapse;font-size:0.85rem;color:#ddd;">
                     <thead>
@@ -641,7 +642,7 @@ async function loadAdminUsers() {
                     <td style="padding:10px;">${u.display_name || '—'}</td>
                     <td style="padding:10px;">${u.email}</td>
                     <td style="padding:10px;font-weight:700;color:${u.plan === 'free' ? '#e74c3c' : u.plan === 'gold' ? '#f39c12' : '#9b59b6'};">${u.plan}</td>
-                    <td style="padding:10px;text-align:center;">${u.is_admin ? '⭐' : '—'}</td>
+                    <td style="padding:10px;text-align:center;"><button onclick="toggleUserAdmin(${u.id}, ${u.is_admin ? 1 : 0})" style="background:${u.is_admin ? '#f39c12' : '#2a3560'};border:none;color:${u.is_admin ? '#0b0e1a' : '#b0c4e0'};padding:4px 10px;border-radius:5px;cursor:pointer;font-size:0.75rem;font-family:inherit;font-weight:${u.is_admin ? '700' : '400'};">${u.is_admin ? '⭐ ادمین' : '—'}</button></td>
                     <td style="padding:10px;">${u.daily_charts_used || 0}</td>
                     <td style="padding:10px;font-size:0.75rem;">${u.created_at || ''}</td>
                     <td style="padding:10px;text-align:center;">
@@ -666,6 +667,105 @@ window.changeUserPlan = async function(userId, planName) {
     } catch(e) {
         if (window.showToast) showToast(e.message, 'error');
         loadAdminUsers();
+    }
+}
+window.toggleUserAdmin = async function(userId, currentStatus) {
+    var newStatus = currentStatus ? 'غیرادمین' : 'ادمین';
+    if (!confirm('تغییر وضعیت ادمین کاربر به ' + newStatus + '?')) return;
+    try {
+        await apiCall('PUT', '/admin/users/' + userId + '/admin');
+        if (window.showToast) showToast('✅ وضعیت ادمین تغییر کرد', 'success');
+        loadAdminUsers();
+    } catch(e) {
+        if (window.showToast) showToast(e.message, 'error');
+    }
+};;
+
+// ─── ADMIN: CREATE USER ───
+
+window.openCreateUserForm = function() {
+    // Get available plans for the dropdown
+    apiCall('GET', '/admin/plans').then(function(data) {
+        var plans = (data.plans || []).filter(function(p) { return p.is_active; });
+        var planOptions = plans.map(function(p) {
+            return '<option value="' + p.name + '">' + escapeHtml(p.display_name) + ' (' + p.name + ')</option>';
+        }).join('');
+
+        var modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.id = 'createUserModal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-box" style="max-width:480px;">
+                <div class="modal-header">
+                    <h3>➕ ساخت کاربر جدید</h3>
+                    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                </div>
+                <div style="padding:20px;">
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">ایمیل *</label>
+                        <input type="email" id="newUserEmail" placeholder="user@example.com" required style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">رمز عبور * (حداقل ۶ کاراکتر)</label>
+                        <input type="password" id="newUserPassword" placeholder="••••••" required style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">نام نمایشی</label>
+                        <input type="text" id="newUserDisplayName" placeholder="نام کاربر" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">پلن</label>
+                        <select id="newUserPlan" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+                            ${planOptions}
+                        </select>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#b0c4e0;cursor:pointer;">
+                            <input type="checkbox" id="newUserIsAdmin"> ادمین
+                        </label>
+                    </div>
+                    <button onclick="createUser()" class="btn-primary" style="width:100%;padding:12px;">✅ ساخت کاربر</button>
+                    <div id="createUserError" style="color:#e74c3c;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }).catch(function(e) {
+        if (window.showToast) showToast('خطا در بارگذاری پلن‌ها: ' + e.message, 'error');
+    });
+};
+
+window.createUser = async function() {
+    var errEl = document.getElementById('createUserError');
+    var email = document.getElementById('newUserEmail').value.trim();
+    var password = document.getElementById('newUserPassword').value;
+    var display_name = document.getElementById('newUserDisplayName').value.trim();
+    var plan = document.getElementById('newUserPlan').value;
+    var is_admin = document.getElementById('newUserIsAdmin').checked;
+
+    if (!email || !password) {
+        errEl.textContent = 'ایمیل و رمز عبور الزامی است';
+        return;
+    }
+    if (password.length < 6) {
+        errEl.textContent = 'رمز عبور باید حداقل ۶ کاراکتر باشد';
+        return;
+    }
+
+    try {
+        await apiCall('POST', '/admin/create-user', {
+            email: email,
+            password: password,
+            display_name: display_name || undefined,
+            plan: plan,
+            is_admin: is_admin,
+        });
+        if (window.showToast) showToast('✅ کاربر ساخته شد', 'success');
+        document.getElementById('createUserModal').remove();
+        loadAdminUsers();
+    } catch(e) {
+        errEl.textContent = e.message;
     }
 };
 

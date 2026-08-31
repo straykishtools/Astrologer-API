@@ -11,6 +11,7 @@ from app.models import (
 )
 import logging
 import json
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +91,62 @@ def _plan_allows_premium(plan_name: str, path_keyword: str) -> bool:
     return path_keyword not in blocked
 
 
+# ─── محدودیت روزانه مهمان (بر اساس IP) ───
+GUEST_DAILY_LIMIT = 5  # 5 چارت در روز برای مهمان
+_guest_usage = {}  # {ip: {"count": int, "date": str}}
+_guest_cleanup_time = 0
+
+
+def _get_guest_ip(scope):
+    """Extract client IP from ASGI scope"""
+    headers = dict(scope.get("headers", []))
+    forwarded = headers.get(b"x-forwarded-for", b"").decode()
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    client = scope.get("client")
+    return client[0] if client else "unknown"
+
+
+def _guest_key(ip):
+    """Return today's date string for keying"""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def _check_guest_limit(ip):
+    """Check and increment guest daily limit. Returns (allowed, count, limit)."""
+    global _guest_usage, _guest_cleanup_time
+    from datetime import datetime, timezone
+    now = time.time()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Cleanup every 10 minutes
+    if now - _guest_cleanup_time > 600:
+        _guest_cleanup_time = now
+        expired = [k for k, v in _guest_usage.items() if v.get("date") != today]
+        for k in expired:
+            del _guest_usage[k]
+    
+    key = f"{ip}:{today}"
+    entry = _guest_usage.get(key)
+    if not entry or entry.get("date") != today:
+        _guest_usage[key] = {"count": 1, "date": today}
+        return True, 1, GUEST_DAILY_LIMIT
+    
+    entry["count"] += 1
+    count = entry["count"]
+    return count <= GUEST_DAILY_LIMIT, count, GUEST_DAILY_LIMIT
+
+
+def _decrement_guest(ip):
+    """Rollback guest usage count on failure"""
+    from datetime import datetime, timezone
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    key = f"{ip}:{today}"
+    entry = _guest_usage.get(key)
+    if entry and entry.get("date") == today and entry["count"] > 0:
+        entry["count"] -= 1
+
+
 class RateLimitMiddleware:
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
@@ -137,7 +194,7 @@ class RateLimitMiddleware:
                 break
         is_premium = matched_keyword is not None
 
-        # اگر کاربر نیست، فقط مسیرهای رایگان
+        # اگر کاربر نیست — محدودیت مهمان بر اساس IP
         if not user:
             if is_premium:
                 response = JSONResponse(
@@ -146,8 +203,26 @@ class RateLimitMiddleware:
                 )
                 await response(scope, receive, send)
                 return
-            # کاربر مهمان: بدون محدودیت فعلی
-            await self.app(scope, receive, send)
+            # محدودیت روزانه مهمان
+            guest_ip = _get_guest_ip(scope)
+            allowed, count, limit = _check_guest_limit(guest_ip)
+            if not allowed:
+                response = JSONResponse(
+                    status_code=429,
+                    content={
+                        "status": "ERROR",
+                        "message": f"محدودیت روزانه مهمان ({limit} چارت) تمام شده. لطفاً وارد شوید.",
+                        "used": count,
+                        "limit": limit,
+                    },
+                )
+                await response(scope, receive, send)
+                return
+            try:
+                await self.app(scope, receive, send)
+            except Exception:
+                _decrement_guest(guest_ip)
+                raise
             return
 
         # ادمین همه دسترسی‌ها رو داره

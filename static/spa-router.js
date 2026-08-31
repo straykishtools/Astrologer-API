@@ -6,6 +6,13 @@
 (function() {
 'use strict';
 
+function escapeHtml(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(String(str)));
+    return div.innerHTML;
+}
+
 // ─── مسیریابی هش‌دار ───
 // #/ → landing
 // #/app → main app (tabs)
@@ -230,9 +237,9 @@ async function loadDashboardCharts() {
 
                 html += '<div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;display:flex;align-items:center;gap:15px;flex-wrap:wrap;">';
                 html += '<div style="flex:1;min-width:200px;">';
-                html += '<div style="font-weight:700;color:#fff;font-size:1rem;">' + chartTypeLabel + '</div>';
-                html += '<div style="color:#888;font-size:0.8rem;margin-top:4px;">' + titleDisplay + '</div>';
-                html += '<div style="color:#666;font-size:0.75rem;margin-top:4px;">📅 ' + dateDisplay + '</div>';
+                html += '<div style="font-weight:700;color:#fff;font-size:1rem;">' + escapeHtml(chartTypeLabel) + '</div>';
+                html += '<div style="color:#888;font-size:0.8rem;margin-top:4px;">' + escapeHtml(titleDisplay) + '</div>';
+                html += '<div style="color:#666;font-size:0.75rem;margin-top:4px;">📅 ' + escapeHtml(dateDisplay) + '</div>';
                 html += '</div>';
                 html += '<div style="display:flex;gap:8px;">';
                 html += '<button onclick="viewSavedChart(' + c.id + ')" style="background:#2a3560;color:#b0c4e0;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-family:inherit;">👁️ مشاهده</button>';
@@ -246,7 +253,7 @@ async function loadDashboardCharts() {
             content.innerHTML = '<div style="text-align:center;padding:40px;"><div style="font-size:3rem;margin-bottom:15px;">📭</div><p style="color:#888;">هنوز چارتی ذخیره نشده.</p><p style="color:#666;font-size:0.8rem;margin-top:5px;">با اشتراک طلایی می‌تونید چارت‌ها رو ذخیره کنید.</p><button onclick="navigate(\'app\')" style="background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;margin-top:15px;">شروع محاسبه</button></div>';
         }
     } catch(e) {
-        content.innerHTML = '<div style="text-align:center;color:#e74c3c;padding:40px;">⚠️ خطا: ' + e.message + '</div>';
+        content.innerHTML = '<div style="text-align:center;color:#e74c3c;padding:40px;">⚠️ خطا: ' + escapeHtml(e.message) + '</div>';
     }
 }
 
@@ -269,7 +276,7 @@ window.viewSavedChart = async function(chartId) {
                         var result = JSON.parse(chart.result_data);
                         resultDiv.innerHTML = result.html || '<pre style="color:#ddd;white-space:pre-wrap;">' + JSON.stringify(result, null, 2) + '</pre>';
                     } catch(e) {
-                        resultDiv.innerHTML = '<pre style="color:#ddd;white-space:pre-wrap;">' + chart.result_data + '</pre>';
+                        resultDiv.innerHTML = '<pre style="color:#ddd;white-space:pre-wrap;">' + escapeHtml(chart.result_data) + '</pre>';
                     }
                 }
             }, 500);

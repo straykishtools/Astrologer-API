@@ -14,7 +14,9 @@ from app.models import (
     PlanCreate,
     PlanResponse,
     PlanUpdate,
+    AdminCreateUser,
     create_user,
+    create_user_admin,
     authenticate_user,
     get_user_by_id,
     create_access_token,
@@ -296,6 +298,46 @@ def admin_list_users(admin=Depends(get_admin_user), limit: int = 100):
     return {"users": [dict(u) for u in users]}
 
 
+@router.post("/admin/create-user", response_model=UserResponse)
+def admin_create_user(data: AdminCreateUser, admin=Depends(get_admin_user)):
+    """ساخت کاربر جدید توسط ادمین — با امکان تنظیم پلن و دسترسی ادمین
+    
+    - **email**: ایمیل کاربر (باید یکتا باشد)
+    - **password**: رمز عبور (حداقل ۶ کاراکتر)
+    - **display_name**: نام نمایشی (اختیاری)
+    - **plan**: نام پلن (پیش‌فرض: free)
+    - **is_admin**: آیا کاربر ادمین باشد (پیش‌فرض: false)
+    """
+    if len(data.password) < 6:
+        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل ۶ کاراکتر باشد")
+    if "@" not in data.email or "." not in data.email:
+        raise HTTPException(status_code=400, detail="ایمیل نامعتبر است")
+    
+    # چک کن پلن وجود داشته باشد
+    plan = get_plan_by_name(data.plan)
+    if not plan:
+        raise HTTPException(status_code=404, detail=f"پلن '{data.plan}' یافت نشد")
+    
+    user = create_user_admin(
+        email=data.email,
+        password=data.password,
+        display_name=data.display_name or "",
+        plan=data.plan,
+        is_admin=data.is_admin,
+    )
+    if not user:
+        raise HTTPException(status_code=409, detail="این ایمیل قبلاً ثبت شده")
+    
+    return UserResponse(
+        id=user["id"],
+        email=user["email"],
+        display_name=user["display_name"],
+        plan=user["plan"],
+        is_admin=bool(user.get("is_admin")),
+        created_at=user["created_at"],
+    )
+
+
 @router.put("/admin/users/{user_id}/plan")
 def admin_change_user_plan(user_id: int, data: dict, admin=Depends(get_admin_user)):
     """تغییر پلن یک کاربر — فقط ادمین
@@ -316,3 +358,28 @@ def admin_change_user_plan(user_id: int, data: dict, admin=Depends(get_admin_use
     if cursor.rowcount == 0:
         raise HTTPException(status_code=404, detail="کاربر یافت نشد")
     return {"status": "updated", "user_id": user_id, "plan": plan_name}
+
+
+@router.put("/admin/users/{user_id}/admin")
+def admin_toggle_user_admin(user_id: int, admin=Depends(get_admin_user)):
+    """تغییر وضعیت ادمین یک کاربر — فقط ادمین
+
+    فلگ is_admin را toggle می‌کند. ادمین نمی‌تواند خودش را از ادمینی خارج کند.
+    """
+    from app.models import get_db
+    conn = get_db()
+    user = conn.execute("SELECT id, is_admin FROM users WHERE id = ?", (user_id,)).fetchone()
+    if not user:
+        conn.close()
+        raise HTTPException(status_code=404, detail="کاربر یافت نشد")
+
+    # جلوگیری از خروج ادمین جاری از وضعیت ادمین
+    if user["id"] == admin["id"] and user["is_admin"]:
+        conn.close()
+        raise HTTPException(status_code=400, detail="نمی‌توانید وضعیت ادمین خودتان را تغییر دهید")
+
+    new_status = 0 if user["is_admin"] else 1
+    conn.execute("UPDATE users SET is_admin = ? WHERE id = ?", (new_status, user_id))
+    conn.commit()
+    conn.close()
+    return {"status": "updated", "user_id": user_id, "is_admin": bool(new_status)}

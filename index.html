@@ -354,7 +354,7 @@
             z-index: 0;
             background:
                 radial-gradient(ellipse at 50% 20%, rgba(7, 12, 31, 0.25), rgba(7, 12, 31, 0.82) 85%),
-                url('header-main.jpg') center / cover no-repeat;
+                radial-gradient(ellipse at 50% 30%, rgba(37,53,107,0.5) 0%, rgba(12,20,48,0.85) 60%, rgba(7,12,31,0.95) 100%);
             border-radius: 0 0 34px 34px;
             pointer-events: none;
         }
@@ -796,6 +796,9 @@
         /* ============================================================
            پاورقی — پس‌زمینه‌ی footer.jpg + اورلی
         ============================================================ */
+        /* ============================================================
+           پاورقی — استایل جدید (بدون تصویر پس‌زمینه)
+        ============================================================ */
         .cosmic .footer-premium {
             position: relative;
             margin-top: 36px;
@@ -803,16 +806,27 @@
             font-size: 12.5px;
             color: var(--ink-dim);
             border-top: 1px solid var(--line);
-            padding: 26px 0 8px;
+            padding: 30px 20px 12px;
             background:
-                radial-gradient(ellipse at 50% 100%, rgba(7, 12, 31, 0.55), rgba(7, 12, 31, 0.92) 80%),
-                url('footer.jpg') center / cover no-repeat;
+                radial-gradient(ellipse at 50% 0%, rgba(37, 53, 107, 0.35) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(16, 26, 61, 0.4) 0%, rgba(7, 12, 31, 0.95) 100%);
             border-radius: 26px 26px 0 0;
-            background-attachment: local;
-            min-height: 70px;
+            min-height: 80px;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .cosmic .footer-premium::before {
+            content: "º6  º6  º6";
+            display: block;
+            font-size: 8px;
+            letter-spacing: 6px;
+            color: var(--gold-500);
+            opacity: 0.5;
+            margin-bottom: 6px;
         }
 
         .cosmic .footer-premium a {

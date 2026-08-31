@@ -107,6 +107,15 @@ class PlanUpdate(BaseModel):
     sort_order: Optional[int] = None
 
 
+class AdminCreateUser(BaseModel):
+    """Model for admin-created users with plan and admin flag"""
+    email: str
+    password: str
+    display_name: Optional[str] = None
+    plan: str = "free"
+    is_admin: bool = False
+
+
 # ─── دیتابیس SQLite ───
 
 def get_db():
@@ -232,6 +241,23 @@ def create_user(email: str, password: str, display_name: str = "") -> Optional[d
         conn.execute(
             "INSERT INTO users (email, password_hash, display_name) VALUES (?, ?, ?)",
             (email.lower().strip(), hash_password(password), display_name or email.split("@")[0]),
+        )
+        conn.commit()
+        user = conn.execute("SELECT * FROM users WHERE email = ?", (email.lower().strip(),)).fetchone()
+        return dict(user)
+    except sqlite3.IntegrityError:
+        return None
+    finally:
+        conn.close()
+
+
+def create_user_admin(email: str, password: str, display_name: str = "", plan: str = "free", is_admin: bool = False) -> Optional[dict]:
+    """ساخت کاربر توسط ادمین — با تنظیم پلن و دسترسی ادمین"""
+    conn = get_db()
+    try:
+        conn.execute(
+            "INSERT INTO users (email, password_hash, display_name, plan, is_admin) VALUES (?, ?, ?, ?, ?)",
+            (email.lower().strip(), hash_password(password), display_name or email.split("@")[0], plan, 1 if is_admin else 0),
         )
         conn.commit()
         user = conn.execute("SELECT * FROM users WHERE email = ?", (email.lower().strip(),)).fetchone()
