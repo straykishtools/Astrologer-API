@@ -268,6 +268,23 @@ def create_user_admin(email: str, password: str, display_name: str = "", plan: s
         conn.close()
 
 
+
+
+def change_password(user_id: int, current_password: str, new_password: str) -> bool:
+    """Change user password after verifying current password"""
+    conn = get_db()
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    if not user:
+        conn.close()
+        return False
+    if not verify_password(current_password, user['password_hash']):
+        conn.close()
+        return False
+    conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (hash_password(new_password), user_id))
+    conn.commit()
+    conn.close()
+    return True
+
 def authenticate_user(email: str, password: str) -> Optional[dict]:
     conn = get_db()
     user = conn.execute("SELECT * FROM users WHERE email = ?", (email.lower().strip(),)).fetchone()
@@ -577,3 +594,9 @@ def get_user_plan(user_id: int) -> Optional[dict]:
     plan = conn.execute("SELECT * FROM plans WHERE name = ?", (user["plan"],)).fetchone()
     conn.close()
     return dict(plan) if plan else None
+
+
+class ChangePassword(BaseModel):
+    """Model for password change"""
+    current_password: str
+    new_password: str

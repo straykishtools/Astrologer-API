@@ -122,7 +122,22 @@ function openLoginModal() {
                 <div id="authFormArea"></div>
             </div>
         </div>
-    `;
+    
+                <div style="margin-top:20px;border-top:1px solid #2a3560;padding-top:20px;">
+                    <h4 style="margin:0 0 12px;color:#f39c12;font-size:0.9rem;">تغییر رمز عبور</h4>
+                    <div style="margin-bottom:10px;">
+                        <input type="password" id="currentPassword" placeholder="رمز عبور امروزی" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <input type="password" id="newPassword" placeholder="رمز جدید" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <input type="password" id="newPasswordConfirm" placeholder="تکرار رمز جدید" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+                    </div>
+                    <button onclick="changeMyPassword()" style="width:100%;padding:10px;border-radius:8px;border:none;background:#f39c12;color:#0b0e1a;font-weight:700;cursor:pointer;font-family:inherit;">ذخیره رمز</button>
+                    <div id="changePwError" style="color:#e74c3c;margin-top:8px;text-align:center;font-size:0.8rem;"></div>
+                </div>
+`;
     document.body.appendChild(modal);
     renderLoginForm();
 }

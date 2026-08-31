@@ -17,6 +17,8 @@ from app.models import (
     AdminCreateUser,
     create_user,
     create_user_admin,
+    ChangePassword,
+    change_password,
     authenticate_user,
     get_user_by_id,
     create_access_token,
@@ -169,6 +171,60 @@ def get_charts(user=Depends(get_current_user)):
     plan = get_user_plan(user["id"])
     if not plan or not plan["can_save_charts"]:
         return {"charts": [], "message": "برای ذخیره چارت، اشتراک خود را ارتقا دهید"}
+
+
+def get_daily_limit(user=Depends(get_current_user)):
+    """چک کردن محدودیت روزانه"""
+    return check_daily_limit(user["id"])
+
+
+# ─── روت‌های ذخیره چارت (فقط کاربران ویژه) ───
+
+@router.post("/charts/save", response_model=ChartResponse)
+def save_chart_endpoint(data: SaveChartRequest, user=Depends(get_current_user)):
+    """ذخیره چارت (بر اساس پلن کاربر)"""
+    plan = get_user_plan(user["id"])
+    if not plan or not plan["can_save_charts"]:
+        raise HTTPException(status_code=403, detail="ذخیره چارت در پلن شما فعال نیست. اشتراک خود را ارتقا دهید.")
+
+    chart = db_save_chart(
+        user_id=user["id"],
+        chart_type=data.chart_type,
+        title=data.title or "",
+        input_data=data.input_data,
+        result_data=data.result_data,
+    )
+    return ChartResponse(
+        id=chart["id"],
+        chart_type=chart["chart_type"],
+        title=chart["title"],
+        input_data=chart["input_data"],
+        result_data=chart["result_data"],
+        created_at=chart["created_at"],
+    )
+
+
+@router.get("/charts")
+def get_charts(user=Depends(get_current_user)):
+    """لیست چارت‌های ذخیره‌شده"""
+    plan = get_user_plan(user["id"])
+    if not plan or not plan["can_save_charts"]:
+        return {"charts": [], "message": "برای ذخیره چارت، اشتراک خود را ارتقا دهید"}
+
+@router.put("/change-password")
+def change_user_password(data: ChangePassword, user=Depends(get_current_user)):
+    """تغییر رمز عبور
+
+    - **current_password**: رمز عبور امروزی
+    - **new_password**: رمز جدید (حداقل 6 کاراکتر)
+    """
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل 6 کاراکتر باشد")
+    ok = change_password(user["id"], data.current_password, data.new_password)
+    if not ok:
+        raise HTTPException(status_code=400, detail="رمز عبور امروزی اشتباه است")
+    return {"status": "ok", "message": "رمز عبور تغییر کرد"}
+
     return {"charts": get_user_charts(user["id"])}
 
 
