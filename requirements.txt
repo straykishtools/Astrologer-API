@@ -11,3 +11,4 @@ simple-ascii-tables
 pydantic-settings
 httpx>=0.28.0
 jdatetime
+PyJWT>=2.8.0
