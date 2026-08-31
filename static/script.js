@@ -532,7 +532,7 @@ function displayGenericChart(data, title, chartType) {
     html += '</div></div>';
         if (chart.relationship_score || chartType === 'composite') {
         var rs = chart.relationship_score || null;
-        var score = rs ? (rs.score_value || rs.score || 0) : (data.composite_score || calculateTransitScore(data));
+        var score = rs ? (rs.score_value || rs.score || 0) : (data.total_score || data.composite_score || 0);
         var isComposite = (chartType === 'composite');
         // Use backend interpretation if available
         var backendInterp = data.interpretation;
@@ -548,12 +548,12 @@ function displayGenericChart(data, title, chartType) {
         html += '<p class="interp-text">' + interp.text + '</p>';
         // Show composite categories for composite charts
         if (isComposite && chart.subject) {
-            var cats = calculateCompositeCategories(chart);
+            var cats = data.composite_categories || {};
             var avgScore = Math.round((cats.emotional.score + cats.intellectual.score + cats.spiritual.score) / 3);
-            var summary = getCompositeSummary(avgScore);
+            var summary = data.composite_summary || '';
             html += '<div class="composite-categories">';
             // House-based description for composite
-            var houseDesc = getCompositeHouseDescription(data);
+            var houseDesc = data.composite_house_description || '';
             if (houseDesc) {
                 html += '<div class="composite-house-desc">' + houseDesc + '</div>';
             }
@@ -709,141 +709,22 @@ function animateScoreProgressBars() {
 // ================================================================
 //   COMPOSITE CHART CATEGORIES (Emotional, Intellectual, Spiritual)
 // ================================================================
-function calculateCompositeCategories(chartData) {
-    var aspects = chartData.aspects || [];
-    var subject = chartData.subject || {};
-    var planets = ['sun','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto'];
-    var firePlanets = ['sun','mars','jupiter'];
-    var earthPlanets = ['venus','saturn'];
-    var airPlanets = ['mercury','uranus'];
-    var waterPlanets = ['moon','neptune'];
-    var signElements = {'Ari':'fire','Leo':'fire','Sag':'fire','Tau':'earth','Vir':'earth','Cap':'earth','Gem':'air','Lib':'air','Aqu':'air','Can':'water','Sco':'water','Pis':'water'};
-    var harmony = {'trine':8,'sextile':5,'conjunction':3,'quintile':2};
-    var tension = {'square':-7,'opposition':-5};
-    var aspectLabels = {'trine':'تثلیث','sextile':'تسدیس','conjunction':'مقارنه','square':'تربیع','opposition':'مقابله','quintile':'تخمیس'};
+// calculateCompositeCategories moved to backend — use data.composite_categories
 
-    function planetScoreWithDetails(planetList) {
-        var score = 50;
-        var details = [];
-        // Aspect contributions
-        aspects.forEach(function(a) {
-            var p1 = (a.p1_name || '').toLowerCase();
-            var p2 = (a.p2_name || '').toLowerCase();
-            var asp = (a.aspect || '').toLowerCase();
-            var isP1 = planetList.indexOf(p1) !== -1;
-            var isP2 = planetList.indexOf(p2) !== -1;
-            if (!isP1 && !isP2) return;
-            var delta = 0;
-            if (harmony[asp] !== undefined) delta = harmony[asp];
-            if (tension[asp] !== undefined) delta = tension[asp];
-            if (delta !== 0) {
-                score += delta;
-                details.push({
-                    text: translate(a.p1_name||p1) + ' ' + (aspectLabels[asp]||asp) + ' ' + translate(a.p2_name||p2),
-                    delta: delta,
-                    positive: delta > 0
-                });
-            }
-        });
-        // Sign dignity bonus
-        var elem = 'fire';
-        if (planetList === earthPlanets) elem = 'earth';
-        else if (planetList === airPlanets) elem = 'air';
-        else if (planetList === waterPlanets) elem = 'water';
-        planets.forEach(function(pk) {
-            var obj = subject[pk];
-            if (!obj || !obj.sign || planetList.indexOf(pk) === -1) return;
-            if (signElements[obj.sign] === elem) {
-                score += 4;
-                details.push({
-                    text: translate(obj.name||pk) + ' در برج ' + translate(obj.sign) + ' اعمالی',
-                    delta: 4,
-                    positive: true
-                });
-            }
-        });
-        score = Math.max(0, Math.min(100, score));
-        // Sort by absolute contribution
-        details.sort(function(a,b) { return Math.abs(b.delta) - Math.abs(a.delta); });
-        return { score: score, details: details };
-    }
-
-    var emo = planetScoreWithDetails(waterPlanets);
-    var int = planetScoreWithDetails(airPlanets);
-    var spi = planetScoreWithDetails(firePlanets);
-
-    return {
-        emotional: { label: 'عاطفی', emoji: '💖', color: '#ff6b8a', score: emo.score, details: emo.details, desc: 'انضراضات عاطفی و احساسی بین شما' },
-        intellectual: { label: 'فکری', emoji: '🧠', color: '#74b9ff', score: int.score, details: int.details, desc: 'تفکر و ارتباط فعالی بین شما' },
-        spiritual: { label: 'معنوی', emoji: '🔮', color: '#a29bfe', score: spi.score, details: spi.details, desc: 'ارتباط معنوی و رشد درون شما' }
-    };
-}
-
-function getCompositeSummary(score) {
-    if (score >= 80) return '💪 رابطه‌ی شما بسیار قوی است و ارتباط عمیقی در بین شما دارد. این تطابق نادر و ارزشمند است.';
-    if (score >= 60) return '⭐ رابطه بنیایی خوبی دارد. هویت رابطه به صورت شخصیت و جذاشت در حال رشد است.';
-    if (score >= 40) return '⚖️ رابطه در مرحله متوازن است. تلاش و صبر می‌تواند این رابطه را تغییر دهید.';
-    if (score >= 20) return 'با اصلاح تلاش و تفاهم متقاضل، می‌توان این رابطه را تقویت دهید.';
-    return '⚠️ این رابطه نیاز به کار اصلی دارد. با تلاش و اصلاح می‌توان این مشکلات را حل کرد.';
-}
+// getCompositeSummary moved to backend — use data.composite_summary
 
 
 // ================================================================
 //   TRANSIT / SOLAR RETURN / LUNAR RETURN INTERPRETATIONS
 // ================================================================
-function calculateTransitScore(chartData) {
-    var chart = chartData.chart_data || chartData;
-    var aspects = chart.aspects || chartData.aspects || [];
-    if (aspects.length === 0) return 50;
-    // Planet significance weights (personal > social > transpersonal)
-    var planetWeight = {'sun':3,'moon':3,'mercury':2.5,'venus':2.5,'mars':2,'jupiter':1.5,'saturn':1.2,'uranus':1,'neptune':0.8,'pluto':0.6};
-    var aspectValue = {'conjunction':3,'trine':4,'sextile':2.5,'square':-4,'opposition':-3.5,'quintile':1.5,'septile':-1};
-    var totalWeight = 0;
-    var weightedSum = 0;
-    aspects.forEach(function(a) {
-        var p1 = (a.p1_name || '').toLowerCase();
-        var p2 = (a.p2_name || '').toLowerCase();
-        var asp = (a.aspect || '').toLowerCase();
-        var av = aspectValue[asp];
-        if (av === undefined) return;
-        var w = (planetWeight[p1] || 1) * (planetWeight[p2] || 1);
-        totalWeight += w;
-        weightedSum += av * w;
-    });
-    if (totalWeight === 0) return 50;
-    // Normalize: weightedSum ranges roughly from -totalWeight*4 to +totalWeight*4
-    var normalized = weightedSum / (totalWeight * 4); // -1 to +1
-    var score = Math.round(50 + normalized * 45); // 5 to 95 range
-    return Math.max(5, Math.min(95, score));
-}
+// Score calculation moved to backend — frontend uses total_score from API response
 
-function getCompositeHouseDescription(chartData) {
-    var chart = chartData.chart_data || chartData;
-    var s1 = chart.first_subject || chart.subject || {};
-    var s2 = chart.second_subject || {};
-    var houseNames = {'First_House':'خانه اول (خود)','Second_House':'خانه دوم (ارزش‌ها)','Third_House':'خانه سوم (ارتباطات)','Fourth_House':'خانه چهارم (خانواده)','Fifth_House':'خانه پنجم (خلاقیت)','Sixth_House':'خانه ششم (کار و سلامت)','Seventh_House':'خانه هفتم (رابطه)','Eighth_House':'خانه هشتم (تحول)','Ninth_House':'خانه نهم (فلسفه)','Tenth_House':'خانه دهم (شهرت)','Eleventh_House':'خانه یازدهم (امیدها)','Twelfth_House':'خانه دوازدهم (پنهان)'};
-    var sunHouse1 = s1.sun ? s1.sun.house : null;
-    var sunHouse2 = s2.sun ? s2.sun.house : null;
-    var moonHouse1 = s1.moon ? s1.moon.house : null;
-    var moonHouse2 = s2.moon ? s2.moon.house : null;
-    var desc = '';
-    if (sunHouse1) desc += '\u0633\u06cc\u0631\u0647 \u0627\u0648\u0644 \u062f\u0631 ' + (houseNames[sunHouse1] || sunHouse1) + ' قرار دارد. ';
-    if (sunHouse2) desc += '\u0633\u06cc\u0631\u0647 \u062f\u0648\u0645 \u062f\u0631 ' + (houseNames[sunHouse2] || sunHouse2) + ' قرار دارد. ';
-    if (moonHouse1) desc += '\u0645\u0627\u0647 \u0627\u0648\u0644 \u062f\u0631 ' + (houseNames[moonHouse1] || moonHouse1) + '. ';
-    if (moonHouse2) desc += '\u0645\u0627\u0646 \u062f\u0648\u0645 \u062f\u0631 ' + (houseNames[moonHouse2] || moonHouse2) + '. ';
-    // Key house themes
-    var themes = [];
-    if (sunHouse1 === 'Seventh_House' || sunHouse2 === 'Seventh_House') themes.push('\u0631ابطه در مرکز اصلی قرار دارد');
-    if (sunHouse1 === 'Fourth_House' || sunHouse2 === 'Fourth_House') themes.push('تمرکز خانواده و ریشه');
-    if (moonHouse1 === 'Fifth_House' || moonHouse2 === 'Fifth_House') themes.push('عشق و خلاقیت در رابطه');
-    if (sunHouse1 === 'Tenth_House' || sunHouse2 === 'Tenth_House') themes.push('اهداف مشترک در زندگی');
-    if (themes.length > 0) desc += 'موضوعات کلیدی: ' + themes.join(', ') + '.';
-    return desc || '\u062aوضیحی برای این رابطه در دسترس است.';
-}
+
+// getCompositeHouseDescription moved to backend — use data.composite_house_description
 
 function displayScoreInterpretation(chartData, title, chartType) {
     var chart = chartData.chart_data || chartData;
-    var score = chartData.chart_score || calculateTransitScore(chartData);
+    var score = chartData.total_score || chartData.chart_score || 50;
     var interp = chartData.interpretation || {level: score + '/100', title: 'امتیاز', text: 'امتیاز شما ' + score + ' از ۱۰۰ است.'};
     var colorCls = getScoreColorClass(score);
     // Context info
@@ -1620,6 +1501,7 @@ calcBtn.addEventListener('click', async function() {
     statusDiv.style.display = 'block';
     statusDiv.innerHTML = makeShimmerCompact('⏳ در حال دریافت اطلاعات...');
     statusDiv.style.color = '#b0caff';
+    if (window.liquidOrb) { window.liquidOrb.show(); window.liquidOrb.thinking(); }
     try {
         if (currentTab === 'birth') await handleBirthChart();
         else if (currentTab === 'synastry') await handleSynastry();
@@ -1628,13 +1510,15 @@ calcBtn.addEventListener('click', async function() {
         else if (currentTab === 'solar-return') await handleReturn('solar-return', '☀️ بازگشت خورشیدی');
         else if (currentTab === 'lunar-return') await handleReturn('lunar-return', '🌙 بازگشت ماهانه');
 
-        else if (currentTab === 'mizaj') { submitMizaj(); return; }
+        else if (currentTab === 'mizaj') { submitMizaj(); if (window.liquidOrb) window.liquidOrb.hide(); return; }
         statusDiv.innerHTML = '✅ انجام شد!';
         statusDiv.style.color = '#5fbf5f';
+        if (window.liquidOrb) { window.liquidOrb.idle(); setTimeout(function() { window.liquidOrb.hide(); }, 700); }
     } catch (err) {
         statusDiv.innerHTML = '⚠️ خطا: ' + err.message;
         statusDiv.style.color = '#e87474';
         console.error(err);
+        if (window.liquidOrb) { window.liquidOrb.idle(); setTimeout(function() { window.liquidOrb.hide(); }, 700); }
     }
 });
 

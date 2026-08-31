@@ -10,7 +10,11 @@ import logging
 
 class SecretKeyCheckerMiddleware:
     # Paths excluded from authentication (public endpoints)
-    EXCLUDED_PATHS: set[str] = {"/health"}
+    EXCLUDED_PATHS: set[str] = {
+        "/health",
+        "/api/v5/auth/login",
+        "/api/v5/auth/register",
+    }
 
     def __init__(self, app: ASGIApp, secret_key_names: str | list[str], secret_keys: list = []) -> None:
         self.app = app
@@ -36,8 +40,9 @@ class SecretKeyCheckerMiddleware:
             return
 
         # Skip authentication for excluded paths (e.g., /health)
+        # Also exempt all /api/v5/auth/* routes (JWT-authenticated, not secret-key-authenticated)
         path = scope.get("path", "")
-        if path in self.EXCLUDED_PATHS:
+        if path in self.EXCLUDED_PATHS or path.startswith("/api/v5/auth/"):
             await self.app(scope, receive, send)
             return
 

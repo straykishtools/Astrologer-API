@@ -21,10 +21,11 @@ from .routers import (
     mizaj, abjad_router, tarot_router,
     numerology_router, biorhythm_router, chinese_zodiac_router,
     daily_question_router, hafez_router, geo_router,
-    nasa_router
+    nasa_router, auth_router
 )
 from .config.settings import settings
 from .middleware.secret_key_checker_middleware import SecretKeyCheckerMiddleware
+from .middleware.rate_limit_middleware import RateLimitMiddleware
 from .utils.validation_helpers import format_extra_field_error
 
 # ============================================
@@ -73,6 +74,7 @@ app.include_router(daily_question_router.router, tags=["Daily Question"])
 app.include_router(hafez_router.router, tags=["Hafez"])
 app.include_router(geo_router.router, tags=["Geo"])
 app.include_router(nasa_router.router, tags=["NASA"])
+app.include_router(auth_router.router, tags=["Auth"])
 
 # ============================================
 # سرویس فایل‌های استاتیک (فرانت‌اند)
@@ -136,6 +138,9 @@ if not settings.debug:
             settings.rapid_api_key,
         ],
     )
+
+# ─── واسطه‌ی محدودیت روزانه ───
+app.add_middleware(RateLimitMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

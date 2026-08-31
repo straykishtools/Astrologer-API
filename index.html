@@ -3,121 +3,1421 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Oracle · چارت تولد حرفه‌ای</title>
+    <title>Cosmic Oracle · رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&family=Cinzel:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static/style.css">
     <link rel="stylesheet" href="static/date-wheel-picker.css">
-</head>
-<body>
 
-    <!-- ===== Animated Background ===== -->
+    <style>
+        /* ============================================================
+           COSMIC ORACLE — لاجورد و زرّ کاغذ
+           سایت کامل: سایدبار حرفه‌ای + صفحه اصلی غنی + ابزارها
+           موتورهای سنگین (mizaj/abjad/leaflet/liquid-orb/auth) lazy
+           بارگذاری می‌شوند؛ هوک‌های جاوااسکریپتی دست‌نخورده‌اند.
+           همه‌ی استایل‌های پوسته با پیشوند .cosmic نوشته شده‌اند تا
+           بر static/style.css غالب شوند و خروجی داینامیک دست نماند.
+        ============================================================ */
+
+        :root {
+            color-scheme: dark;
+            --lapis-950: #070c1f;
+            --lapis-900: #0c1430;
+            --lapis-850: #101a3d;
+            --lapis-800: #16224d;
+            --lapis-700: #22305f;
+            --gold-200: #f3e5b8;
+            --gold-300: #ecd9a0;
+            --gold-400: #ddc070;
+            --gold-500: #c9a227;
+            --gold-600: #a8812a;
+            --ink: #ece6d6;
+            --ink-dim: #aab2cd;
+            --star: #9fd4e0;
+            --line: rgba(221, 192, 112, 0.16);
+            --line-strong: rgba(221, 192, 112, 0.42);
+            --panel: rgba(16, 26, 61, 0.72);
+            --shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.85);
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { margin: 0; padding: 0; }
+
+        body.cosmic {
+            font-family: "Vazirmatn", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 700px at 50% -10%, rgba(37, 53, 107, 0.55), transparent 65%),
+                radial-gradient(900px 600px at 85% 15%, rgba(18, 34, 77, 0.9), transparent 60%),
+                radial-gradient(700px 500px at 8% 90%, rgba(20, 32, 74, 0.8), transparent 60%),
+                linear-gradient(180deg, var(--lapis-950) 0%, var(--lapis-900) 45%, var(--lapis-950) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        body.cosmic::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(1px 1px at 12% 22%, rgba(236, 230, 214, 0.5), transparent 100%),
+                radial-gradient(1px 1px at 28% 68%, rgba(159, 212, 224, 0.4), transparent 100%),
+                radial-gradient(1.5px 1.5px at 43% 12%, rgba(236, 230, 214, 0.35), transparent 100%),
+                radial-gradient(1px 1px at 61% 38%, rgba(236, 230, 214, 0.45), transparent 100%),
+                radial-gradient(1px 1px at 74% 82%, rgba(221, 192, 112, 0.4), transparent 100%),
+                radial-gradient(1.5px 1.5px at 88% 30%, rgba(236, 230, 214, 0.35), transparent 100%),
+                radial-gradient(1px 1px at 7% 55%, rgba(221, 192, 112, 0.35), transparent 100%),
+                radial-gradient(1px 1px at 55% 92%, rgba(236, 230, 214, 0.3), transparent 100%);
+            opacity: 0.7;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        /* ============================================================
+           سایدبار
+        ============================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            z-index: 4000;
+            display: flex;
+            flex-direction: column;
+            background: rgba(8, 13, 32, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-left: 1px solid var(--line-strong);
+            transform: translateX(0);
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 20px 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .sidebar-brand .logo-icon {
+            font-size: 28px;
+            filter: drop-shadow(0 0 14px rgba(221, 192, 112, 0.45));
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-name {
+            font-family: "Cinzel", serif;
+            font-weight: 700;
+            font-size: 19px;
+            letter-spacing: 0.1em;
+            background: linear-gradient(180deg, var(--gold-200), var(--gold-500));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .sidebar-brand .brand-sub {
+            font-family: "Reem Kufi", sans-serif;
+            font-size: 12px;
+            color: var(--ink-dim);
+            margin-top: 2px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 10px 16px;
+            overflow-y: auto;
+        }
+
+        .nav-group-title {
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: var(--gold-500);
+            padding: 12px 10px 6px;
+        }
+
+        .nav-item {
+            appearance: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--ink-dim);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13.5px;
+            font-weight: 500;
+            text-align: right;
+            padding: 10px 12px;
+            margin: 1px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .nav-item .nav-emoji {
+            font-size: 16px;
+            width: 26px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(221, 192, 112, 0.08);
+            color: var(--gold-200);
+        }
+
+        .nav-item:active { transform: scale(0.99); }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(221, 192, 112, 0.16), rgba(221, 192, 112, 0.05));
+            color: var(--gold-200);
+            font-weight: 700;
+            box-shadow: inset 0 0 0 1px var(--line-strong);
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--line);
+            margin: 10px 14px;
+        }
+
+        .sidebar-footer {
+            padding: 12px 10px 16px;
+            border-top: 1px solid var(--line);
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 3900;
+            background: rgba(4, 7, 18, 0.66);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        body.cosmic.sidebar-open .sidebar-backdrop {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ============================================================
+           محتوای اصلی
+        ============================================================ */
+        .cosmic-main {
+            position: relative;
+            z-index: 1;
+            margin-right: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---------- نوار بالا ---------- */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            background: rgba(7, 12, 31, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .menu-toggle {
+            appearance: none;
+            display: none;
+            border: 1px solid var(--line-strong);
+            background: rgba(22, 34, 77, 0.6);
+            color: var(--gold-200);
+            font-size: 17px;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .menu-toggle:hover { border-color: var(--gold-400); }
+
+        .topbar-brand {
+            font-family: "Cinzel", serif;
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 0.12em;
+            background: linear-gradient(180deg, var(--gold-200), var(--gold-500));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+
+        .topbar-spacer { flex: 1; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        /* دکمه‌ی «🧘 Yoga Engine» که script.js prepend می‌کند */
+        .cosmic .header-actions .btn-action[style*="margin-right"] {
+            margin-right: 0 !important;
+            margin-left: auto !important;
+        }
+
+        /* ---------- دکمه‌های اکشن ---------- */
+        .cosmic .btn-action {
+            appearance: none;
+            border: 1px solid var(--line-strong);
+            background: rgba(22, 34, 77, 0.55);
+            color: var(--ink);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .cosmic .btn-action:hover {
+            border-color: var(--gold-400);
+            color: var(--gold-200);
+            background: rgba(37, 53, 107, 0.65);
+            transform: translateY(-1px);
+        }
+
+        .cosmic .btn-action.primary {
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500) 60%, var(--gold-600));
+            border-color: transparent;
+            color: var(--lapis-950);
+            font-weight: 800;
+            box-shadow: 0 6px 22px -6px rgba(201, 162, 39, 0.55);
+        }
+
+        .cosmic .btn-action.primary:hover {
+            color: var(--lapis-950);
+            background: linear-gradient(180deg, var(--gold-200), var(--gold-400) 60%, var(--gold-500));
+            box-shadow: 0 8px 28px -6px rgba(201, 162, 39, 0.7);
+        }
+
+        /* ============================================================
+           صفحات
+        ============================================================ */
+        .page { padding: 24px 26px 60px; }
+        .page[hidden] { display: none !important; }
+
+        /* ============================================================
+           صفحه اصلی — هیرو
+        ============================================================ */
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 34px 10px 8px;
+        }
+
+        /* پس‌زمینه‌ی هدر (header-main.jpg) + اورلی برای خوانایی */
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at 50% 20%, rgba(7, 12, 31, 0.25), rgba(7, 12, 31, 0.82) 85%),
+                url('header-main.jpg') center / cover no-repeat;
+            border-radius: 0 0 34px 34px;
+            pointer-events: none;
+        }
+
+        .hero-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(7, 12, 31, 0.15) 0%, rgba(7, 12, 31, 0.35) 55%, var(--lapis-950) 100%);
+            border-radius: inherit;
+        }
+
+        .hero > *:not(.hero-bg) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .astrolabe {
+            position: relative;
+            width: min(44vw, 215px);
+            aspect-ratio: 1;
+            margin: 0 auto;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .astrolabe svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 18px rgba(201, 162, 39, 0.16));
+        }
+
+        .astrolabe .ring-ticks {
+            animation: astro-spin 90s linear infinite;
+            transform-origin: 50% 50%;
+        }
+
+        .astrolabe .sweep-arm {
+            animation: astro-spin 55s linear infinite;
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes astro-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        .hero h1 {
+            margin: 6px 0 0;
+            font-family: "Cinzel", serif;
+            font-weight: 700;
+            font-size: clamp(34px, 6vw, 52px);
+            letter-spacing: 0.14em;
+            line-height: 1.15;
+            background: linear-gradient(180deg, var(--gold-200) 0%, var(--gold-400) 55%, var(--gold-600) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 40px rgba(201, 162, 39, 0.18);
+        }
+
+        .hero .hero-sub {
+            margin: 14px auto 0;
+            max-width: 640px;
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 16px;
+            line-height: 2;
+            color: var(--ink-dim);
+        }
+
+        .hero .hero-sub::before,
+        .hero .hero-sub::after {
+            content: "✦";
+            display: inline-block;
+            margin: 0 10px;
+            font-size: 11px;
+            color: var(--gold-500);
+            vertical-align: middle;
+        }
+
+        .hero-cta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .hero-cta .btn-action {
+            padding: 11px 22px;
+            font-size: 14px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin: 34px auto 0;
+            max-width: 720px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            flex: 1 1 150px;
+            max-width: 170px;
+            padding: 10px 18px;
+            text-align: center;
+        }
+
+        .hero-stat + .hero-stat {
+            border-right: 1px solid var(--line);
+        }
+
+        .hero-stat .stat-num {
+            font-family: "Cinzel", serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--gold-300);
+            line-height: 1.1;
+        }
+
+        .hero-stat .stat-label {
+            font-size: 12.5px;
+            color: var(--ink-dim);
+            margin-top: 4px;
+        }
+
+        /* ============================================================
+           صفحه اصلی — سرویس‌ها
+        ============================================================ */
+        .section-heading {
+            text-align: center;
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--gold-200);
+            margin: 44px 0 6px;
+        }
+
+        .section-heading small {
+            display: block;
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--ink-dim);
+            margin-top: 6px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .service-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 18px 18px 16px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
+            cursor: pointer;
+            text-align: right;
+        }
+
+        .service-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--line-strong);
+            box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(221, 192, 112, 0.12);
+        }
+
+        .service-card .svc-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .service-card .svc-emoji {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            border-radius: 12px;
+            background: linear-gradient(160deg, rgba(221, 192, 112, 0.18), rgba(221, 192, 112, 0.04));
+            border: 1px solid var(--line);
+        }
+
+        .service-card .svc-name {
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .service-card .svc-desc {
+            font-size: 12.5px;
+            line-height: 1.9;
+            color: var(--ink-dim);
+            flex: 1;
+        }
+
+        .service-card .svc-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .svc-badge {
+            font-size: 10.5px;
+            padding: 2px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line-strong);
+            color: var(--gold-300);
+            background: rgba(221, 192, 112, 0.06);
+        }
+
+        .service-card .svc-open {
+            margin-top: 4px;
+            align-self: flex-start;
+            appearance: none;
+            border: none;
+            background: transparent;
+            color: var(--gold-400);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s ease;
+        }
+
+        .service-card .svc-open:hover { color: var(--gold-200); }
+
+        /* ============================================================
+           صفحه اصلی — درباره
+        ============================================================ */
+        .about-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 40px;
+        }
+
+        .about-card {
+            background: rgba(9, 14, 34, 0.5);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 20px 18px;
+        }
+
+        .about-card .ab-icon {
+            font-size: 26px;
+            filter: drop-shadow(0 0 12px rgba(221, 192, 112, 0.3));
+        }
+
+        .about-card h3 {
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gold-200);
+            margin: 10px 0 6px;
+        }
+
+        .about-card p {
+            font-size: 13px;
+            line-height: 2;
+            color: var(--ink-dim);
+            margin: 0;
+        }
+
+        /* ============================================================
+           ابزارها — کارت فرم
+        ============================================================ */
+        .tools-wrap { max-width: 1080px; margin: 0 auto; width: 100%; }
+
+        .cosmic .form-card {
+            position: relative;
+            background: var(--panel);
+            border: 1px solid var(--line-strong);
+            border-radius: 26px;
+            padding: 22px 22px 26px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--shadow), inset 0 0 0 1px rgba(16, 26, 61, 0.6);
+            margin-bottom: 0;
+            overflow: visible;
+        }
+
+        .cosmic .form-card::before {
+            content: "";
+            position: absolute;
+            inset: 8px;
+            border: 1px solid var(--line);
+            border-radius: 19px;
+            pointer-events: none;
+        }
+
+        .cosmic .tab-nav {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 2px 14px;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(201, 162, 39, 0.4) transparent;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cosmic .tab-nav::-webkit-scrollbar { height: 6px; }
+        .cosmic .tab-nav::-webkit-scrollbar-thumb { background: rgba(201, 162, 39, 0.35); border-radius: 3px; }
+        .cosmic .tab-nav::-webkit-scrollbar-track { background: transparent; }
+
+        .cosmic .tab-btn {
+            appearance: none;
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid var(--line-strong);
+            background: rgba(16, 26, 61, 0.6);
+            color: var(--ink-dim);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            white-space: nowrap;
+            justify-content: center;
+        }
+
+        .cosmic .tab-btn .tab-emoji { font-size: 15px; line-height: 1; }
+
+        .cosmic .tab-btn:hover {
+            color: var(--ink);
+            border-color: var(--gold-400);
+        }
+
+        .cosmic .tab-btn.active {
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500));
+            border-color: transparent;
+            color: var(--lapis-950);
+            font-weight: 800;
+            box-shadow: 0 5px 18px -6px rgba(201, 162, 39, 0.6);
+        }
+
+        .cosmic .location-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            margin: 2px 0 6px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(7, 12, 31, 0.35);
+            font-size: 13px;
+            color: var(--ink-dim);
+            justify-content: flex-start;
+        }
+
+        .cosmic .location-bar .location-bar-icon { font-size: 15px; }
+
+        .cosmic .location-bar .location-bar-text { color: var(--ink); font-weight: 500; }
+        .cosmic .location-bar .location-bar-city { color: var(--gold-300); font-weight: 700; }
+        .cosmic .location-bar .location-bar-province { color: var(--gold-500); }
+
+        .cosmic .form-title {
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gold-200);
+            margin: 18px 0 16px;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .cosmic .form-title span {
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--ink-dim);
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .cosmic .btn-primary {
+            appearance: none;
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+            border: none;
+            border-radius: 999px;
+            padding: 15px 24px;
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--lapis-950);
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500) 60%, var(--gold-600));
+            cursor: pointer;
+            box-shadow: 0 10px 30px -8px rgba(201, 162, 39, 0.55);
+            transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.25s ease;
+        }
+
+        .cosmic .btn-primary:hover {
+            filter: brightness(1.06);
+            box-shadow: 0 14px 36px -8px rgba(201, 162, 39, 0.7);
+            transform: translateY(-1px);
+        }
+
+        .cosmic #status {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--ink-dim);
+            min-height: 20px;
+            border: none;
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .cosmic #result { margin-top: 24px; }
+
+        /* ============================================================
+           پاورقی — پس‌زمینه‌ی footer.jpg + اورلی
+        ============================================================ */
+        .cosmic .footer-premium {
+            position: relative;
+            margin-top: 36px;
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--ink-dim);
+            border-top: 1px solid var(--line);
+            padding: 26px 0 8px;
+            background:
+                radial-gradient(ellipse at 50% 100%, rgba(7, 12, 31, 0.55), rgba(7, 12, 31, 0.92) 80%),
+                url('footer.jpg') center / cover no-repeat;
+            border-radius: 26px 26px 0 0;
+            background-attachment: local;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .cosmic .footer-premium a {
+            color: var(--gold-300);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--line-strong);
+            transition: color 0.2s ease;
+        }
+
+        .cosmic .footer-premium a:hover { color: var(--gold-200); }
+
+        /* ============================================================
+           توست
+        ============================================================ */
+        .cosmic .toast-container {
+            position: fixed;
+            bottom: 26px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            width: min(92vw, 480px);
+        }
+
+        /* ============================================================
+           حالت تنفس (یوگا) — نمایش با کلاس .active (طبق script.js)
+        ============================================================ */
+        .cosmic .yoga-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background:
+                radial-gradient(600px 400px at 50% 30%, rgba(37, 53, 107, 0.7), transparent 70%),
+                rgba(7, 12, 31, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            font-family: "Vazirmatn", sans-serif;
+            text-align: center;
+        }
+
+        .cosmic .yoga-overlay.active { display: flex; }
+
+        .cosmic .yoga-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-400);
+            background: radial-gradient(circle at 35% 30%, rgba(221, 192, 112, 0.22), rgba(16, 26, 61, 0.4));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            box-shadow: 0 0 40px rgba(201, 162, 39, 0.35), inset 0 0 30px rgba(201, 162, 39, 0.12);
+        }
+
+        .cosmic .yoga-circle.inhale,
+        .cosmic .yoga-circle.exhale { border-color: var(--gold-300); }
+
+        .cosmic .yoga-text {
+            position: absolute;
+            bottom: 22%;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--gold-200);
+            background: rgba(7, 12, 31, 0.55);
+            padding: 10px 32px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            letter-spacing: 0;
+        }
+
+        .cosmic .yoga-controls {
+            position: absolute;
+            bottom: 8%;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            color: var(--ink-dim);
+            font-size: 13px;
+        }
+
+        .cosmic .yoga-controls button {
+            appearance: none;
+            border: 1px solid var(--line-strong);
+            background: rgba(22, 34, 77, 0.6);
+            color: var(--ink);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .cosmic .yoga-controls button:hover { border-color: var(--gold-400); color: var(--gold-200); }
+        .cosmic .yoga-controls input[type="range"] { accent-color: var(--gold-500); }
+
+        /* ============================================================
+           مودال نقشه — نمایش با کلاس .active (طبق script.js)
+        ============================================================ */
+        .cosmic .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(7, 12, 31, 0.8);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 7000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cosmic .modal-overlay.active { display: flex; }
+
+        .cosmic .modal-box {
+            background: var(--lapis-850);
+            border: 1px solid var(--line-strong);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            max-width: 700px;
+            width: 95%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cosmic .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line);
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 16px;
+            color: var(--gold-200);
+            flex-shrink: 0;
+        }
+
+        .cosmic .modal-header h3 { margin: 0; font-size: 16px; font-weight: 600; }
+
+        .cosmic .modal-close {
+            appearance: none;
+            border: none;
+            background: none;
+            color: var(--ink-dim);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 8px;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .cosmic .modal-close:hover { color: var(--ink); background: rgba(221, 192, 112, 0.12); }
+
+        .cosmic #map {
+            width: 100%;
+            height: 380px;
+            background: var(--lapis-900);
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            min-height: 0;
+        }
+
+        .cosmic .modal-footer {
+            display: flex;
+            justify-content: center;
+            padding: 14px 20px;
+            border-top: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+
+        /* ---------- فوکوس ---------- */
+        body.cosmic :focus-visible {
+            outline: 2px solid var(--gold-400);
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+
+        /* ---------- کاهش حرکت ---------- */
+        @media (prefers-reduced-motion: reduce) {
+            .astrolabe .ring-ticks,
+            .astrolabe .sweep-arm,
+            * { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+        }
+
+        /* ============================================================
+           رسپانسیو
+        ============================================================ */
+        @media (max-width: 1100px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .about-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(100%); }
+            body.cosmic.sidebar-open .sidebar { transform: translateX(0); }
+            .cosmic-main { margin-right: 0; }
+            .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+        }
+
+        @media (max-width: 640px) {
+            .page { padding: 18px 14px 50px; }
+            .services-grid { grid-template-columns: 1fr; }
+            .hero { padding-top: 22px; }
+            .hero .hero-sub::before,
+            .hero .hero-sub::after { content: none; }
+            .hero-stats { gap: 8px; }
+            .hero-stat { flex: 1 1 44%; max-width: none; }
+            .hero-stat + .hero-stat { border-right: none; }
+            .topbar { padding: 8px 12px; gap: 8px; }
+            .topbar-brand { font-size: 15px; }
+            .cosmic .header-actions { gap: 6px; }
+            .cosmic .btn-action { padding: 7px 11px; font-size: 12px; }
+            .cosmic .form-card { padding: 18px 14px 22px; }
+            .cosmic .form-card::before { inset: 6px; border-radius: 17px; }
+            .cosmic .tab-btn { font-size: 12px; padding: 7px 12px; }
+            .cosmic .form-title { font-size: 18px; }
+            .cosmic .btn-primary { font-size: 15px; padding: 14px 18px; }
+            .section-heading { font-size: 21px; }
+        }
+    </style>
+</head>
+<body class="cosmic">
+
+    <!-- ===== پس‌زمینه‌ی متحرک (اسکریپت‌های static روی همین کانواس می‌کشند) ===== -->
     <canvas id="bg-canvas"></canvas>
 
-    <!-- ===== Main Container ===== -->
-    <div class="container">
-
-        <!-- Header -->
-        <header class="main-header">
-            <div class="logo">
-                <span class="logo-icon">🌌</span>
-                <h1>Cosmic Oracle</h1>
+    <!-- ===== سایدبار ===== -->
+    <aside class="sidebar" id="sidebar" aria-label="ناوبری اصلی">
+        <div class="sidebar-brand">
+            <span class="logo-icon">🌌</span>
+            <div>
+                <div class="brand-name">Cosmic Oracle</div>
+                <div class="brand-sub">رصدخانه‌ی کیهانی</div>
             </div>
-            <div class="sub">رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group-title">ابزارهای کیهانی</div>
+            <button class="nav-item" data-nav="birth"><span class="nav-emoji">🔮</span> چارت تولد</button>
+            <button class="nav-item" data-nav="synastry"><span class="nav-emoji">💕</span> سیناستری</button>
+            <button class="nav-item" data-nav="composite"><span class="nav-emoji">🔗</span> کامپوزیت</button>
+            <button class="nav-item" data-nav="transit"><span class="nav-emoji">🌍</span> ترانزیت</button>
+            <button class="nav-item" data-nav="solar-return"><span class="nav-emoji">☀️</span> بازگشت خورشیدی</button>
+            <button class="nav-item" data-nav="lunar-return"><span class="nav-emoji">🌙</span> بازگشت ماهانه</button>
+
+            <div class="nav-divider"></div>
+
+            <div class="nav-group-title">حکمت ایرانی</div>
+            <button class="nav-item" data-nav="mizaj"><span class="nav-emoji">🧬</span> مزاج‌شناسی</button>
+            <button class="nav-item" data-nav="abjad"><span class="nav-emoji">🔢</span> ابجد</button>
+            <button class="nav-item" data-nav="hafez"><span class="nav-emoji">🍃</span> فال حافظ</button>
+
+            <div class="nav-divider"></div>
+
+            <div class="nav-group-title">شخصیت و پیش‌بینی</div>
+            <button class="nav-item" data-nav="tarot"><span class="nav-emoji">🃏</span> تاروت</button>
+            <button class="nav-item" data-nav="numerology"><span class="nav-emoji">🔢</span> عددشناسی</button>
+            <button class="nav-item" data-nav="biorhythm"><span class="nav-emoji">🔬</span> بیوریتم</button>
+            <button class="nav-item" data-nav="zodiac"><span class="nav-emoji">🐉</span> سال حیوانی</button>
+            <button class="nav-item" data-nav="daily-question"><span class="nav-emoji">❓</span> پرسش روزانه</button>
+
+            <div class="nav-divider"></div>
+
+            <div class="nav-group-title">جهان</div>
+            <button class="nav-item" data-nav="nasa"><span class="nav-emoji">🌌</span> ناسا</button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="nav-item" data-nav="home"><span class="nav-emoji">🏠</span> صفحه اصلی</button>
+            <button class="nav-item" data-nav="dashboard"><span class="nav-emoji">📊</span> داشبورد</button>
+        </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ===== محتوای اصلی ===== -->
+    <div class="cosmic-main">
+
+        <!-- نوار بالا -->
+        <div class="topbar">
+            <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">☰</button>
+            <div class="topbar-brand">Cosmic Oracle</div>
+            <div class="topbar-spacer"></div>
             <div class="header-actions">
                 <button class="btn-action primary" id="payBtn">⭐ خرید</button>
                 <button class="btn-action" id="shareBtn">📤 اشتراک</button>
                 <button class="btn-action" id="saveBtn">💾 ذخیره</button>
                 <button class="btn-action" id="printBtn">🖨️ پرینت</button>
             </div>
-        </header>
-
-        <!-- Form -->
-        <div class="form-card">
-            <!-- Tab Navigation -->
-            <div class="tab-nav" id="tabNav">
-                <button class="tab-btn active" data-tab="birth">
-                    <span class="tab-emoji">🔮</span> چارت تولد
-                </button>
-                <button class="tab-btn" data-tab="synastry">
-                    <span class="tab-emoji">💕</span> سیناستری
-                </button>
-                <button class="tab-btn" data-tab="composite">
-                    <span class="tab-emoji">🔗</span> کامپوزیت
-                </button>
-                <button class="tab-btn" data-tab="transit">
-                    <span class="tab-emoji">🌍</span> ترانزیت
-                </button>
-                <button class="tab-btn" data-tab="solar-return">
-                    <span class="tab-emoji">☀️</span> بازگشت خورشیدی
-                </button>
-                <button class="tab-btn" data-tab="lunar-return">
-                    <span class="tab-emoji">🌙</span> بازگشت ماهانه
-                </button>
-                <button class="tab-btn" data-tab="mizaj">
-                    <span class="tab-emoji">🧬</span> مزاج‌شناسی
-                </button>
-                <button class="tab-btn" data-tab="abjad">
-                    <span class="tab-emoji">🔢</span> ابجد
-                </button>
-                <button class="tab-btn" data-tab="tarot">
-                    <span class="tab-emoji">🔮</span> تاروت
-                </button>
-                <button class="tab-btn" data-tab="numerology">
-                    <span class="tab-emoji">🔢</span> عددشناسی
-                </button>
-                <button class="tab-btn" data-tab="biorhythm">
-                    <span class="tab-emoji">🔬</span> بیوریتم
-                </button>
-                <button class="tab-btn" data-tab="zodiac">
-                    <span class="tab-emoji">🐉</span> سال حیوانی
-                </button>
-                <button class="tab-btn" data-tab="daily-question">
-                    <span class="tab-emoji">❓</span> پرسش روزانه
-                </button>
-                <button class="tab-btn" data-tab="hafez">
-                    <span class="tab-emoji">🍃</span> فال حافظ
-                </button>
-                <button class="tab-btn" data-tab="nasa">
-                    <span class="tab-emoji">🌌</span> ناسا
-                </button>
-            </div>
-
-            <!-- Persistent Location Bar -->
-            <div class="location-bar" id="locationBar">
-                <span class="location-bar-icon">📍</span>
-                <span class="location-bar-text" id="locationBarText">مکان: در حال بارگذاری...</span>
-            </div>
-
-            <div class="form-title" id="formTitle">
-                🪐 اطلاعات تولد
-                <span>دقیق و حرفه‌ای</span>
-            </div>
-
-            <!-- Dynamic Form Container -->
-            <div id="formContainer"></div>
-
-            <button class="btn-primary" id="calcBtn">🔮 دریافت چارت و تحلیل کامل</button>
-            <div id="status"></div>
         </div>
 
-        <!-- Results -->
-        <div id="result"></div>
+        <!-- ======================= صفحه اصلی ======================= -->
+        <section class="page" id="pageHome">
+            <div class="hero">
+                <div class="hero-bg" aria-hidden="true"></div>
+                <div class="astrolabe" aria-hidden="true">
+                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="200" cy="200" r="196" fill="none" stroke="#c9a227" stroke-opacity="0.55" stroke-width="1.6"/>
+                        <circle cx="200" cy="200" r="186" fill="none" stroke="#c9a227" stroke-opacity="0.22" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="150" fill="none" stroke="#c9a227" stroke-opacity="0.28" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="96" fill="none" stroke="#c9a227" stroke-opacity="0.22" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="26" fill="none" stroke="#c9a227" stroke-opacity="0.4" stroke-width="1.2"/>
+                        <circle cx="200" cy="128" r="86" fill="none" stroke="#ddc070" stroke-opacity="0.14" stroke-width="0.8"/>
+                        <circle cx="200" cy="272" r="86" fill="none" stroke="#ddc070" stroke-opacity="0.14" stroke-width="0.8"/>
+                        <line x1="50" y1="200" x2="350" y2="200" stroke="#ddc070" stroke-opacity="0.12" stroke-width="0.8"/>
+                        <line x1="200" y1="50" x2="200" y2="350" stroke="#ddc070" stroke-opacity="0.12" stroke-width="0.8"/>
+                        <line x1="94" y1="94" x2="306" y2="306" stroke="#ddc070" stroke-opacity="0.1" stroke-width="0.8"/>
+                        <line x1="306" y1="94" x2="94" y2="306" stroke="#ddc070" stroke-opacity="0.1" stroke-width="0.8"/>
+                        <g class="ring-ticks" fill="#ddc070">
+                            <rect x="199" y="10"  width="2" height="7" rx="1" opacity="0.85"/>
+                            <rect x="199" y="22"  width="2" height="5" rx="1" opacity="0.4"/>
+                            <rect x="199" y="32"  width="2" height="5" rx="1" opacity="0.4"/>
+                            <rect x="199" y="42"  width="2" height="5" rx="1" opacity="0.4"/>
+                            <rect x="199" y="52"  width="2" height="5" rx="1" opacity="0.4"/>
+                        </g>
+                        <g font-family="Georgia, 'Times New Roman', serif" fill="#ecd9a0" font-size="17" text-anchor="middle">
+                            <text x="200" y="52">♈</text>
+                            <text x="270" y="74">♉</text>
+                            <text x="322" y="126">♊</text>
+                            <text x="344" y="202">♋</text>
+                            <text x="322" y="278">♌</text>
+                            <text x="270" y="330">♍</text>
+                            <text x="200" y="352">♎</text>
+                            <text x="130" y="330">♏</text>
+                            <text x="78" y="278">♐</text>
+                            <text x="56" y="202">♑</text>
+                            <text x="78" y="126">♒</text>
+                            <text x="130" y="74">♓</text>
+                        </g>
+                        <g class="sweep-arm">
+                            <line x1="200" y1="200" x2="200" y2="62" stroke="#c9a227" stroke-opacity="0.8" stroke-width="1.4"/>
+                            <circle cx="200" cy="62" r="4.5" fill="#ddc070"/>
+                            <circle cx="200" cy="200" r="4" fill="#c9a227"/>
+                        </g>
+                    </svg>
+                </div>
 
-        <!-- Footer -->
-        <div class="footer-premium">
-            ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
-            <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
-            <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
-        </div>
+                <h1>Cosmic Oracle</h1>
+                <p class="hero-sub">
+                    رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای
+                    <br>
+                    پانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد
+                </p>
+
+                <div class="hero-cta">
+                    <button class="btn-action primary" onclick="openService('birth')">🔮 چارت تولد</button>
+                    <button class="btn-action" onclick="openService('hafez')">🍃 فال حافظ</button>
+                    <button class="btn-action" onclick="openService('tarot')">🃏 تاروت</button>
+                    <button class="btn-action" onclick="openService('nasa')">🌌 ناسا</button>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="hero-stat"><div class="stat-num">۱۵</div><div class="stat-label">موتور محاسباتی</div></div>
+                    <div class="hero-stat"><div class="stat-num">۲۷</div><div class="stat-label">ناکشاترا (ودیک)</div></div>
+                    <div class="hero-stat"><div class="stat-num">۱۲</div><div class="stat-label">برج فلکی</div></div>
+                    <div class="hero-stat"><div class="stat-num">۹</div><div class="stat-label">سیاره‌ی کلاسیک</div></div>
+                </div>
+            </div>
+
+            <!-- گرید سرویس‌ها -->
+            <h2 class="section-heading">خدمات رصدخانه
+                <small>هر ابزار را باز کنید تا در همان لحظه، تنها موتورِ همان ابزار بارگذاری شود</small>
+            </h2>
+
+            <div class="services-grid">
+
+                <div class="service-card" onclick="openService('birth')">
+                    <div class="svc-top"><span class="svc-emoji">🔮</span><span class="svc-name">چارت تولد</span></div>
+                    <div class="svc-desc">چارت کامل نجومی با موقعیت دقیق سیارات، خانه‌ها، جنبه‌ها و تفسیر ودیک. پایه‌ی همه‌ی تحلیل‌ها.</div>
+                    <div class="svc-badges"><span class="svc-badge">نجومی</span><span class="svc-badge">ودیک</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('synastry')">
+                    <div class="svc-top"><span class="svc-emoji">💕</span><span class="svc-name">سیناستری</span></div>
+                    <div class="svc-desc">دو چارت را کنار هم بگذارید و سازگاری عاطفی، کاری و دوستانه‌ی خود را با دیگری بسنجید.</div>
+                    <div class="svc-badges"><span class="svc-badge">سازگاری</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('composite')">
+                    <div class="svc-top"><span class="svc-emoji">🔗</span><span class="svc-name">کامپوزیت</span></div>
+                    <div class="svc-desc">چارت ترکیبی دو نفر را محاسبه کنید تا هویتِ خودِ رابطه، قوی‌ترین جنبه و نقطه ضعف آن را ببینید.</div>
+                    <div class="svc-badges"><span class="svc-badge">رابطه</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('transit')">
+                    <div class="svc-top"><span class="svc-emoji">🌍</span><span class="svc-name">ترانزیت</span></div>
+                    <div class="svc-desc">تأثیر سیارات در حال حرکت بر چارت تولد شما؛ زمان‌های مناسب برای اقدام را پیدا کنید.</div>
+                    <div class="svc-badges"><span class="svc-badge">زمان‌بندی</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('solar-return')">
+                    <div class="svc-top"><span class="svc-emoji">☀️</span><span class="svc-name">بازگشت خورشیدی</span></div>
+                    <div class="svc-desc">نقشه‌ی سالانه‌ی خود را بگیرید و ببینید سال آینده در کدام حوزه‌ها می‌درخشید.</div>
+                    <div class="svc-badges"><span class="svc-badge">سالانه</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('lunar-return')">
+                    <div class="svc-top"><span class="svc-emoji">🌙</span><span class="svc-name">بازگشت ماهانه</span></div>
+                    <div class="svc-desc">تمرکز عاطفی و موضوعات مهم ماه پیش رو را کشف کنید و بهتر برنامه‌ریزی کنید.</div>
+                    <div class="svc-badges"><span class="svc-badge">ماهانه</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('mizaj')">
+                    <div class="svc-top"><span class="svc-emoji">🧬</span><span class="svc-name">مزاج‌شناسی</span></div>
+                    <div class="svc-desc">طبع خود را بر اساس طب سنتی ایرانی شناسایی کنید؛ توصیه‌های غذایی و سبک زندگی متناسب بگیرید.</div>
+                    <div class="svc-badges"><span class="svc-badge">طب سنتی</span><span class="svc-badge">آفلاین</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('abjad')">
+                    <div class="svc-top"><span class="svc-emoji">🔢</span><span class="svc-name">ابجد</span></div>
+                    <div class="svc-desc">ارزش عددی کلمات و نام‌ها را محاسبه کنید و سازگاری دو نام را بررسی کنید.</div>
+                    <div class="svc-badges"><span class="svc-badge">آفلاین</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('tarot')">
+                    <div class="svc-top"><span class="svc-emoji">🃏</span><span class="svc-name">تاروت</span></div>
+                    <div class="svc-desc">کارت روزانه، کشیدن کارت و پخش سه‌کارته؛ پیام‌های راهنما برای تصمیم‌های زندگی.</div>
+                    <div class="svc-badges"><span class="svc-badge">کارت روزانه</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('numerology')">
+                    <div class="svc-top"><span class="svc-emoji">🔢</span><span class="svc-name">عددشناسی</span></div>
+                    <div class="svc-desc">اعداد مسیر زندگی، سال شخصی، عدد بیان و درونی؛ نقشه‌ی عددی شخصیت شما.</div>
+                    <div class="svc-badges"><span class="svc-badge">شخصیت</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('biorhythm')">
+                    <div class="svc-top"><span class="svc-emoji">🔬</span><span class="svc-name">بیوریتم</span></div>
+                    <div class="svc-desc">چرخه‌های ۲۳، ۲۸ و ۳۳ روزه‌ی فیزیکی، عاطفی و ذهنی را روزبه‌روز ببینید.</div>
+                    <div class="svc-badges"><span class="svc-badge">سلامت</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('zodiac')">
+                    <div class="svc-top"><span class="svc-emoji">🐉</span><span class="svc-name">سال حیوانی</span></div>
+                    <div class="svc-desc">حیوان و عنصر سال تولدتان را پیدا کنید؛ شخصیت و سازگاری‌های چینی را بشناسید.</div>
+                    <div class="svc-badges"><span class="svc-badge">چینی</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('daily-question')">
+                    <div class="svc-top"><span class="svc-emoji">❓</span><span class="svc-name">پرسش روزانه</span></div>
+                    <div class="svc-desc">سوال بپرسید و پاسخ ترکیبی از بیوریتم، سال حیوانی و تاروت بگیرید.</div>
+                    <div class="svc-badges"><span class="svc-badge">ترکیبی</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('hafez')">
+                    <div class="svc-top"><span class="svc-emoji">🍃</span><span class="svc-name">فال حافظ</span></div>
+                    <div class="svc-desc">غزل تصادفی دیوان حافظ با تفسیر؛ کاملاً آفلاین و بدون نیاز به اینترنت.</div>
+                    <div class="svc-badges"><span class="svc-badge">آفلاین</span><span class="svc-badge">ادبی</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('nasa')">
+                    <div class="svc-top"><span class="svc-emoji">🌌</span><span class="svc-name">ناسا</span></div>
+                    <div class="svc-desc">تصویر نجومی روز، آب‌وهوای فضا، سیارک‌ها و اطلاعات مریخ را از آرشیو ناسا ببینید.</div>
+                    <div class="svc-badges"><span class="svc-badge">برخط</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+            </div>
+
+            <!-- درباره -->
+            <div class="about-row">
+                <div class="about-card">
+                    <div class="ab-icon">🧭</div>
+                    <h3>موتور ودیک</h3>
+                    <p>محاسبات بر پایه‌ی اخترشناسی ودیک انجام می‌شود: ناکشاترا، شرف و هبوط، طبیعت کارکردی سیارات و جنبه‌های دقیق.</p>
+                </div>
+                <div class="about-card">
+                    <div class="ab-icon">🔒</div>
+                    <h3>آفلاین و خصوصی</h3>
+                    <p>فال حافظ، ابجد و مزاج‌شناسی کاملاً روی دستگاه شما اجرا می‌شوند؛ بدون ارسال داده به هیچ سروری.</p>
+                </div>
+                <div class="about-card">
+                    <div class="ab-icon">🕰️</div>
+                    <h3>رصدخانه‌ی همیشه بیدار</h3>
+                    <p>از چارت تولد تا تصویر نجومی روز ناسا، هر لحظه که بخواهید، آسمان این‌جا باز است.</p>
+                </div>
+            </div>
+
+            <div class="footer-premium">
+                ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
+                <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
+                <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
+            </div>
+        </section>
+
+        <!-- ======================= صفحه ابزارها ======================= -->
+        <section class="page" id="pageTools" hidden>
+            <div class="tools-wrap">
+                <div class="form-card">
+                    <!-- ناوبری تب‌ها -->
+                    <div class="tab-nav" id="tabNav">
+                        <button class="tab-btn active" id="tab-birth" data-tab="birth">
+                            <span class="tab-emoji">🔮</span> چارت تولد
+                        </button>
+                        <button class="tab-btn" id="tab-synastry" data-tab="synastry">
+                            <span class="tab-emoji">💕</span> سیناستری
+                        </button>
+                        <button class="tab-btn" id="tab-composite" data-tab="composite">
+                            <span class="tab-emoji">🔗</span> کامپوزیت
+                        </button>
+                        <button class="tab-btn" id="tab-transit" data-tab="transit">
+                            <span class="tab-emoji">🌍</span> ترانزیت
+                        </button>
+                        <button class="tab-btn" id="tab-solar" data-tab="solar-return">
+                            <span class="tab-emoji">☀️</span> بازگشت خورشیدی
+                        </button>
+                        <button class="tab-btn" id="tab-lunar" data-tab="lunar-return">
+                            <span class="tab-emoji">🌙</span> بازگشت ماهانه
+                        </button>
+                        <button class="tab-btn" data-tab="mizaj">
+                            <span class="tab-emoji">🧬</span> مزاج‌شناسی
+                        </button>
+                        <button class="tab-btn" data-tab="abjad">
+                            <span class="tab-emoji">🔢</span> ابجد
+                        </button>
+                        <button class="tab-btn" data-tab="tarot">
+                            <span class="tab-emoji">🃏</span> تاروت
+                        </button>
+                        <button class="tab-btn" data-tab="numerology">
+                            <span class="tab-emoji">🔢</span> عددشناسی
+                        </button>
+                        <button class="tab-btn" data-tab="biorhythm">
+                            <span class="tab-emoji">🔬</span> بیوریتم
+                        </button>
+                        <button class="tab-btn" data-tab="zodiac">
+                            <span class="tab-emoji">🐉</span> سال حیوانی
+                        </button>
+                        <button class="tab-btn" data-tab="daily-question">
+                            <span class="tab-emoji">❓</span> پرسش روزانه
+                        </button>
+                        <button class="tab-btn" data-tab="hafez">
+                            <span class="tab-emoji">🍃</span> فال حافظ
+                        </button>
+                        <button class="tab-btn" data-tab="nasa">
+                            <span class="tab-emoji">🌌</span> ناسا
+                        </button>
+                    </div>
+
+                    <!-- نوار مکان -->
+                    <div class="location-bar" id="locationBar">
+                        <span class="location-bar-icon">📍</span>
+                        <span class="location-bar-text" id="locationBarText">مکان: در حال بارگذاری...</span>
+                    </div>
+
+                    <div class="form-title" id="formTitle">
+                        🪐 اطلاعات تولد
+                        <span>دقیق و حرفه‌ای</span>
+                    </div>
+
+                    <!-- ظرف فرم داینامیک -->
+                    <div id="formContainer"></div>
+
+                    <button class="btn-primary" id="calcBtn">🔮 دریافت چارت و تحلیل کامل</button>
+                    <div id="status"></div>
+                </div>
+
+                <!-- نتایج -->
+                <div id="result"></div>
+
+                <div class="footer-premium">
+                    ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
+                    <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
+                    <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- ===== TOAST NOTIFICATION ===== -->
+    <!-- ===== توست ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== YOGA ENGINE OVERLAY ===== -->
+    <!-- ===== حالت تنفس ===== -->
     <div class="yoga-overlay" id="yogaOverlay">
         <div class="yoga-circle" id="yogaCircle">
             <span id="yogaPhase">🌬️</span>
@@ -130,12 +1430,12 @@
         </div>
     </div>
 
-    <!-- ===== MAP MODAL ===== -->
+    <!-- ===== مودال نقشه ===== -->
     <div class="modal-overlay" id="mapModal">
         <div class="modal-box">
             <div class="modal-header">
                 <h3>📍 انتخاب مکان روی نقشه</h3>
-                <button class="modal-close" id="closeMapModal">✕</button>
+                <button class="modal-close" id="closeMapModal" aria-label="بستن">✕</button>
             </div>
             <div id="map"></div>
             <div class="modal-footer">
@@ -144,13 +1444,167 @@
         </div>
     </div>
 
-    <!-- ===== Leaflet JS ===== -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="static/mizaj.js?v=4"></script>
-    <script src="static/abjad.js?v=4"></script>
+    <!-- ===== اسکریپت‌های ضروری (کوچک) — موتورهای سنگین lazy هستند ===== -->
     <script src="static/persian-provinces.js"></script>
     <script src="static/date-wheel-picker.js?v=15"></script>
     <script src="static/city-selector.js?v=9"></script>
-    <script src="static/script.js?v=11"></script>
+    <script src="static/spa-router.js?v=1"></script>
+    <script src="static/script.js?v=12"></script>
+
+    <script>
+    /* ================================================================
+       COSMIC SHELL — ناوبری سایدبار، جابه‌جایی صفحه، لود تنبل موتورها
+    ================================================================ */
+    (function () {
+        'use strict';
+
+        var _loaded = {};
+
+        function loadScript(src) {
+            return new Promise(function (resolve, reject) {
+                if (_loaded[src] || document.querySelector('script[src="' + src + '"]')) {
+                    _loaded[src] = true;
+                    return resolve();
+                }
+                var s = document.createElement('script');
+                s.src = src;
+                s.onload = function () { _loaded[src] = true; resolve(); };
+                s.onerror = function () { reject(new Error('خطا در بارگذاری ' + src)); };
+                document.body.appendChild(s);
+            });
+        }
+
+        /* موتورهایی که فقط با باز شدن تبِ خودشان بارگذاری می‌شوند */
+        var TAB_SCRIPTS = {
+            mizaj: 'static/mizaj.js',
+            abjad: 'static/abjad.js'
+        };
+
+        function ensureTabScripts(tab) {
+            var src = TAB_SCRIPTS[tab];
+            return src ? loadScript(src) : Promise.resolve();
+        }
+
+        var _leafletPromise = null;
+        function loadLeaflet() {
+            if (_leafletPromise) return _leafletPromise;
+            if (window.L) { _leafletPromise = Promise.resolve(); return _leafletPromise; }
+            _leafletPromise = new Promise(function (resolve, reject) {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                document.head.appendChild(link);
+                loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').then(resolve, reject);
+            });
+            return _leafletPromise;
+        }
+
+        /* ---------- جابه‌جایی بین صفحه اصلی و ابزارها ---------- */
+        function showPage(name) {
+            var home = document.getElementById('pageHome');
+            var tools = document.getElementById('pageTools');
+            if (!home || !tools) return;
+            if (name === 'home') {
+                home.hidden = false;
+                tools.hidden = true;
+            } else {
+                home.hidden = true;
+                tools.hidden = false;
+            }
+            closeSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ---------- باز کردن یک سرویس: برو به ابزارها + فعال‌سازی تب ---------- */
+        window.openService = function (tab) {
+            showPage('tools');
+            ensureTabScripts(tab).then(function () {
+                var btn = document.querySelector('#tabNav .tab-btn[data-tab="' + tab + '"]');
+                if (btn) btn.click();
+            });
+        };
+
+        /* ---------- سایدبار ---------- */
+        var body = document.body;
+
+        function openSidebar() { body.classList.add('sidebar-open'); }
+        function closeSidebar() { body.classList.remove('sidebar-open'); }
+
+        /* کلیک روی برندِ نوار بالا → بازگشت به خانه */
+        var brand = document.querySelector('.topbar-brand');
+        if (brand) {
+            brand.style.cursor = 'pointer';
+            brand.addEventListener('click', function () { showPage('home'); });
+        }
+
+        document.getElementById('menuToggle').addEventListener('click', openSidebar);
+        var backdrop = document.getElementById('sidebarBackdrop');
+        if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+        document.querySelectorAll('.sidebar [data-nav]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var target = btn.getAttribute('data-nav');
+                if (target === 'home') showPage('home');
+                else if (target === 'dashboard') { if (window.navigate) window.navigate('dashboard'); closeSidebar(); }
+                else window.openService(target);
+            });
+        });
+
+        /* ---------- لود تنبل تب‌ها در tabNav (فاز capture، قبل از handler اسکریپت) ---------- */
+        var tabNav = document.getElementById('tabNav');
+        if (tabNav) {
+            tabNav.addEventListener('click', function (e) {
+                var btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                var tab = btn.getAttribute('data-tab');
+                var src = TAB_SCRIPTS[tab];
+                if (!src || _loaded[src]) return;
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                ensureTabScripts(tab).then(function () { btn.click(); });
+            }, true);
+        }
+
+        /* ---------- لود تنبل Leaflet: فقط وقتی نقشه باز شود ---------- */
+        window.addEventListener('DOMContentLoaded', function () {
+            if (window.openMapForPrefix) {
+                var orig = window.openMapForPrefix;
+                window.openMapForPrefix = function (prefix) {
+                    loadLeaflet().then(function () { orig(prefix); });
+                };
+            }
+        });
+
+        /* ---------- لینک اشتراک: مستقیم به ابزارها برو ---------- */
+        if (window.location.search.indexOf('share=') !== -1) {
+            showPage('tools');
+        }
+
+        /* ---------- موتورهای کم‌اهمیت‌تر پس از لود کامل، در پس‌زمینه ---------- */
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                loadScript('static/liquid-orb.js?v=1');
+                loadScript('static/auth-panel.js?v=2');
+            }, 1500);
+        });
+
+        /* ---------- آیکون سایدبار: همگام‌سازی با تب فعال ---------- */
+        window.addEventListener('DOMContentLoaded', function () {
+            var navItems = document.querySelectorAll('.sidebar .nav-item[data-nav]');
+            var tabNavRef = document.getElementById('tabNav');
+            if (tabNavRef) {
+                tabNavRef.addEventListener('click', function (e) {
+                    var btn = e.target.closest('.tab-btn');
+                    if (!btn) return;
+                    var tab = btn.getAttribute('data-tab');
+                    navItems.forEach(function (it) {
+                        it.classList.toggle('active', it.getAttribute('data-nav') === tab);
+                    });
+                });
+            }
+        });
+    })();
+    </script>
 </body>
 </html>

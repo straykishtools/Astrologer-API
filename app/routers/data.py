@@ -40,6 +40,153 @@ from ..utils.logging_utils import log_request_with_body
 from kerykeion import AstrologicalSubjectFactory
 
 # ============================================================
+# 🔗 Composite Categories (Emotional / Intellectual / Spiritual)
+# ============================================================
+
+_SIGN_ELEMENTS = {
+    'Ari': 'fire', 'Leo': 'fire', 'Sag': 'fire',
+    'Tau': 'earth', 'Vir': 'earth', 'Cap': 'earth',
+    'Gem': 'air', 'Lib': 'air', 'Aqu': 'air',
+    'Can': 'water', 'Sco': 'water', 'Pis': 'water',
+}
+
+_FIRE_PLANETS = {'Sun', 'Mars', 'Jupiter'}
+_EARTH_PLANETS = {'Venus', 'Saturn'}
+_AIR_PLANETS = {'Mercury', 'Uranus'}
+_WATER_PLANETS = {'Moon', 'Neptune'}
+
+_HARMONY = {'trine': 8, 'sextile': 5, 'conjunction': 3, 'quintile': 2}
+_TENSION = {'square': -7, 'opposition': -5}
+
+_ELEMENT_PLANETS = {
+    'fire': _FIRE_PLANETS,
+    'earth': _EARTH_PLANETS,
+    'air': _AIR_PLANETS,
+    'water': _WATER_PLANETS,
+}
+
+_ELEMENT_META = {
+    'water': {'label': 'عاطفی', 'emoji': '💖', 'color': '#ff6b8a', 'desc': 'انضراضات عاطفی و احساسی بین شما'},
+    'air':   {'label': 'فکری',  'emoji': '🧠', 'color': '#74b9ff', 'desc': 'تفکر و ارتباط فعالی بین شما'},
+    'fire':  {'label': 'معنوی', 'emoji': '🔮', 'color': '#a29bfe', 'desc': 'ارتباط معنوی و رشد درون شما'},
+}
+
+
+def _planet_score_for_element(aspects, subject, element):
+    """Calculate score for a group of planets (by element)."""
+    planet_set = _ELEMENT_PLANETS[element]
+    score = 50
+    details = []
+    for a in aspects:
+        p1 = (a.get('p1_name', '') or '').lower()
+        p2 = (a.get('p2_name', '') or '').lower()
+        asp = (a.get('aspect', '') or '').lower()
+        is_p1 = p1 in planet_set
+        is_p2 = p2 in planet_set
+        if not is_p1 and not is_p2:
+            continue
+        delta = _HARMONY.get(asp, 0) or _TENSION.get(asp, 0)
+        if delta != 0:
+            score += delta
+            details.append({
+                'text': f"{a.get('p1_name', p1)} {asp} {a.get('p2_name', p2)}",
+                'delta': delta,
+                'positive': delta > 0,
+            })
+    # Sign dignity bonus
+    for pname in planet_set:
+        pdata = subject.get(pname.lower()) if isinstance(subject, dict) else getattr(subject, pname.lower(), None)
+        if not pdata:
+            continue
+        sign = pdata.get('sign') if isinstance(pdata, dict) else getattr(pdata, 'sign', None)
+        if sign and _SIGN_ELEMENTS.get(sign) == element:
+            score += 4
+            name = pdata.get('name', pname) if isinstance(pdata, dict) else getattr(pdata, 'name', pname)
+            details.append({
+                'text': f"{name} در برج {sign} اعمالی",
+                'delta': 4,
+                'positive': True,
+            })
+    score = max(0, min(100, score))
+    details.sort(key=lambda d: abs(d['delta']), reverse=True)
+    return score, details
+
+
+def _compute_composite_categories(aspects, subject):
+    """Compute emotional / intellectual / spiritual categories for composite chart."""
+    categories = {}
+    for elem in ('water', 'air', 'fire'):
+        score, details = _planet_score_for_element(aspects, subject, elem)
+        meta = _ELEMENT_META[elem]
+        categories[elem] = {
+            'label': meta['label'],
+            'emoji': meta['emoji'],
+            'color': meta['color'],
+            'score': score,
+            'details': details,
+            'desc': meta['desc'],
+        }
+    return categories
+
+
+def _composite_summary_text(score):
+    """Generate composite summary text based on average score."""
+    if score >= 80:
+        return '💪 رابطه‌ی شما بسیار قوی است و ارتباط عمیقی در بین شما دارد. این تطابق نادر و ارزشمند است.'
+    if score >= 60:
+        return '⭐ رابطه بنیایی خوبی دارد. هویت رابطه به صورت شخصیت و جذاشت در حال رشد است.'
+    if score >= 40:
+        return '⚖️ رابطه در مرحله متوازن است. تلاش و صبر می‌تواند این رابطه را تغییر دهید.'
+    if score >= 20:
+        return 'با اصلاح تلاش و تفاهم متقاضل، می‌توان این رابطه را تقویت دهید.'
+    return '⚠️ این رابطه نیاز به کار اصلی دارد. با تلاش و اصلاح می‌توان این مشکلات را حل کرد.'
+
+
+def _composite_house_description(chart_data):
+    """Generate house-based description for composite chart."""
+    chart = chart_data.get('chart_data', chart_data) if isinstance(chart_data, dict) else {}
+    subject = chart.get('subject', {}) if isinstance(chart, dict) else {}
+    s1 = subject.get('first_subject', subject.get('inner_subject', {})) or {}
+    s2 = subject.get('second_subject', subject.get('outer_subject', {})) or {}
+    house_names = {
+        'First_House': 'خانه اول (خود)', 'Second_House': 'خانه دوم (ارزش‌ها)',
+        'Third_House': 'خانه سوم (ارتباطات)', 'Fourth_House': 'خانه چهارم (خانواده)',
+        'Fifth_House': 'خانه پنجم (خلاقیت)', 'Sixth_House': 'خانه ششم (کار و سلامت)',
+        'Seventh_House': 'خانه هفتم (رابطه)', 'Eighth_House': 'خانه هشتم (تحول)',
+        'Ninth_House': 'خانه نهم (فلسفه)', 'Tenth_House': 'خانه دهم (شهرت)',
+        'Eleventh_House': 'خانه یازدهم (امیدها)', 'Twelfth_House': 'خانه دوازدهم (پنهان)',
+    }
+    parts = []
+    themes = []
+    sun_h1 = (s1.get('sun') or {}).get('house')
+    sun_h2 = (s2.get('sun') or {}).get('house')
+    moon_h1 = (s1.get('moon') or {}).get('house')
+    moon_h2 = (s2.get('moon') or {}).get('house')
+    if sun_h1:
+        parts.append(f'سیره اول در {house_names.get(sun_h1, sun_h1)} قرار دارد.')
+    if sun_h2:
+        parts.append(f'سیره دوم در {house_names.get(sun_h2, sun_h2)} قرار دارد.')
+    if moon_h1:
+        parts.append(f'ماه اول در {house_names.get(moon_h1, moon_h1)}.')
+    if moon_h2:
+        parts.append(f'ماه دوم در {house_names.get(moon_h2, moon_h2)}.')
+    for h in (sun_h1, sun_h2):
+        if h == 'Seventh_House':
+            themes.append('رابطه در مرکز اصلی قرار دارد')
+        elif h == 'Fourth_House':
+            themes.append('تمرکز خانواده و ریشه')
+    for h in (moon_h1, moon_h2):
+        if h == 'Fifth_House':
+            themes.append('عشق و خلاقیت در رابطه')
+    for h in (sun_h1, sun_h2):
+        if h == 'Tenth_House':
+            themes.append('اهداف مشترک در زندگی')
+    if themes:
+        parts.append('موضوعات کلیدی: ' + ', '.join(themes) + '.')
+    return ' '.join(parts) if parts else 'توضیحی برای این رابطه در دسترس است.'
+
+
+# ============================================================
 # 🔮 افزودن سرویس Vedic
 # ============================================================
 from ..services.vedic_service import VedicDB
@@ -380,6 +527,7 @@ async def synastry_chart_data(request_body: SynastryChartDataRequestModel, reque
         rs = getattr(chart_data, 'relationship_score', None)
         if rs and hasattr(rs, 'score_value'):
             payload['interpretation'] = _get_interpretation('synastry', rs.score_value)
+            payload['total_score'] = rs.score_value  # standardized field
         return JSONResponse(content=payload, status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)
@@ -425,7 +573,27 @@ async def composite_chart_data(request_body: CompositeChartDataRequestModel, req
             score = 50
         interpretation = get_composite_interpretation(score)
         payload['composite_score'] = score
+        payload['total_score'] = score  # standardized field
         payload['interpretation'] = interpretation
+        # Composite categories (emotional / intellectual / spiritual)
+        subject_data = {}
+        chart_obj = getattr(chart_data, 'subject', None)
+        if chart_obj:
+            first = getattr(chart_obj, 'first_subject', None) or getattr(chart_obj, 'inner_subject', None)
+            if first:
+                for pname in ('sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'):
+                    pobj = getattr(first, pname, None)
+                    if pobj:
+                        subject_data[pname] = {
+                            'name': getattr(pobj, 'name', pname),
+                            'sign': getattr(pobj, 'sign', None),
+                            'house': getattr(pobj, 'house', None),
+                        }
+        categories = _compute_composite_categories(aspects, subject_data)
+        payload['composite_categories'] = categories
+        avg_score = round(sum(c['score'] for c in categories.values()) / max(len(categories), 1))
+        payload['composite_summary'] = _composite_summary_text(avg_score)
+        payload['composite_house_description'] = _composite_house_description(payload)
         return JSONResponse(content=payload, status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
         return await handle_exception(exc, request)
@@ -463,6 +631,7 @@ async def transit_chart_data(request_body: TransitChartDataRequestModel, request
             total_w += w; weighted += av * w
         score = max(5, min(95, round(50 + (weighted / (total_w * 4)) * 45))) if total_w > 0 else 50
         payload['chart_score'] = score
+        payload['total_score'] = score  # standardized field
         payload['interpretation'] = get_transit_interpretation(score)
         return JSONResponse(content=payload, status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
@@ -501,6 +670,7 @@ async def solar_return_data(request_body: PlanetaryReturnDataRequestModel, reque
             total_w += w; weighted += av * w
         score = max(5, min(95, round(50 + (weighted / (total_w * 4)) * 45))) if total_w > 0 else 50
         payload['chart_score'] = score
+        payload['total_score'] = score  # standardized field
         payload['interpretation'] = get_solar_return_interpretation(score)
         return JSONResponse(content=payload, status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
@@ -537,6 +707,7 @@ async def lunar_return_data(request_body: PlanetaryReturnDataRequestModel, reque
             total_w += w; weighted += av * w
         score = max(5, min(95, round(50 + (weighted / (total_w * 4)) * 45))) if total_w > 0 else 50
         payload['chart_score'] = score
+        payload['total_score'] = score  # standardized field
         payload['interpretation'] = get_lunar_return_interpretation(score)
         return JSONResponse(content=payload, status_code=200)
     except Exception as exc:  # pragma: no cover - defensive
