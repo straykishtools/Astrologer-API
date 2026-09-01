@@ -30,138 +30,149 @@ function getHashRoute() {
 
 function navigate(route) {
     window.location.hash = '#/' + route;
-}
-
-function showLanding() {
+}function showLanding() {
     var container = document.querySelector('.container');
     if (!container) return;
-
-    // Hide form card and result
-    var formCard = container.querySelector('.form-card');
-    var result = container.querySelector('#result');
-    var footer = container.querySelector('.footer-premium');
-    if (formCard) formCard.style.display = 'none';
-    if (result) result.style.display = 'none';
-    if (footer) footer.style.display = 'none';
-
-    // Remove existing landing
+    var toolsPage = document.getElementById('pageTools');
+    if (toolsPage) toolsPage.hidden = true;
     var existing = document.getElementById('landingPage');
-    if (existing) { existing.style.display = 'block'; return; }
+    if (existing) { existing.style.display = 'block'; triggerLandingAnimations(); return; }
 
-    // Build landing
     var landing = document.createElement('div');
     landing.id = 'landingPage';
+    landing.className = 'landing-page';
     landing.innerHTML = `
-        <div style="text-align:center;padding:60px 20px 40px;">
-            <div style="font-size:4rem;margin-bottom:20px;">🌌</div>
-            <h1 style="font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,#f39c12,#a29bfe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;">کیهان‌نگر</h1>
-            <p style="font-size:1.2rem;color:#b0c4e0;margin-bottom:30px;">رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای</p>
-            <button onclick="navigate('app')" style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#0b0e1a;border:none;padding:14px 40px;border-radius:50px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(243,156,18,0.4);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                🚀 شروع رایگان
-            </button>
+        <div class="landing-hero">
+            <div class="landing-hero-bg"></div>
+            <div class="landing-orb-container"><canvas id="landingOrbCanvas" width="120" height="120"></canvas></div>
+            <h1 class="landing-title">Cosmic Oracle</h1>
+            <p class="landing-subtitle">رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای</p>
+            <p class="landing-desc">پانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد</p>
+            <button class="landing-cta" onclick="navigate('app')">🚀 شروع رایگان</button>
+            <div class="landing-stats">
+                <div class="landing-stat"><div class="landing-stat-num">۱۵+</div><div class="landing-stat-label">ابزار تخصصی</div></div>
+                <div class="landing-stat"><div class="landing-stat-num">۲۷</div><div class="landing-stat-label">ناکشاترا</div></div>
+                <div class="landing-stat"><div class="landing-stat-num">۱۲</div><div class="landing-stat-label">برج فلکی</div></div>
+                <div class="landing-stat"><div class="landing-stat-num">۱۰۰+</div><div class="landing-stat-label">حرکت یوگا</div></div>
+            </div>
         </div>
 
-        <div style="max-width:800px;margin:0 auto;padding:0 20px;">
-            <h2 style="text-align:center;font-size:1.4rem;color:#fff;margin-bottom:30px;">⭐ محبوب‌ترین ابزارها</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;margin-bottom:50px;">
-                <div class="landing-tool-card" onclick="navigate('app')" style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;text-align:center;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#f39c12'" onmouseout="this.style.borderColor='transparent'">
-                    <div style="font-size:2rem;margin-bottom:10px;">🔮</div>
-                    <div style="font-weight:700;color:#fff;">چارت تولد</div>
-                    <div style="font-size:0.8rem;color:#888;margin-top:5px;">چارت کامل و تحلیل</div>
-                </div>
-                <div class="landing-tool-card" onclick="navigate('app')" style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;text-align:center;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#e84393'" onmouseout="this.style.borderColor='transparent'">
-                    <div style="font-size:2rem;margin-bottom:10px;">💕</div>
-                    <div style="font-weight:700;color:#fff;">سیناستری</div>
-                    <div style="font-size:0.8rem;color:#888;margin-top:5px;">سازگاری زوجین</div>
-                </div>
-                <div class="landing-tool-card" onclick="navigate('app')" style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;text-align:center;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#a29bfe'" onmouseout="this.style.borderColor='transparent'">
-                    <div style="font-size:2rem;margin-bottom:10px;">🃏</div>
-                    <div style="font-weight:700;color:#fff;">تاروت</div>
-                    <div style="font-size:0.8rem;color:#888;margin-top:5px;">کشف آینده</div>
-                </div>
-                <div class="landing-tool-card" onclick="navigate('app')" style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;text-align:center;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#27ae60'" onmouseout="this.style.borderColor='transparent'">
-                    <div style="font-size:2rem;margin-bottom:10px;">🍃</div>
-                    <div style="font-weight:700;color:#fff;">فال حافظ</div>
-                    <div style="font-size:0.8rem;color:#888;margin-top:5px;">غزل و تفأل</div>
-                </div>
-                <div class="landing-tool-card" onclick="navigate('app')" style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;text-align:center;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#0984e3'" onmouseout="this.style.borderColor='transparent'">
-                    <div style="font-size:2rem;margin-bottom:10px;">🌌</div>
-                    <div style="font-weight:700;color:#fff;">ناسا</div>
-                    <div style="font-size:0.8rem;color:#888;margin-top:5px;">عکس روز و فضا</div>
-                </div>
-                <div class="landing-tool-card" onclick="navigate('app')" style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;text-align:center;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#e17055'" onmouseout="this.style.borderColor='transparent'">
-                    <div style="font-size:2rem;margin-bottom:10px;">🔬</div>
-                    <div style="font-weight:700;color:#fff;">بیوریتم</div>
-                    <div style="font-size:0.8rem;color:#888;margin-top:5px;">نمودار زیستی</div>
-                </div>
-            </div>
+        <div class="landing-section">
+            <h2 class="dd-section-title">📋 پنل روزانه شما</h2>
+            <div id="dailyDashboard"></div>
+        </div>
 
-            <h2 style="text-align:center;font-size:1.4rem;color:#fff;margin-bottom:30px;">✨ چرا کیهان‌نگر؟</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px;margin-bottom:50px;">
-                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;">
-                    <div style="font-size:1.5rem;margin-bottom:10px;">🪐</div>
-                    <div style="font-weight:700;color:#f39c12;margin-bottom:8px;">موتور ودیک حرفه‌ای</div>
-                    <div style="font-size:0.85rem;color:#aaa;line-height:1.8;">محاسبات دقیق طبقات بر اساس موتور Kerykeion با پشتیبانی از تقویم ودیک</div>
-                </div>
-                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;">
-                    <div style="font-size:1.5rem;margin-bottom:10px;">📊</div>
-                    <div style="font-weight:700;color:#a29bfe;margin-bottom:8px;">۱۵+ ابزار تخصصی</div>
-                    <div style="font-size:0.85rem;color:#aaa;line-height:1.8;">از چارت تولد تا سیناستری، کامپوزیت، ترانزیت، تاروت، فال حافظ و...</div>
-                </div>
-                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;">
-                    <div style="font-size:1.5rem;margin-bottom:10px;">🆓</div>
-                    <div style="font-weight:700;color:#27ae60;margin-bottom:8px;">رایگان شروع کنید</div>
-                    <div style="font-size:0.85rem;color:#aaa;line-height:1.8;">چارت تولد کامل، تاروت و فال حافظ کاملاً رایگان — ارتقا برای ویژگی‌های پیشرفته</div>
-                </div>
-                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;">
-                    <div style="font-size:1.5rem;margin-bottom:10px;">📈</div>
-                    <div style="font-weight:700;color:#e84393;margin-bottom:8px;">تفسیر هوشمند</div>
-                    <div style="font-size:0.85rem;color:#aaa;line-height:1.8;">تفسیر فارسی کامل برای هر چارت با امتیاز و سطوح سازگاری</div>
-                </div>
+        <div class="landing-section">
+            <h2 class="landing-section-title">⭐ محبوب‌ترین ابزارها</h2>
+            <div class="landing-tools-grid">
+                <div class="landing-tool-card lc-1" onclick="navigate('app')" style="--accent:#f39c12"><div class="ltc-emoji">🔮</div><div class="ltc-name">چارت تولد</div><div class="ltc-desc">چارت کامل و تحلیل ودیک</div></div>
+                <div class="landing-tool-card lc-2" onclick="navigate('app')" style="--accent:#e84393"><div class="ltc-emoji">💕</div><div class="ltc-name">سیناستری</div><div class="ltc-desc">سازگاری زوجین</div></div>
+                <div class="landing-tool-card lc-3" onclick="navigate('app')" style="--accent:#a29bfe"><div class="ltc-emoji">🃏</div><div class="ltc-name">تاروت</div><div class="ltc-desc">کشف آینده</div></div>
+                <div class="landing-tool-card lc-4" onclick="navigate('app')" style="--accent:#27ae60"><div class="ltc-emoji">🍃</div><div class="ltc-name">فال حافظ</div><div class="ltc-desc">غزل و تفأل</div></div>
+                <div class="landing-tool-card lc-5" onclick="navigate('app')" style="--accent:#0984e3"><div class="ltc-emoji">🌌</div><div class="ltc-name">ناسا</div><div class="ltc-desc">عکس روز و فضا</div></div>
+                <div class="landing-tool-card lc-6" onclick="navigate('app')" style="--accent:#e17055"><div class="ltc-emoji">🔬</div><div class="ltc-name">بیوریتم</div><div class="ltc-desc">نمودار زیستی</div></div>
+                <div class="landing-tool-card lc-7" onclick="navigate('app')" style="--accent:#00cec9"><div class="ltc-emoji">📚</div><div class="ltc-name">حرکات یوگا</div><div class="ltc-desc">کتابخانه ۱۰۰+ حرکت</div></div>
+                <div class="landing-tool-card lc-8" onclick="navigate('app')" style="--accent:#fdcb6e"><div class="ltc-emoji">🧬</div><div class="ltc-name">مزاج‌شناسی</div><div class="ltc-desc">طبع‌شناسی ایرانی</div></div>
             </div>
+        </div>
 
-            <h2 style="text-align:center;font-size:1.4rem;color:#fff;margin-bottom:30px;">💬 نظرات کاربران</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:15px;margin-bottom:50px;">
-                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;">
-                    <div style="color:#f39c12;margin-bottom:10px;">⭐⭐⭐⭐⭐</div>
-                    <p style="color:#ddd;line-height:1.8;font-size:0.9rem;">"بهترین اپ طالع‌بینی فارسی که استفاده کردم. چارت تولد فوق‌العاده دقیقه!"</p>
-                    <div style="color:#888;font-size:0.8rem;margin-top:10px;">— سارا م.</div>
-                </div>
-                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;">
-                    <div style="color:#f39c12;margin-bottom:10px;">⭐⭐⭐⭐⭐</div>
-                    <p style="color:#ddd;line-height:1.8;font-size:0.9rem;">"سیناستری عالی بود! تفسیر سازگاری ما دقیق و واقعی بود."</p>
-                    <div style="color:#888;font-size:0.8rem;margin-top:10px;">— رضا ک.</div>
-                </div>
-                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;">
-                    <div style="color:#f39c12;margin-bottom:10px;">⭐⭐⭐⭐⭐</div>
-                    <p style="color:#ddd;line-height:1.8;font-size:0.9rem;">"فال حافظش عالیه، غزل‌ها دقیق انتخاب میشن. ممنون از تیم خوبتون."</p>
-                    <div style="color:#888;font-size:0.8rem;margin-top:10px;">— نگار ا.</div>
-                </div>
+        <div class="landing-section">
+            <h2 class="landing-section-title">✨ چرا کیهان‌نگر؟</h2>
+            <div class="landing-features-grid">
+                <div class="landing-feature-card lc-1"><div class="lfc-icon">🪐</div><div class="lfc-title">موتور ودیک حرفه‌ای</div><div class="lfc-desc">محاسبات دقیق بر اساس موتور Kerykeion با پشتیبانی از تقویم ودیک</div></div>
+                <div class="landing-feature-card lc-2"><div class="lfc-icon">📊</div><div class="lfc-title">۱۵+ ابزار تخصصی</div><div class="lfc-desc">از چارت تولد تا سیناستری، کامپوزیت، ترانزیت، تاروت و فال حافظ</div></div>
+                <div class="landing-feature-card lc-3"><div class="lfc-icon">🆓</div><div class="lfc-title">رایگان شروع کنید</div><div class="lfc-desc">چارت تولد کامل، تاروت و فال حافظ کاملاً رایگان</div></div>
+                <div class="landing-feature-card lc-4"><div class="lfc-icon">📈</div><div class="lfc-title">تفسیر هوشمند</div><div class="lfc-desc">تفسیر فارسی کامل با امتیاز و سطوح سازگاری</div></div>
             </div>
+        </div>
 
-            <div style="text-align:center;padding:40px 20px;">
-                <button onclick="navigate('app')" style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#0b0e1a;border:none;padding:14px 40px;border-radius:50px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(243,156,18,0.4);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                    🚀 شروع رایگان
-                </button>
-                <p style="color:#888;font-size:0.8rem;margin-top:15px;">بدون نیاز به ثبت‌نام شروع کنید</p>
+        <div class="landing-section">
+            <h2 class="landing-section-title">💬 نظرات کاربران</h2>
+            <div class="landing-reviews-grid">
+                <div class="landing-review-card lc-1"><div class="lrc-stars">⭐⭐⭐⭐⭐</div><p class="lrc-text">"بهترین اپ طالع‌بینی فارسی که استفاده کردم. چارت تولد فوق‌العاده دقیقه!"</p><div class="lrc-author">— سارا م.</div></div>
+                <div class="landing-review-card lc-2"><div class="lrc-stars">⭐⭐⭐⭐⭐</div><p class="lrc-text">"سیناستری عالی بود! تفسیر سازگاری ما دقیق و واقعی بود."</p><div class="lrc-author">— رضا ک.</div></div>
+                <div class="landing-review-card lc-3"><div class="lrc-stars">⭐⭐⭐⭐⭐</div><p class="lrc-text">"فال حافظش عالیه، غزل‌ها دقیق انتخاب میشن. ممنون از تیم خوبتون."</p><div class="lrc-author">— نگار ا.</div></div>
             </div>
+        </div>
+
+        <div class="landing-cta-section">
+            <button class="landing-cta landing-cta-lg" onclick="navigate('app')">🚀 شروع رایگان</button>
+            <p class="landing-cta-note">بدون نیاز به ثبت‌نام شروع کنید</p>
         </div>
     `;
     container.insertBefore(landing, container.firstChild);
+    triggerLandingAnimations();
+    initLandingOrb();
+    if (window.DailyDashboard) window.DailyDashboard.renderDashboard('dailyDashboard');
+}
+
+function triggerLandingAnimations() {
+    var cards = document.querySelectorAll('.landing-tool-card, .landing-feature-card, .landing-review-card, .dd-card');
+    cards.forEach(function (card, i) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px) scale(0.95)';
+        setTimeout(function () {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0) scale(1)';
+        }, 100 + i * 80);
+    });
+}
+
+function initLandingOrb() {
+    var canvas = document.getElementById('landingOrbCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var w = 120, h = 120, cx = w/2, cy = h/2, r = 40;
+    var t = 0;
+    function draw() {
+        t += 0.02;
+        ctx.clearRect(0,0,w,h);
+        // Outer glow
+        var g1 = ctx.createRadialGradient(cx,cy,r*0.5,cx,cy,r*1.5);
+        g1.addColorStop(0, 'rgba(201,162,39,0.15)');
+        g1.addColorStop(1, 'rgba(201,162,39,0)');
+        ctx.fillStyle = g1;
+        ctx.fillRect(0,0,w,h);
+        // Orb body
+        var g2 = ctx.createRadialGradient(cx-r*0.3,cy-r*0.3,r*0.1,cx,cy,r);
+        g2.addColorStop(0, 'rgba(236,217,160,0.9)');
+        g2.addColorStop(0.5, 'rgba(201,162,39,0.7)');
+        g2.addColorStop(1, 'rgba(168,129,42,0.4)');
+        ctx.beginPath();
+        ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.fillStyle = g2;
+        ctx.fill();
+        // Flowing bands
+        for (var i=0;i<3;i++) {
+            ctx.beginPath();
+            var offset = i * Math.PI * 0.7 + t;
+            ctx.ellipse(cx,cy,r*0.7,r*0.2,offset,0,Math.PI*2);
+            ctx.strokeStyle = 'rgba(255,255,255,' + (0.15 - i*0.03) + ')';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        // Highlight
+        var hg = ctx.createRadialGradient(cx-r*0.25,cy-r*0.25,0,cx-r*0.25,cy-r*0.25,r*0.35);
+        hg.addColorStop(0, 'rgba(255,255,255,0.35)');
+        hg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = hg;
+        ctx.beginPath();
+        ctx.arc(cx-r*0.25,cy-r*0.25,r*0.35,0,Math.PI*2);
+        ctx.fill();
+        // Stop animation if canvas removed or hidden
+        var landing = document.getElementById('landingPage');
+        if (!landing || landing.style.display === 'none') return;
+        requestAnimationFrame(draw);
+    }
+    draw();
 }
 
 function showApp() {
     var landing = document.getElementById('landingPage');
     if (landing) landing.style.display = 'none';
-
-    var formCard = document.querySelector('.form-card');
-    var result = document.querySelector('#result');
-    var footer = document.querySelector('.footer-premium');
-    if (formCard) formCard.style.display = 'block';
-    if (result) result.style.display = 'none';
-    if (footer) footer.style.display = 'block';
-
-    // Hide dashboard if visible
+    var toolsPage = document.getElementById('pageTools');
+    if (toolsPage) toolsPage.hidden = false;
     var dash = document.getElementById('dashboardPage');
     if (dash) dash.style.display = 'none';
 }
@@ -169,16 +180,10 @@ function showApp() {
 function showDashboard() {
     var container = document.querySelector('.container');
     if (!container) return;
-
-    // Hide other views
     var landing = document.getElementById('landingPage');
-    var formCard = container.querySelector('.form-card');
-    var result = container.querySelector('#result');
-    var footer = container.querySelector('.footer-premium');
+    var toolsPage = document.getElementById('pageTools');
     if (landing) landing.style.display = 'none';
-    if (formCard) formCard.style.display = 'none';
-    if (result) result.style.display = 'none';
-    if (footer) footer.style.display = 'none';
+    if (toolsPage) toolsPage.hidden = true;
 
     var existing = document.getElementById('dashboardPage');
     if (existing) { existing.style.display = 'block'; loadDashboardCharts(); return; }

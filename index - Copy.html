@@ -1,0 +1,2708 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Oracle · رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&family=Cinzel:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/date-wheel-picker.css">
+
+    <style>
+        /* ============================================================
+           COSMIC ORACLE — لاجورد و زرّ کاغذ
+           سایت کامل: سایدبار حرفه‌ای + صفحه اصلی غنی + ابزارها
+           موتورهای سنگین (mizaj/abjad/leaflet/liquid-orb/auth) lazy
+           بارگذاری می‌شوند؛ هوک‌های جاوااسکریپتی دست‌نخورده‌اند.
+           همه‌ی استایل‌های پوسته با پیشوند .cosmic نوشته شده‌اند تا
+           بر static/style.css غالب شوند و خروجی داینامیک دست نماند.
+        ============================================================ */
+
+        :root {
+            color-scheme: dark;
+            --lapis-950: #070c1f;
+            --lapis-900: #0c1430;
+            --lapis-850: #101a3d;
+            --lapis-800: #16224d;
+            --lapis-700: #22305f;
+            --gold-200: #f3e5b8;
+            --gold-300: #ecd9a0;
+            --gold-400: #ddc070;
+            --gold-500: #c9a227;
+            --gold-600: #a8812a;
+            --ink: #ece6d6;
+            --ink-dim: #aab2cd;
+            --star: #9fd4e0;
+            --line: rgba(221, 192, 112, 0.16);
+            --line-strong: rgba(221, 192, 112, 0.42);
+            --panel: rgba(16, 26, 61, 0.72);
+            --shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.85);
+            --sidebar-w: 280px;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { margin: 0; padding: 0; }
+
+        body.cosmic {
+            font-family: "Vazirmatn", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 700px at 50% -10%, rgba(37, 53, 107, 0.55), transparent 65%),
+                radial-gradient(900px 600px at 85% 15%, rgba(18, 34, 77, 0.9), transparent 60%),
+                radial-gradient(700px 500px at 8% 90%, rgba(20, 32, 74, 0.8), transparent 60%),
+                linear-gradient(180deg, var(--lapis-950) 0%, var(--lapis-900) 45%, var(--lapis-950) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        body.cosmic::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(1px 1px at 12% 22%, rgba(236, 230, 214, 0.5), transparent 100%),
+                radial-gradient(1px 1px at 28% 68%, rgba(159, 212, 224, 0.4), transparent 100%),
+                radial-gradient(1.5px 1.5px at 43% 12%, rgba(236, 230, 214, 0.35), transparent 100%),
+                radial-gradient(1px 1px at 61% 38%, rgba(236, 230, 214, 0.45), transparent 100%),
+                radial-gradient(1px 1px at 74% 82%, rgba(221, 192, 112, 0.4), transparent 100%),
+                radial-gradient(1.5px 1.5px at 88% 30%, rgba(236, 230, 214, 0.35), transparent 100%),
+                radial-gradient(1px 1px at 7% 55%, rgba(221, 192, 112, 0.35), transparent 100%),
+                radial-gradient(1px 1px at 55% 92%, rgba(236, 230, 214, 0.3), transparent 100%);
+            opacity: 0.7;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        /* ============================================================
+           سایدبار
+        ============================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            z-index: 4000;
+            display: flex;
+            flex-direction: column;
+            background: rgba(8, 13, 32, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-left: 1px solid var(--line-strong);
+            transform: translateX(0);
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 20px 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .sidebar-brand .logo-icon {
+            font-size: 28px;
+            filter: drop-shadow(0 0 14px rgba(221, 192, 112, 0.45));
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-name {
+            font-family: "Cinzel", serif;
+            font-weight: 700;
+            font-size: 19px;
+            letter-spacing: 0.1em;
+            background: linear-gradient(180deg, var(--gold-200), var(--gold-500));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .sidebar-brand .brand-sub {
+            font-family: "Reem Kufi", sans-serif;
+            font-size: 12px;
+            color: var(--ink-dim);
+            margin-top: 2px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 10px 16px;
+            overflow-y: auto;
+        }
+
+        /* ─── Sidebar Search ─── */
+        .sidebar-search { padding: 10px 14px 6px; }
+        .sidebar-search-input {
+            width: 100%;
+            padding: 9px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--line-strong);
+            background: rgba(7, 12, 31, 0.6);
+            color: var(--ink);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.3s;
+            direction: rtl;
+        }
+        .sidebar-search-input:focus { border-color: var(--gold-400); box-shadow: 0 0 16px rgba(201,162,39,0.15); }
+        .sidebar-search-input::placeholder { color: var(--ink-dim); opacity: 0.6; }
+
+        /* ─── Sidebar Sections ─── */
+        .sb-section {
+            margin-bottom: 2px;
+            animation: sbSlideIn 0.35s ease both;
+        }
+        .sb-section:nth-child(1) { animation-delay: 0ms; }
+        .sb-section:nth-child(2) { animation-delay: 50ms; }
+        .sb-section:nth-child(3) { animation-delay: 100ms; }
+        .sb-section:nth-child(4) { animation-delay: 150ms; }
+        .sb-section:nth-child(5) { animation-delay: 200ms; }
+        .sb-section:nth-child(6) { animation-delay: 250ms; }
+        @keyframes sbSlideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .sb-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--gold-300);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: right;
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.25s, transform 0.2s, box-shadow 0.3s;
+            direction: rtl;
+            position: relative;
+            overflow: hidden;
+        }
+        .sb-section-header:hover { background: rgba(221, 192, 112, 0.06); transform: translateX(-2px); }
+        .sb-section-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; transition: transform 0.3s; }
+        .sb-section-header:hover .sb-section-icon { transform: scale(1.15); }
+        .sb-section-title { flex: 1; }
+        .sb-badge {
+            background: rgba(162, 155, 254, 0.2);
+            color: #a29bfe;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .sb-chevron {
+            font-size: 14px;
+            color: var(--ink-dim);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: rotate(-90deg);
+            flex-shrink: 0;
+        }
+        .sb-section-header.collapsed .sb-chevron { transform: rotate(90deg); }
+        .sb-section-items {
+            overflow: hidden;
+            max-height: 600px;
+            transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.3s ease;
+            opacity: 1;
+            padding: 0 4px;
+        }
+        .sb-section-items:not(.open) {
+            max-height: 0;
+            opacity: 0;
+            padding: 0;
+        }
+
+        /* ─── Nav Items ─── */
+        .nav-item {
+            appearance: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--ink-dim);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: right;
+            padding: 9px 12px;
+            margin: 1px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.25s, color 0.25s, transform 0.2s, box-shadow 0.3s;
+            direction: rtl;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-item .nav-emoji { font-size: 15px; width: 24px; text-align: center; flex-shrink: 0; transition: transform 0.25s; }
+        .nav-item:hover {
+            background: linear-gradient(135deg, rgba(221, 192, 112, 0.1), rgba(162, 155, 254, 0.06));
+            color: var(--gold-200);
+            transform: scale(1.02) translateX(-2px);
+            box-shadow: 0 2px 12px rgba(201, 162, 39, 0.1);
+        }
+        .nav-item:hover .nav-emoji { transform: scale(1.15); }
+        .nav-item:active { transform: scale(0.97); transition-duration: 0.1s; }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(221, 192, 112, 0.16), rgba(162, 155, 254, 0.08));
+            color: var(--gold-200);
+            font-weight: 700;
+            box-shadow: inset 0 0 0 1px var(--line-strong), 0 0 16px rgba(201, 162, 39, 0.08);
+        }
+        .nav-item.nav-hidden { display: none; }
+        /* Ripple effect */
+        .nav-item .sb-ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(221, 192, 112, 0.25);
+            transform: scale(0);
+            animation: rippleExpand 0.5s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleExpand {
+            to { transform: scale(3); opacity: 0; }
+        }
+        /* Status dot */
+        .nav-item .sb-status-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #2ecc71;
+            box-shadow: 0 0 6px rgba(46,204,113,0.5);
+            position: absolute;
+            top: 8px; left: 8px;
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+        /* Tooltip */
+        .sb-tooltip {
+            position: fixed;
+            z-index: 9999;
+            background: rgba(16, 26, 61, 0.95);
+            border: 1px solid var(--line-strong);
+            border-radius: 10px;
+            padding: 10px 14px;
+            max-width: 220px;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateX(8px);
+            transition: opacity 0.2s, transform 0.2s;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .sb-tooltip.visible { opacity: 1; transform: translateX(0); }
+        .sb-tooltip-name { color: var(--gold-200); font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+        .sb-tooltip-desc { color: var(--ink-dim); font-size: 11px; line-height: 1.5; }
+        /* Shimmer skeleton */
+        .sb-shimmer {
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            margin: 4px 0;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ─── Sidebar Footer ─── */
+        .sidebar-footer {
+            padding: 10px 10px 14px;
+            border-top: 1px solid var(--line);
+        }
+        .sb-footer-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: rgba(221, 192, 112, 0.06);
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .sb-footer-user:hover { background: rgba(221, 192, 112, 0.12); transform: scale(1.02); }
+        .sb-footer-user:active { transform: scale(0.98); }
+        .sb-footer-avatar { font-size: 22px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(162,155,254,0.15); border-radius: 50%; }
+        .sb-footer-info { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+        .sb-footer-name { font-size: 12px; color: var(--ink); font-weight: 600; }
+        .sb-footer-role { font-size: 10px; color: var(--ink-dim); }
+        /* ─── User Popup ─── */
+        .user-popup {
+            position: fixed;
+            bottom: 80px;
+            left: 16px;
+            width: 260px;
+            background: rgba(16, 26, 61, 0.95);
+            border: 1px solid var(--line-strong);
+            border-radius: 16px;
+            padding: 6px 0;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(10px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+        .user-popup.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .popup-arrow {
+            position: absolute;
+            bottom: -6px;
+            left: 40px;
+            width: 12px;
+            height: 12px;
+            background: rgba(16, 26, 61, 0.95);
+            border-right: 1px solid var(--line-strong);
+            border-bottom: 1px solid var(--line-strong);
+            transform: rotate(45deg);
+        }
+        .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .popup-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(162,155,254,0.2), rgba(221,192,112,0.15));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .popup-info { flex: 1; min-width: 0; }
+        .popup-name { font-size: 14px; font-weight: 700; color: var(--gold-200); }
+        .popup-role { font-size: 11px; color: var(--ink-dim); margin-top: 2px; }
+        .popup-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
+        .popup-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: var(--ink-dim);
+            font-size: 13px;
+            font-family: 'Vazirmatn', sans-serif;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            direction: rtl;
+        }
+        .popup-item:hover {
+            background: rgba(221, 192, 112, 0.08);
+            color: var(--gold-200);
+        }
+        .popup-item-icon { font-size: 16px; width: 22px; text-align: center; }
+        .popup-item-text { flex: 1; }
+        .popup-item-danger { color: #e74c3c; }
+        .popup-item-danger:hover { background: rgba(231, 76, 60, 0.1); color: #ff6b6b; }
+        /* ─── Mobile bottom sheet ─── */
+        @media (max-width: 768px) {
+            .user-popup {
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                border-radius: 20px 20px 0 0;
+                transform: translateY(100%);
+                max-height: 50vh;
+                overflow-y: auto;
+            }
+            .user-popup.open { transform: translateY(0); }
+            .popup-arrow { display: none; }
+            .popup-header { padding: 20px 16px 14px; }
+            .popup-header::before {
+                content: '';
+                display: block;
+                width: 40px;
+                height: 4px;
+                background: rgba(255,255,255,0.15);
+                border-radius: 2px;
+                margin: 0 auto 12px;
+            }
+        }
+
+        /* ─── Sidebar Collapsed State ─── */
+        body.cosmic.sidebar-collapsed .sidebar { width: 60px; }
+        body.cosmic.sidebar-collapsed .sidebar .sb-section-title,
+        body.cosmic.sidebar-collapsed .sidebar .sb-badge,
+        body.cosmic.sidebar-collapsed .sidebar .sb-chevron,
+        body.cosmic.sidebar-collapsed .sidebar .nav-item span:not(.nav-emoji),
+        body.cosmic.sidebar-collapsed .sidebar .sidebar-search,
+        body.cosmic.sidebar-collapsed .sidebar .sidebar-footer .sb-footer-name,
+        body.cosmic.sidebar-collapsed .sidebar .brand-name,
+        body.cosmic.sidebar-collapsed .sidebar .brand-sub { display: none; }
+        body.cosmic.sidebar-collapsed .sidebar .sb-section-header { justify-content: center; padding: 10px 6px; }
+        body.cosmic.sidebar-collapsed .sidebar .nav-item { justify-content: center; padding: 10px 6px; }
+        body.cosmic.sidebar-collapsed .sidebar .sb-footer-user { justify-content: center; }
+        body.cosmic.sidebar-collapsed .cosmic-main { margin-right: 60px; }
+        @media (max-width: 768px) {
+            body.cosmic.sidebar-collapsed .sidebar { width: var(--sidebar-w); }
+            body.cosmic.sidebar-collapsed .cosmic-main { margin-right: 0; }
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 3900;
+            background: rgba(4, 7, 18, 0.66);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        body.cosmic.sidebar-open .sidebar-backdrop {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ============================================================
+           محتوای اصلی
+        ============================================================ */
+        .cosmic-main {
+            position: relative;
+            z-index: 1;
+            margin-right: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---------- نوار بالا ---------- */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            background: rgba(7, 12, 31, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .menu-toggle {
+            appearance: none;
+            display: none;
+            border: 1px solid var(--line-strong);
+            background: rgba(22, 34, 77, 0.6);
+            color: var(--gold-200);
+            font-size: 17px;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .menu-toggle:hover { border-color: var(--gold-400); }
+
+        .topbar-brand {
+            font-family: "Cinzel", serif;
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 0.12em;
+            background: linear-gradient(180deg, var(--gold-200), var(--gold-500));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+
+        .topbar-spacer { flex: 1; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        /* دکمه‌ی «🧘 Yoga Engine» که script.js prepend می‌کند */
+        .cosmic .header-actions .btn-action[style*="margin-right"] {
+            margin-right: 0 !important;
+            margin-left: auto !important;
+        }
+
+        /* ---------- دکمه‌های اکشن ---------- */
+        .cosmic .btn-action {
+            appearance: none;
+            border: 1px solid var(--line-strong);
+            background: rgba(22, 34, 77, 0.55);
+            color: var(--ink);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .cosmic .btn-action:hover {
+            border-color: var(--gold-400);
+            color: var(--gold-200);
+            background: rgba(37, 53, 107, 0.65);
+            transform: translateY(-1px);
+        }
+
+        .cosmic .btn-action.primary {
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500) 60%, var(--gold-600));
+            border-color: transparent;
+            color: var(--lapis-950);
+            font-weight: 800;
+            box-shadow: 0 6px 22px -6px rgba(201, 162, 39, 0.55);
+        }
+
+        .cosmic .btn-action.primary:hover {
+            color: var(--lapis-950);
+            background: linear-gradient(180deg, var(--gold-200), var(--gold-400) 60%, var(--gold-500));
+            box-shadow: 0 8px 28px -6px rgba(201, 162, 39, 0.7);
+        }
+
+        /* ============================================================
+           صفحات
+        ============================================================ */
+        .page { padding: 24px 26px 60px; }
+        .page[hidden] { display: none !important; }
+
+        /* ============================================================
+           صفحه اصلی — هیرو
+        ============================================================ */
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 34px 10px 8px;
+        }
+
+        /* پس‌زمینه‌ی هدر (header-main.jpg) + اورلی برای خوانایی */
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at 50% 20%, rgba(7, 12, 31, 0.25), rgba(7, 12, 31, 0.82) 85%),
+                radial-gradient(ellipse at 50% 30%, rgba(37,53,107,0.5) 0%, rgba(12,20,48,0.85) 60%, rgba(7,12,31,0.95) 100%);
+            border-radius: 0 0 34px 34px;
+            pointer-events: none;
+        }
+
+        .hero-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(7, 12, 31, 0.15) 0%, rgba(7, 12, 31, 0.35) 55%, var(--lapis-950) 100%);
+            border-radius: inherit;
+        }
+
+        .hero > *:not(.hero-bg) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .astrolabe {
+            position: relative;
+            width: min(44vw, 215px);
+            aspect-ratio: 1;
+            margin: 0 auto;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .astrolabe svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 18px rgba(201, 162, 39, 0.16));
+        }
+
+        .astrolabe .ring-ticks {
+            animation: astro-spin 90s linear infinite;
+            transform-origin: 50% 50%;
+        }
+
+        .astrolabe .sweep-arm {
+            animation: astro-spin 55s linear infinite;
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes astro-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        .hero h1 {
+            margin: 6px 0 0;
+            font-family: "Cinzel", serif;
+            font-weight: 700;
+            font-size: clamp(34px, 6vw, 52px);
+            letter-spacing: 0.14em;
+            line-height: 1.15;
+            background: linear-gradient(180deg, var(--gold-200) 0%, var(--gold-400) 55%, var(--gold-600) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 40px rgba(201, 162, 39, 0.18);
+        }
+
+        .hero .hero-sub {
+            margin: 14px auto 0;
+            max-width: 640px;
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 16px;
+            line-height: 2;
+            color: var(--ink-dim);
+        }
+
+        .hero .hero-sub::before,
+        .hero .hero-sub::after {
+            content: "✦";
+            display: inline-block;
+            margin: 0 10px;
+            font-size: 11px;
+            color: var(--gold-500);
+            vertical-align: middle;
+        }
+
+        .hero-cta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .hero-cta .btn-action {
+            padding: 11px 22px;
+            font-size: 14px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin: 34px auto 0;
+            max-width: 720px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            flex: 1 1 150px;
+            max-width: 170px;
+            padding: 10px 18px;
+            text-align: center;
+        }
+
+        .hero-stat + .hero-stat {
+            border-right: 1px solid var(--line);
+        }
+
+        .hero-stat .stat-num {
+            font-family: "Cinzel", serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--gold-300);
+            line-height: 1.1;
+        }
+
+        .hero-stat .stat-label {
+            font-size: 12.5px;
+            color: var(--ink-dim);
+            margin-top: 4px;
+        }
+
+        /* ============================================================
+           صفحه اصلی — سرویس‌ها
+        ============================================================ */
+        .section-heading {
+            text-align: center;
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--gold-200);
+            margin: 44px 0 6px;
+        }
+
+        .section-heading small {
+            display: block;
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--ink-dim);
+            margin-top: 6px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .service-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 18px 18px 16px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
+            cursor: pointer;
+            text-align: right;
+        }
+
+        .service-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--line-strong);
+            box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(221, 192, 112, 0.12);
+        }
+
+        .service-card .svc-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .service-card .svc-emoji {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            border-radius: 12px;
+            background: linear-gradient(160deg, rgba(221, 192, 112, 0.18), rgba(221, 192, 112, 0.04));
+            border: 1px solid var(--line);
+        }
+
+        .service-card .svc-name {
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .service-card .svc-desc {
+            font-size: 12.5px;
+            line-height: 1.9;
+            color: var(--ink-dim);
+            flex: 1;
+        }
+
+        .service-card .svc-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .svc-badge {
+            font-size: 10.5px;
+            padding: 2px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line-strong);
+            color: var(--gold-300);
+            background: rgba(221, 192, 112, 0.06);
+        }
+
+        .service-card .svc-open {
+            margin-top: 4px;
+            align-self: flex-start;
+            appearance: none;
+            border: none;
+            background: transparent;
+            color: var(--gold-400);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s ease;
+        }
+
+        .service-card .svc-open:hover { color: var(--gold-200); }
+
+        /* ============================================================
+           صفحه اصلی — درباره
+        ============================================================ */
+        .about-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 40px;
+        }
+
+        .about-card {
+            background: rgba(9, 14, 34, 0.5);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 20px 18px;
+        }
+
+        .about-card .ab-icon {
+            font-size: 26px;
+            filter: drop-shadow(0 0 12px rgba(221, 192, 112, 0.3));
+        }
+
+        .about-card h3 {
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gold-200);
+            margin: 10px 0 6px;
+        }
+
+        .about-card p {
+            font-size: 13px;
+            line-height: 2;
+            color: var(--ink-dim);
+            margin: 0;
+        }
+
+        /* ============================================================
+           ابزارها — کارت فرم
+        ============================================================ */
+        .tools-wrap { max-width: 1080px; margin: 0 auto; width: 100%; }
+
+        .cosmic .form-card {
+            position: relative;
+            background: var(--panel);
+            border: 1px solid var(--line-strong);
+            border-radius: 26px;
+            padding: 22px 22px 26px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--shadow), inset 0 0 0 1px rgba(16, 26, 61, 0.6);
+            margin-bottom: 0;
+            overflow: visible;
+        }
+
+        .cosmic .form-card::before {
+            content: "";
+            position: absolute;
+            inset: 8px;
+            border: 1px solid var(--line);
+            border-radius: 19px;
+            pointer-events: none;
+        }
+
+        .cosmic .tab-nav {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 2px 14px;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(201, 162, 39, 0.4) transparent;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cosmic .tab-nav::-webkit-scrollbar { height: 6px; }
+        .cosmic .tab-nav::-webkit-scrollbar-thumb { background: rgba(201, 162, 39, 0.35); border-radius: 3px; }
+        .cosmic .tab-nav::-webkit-scrollbar-track { background: transparent; }
+
+        .cosmic .tab-btn {
+            appearance: none;
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border: 1px solid var(--line-strong);
+            background: rgba(16, 26, 61, 0.6);
+            color: var(--ink-dim);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            white-space: nowrap;
+            justify-content: center;
+        }
+
+        .cosmic .tab-btn .tab-emoji { font-size: 15px; line-height: 1; }
+
+        .cosmic .tab-btn:hover {
+            color: var(--ink);
+            border-color: var(--gold-400);
+        }
+
+        .cosmic .tab-btn.active {
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500));
+            border-color: transparent;
+            color: var(--lapis-950);
+            font-weight: 800;
+            box-shadow: 0 5px 18px -6px rgba(201, 162, 39, 0.6);
+        }
+
+        .cosmic .location-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            margin: 2px 0 6px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(7, 12, 31, 0.35);
+            font-size: 13px;
+            color: var(--ink-dim);
+            justify-content: flex-start;
+        }
+
+        .cosmic .location-bar .location-bar-icon { font-size: 15px; }
+
+        .cosmic .location-bar .location-bar-text { color: var(--ink); font-weight: 500; }
+        .cosmic .location-bar .location-bar-city { color: var(--gold-300); font-weight: 700; }
+        .cosmic .location-bar .location-bar-province { color: var(--gold-500); }
+
+        .cosmic .form-title {
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gold-200);
+            margin: 18px 0 16px;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .cosmic .form-title span {
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--ink-dim);
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .cosmic .btn-primary {
+            appearance: none;
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+            border: none;
+            border-radius: 999px;
+            padding: 15px 24px;
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--lapis-950);
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500) 60%, var(--gold-600));
+            cursor: pointer;
+            box-shadow: 0 10px 30px -8px rgba(201, 162, 39, 0.55);
+            transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.25s ease;
+        }
+
+        .cosmic .btn-primary:hover {
+            filter: brightness(1.06);
+            box-shadow: 0 14px 36px -8px rgba(201, 162, 39, 0.7);
+            transform: translateY(-1px);
+        }
+
+        .cosmic #status {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--ink-dim);
+            min-height: 20px;
+            border: none;
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .cosmic #result { margin-top: 24px; }
+
+        /* ============================================================
+           پاورقی — پس‌زمینه‌ی footer.jpg + اورلی
+        ============================================================ */
+        /* ============================================================
+           پاورقی — استایل جدید (بدون تصویر پس‌زمینه)
+        ============================================================ */
+        .cosmic .footer-premium {
+            position: relative;
+            margin-top: 36px;
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--ink-dim);
+            border-top: 1px solid var(--line);
+            padding: 30px 20px 12px;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(37, 53, 107, 0.35) 0%, transparent 60%),
+                linear-gradient(180deg, rgba(16, 26, 61, 0.4) 0%, rgba(7, 12, 31, 0.95) 100%);
+            border-radius: 26px 26px 0 0;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .cosmic .footer-premium::before {
+            content: "º6  º6  º6";
+            display: block;
+            font-size: 8px;
+            letter-spacing: 6px;
+            color: var(--gold-500);
+            opacity: 0.5;
+            margin-bottom: 6px;
+        }
+
+        .cosmic .footer-premium a {
+            color: var(--gold-300);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--line-strong);
+            transition: color 0.2s ease;
+        }
+
+        .cosmic .footer-premium a:hover { color: var(--gold-200); }
+
+        /* ============================================================
+           توست
+        ============================================================ */
+        .cosmic .toast-container {
+            position: fixed;
+            bottom: 26px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            width: min(92vw, 480px);
+        }
+
+        /* ============================================================
+           حالت تنفس (یوگا) — نمایش با کلاس .active (طبق script.js)
+        ============================================================ */
+        .cosmic .yoga-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background:
+                radial-gradient(600px 400px at 50% 30%, rgba(37, 53, 107, 0.7), transparent 70%),
+                rgba(7, 12, 31, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            font-family: "Vazirmatn", sans-serif;
+            text-align: center;
+        }
+
+        .cosmic .yoga-overlay.active { display: flex; }
+
+        .cosmic .yoga-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-400);
+            background: radial-gradient(circle at 35% 30%, rgba(221, 192, 112, 0.22), rgba(16, 26, 61, 0.4));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            box-shadow: 0 0 40px rgba(201, 162, 39, 0.35), inset 0 0 30px rgba(201, 162, 39, 0.12);
+        }
+
+        .cosmic .yoga-circle.inhale,
+        .cosmic .yoga-circle.exhale { border-color: var(--gold-300); }
+
+        .cosmic .yoga-text {
+            position: absolute;
+            bottom: 22%;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--gold-200);
+            background: rgba(7, 12, 31, 0.55);
+            padding: 10px 32px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            letter-spacing: 0;
+        }
+
+        .cosmic .yoga-controls {
+            position: absolute;
+            bottom: 8%;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            color: var(--ink-dim);
+            font-size: 13px;
+        }
+
+        .cosmic .yoga-controls button {
+            appearance: none;
+            border: 1px solid var(--line-strong);
+            background: rgba(22, 34, 77, 0.6);
+            color: var(--ink);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .cosmic .yoga-controls button:hover { border-color: var(--gold-400); color: var(--gold-200); }
+        .cosmic .yoga-controls input[type="range"] { accent-color: var(--gold-500); }
+
+        /* ============================================================
+           مودال نقشه — نمایش با کلاس .active (طبق script.js)
+        ============================================================ */
+        .cosmic .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(7, 12, 31, 0.8);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 7000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cosmic .modal-overlay.active { display: flex; }
+
+        .cosmic .modal-box {
+            background: var(--lapis-850);
+            border: 1px solid var(--line-strong);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            max-width: 700px;
+            width: 95%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cosmic .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line);
+            font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+            font-size: 16px;
+            color: var(--gold-200);
+            flex-shrink: 0;
+        }
+
+        .cosmic .modal-header h3 { margin: 0; font-size: 16px; font-weight: 600; }
+
+        .cosmic .modal-close {
+            appearance: none;
+            border: none;
+            background: none;
+            color: var(--ink-dim);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 8px;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .cosmic .modal-close:hover { color: var(--ink); background: rgba(221, 192, 112, 0.12); }
+
+        .cosmic #map {
+            width: 100%;
+            height: 380px;
+            background: var(--lapis-900);
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            min-height: 0;
+        }
+
+        .cosmic .modal-footer {
+            display: flex;
+            justify-content: center;
+            padding: 14px 20px;
+            border-top: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+
+        /* ---------- فوکوس ---------- */
+        body.cosmic :focus-visible {
+            outline: 2px solid var(--gold-400);
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+
+        /* ---------- کاهش حرکت ---------- */
+        @media (prefers-reduced-motion: reduce) {
+            .astrolabe .ring-ticks,
+            .astrolabe .sweep-arm,
+            * { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+        }
+
+        /* ============================================================
+           رسپانسیو
+        ============================================================ */
+        @media (max-width: 1100px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .about-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(100%); }
+            body.cosmic.sidebar-open .sidebar { transform: translateX(0); }
+            .cosmic-main { margin-right: 0; }
+            .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+        }
+
+        @media (max-width: 640px) {
+            .page { padding: 18px 14px 50px; }
+            .services-grid { grid-template-columns: 1fr; }
+            .hero { padding-top: 22px; }
+            .hero .hero-sub::before,
+            .hero .hero-sub::after { content: none; }
+            .hero-stats { gap: 8px; }
+            .hero-stat { flex: 1 1 44%; max-width: none; }
+            .hero-stat + .hero-stat { border-right: none; }
+            .topbar { padding: 8px 12px; gap: 8px; }
+            .topbar-brand { font-size: 15px; }
+            .cosmic .header-actions { gap: 6px; }
+            .cosmic .btn-action { padding: 7px 11px; font-size: 12px; }
+            .cosmic .form-card { padding: 18px 14px 22px; }
+            .cosmic .form-card::before { inset: 6px; border-radius: 17px; }
+            .cosmic .tab-btn { font-size: 12px; padding: 7px 12px; }
+            .cosmic .form-title { font-size: 18px; }
+            .cosmic .btn-primary { font-size: 15px; padding: 14px 18px; }
+            .section-heading { font-size: 21px; }
+        }
+    </style>
+</head>
+<body class="cosmic">
+
+    <!-- ===== پس‌زمینه‌ی متحرک (اسکریپت‌های static روی همین کانواس می‌کشند) ===== -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- ===== سایدبار ===== -->
+    <aside class="sidebar" id="sidebar" aria-label="ناوبری اصلی">
+        <div class="sidebar-brand">
+            <span class="logo-icon">🌌</span>
+            <div>
+                <div class="brand-name">Cosmic Oracle</div>
+                <div class="brand-sub">رصدخانه‌ی کیهانی</div>
+            </div>
+        </div>
+
+        <div class="sidebar-search">
+            <input type="text" class="sidebar-search-input" id="sidebarSearch" placeholder="🔍 جستجو..." autocomplete="off">
+        </div>
+
+        <nav class="sidebar-nav" id="sidebarNav">
+            <!-- 🏠 داشبورد -->
+            <div class="sb-section" data-section="dashboard">
+                <button class="sb-section-header" onclick="toggleSbSection(this)">
+                    <span class="sb-section-icon">🏠</span>
+                    <span class="sb-section-title">داشبورد</span>
+                    <span class="sb-chevron">‹</span>
+                </button>
+                <div class="sb-section-items open">
+                    <button class="nav-item" data-nav="home"><span class="nav-emoji">🏠</span> صفحه اصلی</button>
+                    <button class="nav-item" data-nav="dashboard"><span class="nav-emoji">📊</span> داشبورد کاربری</button>
+                </div>
+            </div>
+
+            <!-- ⭐ ابزارهای کیهانی -->
+            <div class="sb-section" data-section="cosmic">
+                <button class="sb-section-header" onclick="toggleSbSection(this)">
+                    <span class="sb-section-icon">⭐</span>
+                    <span class="sb-section-title">ابزارهای کیهانی</span>
+                    <span class="sb-badge">۶</span>
+                    <span class="sb-chevron">‹</span>
+                </button>
+                <div class="sb-section-items open">
+                    <button class="nav-item" data-nav="birth"><span class="nav-emoji">🔮</span> چارت تولد</button>
+                    <button class="nav-item" data-nav="synastry"><span class="nav-emoji">💕</span> سیناستری</button>
+                    <button class="nav-item" data-nav="composite"><span class="nav-emoji">🔗</span> کامپوزیت</button>
+                    <button class="nav-item" data-nav="transit"><span class="nav-emoji">🌍</span> ترانزیت</button>
+                    <button class="nav-item" data-nav="solar-return"><span class="nav-emoji">☀️</span> بازگشت خورشیدی</button>
+                    <button class="nav-item" data-nav="lunar-return"><span class="nav-emoji">🌙</span> بازگشت ماهانه</button>
+                </div>
+            </div>
+
+            <!-- 🧬 حکمت ایرانی -->
+            <div class="sb-section" data-section="wisdom">
+                <button class="sb-section-header" onclick="toggleSbSection(this)">
+                    <span class="sb-section-icon">🧬</span>
+                    <span class="sb-section-title">حکمت ایرانی</span>
+                    <span class="sb-chevron">‹</span>
+                </button>
+                <div class="sb-section-items open">
+                    <button class="nav-item" data-nav="mizaj"><span class="nav-emoji">🧬</span> مزاج‌شناسی</button>
+                    <button class="nav-item" data-nav="abjad"><span class="nav-emoji">🔢</span> ابجد</button>
+                    <button class="nav-item" data-nav="hafez"><span class="nav-emoji">🍃</span> فال حافظ</button>
+                </div>
+            </div>
+
+            <!-- 🃏 شخصیت و پیش‌بینی -->
+            <div class="sb-section" data-section="prediction">
+                <button class="sb-section-header" onclick="toggleSbSection(this)">
+                    <span class="sb-section-icon">🃏</span>
+                    <span class="sb-section-title">شخصیت و پیش‌بینی</span>
+                    <span class="sb-chevron">‹</span>
+                </button>
+                <div class="sb-section-items open">
+                    <button class="nav-item" data-nav="tarot"><span class="nav-emoji">🃏</span> تاروت</button>
+                    <button class="nav-item" data-nav="numerology"><span class="nav-emoji">🔢</span> عددشناسی</button>
+                    <button class="nav-item" data-nav="biorhythm"><span class="nav-emoji">🔬</span> بیوریتم</button>
+                    <button class="nav-item" data-nav="zodiac"><span class="nav-emoji">🐉</span> سال حیوانی</button>
+                    <button class="nav-item" data-nav="daily-question"><span class="nav-emoji">❓</span> پرسش روزانه</button>
+                    <button class="nav-item" data-nav="qol"><span class="nav-emoji">📋</span> کیفیت زندگی</button>
+                </div>
+            </div>
+
+            <!-- 🌌 جهان -->
+            <div class="sb-section" data-section="universe">
+                <button class="sb-section-header" onclick="toggleSbSection(this)">
+                    <span class="sb-section-icon">🌌</span>
+                    <span class="sb-section-title">جهان</span>
+                    <span class="sb-chevron">‹</span>
+                </button>
+                <div class="sb-section-items open">
+                    <button class="nav-item" data-nav="nasa"><span class="nav-emoji">🌌</span> ناسا</button>
+                    <button class="nav-item" data-nav="moon-phase"><span class="nav-emoji">🌙</span> فاز ماه</button>
+                </div>
+            </div>
+
+            <!-- 🧘 بدن و ذهن -->
+            <div class="sb-section" data-section="body">
+                <button class="sb-section-header" onclick="toggleSbSection(this)">
+                    <span class="sb-section-icon">🧘</span>
+                    <span class="sb-section-title">بدن و ذهن</span>
+                    <span class="sb-chevron">‹</span>
+                </button>
+                <div class="sb-section-items open">
+                    <button class="nav-item" data-nav="yoga"><span class="nav-emoji">📚</span> حرکات یوگا</button>
+                    <button class="nav-item" data-nav="breath"><span class="nav-emoji">🌬️</span> تنفس و مدیتیشن</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sb-footer-user" id="userProfileTrigger">
+                <span class="sb-footer-avatar" id="sbAvatar">👤</span>
+                <div class="sb-footer-info">
+                    <span class="sb-footer-name" id="sbUserName">کاربر مهمان</span>
+                    <span class="sb-footer-role" id="sbUserRole">ورود / ثبت‌نام</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Popup -->
+        <div class="user-popup" id="userPopup">
+            <div class="popup-arrow"></div>
+            <div class="popup-header">
+                <div class="popup-avatar" id="popupAvatar">👤</div>
+                <div class="popup-info">
+                    <div class="popup-name" id="popupName">کاربر مهمان</div>
+                    <div class="popup-role" id="popupRole">برای دسترسی کامل وارد شوید</div>
+                </div>
+            </div>
+            <div class="popup-divider"></div>
+            <a class="popup-item" id="popupAuthAction" onclick="closeUserPopup();">
+                <span class="popup-item-icon">🔑</span>
+                <span class="popup-item-text">ورود / ثبت‌نام</span>
+            </a>
+            <a class="popup-item" onclick="closeUserPopup(); showPage('home');">
+                <span class="popup-item-icon">🏠</span>
+                <span class="popup-item-text">صفحه اصلی</span>
+            </a>
+            <a class="popup-item" onclick="closeUserPopup(); showPage('dashboard');">
+                <span class="popup-item-icon">📊</span>
+                <span class="popup-item-text">داشبورد روزانه</span>
+            </a>
+            <a class="popup-item" id="popupSubAction" onclick="closeUserPopup();" style="display:none;">
+                <span class="popup-item-icon">💎</span>
+                <span class="popup-item-text">اشتراک و ارتقا</span>
+            </a>
+            <div class="popup-divider"></div>
+            <a class="popup-item popup-item-danger" id="popupLogout" onclick="closeUserPopup();" style="display:none;">
+                <span class="popup-item-icon">🚪</span>
+                <span class="popup-item-text">خروج</span>
+            </a>
+        </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ===== محتوای اصلی ===== -->
+    <div class="cosmic-main">
+
+        <!-- نوار بالا -->
+        <div class="topbar">
+            <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">☰</button>
+            <canvas class="topbar-orb" id="topbarOrb" width="32" height="32"></canvas>
+            <div class="topbar-brand">Cosmic Oracle</div>
+            <div class="topbar-spacer"></div>
+            <div class="header-actions">
+                <button class="btn-action primary" id="yogaEngineToggle">🧘 Yoga Engine</button>
+                <div class="zodiac-display" id="zodiacDisplay">
+                    <div class="zodiac-trigger" id="zodiacTrigger">
+                        <span class="zodiac-emoji" id="zodiacEmoji">🐉</span>
+                        <span class="zodiac-text" id="zodiacText">ثبت نشده</span>
+                        <span class="zodiac-date" id="zodiacDate"></span>
+                    </div>
+                </div>
+                <button class="btn-action" id="payBtn">⭐ خرید</button>
+                <button class="btn-action" id="shareBtn">📤 اشتراک</button>
+                <button class="btn-action" id="saveBtn">💾 ذخیره</button>
+                <button class="btn-action" id="printBtn">🖨️ پرینت</button>
+            </div>
+        </div>
+
+        <!-- ======================= صفحه اصلی ======================= -->
+        <section class="page" id="pageHome">
+            <div class="hero">
+                <div class="hero-bg" aria-hidden="true"></div>
+                <div class="astrolabe" aria-hidden="true">
+                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="200" cy="200" r="196" fill="none" stroke="#c9a227" stroke-opacity="0.55" stroke-width="1.6"/>
+                        <circle cx="200" cy="200" r="186" fill="none" stroke="#c9a227" stroke-opacity="0.22" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="150" fill="none" stroke="#c9a227" stroke-opacity="0.28" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="96" fill="none" stroke="#c9a227" stroke-opacity="0.22" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="26" fill="none" stroke="#c9a227" stroke-opacity="0.4" stroke-width="1.2"/>
+                        <circle cx="200" cy="128" r="86" fill="none" stroke="#ddc070" stroke-opacity="0.14" stroke-width="0.8"/>
+                        <circle cx="200" cy="272" r="86" fill="none" stroke="#ddc070" stroke-opacity="0.14" stroke-width="0.8"/>
+                        <line x1="50" y1="200" x2="350" y2="200" stroke="#ddc070" stroke-opacity="0.12" stroke-width="0.8"/>
+                        <line x1="200" y1="50" x2="200" y2="350" stroke="#ddc070" stroke-opacity="0.12" stroke-width="0.8"/>
+                        <line x1="94" y1="94" x2="306" y2="306" stroke="#ddc070" stroke-opacity="0.1" stroke-width="0.8"/>
+                        <line x1="306" y1="94" x2="94" y2="306" stroke="#ddc070" stroke-opacity="0.1" stroke-width="0.8"/>
+                        <g class="ring-ticks" fill="#ddc070">
+                            <rect x="199" y="10"  width="2" height="7" rx="1" opacity="0.85"/>
+                            <rect x="199" y="22"  width="2" height="5" rx="1" opacity="0.4"/>
+                            <rect x="199" y="32"  width="2" height="5" rx="1" opacity="0.4"/>
+                            <rect x="199" y="42"  width="2" height="5" rx="1" opacity="0.4"/>
+                            <rect x="199" y="52"  width="2" height="5" rx="1" opacity="0.4"/>
+                        </g>
+                        <g font-family="Georgia, 'Times New Roman', serif" fill="#ecd9a0" font-size="17" text-anchor="middle">
+                            <text x="200" y="52">♈</text>
+                            <text x="270" y="74">♉</text>
+                            <text x="322" y="126">♊</text>
+                            <text x="344" y="202">♋</text>
+                            <text x="322" y="278">♌</text>
+                            <text x="270" y="330">♍</text>
+                            <text x="200" y="352">♎</text>
+                            <text x="130" y="330">♏</text>
+                            <text x="78" y="278">♐</text>
+                            <text x="56" y="202">♑</text>
+                            <text x="78" y="126">♒</text>
+                            <text x="130" y="74">♓</text>
+                        </g>
+                        <g class="sweep-arm">
+                            <line x1="200" y1="200" x2="200" y2="62" stroke="#c9a227" stroke-opacity="0.8" stroke-width="1.4"/>
+                            <circle cx="200" cy="62" r="4.5" fill="#ddc070"/>
+                            <circle cx="200" cy="200" r="4" fill="#c9a227"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <h1>Cosmic Oracle</h1>
+                <p class="hero-sub">
+                    رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای
+                    <br>
+                    پانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد
+                </p>
+
+                <div class="hero-cta">
+                    <button class="btn-action primary" onclick="openService('birth')">🔮 چارت تولد</button>
+                    <button class="btn-action" onclick="openService('hafez')">🍃 فال حافظ</button>
+                    <button class="btn-action" onclick="openService('tarot')">🃏 تاروت</button>
+                    <button class="btn-action" onclick="openService('nasa')">🌌 ناسا</button>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="hero-stat"><div class="stat-num">۱۵</div><div class="stat-label">موتور محاسباتی</div></div>
+                    <div class="hero-stat"><div class="stat-num">۲۷</div><div class="stat-label">ناکشاترا (ودیک)</div></div>
+                    <div class="hero-stat"><div class="stat-num">۱۲</div><div class="stat-label">برج فلکی</div></div>
+                    <div class="hero-stat"><div class="stat-num">۹</div><div class="stat-label">سیاره‌ی کلاسیک</div></div>
+                </div>
+            </div>
+
+            <!-- گرید سرویس‌ها -->
+            <h2 class="section-heading">خدمات رصدخانه
+                <small>هر ابزار را باز کنید تا در همان لحظه، تنها موتورِ همان ابزار بارگذاری شود</small>
+            </h2>
+
+            <div class="services-grid">
+
+                <div class="service-card" onclick="openService('birth')">
+                    <div class="svc-top"><span class="svc-emoji">🔮</span><span class="svc-name">چارت تولد</span></div>
+                    <div class="svc-desc">چارت کامل نجومی با موقعیت دقیق سیارات، خانه‌ها، جنبه‌ها و تفسیر ودیک. پایه‌ی همه‌ی تحلیل‌ها.</div>
+                    <div class="svc-badges"><span class="svc-badge">نجومی</span><span class="svc-badge">ودیک</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('synastry')">
+                    <div class="svc-top"><span class="svc-emoji">💕</span><span class="svc-name">سیناستری</span></div>
+                    <div class="svc-desc">دو چارت را کنار هم بگذارید و سازگاری عاطفی، کاری و دوستانه‌ی خود را با دیگری بسنجید.</div>
+                    <div class="svc-badges"><span class="svc-badge">سازگاری</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('composite')">
+                    <div class="svc-top"><span class="svc-emoji">🔗</span><span class="svc-name">کامپوزیت</span></div>
+                    <div class="svc-desc">چارت ترکیبی دو نفر را محاسبه کنید تا هویتِ خودِ رابطه، قوی‌ترین جنبه و نقطه ضعف آن را ببینید.</div>
+                    <div class="svc-badges"><span class="svc-badge">رابطه</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('transit')">
+                    <div class="svc-top"><span class="svc-emoji">🌍</span><span class="svc-name">ترانزیت</span></div>
+                    <div class="svc-desc">تأثیر سیارات در حال حرکت بر چارت تولد شما؛ زمان‌های مناسب برای اقدام را پیدا کنید.</div>
+                    <div class="svc-badges"><span class="svc-badge">زمان‌بندی</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('solar-return')">
+                    <div class="svc-top"><span class="svc-emoji">☀️</span><span class="svc-name">بازگشت خورشیدی</span></div>
+                    <div class="svc-desc">نقشه‌ی سالانه‌ی خود را بگیرید و ببینید سال آینده در کدام حوزه‌ها می‌درخشید.</div>
+                    <div class="svc-badges"><span class="svc-badge">سالانه</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('lunar-return')">
+                    <div class="svc-top"><span class="svc-emoji">🌙</span><span class="svc-name">بازگشت ماهانه</span></div>
+                    <div class="svc-desc">تمرکز عاطفی و موضوعات مهم ماه پیش رو را کشف کنید و بهتر برنامه‌ریزی کنید.</div>
+                    <div class="svc-badges"><span class="svc-badge">ماهانه</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('mizaj')">
+                    <div class="svc-top"><span class="svc-emoji">🧬</span><span class="svc-name">مزاج‌شناسی</span></div>
+                    <div class="svc-desc">طبع خود را بر اساس طب سنتی ایرانی شناسایی کنید؛ توصیه‌های غذایی و سبک زندگی متناسب بگیرید.</div>
+                    <div class="svc-badges"><span class="svc-badge">طب سنتی</span><span class="svc-badge">آفلاین</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('abjad')">
+                    <div class="svc-top"><span class="svc-emoji">🔢</span><span class="svc-name">ابجد</span></div>
+                    <div class="svc-desc">ارزش عددی کلمات و نام‌ها را محاسبه کنید و سازگاری دو نام را بررسی کنید.</div>
+                    <div class="svc-badges"><span class="svc-badge">آفلاین</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('tarot')">
+                    <div class="svc-top"><span class="svc-emoji">🃏</span><span class="svc-name">تاروت</span></div>
+                    <div class="svc-desc">کارت روزانه، کشیدن کارت و پخش سه‌کارته؛ پیام‌های راهنما برای تصمیم‌های زندگی.</div>
+                    <div class="svc-badges"><span class="svc-badge">کارت روزانه</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('numerology')">
+                    <div class="svc-top"><span class="svc-emoji">🔢</span><span class="svc-name">عددشناسی</span></div>
+                    <div class="svc-desc">اعداد مسیر زندگی، سال شخصی، عدد بیان و درونی؛ نقشه‌ی عددی شخصیت شما.</div>
+                    <div class="svc-badges"><span class="svc-badge">شخصیت</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('biorhythm')">
+                    <div class="svc-top"><span class="svc-emoji">🔬</span><span class="svc-name">بیوریتم</span></div>
+                    <div class="svc-desc">چرخه‌های ۲۳، ۲۸ و ۳۳ روزه‌ی فیزیکی، عاطفی و ذهنی را روزبه‌روز ببینید.</div>
+                    <div class="svc-badges"><span class="svc-badge">سلامت</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('zodiac')">
+                    <div class="svc-top"><span class="svc-emoji">🐉</span><span class="svc-name">سال حیوانی</span></div>
+                    <div class="svc-desc">حیوان و عنصر سال تولدتان را پیدا کنید؛ شخصیت و سازگاری‌های چینی را بشناسید.</div>
+                    <div class="svc-badges"><span class="svc-badge">چینی</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('daily-question')">
+                    <div class="svc-top"><span class="svc-emoji">❓</span><span class="svc-name">پرسش روزانه</span></div>
+                    <div class="svc-desc">سوال بپرسید و پاسخ ترکیبی از بیوریتم، سال حیوانی و تاروت بگیرید.</div>
+                    <div class="svc-badges"><span class="svc-badge">ترکیبی</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('hafez')">
+                    <div class="svc-top"><span class="svc-emoji">🍃</span><span class="svc-name">فال حافظ</span></div>
+                    <div class="svc-desc">غزل تصادفی دیوان حافظ با تفسیر؛ کاملاً آفلاین و بدون نیاز به اینترنت.</div>
+                    <div class="svc-badges"><span class="svc-badge">آفلاین</span><span class="svc-badge">ادبی</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+                <div class="service-card" onclick="openService('nasa')">
+                    <div class="svc-top"><span class="svc-emoji">🌌</span><span class="svc-name">ناسا</span></div>
+                    <div class="svc-desc">تصویر نجومی روز، آب‌وهوای فضا، سیارک‌ها و اطلاعات مریخ را از آرشیو ناسا ببینید.</div>
+                    <div class="svc-badges"><span class="svc-badge">برخط</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
+            </div>
+
+            <!-- درباره -->
+            <div class="about-row">
+                <div class="about-card">
+                    <div class="ab-icon">🧭</div>
+                    <h3>موتور ودیک</h3>
+                    <p>محاسبات بر پایه‌ی اخترشناسی ودیک انجام می‌شود: ناکشاترا، شرف و هبوط، طبیعت کارکردی سیارات و جنبه‌های دقیق.</p>
+                </div>
+                <div class="about-card">
+                    <div class="ab-icon">🔒</div>
+                    <h3>آفلاین و خصوصی</h3>
+                    <p>فال حافظ، ابجد و مزاج‌شناسی کاملاً روی دستگاه شما اجرا می‌شوند؛ بدون ارسال داده به هیچ سروری.</p>
+                </div>
+                <div class="about-card">
+                    <div class="ab-icon">🕰️</div>
+                    <h3>رصدخانه‌ی همیشه بیدار</h3>
+                    <p>از چارت تولد تا تصویر نجومی روز ناسا، هر لحظه که بخواهید، آسمان این‌جا باز است.</p>
+                </div>
+            </div>
+
+            <div class="footer-premium">
+                ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
+                <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
+                <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
+            </div>
+        </section>
+
+        <!-- ======================= صفحه ابزارها ======================= -->
+        <section class="page" id="pageTools" hidden>
+            <!-- نوار مکان -->
+            <div class="location-bar" id="locationBar">
+                <span class="location-bar-icon">📍</span>
+                <span class="location-bar-text" id="locationBarText">مکان: در حال بارگذاری...</span>
+            </div>
+
+            <div class="form-title" id="formTitle">
+                🪐 اطلاعات تولد
+                <span>دقیق و حرفه‌ای</span>
+            </div>
+
+            <!-- ظرف فرم داینامیک -->
+            <div id="formContainer"></div>
+
+            <button class="btn-primary" id="calcBtn">🔮 دریافت چارت و تحلیل کامل</button>
+            <div id="status"></div>
+
+            <!-- نتایج -->
+            <div id="result"></div>
+
+            <div class="footer-premium">
+                ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
+                <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
+                <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
+            </div>
+        </section>
+
+        <!-- ======================= صفحه کتابخانه یوگا ======================= -->
+        <section class="page" id="pageYoga" hidden>
+            <div class="yoga-page">
+                <!-- هدر صفحه یوگا -->
+                <div class="yoga-page-header">
+                    <h2>🧘 یوگا</h2>
+                    <span class="yoga-count" id="yogaCount">— حرکت</span>
+                </div>
+                <!-- تب‌های اصلی -->
+                <div class="yoga-tabs">
+                    <button class="yoga-tab active" data-tab="library">📚 کتابخانه حرکات</button>
+                    <button class="yoga-tab" data-tab="daily">🌟 تمرین روزانه</button>
+                </div>
+                <!-- فیلترها (فقط تب کتابخانه) -->
+                <div id="yogaFilters"></div>
+                <!-- گرید حرکات -->
+                <div id="yogaGridWrap" class="yoga-grid-wrap">
+                    <div class="yoga-poses-grid" id="yogaPosesGrid"></div>
+                    <div class="yoga-pagination" id="yogaPagination"></div>
+                </div>
+                <!-- پنل تمرین روزانه -->
+                <div id="yogaDailyPanel" style="display:none;"></div>
+                <!-- پنل تنفس و مدیتیشن -->
+                <div id="yogaBreathPanel" style="display:none;"></div>
+                <!-- صفحه جزئیات -->
+                <div id="yogaDetail" style="display:none;"></div>
+            </div>
+        </section>
+
+        <!-- ======================= صفحه تنفس و مدیتیشن ======================= -->
+        <section class="page" id="pageBreath" hidden>
+            <div class="breath-page">
+                <div class="breath-page-head">
+                    <h2>🌬️ تنفس و مدیتیشن</h2>
+                    <p class="breath-page-sub">فضایی آرام برای تمرینات تنفسی و مدیتیشن</p>
+                </div>
+                <div class="breath-techniques" id="breathTechniques"></div>
+                <div class="breath-timer-section" id="breathTimerSection" style="display:none;">
+                    <button class="breath-back-btn" onclick="document.getElementById('breathTimerSection').style.display='none';document.getElementById('breathTechniques').style.display='';">→ بازگشت به لیست</button>
+                    <div class="breath-timer-head">
+                        <h3 id="breathTimerTitle"></h3>
+                        <p id="breathTimerDesc" class="breath-timer-desc"></p>
+                    </div>
+                    <div class="yoga-circle-container">
+                        <div class="yoga-circle" id="breathCircle">
+                            <span class="yoga-phase-icon" id="breathPhaseIcon">🌬️</span>
+                            <span class="yoga-phase-text" id="breathPhaseText">آماده باشید...</span>
+                        </div>
+                        <div class="yoga-progress" id="breathProgress"><div class="yoga-progress-bar" id="breathProgressBar"></div></div>
+                    </div>
+                    <div class="yoga-controls">
+                        <button id="breathStartBtn">▶ شروع</button>
+                        <button id="breathPauseBtn" disabled>⏸ مکث</button>
+                        <button id="breathResetBtn">⟳ بازنشانی</button>
+                        <div class="yoga-stats">
+                            <span>⏱ <span id="breathTimer">۰۰:۰۰</span></span>
+                            <span>🔄 <span id="breathCycles">۰</span></span>
+                        </div>
+                        <div class="yoga-speed"><label>سرعت: <span id="breathSpeedLabel">۴ث</span></label><input type="range" id="breathSpeedSlider" min="2" max="10" value="4" step="0.5"></div>
+                    </div>
+                    <div class="yoga-guide" id="breathGuide"><p>🪷 با هر دم، انرژی را به درون بکش... با هر بازدم، تنش را رها کن.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= پرسشنامه کیفیت زندگی ======================= -->
+        <section class="page" id="pageQoL" hidden>
+            <div id="qolContainer"></div>
+        </section>
+
+        <!-- ======================= صفحه داشبورد روزانه ======================= -->
+        <section class="page" id="pageDashboard" hidden>
+            <div class="dashboard-page">
+                <div class="dash-head">
+                    <h2 class="dash-title">📊 داشبورد روزانه</h2>
+                    <div class="dash-date" id="dashDate"></div>
+                </div>
+                <div id="dailyDashboard" class="daily-dashboard"></div>
+            </div>
+        </section>
+
+        <!-- ======================= صفحه لندینگ (بزرگ) ======================= -->
+        <section class="page" id="pageLanding" hidden>
+            <div class="landing-hero" id="landingHero">
+                <canvas id="liquidOrbCanvas" class="landing-orb-canvas"></canvas>
+                <div class="landing-particles" id="landingParticles"></div>
+                <div class="landing-content">
+                    <div class="landing-badge">✨ رصدخانه‌ی کیهانی</div>
+                    <h1 class="landing-title">
+                        <span class="landing-title-line">Cosmic</span>
+                        <span class="landing-title-line accent">Oracle</span>
+                    </h1>
+                    <p class="landing-sub">پانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد</p>
+                    <div class="landing-cta">
+                        <button class="btn-landing primary" onclick="openService('birth')">🔮 چارت تولد</button>
+                        <button class="btn-landing" onclick="openService('tarot')">🃏 تاروت</button>
+                        <button class="btn-landing" onclick="openService('yoga')">🧘 یوگا</button>
+                        <button class="btn-landing" onclick="openService('nasa')">🌌 ناسا</button>
+                    </div>
+                    <div class="landing-stats">
+                        <div class="lstat"><div class="lstat-num">۱۵</div><div class="lstat-label">موتور محاسباتی</div></div>
+                        <div class="lstat"><div class="lstat-num">۲۷</div><div class="lstat-label">ناکشاترا</div></div>
+                        <div class="lstat"><div class="lstat-num">۲۸۱</div><div class="lstat-label">حرکت یوگا</div></div>
+                        <div class="lstat"><div class="lstat-num">۱۲</div><div class="lstat-label">برج فلکی</div></div>
+                    </div>
+                </div>
+                <div class="landing-scroll-hint" onclick="document.querySelector('.landing-features').scrollIntoView({behavior:'smooth'})">
+                    <span>⬇</span>
+                    <small>بیشتر کشف کنید</small>
+                </div>
+            </div>
+            <div class="landing-features">
+                <h2 class="section-heading">خدمات رصدخانه</h2>
+                <div class="landing-features-grid">
+                    <div class="lf-card" data-anim="fadeUp" onclick="openService('birth')">
+                        <span class="lf-emoji">🔮</span>
+                        <h3>چارت تولد</h3>
+                        <p>چارت کامل نجومی با تحلیل ودیک و جنبه‌های سیاره‌ای</p>
+                    </div>
+                    <div class="lf-card" data-anim="fadeUp" onclick="openService('synastry')">
+                        <span class="lf-emoji">💕</span>
+                        <h3>سیناستری</h3>
+                        <p>سازگاری دو چارت برای روابط عاطفی و کاری</p>
+                    </div>
+                    <div class="lf-card" data-anim="fadeUp" onclick="openService('tarot')">
+                        <span class="lf-emoji">🃏</span>
+                        <h3>تاروت</h3>
+                        <p>کشیدن کارت و دریافت پیام از کیهان</p>
+                    </div>
+                    <div class="lf-card" data-anim="fadeUp" onclick="openService('yoga')">
+                        <span class="lf-emoji">🧘</span>
+                        <h3>یوگا</h3>
+                        <p>کتابخانه جامع ۲۸۱ حرکت با تصویر و توضیح</p>
+                    </div>
+                    <div class="lf-card" data-anim="fadeUp" onclick="openService('breath')">
+                        <span class="lf-emoji">🌬️</span>
+                        <h3>تنفس و مدیتیشن</h3>
+                        <p>تکنیک‌های تنفسی و مراقبه هدایت‌شده</p>
+                    </div>
+                    <div class="lf-card" data-anim="fadeUp" onclick="openService('mizaj')">
+                        <span class="lf-emoji">🧬</span>
+                        <h3>مزاج‌شناسی</h3>
+                        <p>تشخیص طبع و توصیه‌های غذایی</p>
+                    </div>
+                    <div class="lf-card" data-anim="fadeUp" onclick="openService('nasa')">
+                        <span class="lf-emoji">🌌</span>
+                        <h3>ناسا</h3>
+                        <p>تصویر نجومی روز و اطلاعات فضا</p>
+                    </div>
+                    <div class="lf-card" data-anim="fadeUp" onclick="openService('hafez')">
+                        <span class="lf-emoji">🍃</span>
+                        <h3>فال حافظ</h3>
+                        <p>تفسیر غزل حافظ با هوش مصنوعی</p>
+                    </div>
+                </div>
+            </div>
+            <div class="landing-footer">
+                <p>Cosmic Oracle © ۲۰۲۶ · ساخته شده با ❤️</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===== پنل یوگا (۳ بخش: تنفس / مراقبه / آسانا) ===== -->
+    <div class="yoga-panel" id="yogaPanel">
+        <div class="yoga-panel-header">
+            <div class="yoga-panel-tabs">
+                <button class="yoga-panel-tab active" data-panel="breathing">🌬️ تنفس</button>
+                <button class="yoga-panel-tab" data-panel="meditation">🧘 مراقبه</button>
+            </div>
+            <button class="yoga-panel-close" id="yogaPanelClose">✕</button>
+        </div>
+        <div class="yoga-panel-body">
+            <!-- بخش تنفس -->
+            <div class="yoga-panel-section active" id="yogaBreathingSection">
+                <div class="yoga-selector">
+                    <label>نوع تنفس</label>
+                    <select id="yogaBreathSelect">
+                        <option value="box" selected>تنفس بوکس (۴-۴-۴-۴)</option>
+                        <option value="diaphragmatic">تنفس دیافراگمی (۴-۴-۴)</option>
+                        <option value="kapalabhati">تنفس آتش (کاپالابهاتی)</option>
+                    </select>
+                </div>
+            </div>
+            <!-- بخش مراقبه -->
+            <div class="yoga-panel-section" id="yogaMeditationSection">
+                <div class="yoga-selector">
+                    <label>نوع مراقبه</label>
+                    <select id="yogaMeditSelect">
+                        <option value="guided" selected>مراقبه هدایت‌شده</option>
+                        <option value="silent">سکوت و تمرکز</option>
+                        <option value="body_scan">اسکن بدن</option>
+                    </select>
+                </div>
+            </div>
+            <!-- دایره تنفس (مشترک) -->
+            <div class="yoga-circle-container">
+                <div class="yoga-circle" id="yogaCircle">
+                    <span class="yoga-phase-icon" id="yogaPhaseIcon">🌬️</span>
+                    <span class="yoga-phase-text" id="yogaPhaseText">دم بکش...</span>
+                </div>
+                <div class="yoga-progress" id="yogaProgress">
+                    <div class="yoga-progress-bar" id="yogaProgressBar"></div>
+                </div>
+            </div>
+            <!-- کنترل‌ها -->
+            <div class="yoga-controls">
+                <button id="yogaStartBtn">▶ شروع</button>
+                <button id="yogaPauseBtn" disabled>⏸ مکث</button>
+                <button id="yogaResetBtn">⟳ بازنشانی</button>
+                <div class="yoga-stats">
+                    <span>⏱ <span id="yogaTimer">۰۰:۰۰</span></span>
+                    <span>🔄 <span id="yogaCycleCounter">۰</span></span>
+                </div>
+                <div class="yoga-speed">
+                    <label>سرعت: <span id="yogaSpeedLabel">۴ث</span></label>
+                    <input type="range" id="yogaSpeedSlider" min="2" max="10" value="4" step="0.5">
+                </div>
+            </div>
+            <div class="yoga-guide" id="yogaGuide"><p>🪷 با هر دم، انرژی را به درون بکش...</p></div>
+        </div>
+    </div>
+
+    <!-- ===== مودال حیوان سال ===== -->
+    <div class="zodiac-modal" id="zodiacModal">
+        <div class="zodiac-modal-content">
+            <button class="zodiac-modal-close" id="zodiacModalClose">✕</button>
+            <div id="zodiacModalBody"></div>
+        </div>
+    </div>
+
+    <!-- ===== پرسشنامه ===== -->
+
+
+    <!-- ===== توست ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== حالت تنفس ===== -->    <div class="yoga-overlay" id="yogaOverlay">
+            <div class="yoga-circle" id="yogaOverlayCircle">
+            <span id="yogaPhase">🌬️</span>
+        </div>
+        <div class="yoga-text" id="yogaText">دم بکش...</div>
+        <div class="yoga-controls">
+            <button id="yogaToggle">⏸️ توقف</button>
+            <label>سرعت: <input type="range" id="yogaSpeed" min="3" max="10" value="4" step="0.5"></label>
+            <button id="yogaClose">✖ بستن</button>
+        </div>
+    </div>
+
+    <!-- ===== مودال نقشه ===== -->
+    <div class="modal-overlay" id="mapModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>📍 انتخاب مکان روی نقشه</h3>
+                <button class="modal-close" id="closeMapModal" aria-label="بستن">✕</button>
+            </div>
+            <div id="map"></div>
+            <div class="modal-footer">
+                <button id="confirmLocationBtn" class="btn-action primary" style="padding:10px 30px; font-size:14px;">✅ انتخاب</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== اسکریپت‌های ضروری (کوچک) — موتورهای سنگین lazy هستند ===== -->
+    <script src="static/persian-provinces.js"></script>
+    <script src="static/date-wheel-picker.js?v=15"></script>
+    <script src="static/city-selector.js?v=9"></script>
+    <script src="static/spa-router.js?v=1"></script>
+    <script src="static/script.js?v=13"></script>
+    <script src="static/yoga-library.js?v=1"></script>
+    <script src="static/yoga-engine.js?v=1"></script>
+    <script src="static/breath-module.js?v=1"></script>
+    <script src="static/quality-of-life.js?v=1"></script>
+    <script src="static/moon-phase.js?v=1"></script>
+    <script src="static/zodiac-display.js?v=1"></script>
+    <script src="static/questionnaire.js?v=1"></script>
+    <script src="static/daily-dashboard.js?v=1"></script>
+
+    <script>
+    /* ================================================================
+       COSMIC SHELL — ناوبری سایدبار، جابه‌جایی صفحه، لود تنبل موتورها
+    ================================================================ */
+    (function () {
+        'use strict';
+
+        var _loaded = {};
+
+        function loadScript(src) {
+            return new Promise(function (resolve, reject) {
+                if (_loaded[src] || document.querySelector('script[src="' + src + '"]')) {
+                    _loaded[src] = true;
+                    return resolve();
+                }
+                var s = document.createElement('script');
+                s.src = src;
+                s.onload = function () { _loaded[src] = true; resolve(); };
+                s.onerror = function () { reject(new Error('خطا در بارگذاری ' + src)); };
+                document.body.appendChild(s);
+            });
+        }
+
+        /* موتورهایی که فقط با باز شدن تبِ خودشان بارگذاری می‌شوند */
+        var TAB_SCRIPTS = {
+            mizaj: 'static/mizaj.js',
+            abjad: 'static/abjad.js'
+        };
+
+        function ensureTabScripts(tab) {
+            var src = TAB_SCRIPTS[tab];
+            return src ? loadScript(src) : Promise.resolve();
+        }
+
+        var _leafletPromise = null;
+        function loadLeaflet() {
+            if (_leafletPromise) return _leafletPromise;
+            if (window.L) { _leafletPromise = Promise.resolve(); return _leafletPromise; }
+            _leafletPromise = new Promise(function (resolve, reject) {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                document.head.appendChild(link);
+                loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').then(resolve, reject);
+            });
+            return _leafletPromise;
+        }
+
+        /* ---------- جابه‌جایی بین صفحات ---------- */
+        function showPage(name) {
+            var home = document.getElementById('pageHome');
+            var tools = document.getElementById('pageTools');
+            var yoga = document.getElementById('pageYoga');
+            var breath = document.getElementById('pageBreath');
+            var qol = document.getElementById('pageQoL');
+            var dashboard = document.getElementById('pageDashboard');
+            var landing = document.getElementById('pageLanding');
+            if (!home || !tools) return;
+            // Hide all
+            home.hidden = true;
+            tools.hidden = true;
+            if (yoga) yoga.hidden = true;
+            if (breath) breath.hidden = true;
+            if (qol) qol.hidden = true;
+            if (dashboard) dashboard.hidden = true;
+            if (landing) landing.hidden = true;
+            // Show target
+            if (name === 'home') {
+                home.hidden = false;
+            } else if (name === 'landing') {
+                if (landing) landing.hidden = false;
+                initLandingPage();
+            } else if (name === 'yoga') {
+                if (yoga) yoga.hidden = false;
+            } else if (name === 'breath') {
+                if (breath) breath.hidden = false;
+            } else if (name === 'qol') {
+                if (qol) qol.hidden = false;
+                if (window.QualityOfLife) window.QualityOfLife.init();
+            } else if (name === 'dashboard') {
+                if (dashboard) dashboard.hidden = false;
+                if (window.DailyDashboard) window.DailyDashboard.init();
+            } else {
+                tools.hidden = false;
+            }
+            closeSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        window.showPage = showPage;
+
+        /* ---------- باز کردن یک سرویس: برو به ابزارها + فعال‌سازی تب ---------- */
+        window.openService = function (tab) {
+            if (tab === 'yoga') {
+                showPage('yoga');
+                if (window.YogaLibrary) window.YogaLibrary.init();
+                return;
+            }
+            if (tab === 'breath') {
+                showPage('breath');
+                if (window.BreathModule) window.BreathModule.init();
+                return;
+            }
+            showPage('tools');
+            ensureTabScripts(tab).then(function () {
+                if (window.switchTab) window.switchTab(tab);
+            });
+        };
+
+        /* ---------- سایدبار ---------- */
+        var body = document.body;
+
+        function openSidebar() { body.classList.add('sidebar-open'); }
+        function closeSidebar() { body.classList.remove('sidebar-open'); }
+
+        /* ─── User Profile Popup ─── */
+        var _profileOpen = false;
+        var _profilePopup = document.getElementById('userPopup');
+        var _profileTrigger = document.getElementById('userProfileTrigger');
+
+        window.closeUserPopup = function() {
+            _profileOpen = false;
+            if (_profilePopup) _profilePopup.classList.remove('open');
+            document.removeEventListener('click', _closePopupOutside);
+        };
+
+        function _closePopupOutside(e) {
+            if (_profilePopup && _profileTrigger && !_profilePopup.contains(e.target) && !_profileTrigger.contains(e.target)) {
+                closeUserPopup();
+            }
+        }
+
+        if (_profileTrigger) {
+            _profileTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                _profileOpen = !_profileOpen;
+                if (_profileOpen) {
+                    _profilePopup.classList.add('open');
+                    setTimeout(function() { document.addEventListener('click', _closePopupOutside); }, 10);
+                } else {
+                    closeUserPopup();
+                }
+            });
+        }
+        // Close popup when sidebar closes
+        var _origCloseSidebar = closeSidebar;
+        closeSidebar = function() {
+            _origCloseSidebar();
+            closeUserPopup();
+        };
+
+        /* کلیک روی برندِ نوار بالا → بازگشت به خانه */
+        var brand = document.querySelector('.topbar-brand');
+        if (brand) {
+            brand.style.cursor = 'pointer';
+            brand.addEventListener('click', function () { showPage('home'); });
+        }
+
+        document.getElementById('menuToggle').addEventListener('click', function () {
+            if (body.classList.contains('sidebar-collapsed')) {
+                body.classList.remove('sidebar-collapsed');
+            }
+            openSidebar();
+        });
+        var backdrop = document.getElementById('sidebarBackdrop');
+        if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+        /* Ctrl+B for sidebar toggle */
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+                body.classList.toggle('sidebar-collapsed');
+            }
+        });
+
+        /* Sidebar search */
+        var searchInput = document.getElementById('sidebarSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                var q = this.value.toLowerCase().trim();
+                document.querySelectorAll('.sidebar .nav-item').forEach(function (item) {
+                    var text = item.textContent.toLowerCase();
+                    item.classList.toggle('nav-hidden', q.length > 0 && text.indexOf(q) < 0);
+                });
+                // Auto-expand sections with matching items
+                if (q.length > 0) {
+                    document.querySelectorAll('.sb-section-items').forEach(function (sec) {
+                        var hasVisible = sec.querySelector('.nav-item:not(.nav-hidden)');
+                        if (hasVisible) {
+                            sec.classList.add('open');
+                            sec.previousElementSibling.classList.remove('collapsed');
+                        }
+                    });
+                }
+            });
+        }
+
+        document.querySelectorAll('.sidebar [data-nav]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var target = btn.getAttribute('data-nav');
+                if (target === 'home') showPage('home');
+                else if (target === 'landing') showPage('landing');
+                else if (target === 'dashboard') { showPage('dashboard'); closeSidebar(); }
+                else if (target === 'yoga') {
+                    showPage('yoga');
+                    closeSidebar();
+                    if (window.YogaLibrary) window.YogaLibrary.init();
+                }
+                else if (target === 'breath') {
+                    showPage('breath');
+                    closeSidebar();
+                    if (window.BreathModule) window.BreathModule.init();
+                }
+                else if (target === 'qol') {
+                    showPage('qol');
+                    closeSidebar();
+                }
+                else window.openService(target);
+            });
+        });
+
+        /* Section toggle function */
+        window.toggleSbSection = function(header) {
+            var items = header.nextElementSibling;
+            if (!items) return;
+            var isOpen = items.classList.contains('open');
+            items.classList.toggle('open');
+            header.classList.toggle('collapsed');
+        };
+
+        /* ─── Micro-interactions: Tooltips ─── */
+        var TOOL_DESC = {
+            'home': 'بازگشت به صفحه اصلی رصدخانه',
+            'dashboard': 'داشبورد شخصی و چارت‌های ذخیره‌شده',
+            'birth': 'چارت کامل نجومی با تحلیل ودیک',
+            'synastry': 'مقایسه دو چارت برای سازگاری',
+            'composite': 'چارت ترکیبی رابطه دو نفر',
+            'transit': 'تأثیر سیارات امروز بر زندگی شما',
+            'solar-return': 'نقشه سالانه بازگشت خورشیدی',
+            'lunar-return': 'تمرکز عاطفی ماه آینده',
+            'mizaj': 'طبع‌شناسی و توصیه‌های غذایی',
+            'abjad': 'ارزش عددی کلمات و نام‌ها',
+            'hafez': 'فال حافظ با تفسیر غزل',
+            'tarot': 'کشیدن کارت تاروت',
+            'numerology': 'اعداد مسیر زندگی و شخصیت',
+            'biorhythm': 'چرخه‌های فیزیکی، عاطفی و ذهنی',
+            'zodiac': 'حیوان و عنصر سال چینی',
+            'daily-question': 'پاسخ ترکیبی به سوالات',
+            'qol': 'پرسشنامه کیفیت زندگی',
+            'nasa': 'تصویر نجومی روز و اطلاعات فضا',
+            'moon-phase': 'فاز ماه و منازل قمری',
+            'yoga': 'کتابخانه جامع حرکات یوگا',
+            'breath': 'تمرینات تنفسی و مدیتیشن'
+        };
+        var _tooltipEl = null;
+        function createTooltip() {
+            if (_tooltipEl) return;
+            _tooltipEl = document.createElement('div');
+            _tooltipEl.className = 'sb-tooltip';
+            _tooltipEl.innerHTML = '<div class="sb-tooltip-name"></div><div class="sb-tooltip-desc"></div>';
+            document.body.appendChild(_tooltipEl);
+        }
+        document.querySelectorAll('.sidebar .nav-item').forEach(function(item) {
+            item.addEventListener('mouseenter', function(e) {
+                var nav = this.dataset.nav;
+                var desc = TOOL_DESC[nav];
+                if (!desc) return;
+                createTooltip();
+                _tooltipEl.querySelector('.sb-tooltip-name').textContent = this.textContent.trim();
+                _tooltipEl.querySelector('.sb-tooltip-desc').textContent = desc;
+                var rect = this.getBoundingClientRect();
+                _tooltipEl.style.top = rect.top + 'px';
+                _tooltipEl.style.left = (rect.left - 230) + 'px';
+                _tooltipEl.classList.add('visible');
+            });
+            item.addEventListener('mouseleave', function() {
+                if (_tooltipEl) _tooltipEl.classList.remove('visible');
+            });
+            /* Ripple effect on click */
+            item.addEventListener('click', function(e) {
+                var ripple = document.createElement('span');
+                ripple.className = 'sb-ripple';
+                var rect = this.getBoundingClientRect();
+                var size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                this.appendChild(ripple);
+                setTimeout(function() { ripple.remove(); }, 600);
+                /* Track last used */
+                try {
+                    var lastUsed = JSON.parse(localStorage.getItem('sb_last_used') || '[]');
+                    var navKey = this.dataset.nav;
+                    var idx = lastUsed.indexOf(navKey);
+                    if (idx >= 0) lastUsed.splice(idx, 1);
+                    lastUsed.unshift(navKey);
+                    if (lastUsed.length > 5) lastUsed.pop();
+                    localStorage.setItem('sb_last_used', JSON.stringify(lastUsed));
+                    updateStatusDots();
+                } catch(_) {}
+            });
+        });
+        /* ─── Status dots for recently used tools ─── */
+        function updateStatusDots() {
+            try {
+                var lastUsed = JSON.parse(localStorage.getItem('sb_last_used') || '[]');
+                document.querySelectorAll('.sidebar .nav-item').forEach(function(item) {
+                    var existing = item.querySelector('.sb-status-dot');
+                    if (lastUsed.indexOf(item.dataset.nav) >= 0) {
+                        if (!existing) {
+                            var dot = document.createElement('span');
+                            dot.className = 'sb-status-dot';
+                            item.appendChild(dot);
+                        }
+                    } else {
+                        if (existing) existing.remove();
+                    }
+                });
+            } catch(_) {}
+        }
+        updateStatusDots();
+        /* ─── Shimmer skeleton on sidebar open ─── */
+        function showSidebarShimmer() {
+            var nav = document.getElementById('sidebarNav');
+            if (!nav) return;
+            var items = nav.querySelectorAll('.sb-section-items');
+            items.forEach(function(sec) {
+                var btns = sec.querySelectorAll('.nav-item');
+                btns.forEach(function(b) { b.style.opacity = '0.3'; });
+            });
+            setTimeout(function() {
+                items.forEach(function(sec) {
+                    var btns = sec.querySelectorAll('.nav-item');
+                    btns.forEach(function(b, i) {
+                        setTimeout(function() { b.style.opacity = '1'; b.style.transition = 'opacity 0.3s'; }, i * 40);
+                    });
+                });
+            }, 150);
+        }
+        /* Trigger shimmer when sidebar opens */
+        var _origOpen = openSidebar;
+        openSidebar = function() {
+            _origOpen();
+            showSidebarShimmer();
+        };
+
+        /* ---------- لود تنبل تب‌ها در tabNav (فاز capture، قبل از handler اسکریپت) ---------- */
+        var tabNav = document.getElementById('tabNav');
+        if (tabNav) {
+            tabNav.addEventListener('click', function (e) {
+                var btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                var tab = btn.getAttribute('data-tab');
+                var src = TAB_SCRIPTS[tab];
+                if (!src || _loaded[src]) return;
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                ensureTabScripts(tab).then(function () { btn.click(); });
+            }, true);
+        }
+
+        /* ---------- لود تنبل Leaflet: فقط وقتی نقشه باز شود ---------- */
+        window.addEventListener('DOMContentLoaded', function () {
+            if (window.openMapForPrefix) {
+                var orig = window.openMapForPrefix;
+                window.openMapForPrefix = function (prefix) {
+                    loadLeaflet().then(function () { orig(prefix); });
+                };
+            }
+        });
+
+        /* ---------- لینک اشتراک: مستقیم به ابزارها برو ---------- */
+        if (window.location.search.indexOf('share=') !== -1) {
+            showPage('tools');
+        }
+
+        /* ---------- موتورهای کم‌اهمیت‌تر پس از لود کامل، در پس‌زمینه ---------- */
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                loadScript('static/liquid-orb.js?v=2');
+                loadScript('static/auth-panel.js?v=2');
+            }, 1500);
+        });
+
+        /* ---------- آیکون سایدبار: همگام‌سازی با تب فعال ---------- */
+        window.addEventListener('DOMContentLoaded', function () {
+            var navItems = document.querySelectorAll('.sidebar .nav-item[data-nav]');
+            // Watch for switchTab calls via a wrapper
+            var origSwitchTab = window.switchTab;
+            window.switchTab = function(tab) {
+                if (origSwitchTab) origSwitchTab(tab);
+                navItems.forEach(function (it) {
+                    it.classList.toggle('active', it.getAttribute('data-nav') === tab);
+                });
+            };
+            // Also sync on sidebar click
+            document.querySelectorAll('.sidebar [data-nav]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var target = btn.getAttribute('data-nav');
+                    navItems.forEach(function (it) {
+                        it.classList.toggle('active', it.getAttribute('data-nav') === target);
+                    });
+                });
+            });
+
+            /* ---------- راه‌اندازی ماژول‌های جدید ---------- */
+            if (window.YogaEngine) window.YogaEngine.init();
+            if (window.ZodiacDisplay) window.ZodiacDisplay.init();
+            if (window.Questionnaire) window.Questionnaire.init();
+            if (window.DailyDashboard) window.DailyDashboard.init();
+
+            /* ---------- همگام‌سازی Zodiac با sharedInputs ---------- */
+            var _zodiacSyncObs = new MutationObserver(function () {
+                if (window.ZodiacDisplay) window.ZodiacDisplay.refresh();
+            });
+            var _birthInput = document.getElementById('birthDatePicker_hidden') || document.getElementById('numYear');
+            if (_birthInput) _zodiacSyncObs.observe(_birthInput, { attributes: true, childList: true, subtree: true });
+
+            /* ---------- Liquid Orb کوچک در سربرگ ---------- */
+            (function() {
+                var c = document.getElementById('topbarOrb');
+                if (!c) return;
+                var ctx = c.getContext('2d');
+                var t = 0;
+                function draw() {
+                    t += 0.015;
+                    ctx.clearRect(0,0,32,32);
+                    var cx=16,cy=16,r=10;
+                    // glow
+                    var g1=ctx.createRadialGradient(cx,cy,r*0.4,cx,cy,r*1.8);
+                    g1.addColorStop(0,'rgba(201,162,39,0.2)');g1.addColorStop(1,'rgba(201,162,39,0)');
+                    ctx.fillStyle=g1;ctx.fillRect(0,0,32,32);
+                    // body
+                    var g2=ctx.createRadialGradient(cx-r*0.3,cy-r*0.3,r*0.1,cx,cy,r);
+                    g2.addColorStop(0,'rgba(236,217,160,0.9)');g2.addColorStop(0.5,'rgba(201,162,39,0.7)');g2.addColorStop(1,'rgba(168,129,42,0.3)');
+                    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=g2;ctx.fill();
+                    // bands
+                    for(var i=0;i<2;i++){ctx.beginPath();ctx.ellipse(cx,cy,r*0.65,r*0.15,t+i*Math.PI*0.8,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,'+(0.18-i*0.05)+')';ctx.lineWidth=1;ctx.stroke();}
+                    // highlight
+                    var hg=ctx.createRadialGradient(cx-r*0.2,cy-r*0.2,0,cx-r*0.2,cy-r*0.2,r*0.3);
+                    hg.addColorStop(0,'rgba(255,255,255,0.4)');hg.addColorStop(1,'rgba(255,255,255,0)');
+                    ctx.fillStyle=hg;ctx.beginPath();ctx.arc(cx-r*0.2,cy-r*0.2,r*0.3,0,Math.PI*2);ctx.fill();
+                    requestAnimationFrame(draw);
+                }
+                draw();
+            })();
+        });
+
+        /* ─── صفحه لندینگ: Liquid Orb + Parallax + Scroll Animations ─── */
+        window.initLandingPage = function() {
+            // Particle field
+            var pc = document.getElementById('landingParticles');
+            if (pc && !pc.dataset.init) {
+                pc.dataset.init = '1';
+                for (var i = 0; i < 50; i++) {
+                    var star = document.createElement('div');
+                    star.className = 'lp-star';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.animationDelay = (Math.random() * 5) + 's';
+                    star.style.width = star.style.height = (1 + Math.random() * 3) + 'px';
+                    pc.appendChild(star);
+                }
+            }
+            // Liquid Orb Canvas
+            var canvas = document.getElementById('liquidOrbCanvas');
+            if (canvas && !canvas.dataset.init) {
+                canvas.dataset.init = '1';
+                var ctx = canvas.getContext('2d');
+                var W, H;
+                function resize() {
+                    W = canvas.width = canvas.parentElement.offsetWidth;
+                    H = canvas.height = canvas.parentElement.offsetHeight;
+                }
+                resize();
+                window.addEventListener('resize', resize);
+                var t = 0;
+                var particles = [];
+                for (var j = 0; j < 80; j++) {
+                    particles.push({
+                        x: Math.random() * 2 - 1,
+                        y: Math.random() * 2 - 1,
+                        r: 0.5 + Math.random() * 1.5,
+                        speed: 0.001 + Math.random() * 0.003,
+                        angle: Math.random() * Math.PI * 2,
+                        alpha: 0.2 + Math.random() * 0.6
+                    });
+                }
+                function drawOrb() {
+                    t += 0.008;
+                    ctx.clearRect(0, 0, W, H);
+                    var cx = W / 2, cy = H / 2;
+                    var baseR = Math.min(W, H) * 0.22;
+                    // Outer glow
+                    var gOuter = ctx.createRadialGradient(cx, cy, baseR * 0.3, cx, cy, baseR * 2.5);
+                    gOuter.addColorStop(0, 'rgba(201,162,39,0.08)');
+                    gOuter.addColorStop(0.5, 'rgba(108,92,231,0.04)');
+                    gOuter.addColorStop(1, 'rgba(201,162,39,0)');
+                    ctx.fillStyle = gOuter;
+                    ctx.fillRect(0, 0, W, H);
+                    // Main orb body
+                    var pulse = 1 + Math.sin(t * 2) * 0.03;
+                    var r = baseR * pulse;
+                    var g1 = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.05, cx, cy, r);
+                    g1.addColorStop(0, 'rgba(236,217,160,0.85)');
+                    g1.addColorStop(0.3, 'rgba(201,162,39,0.65)');
+                    g1.addColorStop(0.7, 'rgba(108,92,231,0.4)');
+                    g1.addColorStop(1, 'rgba(52,31,151,0.15)');
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                    ctx.fillStyle = g1;
+                    ctx.fill();
+                    // Rotating bands
+                    for (var b = 0; b < 3; b++) {
+                        ctx.save();
+                        ctx.translate(cx, cy);
+                        ctx.rotate(t * (0.5 + b * 0.3) + b * Math.PI / 3);
+                        ctx.beginPath();
+                        ctx.ellipse(0, 0, r * 0.7, r * 0.08 + Math.sin(t + b) * r * 0.02, 0, 0, Math.PI * 2);
+                        ctx.strokeStyle = 'rgba(255,255,255,' + (0.12 - b * 0.03) + ')';
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    // Specular highlight
+                    var hg = ctx.createRadialGradient(cx - r * 0.25, cy - r * 0.25, 0, cx - r * 0.25, cy - r * 0.25, r * 0.4);
+                    hg.addColorStop(0, 'rgba(255,255,255,0.45)');
+                    hg.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.fillStyle = hg;
+                    ctx.beginPath();
+                    ctx.arc(cx - r * 0.25, cy - r * 0.25, r * 0.4, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Floating particles
+                    particles.forEach(function(p) {
+                        p.angle += p.speed;
+                        var px = cx + Math.cos(p.angle) * r * 1.4 * p.x + Math.sin(t + p.angle) * 20;
+                        var py = cy + Math.sin(p.angle) * r * 1.4 * p.y + Math.cos(t + p.angle) * 15;
+                        ctx.beginPath();
+                        ctx.arc(px, py, p.r, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(221,192,112,' + p.alpha * (0.5 + 0.5 * Math.sin(t * 2 + p.angle)) + ')';
+                        ctx.fill();
+                    });
+                    requestAnimationFrame(drawOrb);
+                }
+                drawOrb();
+            }
+            // Parallax on scroll
+            var hero = document.getElementById('landingHero');
+            if (hero && !hero._parallax) {
+                hero._parallax = true;
+                hero.addEventListener('scroll', function() {
+                    var st = hero.scrollTop;
+                    var orb = document.getElementById('liquidOrbCanvas');
+                    if (orb) orb.style.transform = 'translateY(' + (st * 0.3) + 'px) scale(' + (1 - st * 0.0003) + ')';
+                    var content = hero.querySelector('.landing-content');
+                    if (content) content.style.transform = 'translateY(' + (st * 0.15) + 'px)';
+                    content.style.opacity = Math.max(0, 1 - st / 500);
+                });
+            }
+            // Scroll-triggered fade-in for feature cards
+            if (!window._landingScrollObs) {
+                window._landingScrollObs = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('lf-visible');
+                            window._landingScrollObs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+                document.querySelectorAll('.lf-card').forEach(function(card) {
+                    window._landingScrollObs.observe(card);
+                });
+            }
+        };
+
+        /* ─── Auth Wiring: Update sidebar profile from auth state ─── */
+        function wireAuthToSidebar() {
+            function updateSidebarAuth() {
+                var token = localStorage.getItem('cosmic_token') || '';
+                var user = {};
+                try { user = JSON.parse(localStorage.getItem('cosmic_user') || '{}'); } catch(_) {}
+                var sbName = document.getElementById('sbUserName');
+                var sbRole = document.getElementById('sbUserRole');
+                var sbAvatar = document.getElementById('sbAvatar');
+                var popupName = document.getElementById('popupName');
+                var popupRole = document.getElementById('popupRole');
+                var popupAvatar = document.getElementById('popupAvatar');
+                var popupAuth = document.getElementById('popupAuthAction');
+                var popupSub = document.getElementById('popupSubAction');
+                var popupLogout = document.getElementById('popupLogout');
+                if (token && user.email) {
+                    // Logged in
+                    var name = user.display_name || user.email.split('@')[0];
+                    var plan = user.plan || 'free';
+                    var planLabel = plan === 'gold' ? '⭐ طلایی' : plan === 'diamond' ? '💎 الماسی' : '🆓 رایگان';
+                    if (sbName) sbName.textContent = name;
+                    if (sbRole) sbRole.textContent = planLabel;
+                    if (sbAvatar) sbAvatar.textContent = name.charAt(0);
+                    if (popupName) popupName.textContent = name;
+                    if (popupRole) popupRole.textContent = user.email + ' · ' + planLabel;
+                    if (popupAvatar) popupAvatar.textContent = name.charAt(0);
+                    if (popupAuth) { popupAuth.querySelector('.popup-item-text').textContent = '⚙️ تنظیمات حساب'; popupAuth.querySelector('.popup-item-icon').textContent = '⚙️'; }
+                    if (popupSub) popupSub.style.display = '';
+                    if (popupLogout) { popupLogout.style.display = ''; popupLogout.onclick = function() { closeUserPopup(); if (window.doLogout) window.doLogout(); else { localStorage.removeItem('cosmic_token'); localStorage.removeItem('cosmic_user'); updateSidebarAuth(); } }; }
+                } else {
+                    // Guest
+                    if (sbName) sbName.textContent = 'کاربر مهمان';
+                    if (sbRole) sbRole.textContent = 'ورود / ثبت‌نام';
+                    if (sbAvatar) sbAvatar.textContent = '👤';
+                    if (popupName) popupName.textContent = 'کاربر مهمان';
+                    if (popupRole) popupRole.textContent = 'برای دسترسی کامل وارد شوید';
+                    if (popupAvatar) popupAvatar.textContent = '👤';
+                    if (popupAuth) { popupAuth.querySelector('.popup-item-text').textContent = '🔑 ورود / ثبت‌نام'; popupAuth.querySelector('.popup-item-icon').textContent = '🔑'; popupAuth.onclick = function() { closeUserPopup(); if (window.openLoginModal) window.openLoginModal(); }; }
+                    if (popupSub) popupSub.style.display = 'none';
+                    if (popupLogout) popupLogout.style.display = 'none';
+                }
+            }
+            updateSidebarAuth();
+            // Re-check every 3 seconds (auth panel modifies localStorage)
+            setInterval(updateSidebarAuth, 3000);
+        }
+        wireAuthToSidebar();
+
+        /* ─── Premium Gating ─── */
+        var PREMIUM_TOOLS = ['composite', 'solar-return', 'lunar-return', 'qol'];
+        function addPremiumBadges() {
+            PREMIUM_TOOLS.forEach(function(tool) {
+                var navBtn = document.querySelector('.nav-item[data-nav="' + tool + '"]');
+                if (navBtn && !navBtn.querySelector('.nav-badge-pro')) {
+                    var badge = document.createElement('span');
+                    badge.className = 'nav-badge-pro';
+                    badge.textContent = 'PRO';
+                    navBtn.appendChild(badge);
+                }
+            });
+        }
+        addPremiumBadges();
+        // Gate premium tools on click
+        document.querySelectorAll('.sidebar .nav-item[data-nav]').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                var nav = this.getAttribute('data-nav');
+                if (PREMIUM_TOOLS.indexOf(nav) >= 0) {
+                    var user = {};
+                    try { user = JSON.parse(localStorage.getItem('cosmic_user') || '{}'); } catch(_) {}
+                    var plan = user.plan || 'free';
+                    if (plan === 'free') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        if (window.showToast) showToast('💎 برای دسترسی به این ابزار، اشتراک طلایی تهیه کنید', 'warning');
+                        else alert('💎 برای دسترسی به این ابزار، اشتراک طلایی تهیه کنید');
+                        if (window.openPricingModal) window.openPricingModal();
+                        else if (window.openLoginModal) window.openLoginModal();
+                        closeSidebar();
+                        return false;
+                    }
+                }
+            }, true);
+        });
+
+    })();
+    </script>
+</body>
+</html>

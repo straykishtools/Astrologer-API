@@ -268,7 +268,8 @@ var TAB_INFO = {
     'zodiac': { title: 'سال حیوانی چینی', text: 'حیوان و عنصر سال تولد خود را پیدا کنید و شخصیت و سازگاری‌های خود را بررسی کنید.' },
     'daily-question': { title: 'پرسش روزانه', text: 'یک سوال بپرسید و پاسخ ترکیبی از بیوریتم، سال حیوانی و تاروت را دریافت کنید.' },
     'hafez': { title: 'فال حافظ', text: 'فال حافظ بگیرید و غزل تصادفی دیوان حافظ را با تفسیر دریافت کنید. کاملاً آفلاین و بدون نیاز به اینترنت.' },
-    'nasa': { title: 'ناسا', text: 'تصویر نجومی روز، تصاویر فضایی، آب و هوای فضا، سیارک‌ها و اطلاعات مریخ را مشاهده کنید.' }
+    'nasa': { title: 'ناسا', text: 'تصویر نجومی روز، تصاویر فضایی، آب و هوای فضا، سیارک‌ها و اطلاعات مریخ را مشاهده کنید.' },
+    'moon-phase': { title: 'فاز ماه', text: 'فاز ماه و منازل قمری را بر اساس تاریخ انتخابی مشاهده کنید. زمان‌های مناسب برای فعالیت‌های مختلف را بر اساس موقعیت ماه در آسمان پیدا کنید.' }
 };
 
 // ================================================================
@@ -646,14 +647,94 @@ function displayGenericChart(data, title, chartType) {
             html += '</div>';
         }
         if (rs && rs.score_breakdown && rs.score_breakdown.length > 0) {
-            html += '<div class="score-breakdown"><h4>\u062c\u0632\u0626\u06cc\u0627\u062a \u0627\u0645\u062a\u06cc\u0627\u0632</h4>';
+            // ── XSS escape helper ──
+            var _esc = function(s) { var d = document.createElement('div'); d.appendChild(document.createTextNode(s || '')); return d.innerHTML; };
+            // ── Rule explanations (Persian) ──
+            var ruleExplanations = {
+                'destiny_sign': 'هر دو نفر در یک نشان سرنوشت‌ساز قرار دارند — پیوندی عمیق و معنوی که فراتر از زندگی روزمره است.',
+                'sun_sun_major': 'خورشید هر دو نفر در یک عنصر مشترک (آتش/خاک/هوا/آب) است — درک عمیقی از ماهیت یکدیگر دارید.',
+                'sun_sun_minor': 'خورشیدهای شما در عناصر مکمل قرار دارند — تفاوت‌هایتان مکمل یکدیگرند.',
+                'sun_sun_quality': 'هر دو خورشید در یک کیفیت (کاردینال/fixed/ changing) هستید — سبک عملکرد شما مشابه است.',
+                'moon_moon': 'ماه‌های شما در یک نشان مشترک یا سازگار هستند — از نظر احساسی هماهنگید.',
+                'venus_mars': 'ونوس شما با مریخ دیگری در ارتباط است — جذابیت و کشش عاطفی قوی.',
+                'sun_moon_conjunction': 'خورشید یکی با ماه دیگری هماهنگ است — حمایت احساسی عمیق بین شما.',
+                'sun_moon_other': 'خورشید و ماه شما در جنبه سازگار هستند — درک متقابل عاطفی وجود دارد.',
+                'sun_ascendant': 'خورشید شما با طالع دیگری هماهنگ است — نحوه برخورد شما با دنیا مکمل است.',
+                'moon_ascendant': 'ماه شما با طالع دیگری هماهنگ است — پیوند احساسی عمیقی دارید.',
+                'ascendant_compatibility': 'طالع‌های شما سازگار هستند — نحوه برخورد شما با دنیا مشابه یا مکمل است.',
+                'saturn_hard': 'کیوان در جنبه‌های سخت بین شماست — چالش‌هایی وجود دارد که با صبر قابل حل است.',
+                'pluto_power': 'پلوتون در ارتباط قوی است — تغییرات عمیق و تحول‌آفرین در رابطه.',
+                'neptune_dream': 'نپتون خلاقیت و معنویت را تقویت می‌کند — رابطه‌ای رویایی و الهام‌بخش.',
+                'uranus_change': 'اورانوس هیجان و تغییر را به رابطه می‌آورد — غیرقابل پیش‌بینی و مهیج.',
+                'aspect_trine': 'تثلیث بین سیارات — جریان انرژی روان و آسان بین شما.',
+                'aspect_sextile': 'تسدیس — فرصت‌های رشد و همکاری در رابطه.',
+                'aspect_square': 'تربیع — چالش‌هایی که رشد شخصی را تقویت می‌کنند.',
+                'aspect_opposition': 'مقابله — کشش و مکمل بودن، نیاز به تعادل.',
+                'aspect_conjunction': 'مقارنه — قدرتمندترین جنبه، ترکیب انرژی دو سیاره.',
+                'house_comparison': ' مقایسه خانه‌ها — حوزه‌های زندگی که بیشترین تعامل را دارید.',
+                'element_balance': 'تعادل عناصر — تنوع یا تمرکز عناصر چهارگانه در رابطه.',
+                'default': 'این قانون بر اساس تحلیل اختری بین دو چارت تولد محاسبه شده است.'
+            };
+            // ── Category mapping ──
+            var ruleCategories = {
+                'destiny_sign': 0, 'sun_sun_major': 0, 'sun_sun_minor': 0, 'sun_sun_quality': 0,
+                'sun_moon_conjunction': 0, 'sun_moon_other': 0,
+                'moon_moon': 0, 'venus_mars': 0,
+                'sun_ascendant': 1, 'moon_ascendant': 1,
+                'aspect_trine': 1, 'aspect_sextile': 1, 'aspect_square': 1,
+                'aspect_opposition': 1, 'aspect_conjunction': 1,
+                'ascendant_compatibility': 2, 'house_comparison': 2,
+                'saturn_hard': 3, 'pluto_power': 3, 'neptune_dream': 3, 'uranus_change': 3,
+                'element_balance': 4
+            };
+            var catNames = ['⭐ جنبه‌های اصلی', '⚡ جنبه‌های سیاره‌ای', '🏠 خانه‌ها و طالع', '🔮 سیارات فراسویی', '🔥 تعادل عناصر'];
+            var catEmojis = ['⭐', '⚡', '🏠', '🔮', '🔥'];
+            // ── Group items by category ──
+            var groups = {};
+            var ordered = [];
             rs.score_breakdown.forEach(function(b) {
-                var pts = b.points || 0;
-                var desc = b.description || b.details || b.rule || '';
-                var maxPts = 15;
-                var pctW = Math.min(100, Math.abs(pts) / maxPts * 100);
-                var barColor = pts >= 0 ? 'linear-gradient(90deg, #2ecc71, #51cf66)' : 'linear-gradient(90deg, #e74c3c, #ff6b6b)';
-                html += '<div class="breakdown-item"><span class="breakdown-label">' + desc + '</span><div class="breakdown-bar"><div class="breakdown-fill" style="width:' + pctW + '%;background:' + barColor + '"></div></div><span class="breakdown-value" style="color:' + (pts >= 0 ? '#51cf66' : '#ff6b6b') + '">' + (pts >= 0 ? '+' : '') + pts + '</span></div>';
+                var cat = ruleCategories[b.rule] !== undefined ? ruleCategories[b.rule] : 4;
+                if (!groups[cat]) { groups[cat] = []; ordered.push(cat); }
+                groups[cat].push(b);
+            });
+            // ── Summary stats ──
+            var totalPos = 0, totalNeg = 0;
+            rs.score_breakdown.forEach(function(b) { if (b.points > 0) totalPos += b.points; else totalNeg += b.points; });
+            html += '<div class="score-breakdown">';
+            html += '<h4>\u062c\u0632\u0626\u06cc\u0627\u062a \u0627\u0645\u062a\u06cc\u0627\u0632</h4>';
+            html += '<div class="breakdown-summary">';
+            html += '<div class="breakdown-sum-item breakdown-sum-pos"><span class="breakdown-sum-icon">✅</span><span>نقاط مثبت</span><span class="breakdown-sum-val">+' + totalPos + '</span></div>';
+            html += '<div class="breakdown-sum-item breakdown-sum-neg"><span class="breakdown-sum-icon">⚠️</span><span>نقاط منفی</span><span class="breakdown-sum-val">' + totalNeg + '</span></div>';
+            html += '<div class="breakdown-sum-item breakdown-sum-total"><span class="breakdown-sum-icon">📊</span><span>مجموع</span><span class="breakdown-sum-val">' + (totalPos + totalNeg) + '</span></div>';
+            html += '</div>';
+            // ── Render each category ──
+            ordered.forEach(function(cat) {
+                var items = groups[cat];
+                html += '<div class="breakdown-category">';
+                html += '<div class="breakdown-cat-header">';
+                html += '<span class="breakdown-cat-emoji">' + (catEmojis[cat] || '📌') + '</span>';
+                html += '<span class="breakdown-cat-name">' + (catNames[cat] || 'سایر') + '</span>';
+                html += '</div>';
+                items.forEach(function(b) {
+                    var pts = b.points || 0;
+                    var desc = _esc(b.description || b.details || b.rule || '');
+                    var detail = _esc(b.details || '');
+                    var rule = b.rule || '';
+                    var explanation = ruleExplanations[rule] || ruleExplanations['default'];
+                    var maxPts = 15;
+                    var pctW = Math.min(100, Math.abs(pts) / maxPts * 100);
+                    var barColor = pts >= 0 ? 'linear-gradient(90deg, #2ecc71, #51cf66)' : 'linear-gradient(90deg, #e74c3c, #ff6b6b)';
+                    html += '<div class="breakdown-item">';
+                    html += '<div class="breakdown-item-head">';
+                    html += '<span class="breakdown-label">' + desc + '</span>';
+                    html += '<span class="breakdown-value" style="color:' + (pts >= 0 ? '#51cf66' : '#ff6b6b') + '">' + (pts >= 0 ? '+' : '') + pts + '</span>';
+                    html += '</div>';
+                    html += '<div class="breakdown-bar"><div class="breakdown-fill" style="width:' + pctW + '%;background:' + barColor + '"></div></div>';
+                    html += '<div class="breakdown-explain">' + explanation + '</div>';
+                    if (detail) html += '<div class="breakdown-detail">\u2699\uFE0F ' + detail + '</div>';
+                    html += '</div>';
+                });
+                html += '</div>';
             });
             html += '</div>';
         }
@@ -1309,6 +1390,7 @@ var formBuilders = {
     'daily-question': function() { formTitle.innerHTML = '❓ پرسش روزانه'; calcBtn.style.display = 'none'; return getDailyQuestionForm(); },
     'hafez': function() { formTitle.innerHTML = '🍃 فال حافظ'; calcBtn.style.display = 'none'; return getHafezForm(); },
     'nasa': function() { formTitle.innerHTML = '🌌 ناسا'; calcBtn.style.display = 'none'; return getNasaForm(); },
+    'moon-phase': function() { formTitle.innerHTML = '🌙 فاز ماه'; calcBtn.style.display = 'none'; return getMoonPhaseForm(); },
 
     'lunar-return': function() {
         formTitle.innerHTML = '🌙 بازگشت ماهانه'; calcBtn.innerHTML = '🌙 محاسبه';
@@ -1326,41 +1408,49 @@ var formBuilders = {
     }
 };
 
-document.getElementById('tabNav').addEventListener('click', function(e) {
-    var btn = e.target.closest('.tab-btn');
-    if (!btn) return;
-    var tab = btn.dataset.tab;
-    if (tab === currentTab) return;
-    // Sync shared inputs from current form before switching
-    syncSharedInputsFromForm();
-    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-    btn.classList.add('active');
-    currentTab = tab;
-    var formHtml = formBuilders[tab]();
-    // Insert info section at top
-    var info = TAB_INFO[tab];
-    if (info) {
-        formHtml = makeInfoSection(info.title, info.text) + formHtml;
-    }
-    formContainer.innerHTML = formHtml;
-    // Only astro tabs use the shared calcBtn; multi-action tabs render their own buttons
+function doSwitchTab(tab) {
+    // Always update calcBtn + orb-wrapper visibility, even on same tab
     var usesCalcBtn = ['birth', 'synastry', 'composite', 'transit', 'solar-return', 'lunar-return'].indexOf(tab) !== -1;
     calcBtn.style.display = usesCalcBtn ? 'block' : 'none';
-    // Init CitySelector first (creates instances), THEN apply shared inputs
+    var orbWrap = calcBtn.closest('.orb-wrapper');
+    if (orbWrap) {
+        if (usesCalcBtn) orbWrap.classList.add('visible');
+        else orbWrap.classList.remove('visible');
+    }
+    // Also sync via liquidOrb API if available (handles race with lazy-loaded orb)
+    if (window.liquidOrb && window.liquidOrb.sync) window.liquidOrb.sync();
+
+    // Early return if same tab already rendered
+    if (tab === currentTab && formContainer.innerHTML.trim() !== '') return;
+    syncSharedInputsFromForm();
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
+    if (btn) btn.classList.add('active');
+    currentTab = tab;
+    var formHtml = formBuilders[tab]();
+    var info = TAB_INFO[tab];
+    if (info) formHtml = makeInfoSection(info.title, info.text) + formHtml;
+    formContainer.innerHTML = formHtml;
     attachCityAutocomplete();
     reattachMapButton();
     applySharedInputs();
     attachDatePickerTriggers(tab);
-    // Explicitly refresh location bar after shared inputs are applied
     _lastLocationBarKey = '';
     updateLocationBar();
     document.getElementById('result').style.display = 'none';
     document.getElementById('status').style.display = 'none';
-    // Add input listeners to capture changes for shared state
     formContainer.querySelectorAll('input, select').forEach(function(el) {
         el.addEventListener('change', syncSharedInputsFromForm);
         el.addEventListener('input', syncSharedInputsFromForm);
     });
+}
+window.switchTab = doSwitchTab;
+
+var _tabNavEl = document.getElementById('tabNav');
+if (_tabNavEl) _tabNavEl.addEventListener('click', function(e) {
+    var btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    doSwitchTab(btn.dataset.tab);
 });
 
 function attachCityAutocomplete() {
@@ -2047,7 +2137,7 @@ async function getDeepSeekAnalysisFromBackend(contextText, vedicData) {
 // ================================================================
 (function initYoga() {
     const overlay = document.getElementById('yogaOverlay');
-    const circle = document.getElementById('yogaCircle');
+    const circle = document.getElementById('yogaOverlayCircle');
     const phaseText = document.getElementById('yogaPhase');
     const textDisplay = document.getElementById('yogaText');
     const toggleBtn = document.getElementById('yogaToggle');
@@ -2062,21 +2152,7 @@ async function getDeepSeekAnalysisFromBackend(contextText, vedicData) {
     let currentPhase = 'inhale';
     let paused = false;
 
-    const headerActions = document.querySelector('.header-actions');
-    const yogaBtn = document.createElement('button');
-    yogaBtn.className = 'btn-action primary';
-    yogaBtn.innerHTML = '🧘 Yoga Engine';
-    yogaBtn.style.marginRight = 'auto';
-    yogaBtn.addEventListener('click', () => {
-        if (!overlay.classList.contains('active')) {
-            overlay.classList.add('active');
-            startYoga();
-        } else {
-            stopYoga();
-            overlay.classList.remove('active');
-        }
-    });
-    headerActions.prepend(yogaBtn);
+    /* Duplicate yoga button removed — yoga-engine.js handles yogaEngineToggle */
 
     function startYoga() {
         if (isRunning) return;
