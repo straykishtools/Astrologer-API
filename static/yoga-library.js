@@ -491,6 +491,11 @@ function renderDailyPanel() {
         html += '<div class="yoga-empty">حرکتی یافت نشد</div>';
     }
     html += '</div>';
+    // دکمه شروع تمرین
+    html += '<div style="text-align:center;margin-top:20px;">';
+    html += '<button class="btn-primary" id="yogaStartPractice" style="padding:12px 32px;font-size:15px;">🧘 شروع تمرین</button>';
+    html += '</div>';
+    html += '</div>';
     el.innerHTML = html;
     // رویدادها
     el.querySelectorAll('.yoga-daily-item').forEach(function (item) {
@@ -507,6 +512,24 @@ function renderDailyPanel() {
             this.disabled = true;
         });
     });
+    // شروع تمرین
+    var startBtn = document.getElementById('yogaStartPractice');
+    if (startBtn) {
+        startBtn.addEventListener('click', function () {
+            // رفتن به تب تمرین پیشرفته
+            _activeTab = 'practice';
+            document.querySelectorAll('.yoga-tab').forEach(function(t) {
+                t.classList.toggle('active', t.dataset.tab === 'practice');
+            });
+            document.getElementById('yogaGridWrap').style.display = 'none';
+            document.getElementById('yogaFilters').style.display = 'none';
+            document.getElementById('yogaDailyPanel').style.display = 'none';
+            document.getElementById('yogaBreathPanel').style.display = 'none';
+            document.getElementById('yogaPracticePanel').style.display = '';
+            document.getElementById('yogaDetail').style.display = 'none';
+            if (window.YogaPractice) window.YogaPractice.init();
+        });
+    }
 }
 
 function getRecommendations(expLevel) {
@@ -570,7 +593,7 @@ function renderTabs() {
         t.classList.toggle('active', t.dataset.tab === _activeTab);
     });
     // نمایش/مخفی پنل‌ها
-    var show = { library: 'yogaGridWrap', daily: 'yogaDailyPanel', breath: 'yogaBreathPanel' };
+    var show = { library: 'yogaGridWrap', daily: 'yogaDailyPanel', breath: 'yogaBreathPanel', practice: 'yogaPracticePanel' };
     var filterShow = _activeTab === 'library';
     var detailShow = activeDetailPose ? true : false;
     Object.keys(show).forEach(function (k) {
@@ -583,6 +606,9 @@ function renderTabs() {
     if (_activeTab === 'library') { applyFilters(); }
     if (_activeTab === 'daily') renderDailyPanel();
     if (_activeTab === 'breath') renderBreathPanel();
+    if (_activeTab === 'practice') {
+        if (window.YogaPractice) window.YogaPractice.init();
+    }
 }
 
 // ─── بارگذاری داده ───
