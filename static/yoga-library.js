@@ -559,11 +559,8 @@ function switchTab(tab) {
     activeDetailPose = null;
     var detail = document.getElementById('yogaDetail');
     if (detail) detail.style.display = 'none';
-    if (tab === 'practice' && window.YogaPractice) {
-        window.YogaPractice.init();
-    } else {
-        renderTabs();
-    }
+    // renderTabs خودش پنل تب تمرین را نمایش می‌دهد و در صورت نیاز YogaPractice را مقداردهی می‌کند
+    renderTabs();
 }
 
 function showLibrary() {
