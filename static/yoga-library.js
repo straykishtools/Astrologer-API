@@ -428,10 +428,16 @@ function renderDailyPanel() {
     if (!el) return;
     var practice = C.getPracticeData();
     var favs = C.getFavs().length;
-    var exp = getQA().step_1 && getQA().step_1[0] ? getQA().step_1[0] : 'beginner';
+    // حداکثر سطح مجاز: اول از نتیجه تست جدید (yoga-test.js)، بعد پرسشنامه قدیمی
     var maxDiff = 'beginner';
-    if (exp === 'intermediate' || exp === 'advanced') maxDiff = 'intermediate';
-    if (exp === 'mentor') maxDiff = 'expert';
+    var tmax = (window.YogaTest && window.YogaTest.maxDifficulty) ? window.YogaTest.maxDifficulty() : null;
+    if (tmax) {
+        maxDiff = tmax;
+    } else {
+        var exp = getQA().step_1 && getQA().step_1[0] ? getQA().step_1[0] : 'beginner';
+        if (exp === 'intermediate' || exp === 'advanced') maxDiff = 'intermediate';
+        if (exp === 'mentor') maxDiff = 'expert';
+    }
 
     // توصیه روز: یک زنجیره متصل از حرکات
     var flow = C.buildFlow('auto', 6).filter(function (n) {
@@ -691,6 +697,7 @@ function onData() {
     if (match && poseMap[decodeURIComponent(match[1])]) {
         openDetail(decodeURIComponent(match[1]));
     }
+    notifyTest();
 }
 
 // ─── راه‌اندازی ───
@@ -718,6 +725,14 @@ function init() {
     if (activeDetailPose) renderDetail(activeDetailPose);
     else if (_activeTab === 'library') renderFilters();
     renderTabs();
+    notifyTest();
+}
+
+// اطلاعرسانی به ماژول تست تشخیص تمرین (نوار وضعیت + باز شدن خودکار در اولین بازدید)
+function notifyTest() {
+    if (window.YogaTest && window.YogaTest.onYogaOpened) {
+        try { window.YogaTest.onYogaOpened(); } catch (e) {}
+    }
 }
 
 // ─── API عمومی ───
