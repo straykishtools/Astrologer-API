@@ -1,0 +1,13 @@
+Yoga Pose Audit
+Total poses: 542
+Full-dir files: 1170
+Preview-dir files: 171
+Poses with full image: 298
+Poses missing full image: 244
+Two-sided complete: 80
+Two-sided incomplete: 1
+Orphan stems: 20
+
+previous_poses broken: 41
+next_poses broken: 40
+variations broken: 6

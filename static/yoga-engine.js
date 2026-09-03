@@ -94,6 +94,7 @@ var cycleCount = 0;
 var isPaused = false;
 var isRunning = false;
 var speedMultiplier = 1;
+var targetDuration = 0; // 0 = unlimited, else seconds
 var dom = {};
 
 function getPhases() { var ex = EXERCISES[currentExercise]; return ex ? ex.phases : []; }
@@ -120,7 +121,14 @@ function updateUI(phase, progress) {
     var ex = EXERCISES[currentExercise];
     if (ex && dom.guide) { dom.guide.innerHTML = '<p>' + ex.guide + '</p>'; dom.guide.classList.add('active'); }
     if (dom.cycleCounter) dom.cycleCounter.textContent = cycleCount;
-    if (dom.timer) dom.timer.textContent = formatTime(elapsedTime);
+    if (dom.timer) {
+        if (targetDuration > 0) {
+            var rem = Math.max(0, targetDuration - Math.floor(elapsedTime / 1000));
+            dom.timer.textContent = formatTime(rem * 1000);
+        } else {
+            dom.timer.textContent = formatTime(elapsedTime);
+        }
+    }
     if (dom.speedSlider) dom.speedSlider.value = speedMultiplier;
     if (dom.speedLabel) dom.speedLabel.textContent = Math.round(speedMultiplier * 4) + 'ث';
 }
@@ -131,6 +139,14 @@ function tick(timestamp) {
     var delta = (timestamp - lastTimestamp) * speedMultiplier;
     lastTimestamp = timestamp;
     elapsedTime += delta;
+
+    // Auto-stop if target duration reached
+    if (targetDuration > 0 && elapsedTime >= targetDuration * 1000) {
+        updateUI(null, 0);
+        if (window.AudioManager) AudioManager.sfx('chime');
+        setTimeout(function() { stop(); }, 500);
+        return;
+    }
 
     var phases = getPhases();
     var phase = getPhase(currentPhaseIndex);
@@ -169,6 +185,13 @@ function pause() {
 }
 
 function stop() {
+    // Record session if meaningful (>=30s and >=1 cycle)
+    if (isRunning && elapsedTime >= 30000) {
+        var minutes = Math.max(1, Math.round(elapsedTime / 60000));
+        if (window.YogaSummary) {
+            YogaSummary.recordSession(currentExercise, minutes);
+        }
+    }
     isRunning = false; isPaused = false;
     if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
     if (dom.startBtn) { dom.startBtn.textContent = '▶ شروع'; dom.startBtn.classList.remove('active'); }
@@ -177,7 +200,7 @@ function stop() {
 }
 
 function reset() {
-    stop(); currentPhaseIndex = 0; phaseProgress = 0; elapsedTime = 0;
+    stop(); currentPhaseIndex = 0; phaseProgress = 0; elapsedTime = 0; targetDuration = 0;
     if (currentExercise !== 'asana') cycleCount = 0;
     updateUI(getPhase(0), 0);
     if (dom.timer) dom.timer.textContent = '۰۰:۰۰';
@@ -254,12 +277,25 @@ function init() {
         tab.addEventListener('click', function() { switchTab(this.getAttribute('data-panel')); });
     });
     if (dom.speedSlider) dom.speedSlider.addEventListener('input', function () { setSpeed(this.value); });
+    // Duration preset buttons
+    document.querySelectorAll('.yoga-dur-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.yoga-dur-btn').forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            targetDuration = parseInt(this.getAttribute('data-dur')) || 0;
+            // Update timer display to show remaining if running
+            if (isRunning && targetDuration > 0) {
+                var rem = Math.max(0, targetDuration - Math.floor(elapsedTime / 1000));
+                if (dom.timer) dom.timer.textContent = formatTime(rem * 1000);
+            }
+        });
+    });
     if (dom.startBtn) dom.startBtn.addEventListener('click', function () {
         if (isRunning && !isPaused) pause(); else if (isRunning && isPaused) isPaused = false, lastTimestamp = 0, start(); else start();
     });
     if (dom.pauseBtn) { dom.pauseBtn.disabled = true; dom.pauseBtn.addEventListener('click', function () { if (isRunning && !isPaused) pause(); else if (isPaused) { isPaused = false; lastTimestamp = 0; start(); } }); }
     if (dom.resetBtn) dom.resetBtn.addEventListener('click', reset);
-    if (dom.toggleBtn) dom.toggleBtn.addEventListener('click', function () { openPanel('breathing'); });
+    // toggleBtn is now handled by YogaSummary dropdown
     if (dom.breathBtn) dom.breathBtn.addEventListener('click', function () { openPanel('breathing'); });
     if (dom.meditBtn) dom.meditBtn.addEventListener('click', function () { openPanel('meditation'); });
     if (dom.closeBtn) dom.closeBtn.addEventListener('click', function () { if (dom.panel) dom.panel.classList.remove('active'); if (isRunning) stop(); });

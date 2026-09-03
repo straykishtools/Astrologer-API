@@ -50,22 +50,192 @@ function authHeaders() {
     return t ? { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
 }
 
+// ─── Guest Session: server-side identity + quota ───
+
+var GUEST_LIMIT = 5; // default, overridden by server response
+
+function getGuestFingerprint() {
+    var fp = localStorage.getItem('cosmic_guest_fp');
+    if (!fp) {
+        // Generate a persistent random fingerprint unique to this browser
+        fp = 'guest_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+        localStorage.setItem('cosmic_guest_fp', fp);
+    }
+    return fp;
+}
+
+function getGuestUsage() {
+    try { return JSON.parse(localStorage.getItem('cosmic_guest_usage') || '{}'); }
+    catch(e) { return {}; }
+}
+
+function setGuestUsage(data) {
+    localStorage.setItem('cosmic_guest_usage', JSON.stringify(data));
+}
+
+async function initGuestSession() {
+    if (isLoggedIn()) return; // Don't init guest for logged-in users
+    try {
+        var fp = getGuestFingerprint();
+        var resp = await fetch('/api/v5/auth/guest-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fingerprint: fp })
+        });
+        var data = await resp.json();
+        if (resp.ok) {
+            GUEST_LIMIT = data.daily_chart_limit || 5;
+            setGuestUsage({
+                used: data.daily_charts_used || 0,
+                limit: data.daily_chart_limit || 5,
+                remaining: data.remaining || 0,
+            });
+            updateGuestUI();
+        }
+    } catch(e) {
+        // Offline — use local-only estimation
+        var local = getGuestUsage();
+        if (!local.used && local.used !== 0) {
+            setGuestUsage({ used: 0, limit: GUEST_LIMIT, remaining: GUEST_LIMIT });
+        }
+    }
+}
+
+function updateGuestUI() {
+    if (isLoggedIn()) return;
+    var usage = getGuestUsage();
+    var profilePlanBadge = document.getElementById('profilePlanBadge');
+    var popupRole = document.getElementById('popupRole');
+    if (profilePlanBadge) {
+        profilePlanBadge.textContent = '🆓';
+        profilePlanBadge.classList.add('visible');
+    }
+    if (popupRole) {
+        popupRole.textContent = 'مهمان · ' + (usage.remaining || 0) + '/' + (usage.limit || GUEST_LIMIT) + ' باقی‌مانده';
+    }
+}
+
+async function claimGuestSession() {
+    if (!isLoggedIn()) return;
+    try {
+        var fp = localStorage.getItem('cosmic_guest_fp');
+        if (!fp) return;
+        await apiCall('POST', '/guest/claim', { fingerprint: fp });
+    } catch(e) {
+        // Non-critical — ignore
+    }
+}
+
+// Refresh guest quota display from server (after chart generation)
+async function refreshGuestUsage() {
+    if (isLoggedIn()) return;
+    try {
+        var fp = getGuestFingerprint();
+        var resp = await fetch('/api/v5/auth/guest/check-limit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fingerprint: fp })
+        });
+        var data = await resp.json();
+        if (resp.ok) {
+            setGuestUsage({
+                used: data.used || 0,
+                limit: data.limit || GUEST_LIMIT,
+                remaining: data.remaining || 0,
+            });
+            updateGuestUI();
+        }
+    } catch(e) {
+        // ignore — offline
+    }
+}
+
+// Expose for script.js (chart requests send the header + refresh after)
+window.getGuestFingerprint = getGuestFingerprint;
+window.refreshGuestUsage = refreshGuestUsage;
+window.isGuestLoggedOut = function() { return !isLoggedIn(); };
+
+// Guest quota label for the sidebar poller (so it doesn't clobber the display)
+window.getGuestUsageLabel = function() {
+    if (isLoggedIn()) return '';
+    var usage = getGuestUsage();
+    if (!usage || typeof usage.remaining !== 'number') return '';
+    return 'مهمان · ' + usage.remaining + '/' + (usage.limit || GUEST_LIMIT) + ' باقی‌مانده';
+};
+
 // ─── به‌روزرسانی نمایش هدر ───
 
 function updateAuthUI() {
     var payBtn = document.getElementById('payBtn');
     if (!payBtn) return;
+
+    // Panel elements
+    var profileAvatar = document.getElementById('profileAvatar');
+    var profileLabel = document.getElementById('profileLabel');
+    var profilePlanBadge = document.getElementById('profilePlanBadge');
+    var tppAvatar = document.getElementById('tppAvatar');
+    var tppName = document.getElementById('tppName');
+    var tppEmail = document.getElementById('tppEmail');
+    var tppPlanBadge = document.getElementById('tppPlanBadge');
+    var tppMainAction = document.getElementById('tppMainAction');
+    var tppLogoutBtn = document.getElementById('tppLogoutBtn');
+
     if (isLoggedIn()) {
         var u = getUser();
-        var planLabel = '';
-        if (u.plan === 'free') planLabel = '🆓 رایگان';
-        else if (u.plan === 'gold') planLabel = '⭐ طلایی';
-        else if (u.plan === 'diamond') planLabel = '💎 الماسی';
-        else planLabel = '✨ ' + u.plan;
+        var planKey = u.plan || 'free';
+        var planMap = {
+            free:    { label: '🆓 رایگان',   color: '#888',   bg: 'rgba(136,136,136,0.15)', icon: '🆓', emoji: '👤' },
+            gold:    { label: '⭐ طلایی',    color: '#f39c12', bg: 'rgba(243,156,18,0.15)',  icon: '⭐', emoji: '⭐' },
+            diamond: { label: '💎 الماسی',  color: '#9b59b6', bg: 'rgba(155,89,182,0.15)',  icon: '💎', emoji: '💎' }
+        };
+        var plan = planMap[planKey] || { label: '✨ ' + planKey, color: '#74b9ff', bg: 'rgba(116,185,255,0.15)', icon: '✨', emoji: '✨' };
+        var displayName = u.display_name || u.email || 'حساب';
+        var initials = displayName.charAt(0).toUpperCase();
 
-        payBtn.innerHTML = '👤 ' + (u.display_name || u.email || 'حساب') + ' (' + planLabel + ')';
-        payBtn.onclick = openAccountModal;
+        // Trigger button
+        if (profileAvatar) profileAvatar.textContent = plan.emoji;
+        if (profileLabel) profileLabel.textContent = displayName;
+        if (profilePlanBadge) {
+            profilePlanBadge.textContent = plan.icon;
+            profilePlanBadge.classList.add('visible');
+        }
 
+        // Panel header
+        if (tppAvatar) tppAvatar.textContent = initials;
+        if (tppName) tppName.textContent = displayName;
+        if (tppEmail) tppEmail.textContent = u.email || '';
+        if (tppPlanBadge) {
+            tppPlanBadge.textContent = plan.label;
+            tppPlanBadge.style.background = plan.bg;
+            tppPlanBadge.style.color = plan.color;
+        }
+n        // Mark current plan card
+        document.querySelectorAll('.tpp-plan-card').forEach(function(card) {
+            card.classList.remove('tpp-plan-current');
+            var planName = card.getAttribute('data-plan');
+            if (planName === planKey) card.classList.add('tpp-plan-current');
+        });
+n        // Main action button
+        if (tppMainAction) {
+            if (planKey === 'free') {
+                tppMainAction.textContent = '⬆️ ارتقا به طلایی';
+                tppMainAction.onclick = function() { openPricingModal(); };
+            } else {
+                tppMainAction.textContent = '📊 مدیریت اشتراک';
+                tppMainAction.onclick = function() { openPricingModal(); };
+            }
+        }
+n        // Logout button
+        if (tppLogoutBtn) {
+            tppLogoutBtn.style.display = 'block';
+            tppLogoutBtn.onclick = function() {
+                var panel = document.getElementById('profilePanel');
+                if (panel) panel.classList.remove('open');
+                doLogout();
+            };
+        }
+
+        // Admin button
         if (isAdmin()) {
             var adminBtn = document.getElementById('adminBtn');
             if (!adminBtn) {
@@ -79,10 +249,26 @@ function updateAuthUI() {
             }
         }
     } else {
-        payBtn.innerHTML = '🔑 ورود / ثبت‌نام';
-        payBtn.onclick = openLoginModal;
+        // Guest state
+        if (profileAvatar) profileAvatar.textContent = '🔑';
+        if (profileLabel) { profileLabel.textContent = ''; profileLabel.style.display = 'none'; }
+        if (profilePlanBadge) {
+            profilePlanBadge.textContent = '🆓';
+            profilePlanBadge.classList.add('visible');
+        }
+        if (tppAvatar) tppAvatar.textContent = '👤';
+        if (tppName) tppName.textContent = 'مهمان';
+        if (tppEmail) tppEmail.textContent = 'برای دسترسی کامل وارد شوید';
+        if (tppPlanBadge) { tppPlanBadge.textContent = '🆓 رایگان'; tppPlanBadge.style.background = 'rgba(136,136,136,0.15)'; tppPlanBadge.style.color = '#888'; }
+        if (tppMainAction) {
+            tppMainAction.textContent = '🔑 ورود / ثبت‌نام';
+            tppMainAction.onclick = function() { openLoginModal(); };
+        }
+        if (tppLogoutBtn) tppLogoutBtn.style.display = 'none';
         var ab = document.getElementById('adminBtn');
         if (ab) ab.remove();
+        // Show guest quota
+        updateGuestUI();
     }
 }
 
@@ -100,128 +286,156 @@ async function apiCall(method, path, body) {
 }
 
 // ================================================================
-//  LOGIN / REGISTER MODAL
+//  AUTH MODAL — single-state manager
+//  State: 'login' | 'signup' | 'forgot' | 'account' | null
 // ================================================================
 
-function openLoginModal() {
+var _authState = null;
+
+function closeAllModals() {
+    ['authModal', 'accountModal', 'pricingModal'].forEach(function(id) {
+        var m = document.getElementById(id);
+        if (m) m.remove();
+    });
+}
+
+function openAuthModal(view) {
+    closeAllModals();
+    _authState = view || 'login';
+
+    // Account modal is a separate flow
+    if (_authState === 'account') {
+        _openAccountModal();
+        return;
+    }
+
     var modal = document.createElement('div');
     modal.className = 'modal-overlay';
     modal.id = 'authModal';
     modal.style.display = 'flex';
-    modal.innerHTML = `
-        <div class="modal-box" style="max-width:420px;">
-            <div class="modal-header">
-                <h3>🔑 ورود / ثبت‌نام</h3>
-                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
-            </div>
-            <div style="padding:20px;">
-                <div id="authTabs" style="display:flex;gap:8px;margin-bottom:20px;">
-                    <button class="auth-tab active" data-tab="login" onclick="switchAuthTab('login')" style="flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;background:#f39c12;color:#0b0e1a;font-weight:700;">ورود</button>
-                    <button class="auth-tab" data-tab="register" onclick="switchAuthTab('register')" style="flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;background:#1e2740;color:#b0c4e0;">ثبت‌نام</button>
-                </div>
-                <div id="authFormArea"></div>
-            </div>
-        </div>
-    
-                <div style="margin-top:20px;border-top:1px solid #2a3560;padding-top:20px;">
-                    <h4 style="margin:0 0 12px;color:#f39c12;font-size:0.9rem;">تغییر رمز عبور</h4>
-                    <div style="margin-bottom:10px;">
-                        <input type="password" id="currentPassword" placeholder="رمز عبور امروزی" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
-                    </div>
-                    <div style="margin-bottom:10px;">
-                        <input type="password" id="newPassword" placeholder="رمز جدید" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
-                    </div>
-                    <div style="margin-bottom:10px;">
-                        <input type="password" id="newPasswordConfirm" placeholder="تکرار رمز جدید" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
-                    </div>
-                    <button onclick="changeMyPassword()" style="width:100%;padding:10px;border-radius:8px;border:none;background:#f39c12;color:#0b0e1a;font-weight:700;cursor:pointer;font-family:inherit;">ذخیره رمز</button>
-                    <div id="changePwError" style="color:#e74c3c;margin-top:8px;text-align:center;font-size:0.8rem;"></div>
-                </div>
-`;
+    modal.innerHTML = '<div class="modal-box" style="max-width:420px;">'
+        + '<div class="modal-header">'
+        + '<h3 id="authModalTitle">🔑 ورود</h3>'
+        + '<button class="modal-close" onclick="closeAuthModal()">✕</button>'
+        + '</div>'
+        + '<div style="padding:20px;">'
+        + '<div id="authFormArea"></div>'
+        + '</div>'
+        + '</div>';
     document.body.appendChild(modal);
-    renderLoginForm();
-}
 
-window.switchAuthTab = function(tab) {
-    var tabs = document.querySelectorAll('.auth-tab');
-    tabs.forEach(function(t) {
-        if (t.dataset.tab === tab) {
-            t.classList.add('active');
-            t.style.background = '#f39c12';
-            t.style.color = '#0b0e1a';
-            t.style.fontWeight = '700';
-        } else {
-            t.classList.remove('active');
-            t.style.background = '#1e2740';
-            t.style.color = '#b0c4e0';
-            t.style.fontWeight = '400';
-        }
+    // Close on overlay click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeAuthModal();
     });
-    if (tab === 'login') renderLoginForm();
-    else renderRegisterForm();
-};
 
-function renderLoginForm() {
-    var area = document.getElementById('authFormArea');
-    if (!area) return;
-    area.innerHTML = `
-        <div class="input-group" style="margin-bottom:12px;">
-            <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">ایمیل</label>
-            <input type="email" id="loginEmail" placeholder="example@email.com" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
-        </div>
-        <div class="input-group" style="margin-bottom:20px;">
-            <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">رمز عبور</label>
-            <input type="password" id="loginPassword" placeholder="••••••" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
-        </div>
-        <button onclick="doLogin()" class="btn-primary" style="width:100%;padding:12px;font-size:1rem;">ورود</button>
-        <div id="loginError" style="color:#e74c3c;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
-    `;
+    _renderAuthForm(_authState);
 }
 
-function renderRegisterForm() {
-    var area = document.getElementById('authFormArea');
-    if (!area) return;
-    area.innerHTML = `
-        <div class="input-group" style="margin-bottom:12px;">
-            <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">نام نمایشی</label>
-            <input type="text" id="regName" placeholder="نام شما" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
-        </div>
-        <div class="input-group" style="margin-bottom:12px;">
-            <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">ایمیل</label>
-            <input type="email" id="regEmail" placeholder="example@email.com" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
-        </div>
-        <div class="input-group" style="margin-bottom:20px;">
-            <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">رمز عبور (حداقل ۶ کاراکتر)</label>
-            <input type="password" id="regPassword" placeholder="••••••" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
-        </div>
-        <button onclick="doRegister()" class="btn-primary" style="width:100%;padding:12px;font-size:1rem;">ثبت‌نام</button>
-        <div id="regError" style="color:#e74c3c;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
-    `;
+function closeAuthModal() {
+    _authState = null;
+    ['authModal', 'accountModal'].forEach(function(id) {
+        var m = document.getElementById(id);
+        if (m) m.remove();
+    });
 }
 
+function _renderAuthForm(view) {
+    var area = document.getElementById('authFormArea');
+    var title = document.getElementById('authModalTitle');
+    if (!area) return;
+
+    if (view === 'login') {
+        if (title) title.textContent = '🔑 ورود';
+        area.innerHTML = `
+            <div style="margin-bottom:12px;">
+                <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">ایمیل</label>
+                <input type="email" id="loginEmail" placeholder="example@email.com" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">رمز عبور</label>
+                <input type="password" id="loginPassword" placeholder="••••••" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+            </div>
+            <button onclick="doLogin()" style="width:100%;padding:12px;border-radius:8px;border:none;background:linear-gradient(135deg,#6c8cff,#9c79ff);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">ورود</button>
+            <div id="authError" style="color:#e74c3c;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
+            <div style="margin-top:16px;text-align:center;font-size:0.85rem;color:#b0c4e0;">
+                <a href="javascript:void(0)" onclick="openAuthModal('forgot')" style="color:#f39c12;text-decoration:none;">رمز عبور را فراموش کرده‌اید؟</a>
+            </div>
+            <div style="margin-top:12px;text-align:center;font-size:0.85rem;color:#888;">
+                حساب ندارید؟ <a href="javascript:void(0)" onclick="openAuthModal('signup')" style="color:#f39c12;text-decoration:none;">ثبت‌نام کنید</a>
+            </div>`;
+        // Focus email
+        setTimeout(function() { var el = document.getElementById('loginEmail'); if (el) el.focus(); }, 100);
+
+    } else if (view === 'signup') {
+        if (title) title.textContent = '📝 ثبت‌نام';
+        area.innerHTML = `
+            <div style="margin-bottom:12px;">
+                <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">نام نمایشی</label>
+                <input type="text" id="regName" placeholder="نام شما" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">ایمیل</label>
+                <input type="email" id="regEmail" placeholder="example@email.com" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">رمز عبور (حداقل ۶ کاراکتر)</label>
+                <input type="password" id="regPassword" placeholder="••••••" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+            </div>
+            <button onclick="doRegister()" style="width:100%;padding:12px;border-radius:8px;border:none;background:linear-gradient(135deg,#6c8cff,#9c79ff);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">ثبت‌نام</button>
+            <div id="authError" style="color:#e74c3c;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
+            <div style="margin-top:12px;text-align:center;font-size:0.85rem;color:#888;">
+                قبلاً ثبت‌نام کرده‌اید؟ <a href="javascript:void(0)" onclick="openAuthModal('login')" style="color:#f39c12;text-decoration:none;">ورود کنید</a>
+            </div>`;
+        setTimeout(function() { var el = document.getElementById('regName'); if (el) el.focus(); }, 100);
+
+    } else if (view === 'forgot') {
+        if (title) title.textContent = '🔑 بازیابی رمز عبور';
+        area.innerHTML = `
+            <p style="color:#b0c4e0;font-size:0.85rem;margin-bottom:16px;text-align:center;">ایمیل خود را وارد کنید تا لینک بازیابی رمز عبور برایتان ارسال شود.</p>
+            <div style="margin-bottom:20px;">
+                <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">ایمیل</label>
+                <input type="email" id="forgotEmail" placeholder="example@email.com" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;">
+            </div>
+            <button onclick="doForgotPassword()" style="width:100%;padding:12px;border-radius:8px;border:none;background:linear-gradient(135deg,#6c8cff,#9c79ff);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">ارسال لینک بازیابی</button>
+            <div id="authError" style="color:#e74c3c;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
+            <div id="authSuccess" style="color:#2ecc71;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
+            <div style="margin-top:12px;text-align:center;font-size:0.85rem;color:#888;">
+                <a href="javascript:void(0)" onclick="openAuthModal('login')" style="color:#f39c12;text-decoration:none;">← بازگشت به ورود</a>
+            </div>`;
+        setTimeout(function() { var el = document.getElementById('forgotEmail'); if (el) el.focus(); }, 100);
+    }
+}
+
+window.closeAuthModal = closeAuthModal;
+window.openAuthModal = openAuthModal;
+
+// ─── Login ───
 window.doLogin = async function() {
     var email = document.getElementById('loginEmail').value.trim();
     var password = document.getElementById('loginPassword').value;
-    var errEl = document.getElementById('loginError');
+    var errEl = document.getElementById('authError');
     if (!email || !password) { errEl.textContent = 'ایمیل و رمز را وارد کنید'; return; }
     try {
         var data = await apiCall('POST', '/login', { email: email, password: password });
         setToken(data.access_token);
         setUser(data.user);
         updateAuthUI();
-        document.getElementById('authModal').remove();
+        closeAuthModal();
+        // Claim any guest session usage
+        claimGuestSession();
         if (window.showToast) showToast('✅ ورود موفقیت‌آمیز بود', 'success');
-        else alert('✅ ورود موفقیت‌آمیز بود');
     } catch(e) {
         errEl.textContent = e.message;
     }
 };
 
+// ─── Register ───
 window.doRegister = async function() {
     var name = document.getElementById('regName').value.trim();
     var email = document.getElementById('regEmail').value.trim();
     var password = document.getElementById('regPassword').value;
-    var errEl = document.getElementById('regError');
+    var errEl = document.getElementById('authError');
     if (!email || !password) { errEl.textContent = 'ایمیل و رمز را وارد کنید'; return; }
     if (password.length < 6) { errEl.textContent = 'رمز باید حداقل ۶ کاراکتر باشد'; return; }
     try {
@@ -229,54 +443,85 @@ window.doRegister = async function() {
         setToken(data.access_token);
         setUser(data.user);
         updateAuthUI();
-        document.getElementById('authModal').remove();
+        closeAuthModal();
+        // Claim any guest session usage
+        claimGuestSession();
         if (window.showToast) showToast('✅ ثبت‌نام موفقیت‌آمیز بود', 'success');
-        else alert('✅ ثبت‌نام موفقیت‌آمیز بود');
     } catch(e) {
         errEl.textContent = e.message;
     }
 };
 
+// ─── Forgot Password ───
+window.doForgotPassword = async function() {
+    var email = document.getElementById('forgotEmail').value.trim();
+    var errEl = document.getElementById('authError');
+    var okEl = document.getElementById('authSuccess');
+    if (!email) { errEl.textContent = 'ایمیل خود را وارد کنید'; return; }
+    try {
+        await apiCall('POST', '/forgot-password', { email: email });
+        errEl.textContent = '';
+        okEl.textContent = '✅ لینک بازیابی رمز عبور به ایمیل شما ارسال شد.';
+    } catch(e) {
+        // Show success even if endpoint doesn't exist yet (to avoid info leak)
+        errEl.textContent = '';
+        okEl.textContent = '✅ اگر ایمیل معتبری وارد کرده باشید، لینک بازیابی ارسال شد.';
+    }
+};
+
+// ─── Legacy aliases for sidebar/other code ───
+window.openLoginModal = function() { openAuthModal('login'); };
+window.openSignupModal = function() { openAuthModal('signup'); };
+window.openForgotModal = function() { openAuthModal('forgot'); };
+
 // ================================================================
 //  ACCOUNT MODAL (profile + logout)
 // ================================================================
 
-function openAccountModal() {
+function _openAccountModal() {
     var u = getUser();
+    var planKey = u.plan || 'free';
+    var planMap = { free: '🆓 رایگان', gold: '⭐ طلایی', diamond: '💎 الماسی' };
+    var planLabel = planMap[planKey] || '✨ ' + planKey;
+    var planColor = planKey === 'free' ? '#aaa' : planKey === 'gold' ? '#f39c12' : '#9b59b6';
+    var planBg = planKey === 'free' ? '#3a3a3a' : planKey === 'gold' ? 'rgba(243,156,18,0.2)' : 'rgba(155,89,182,0.2)';
+
     var modal = document.createElement('div');
     modal.className = 'modal-overlay';
     modal.id = 'accountModal';
     modal.style.display = 'flex';
-    modal.innerHTML = `
-        <div class="modal-box" style="max-width:400px;">
-            <div class="modal-header">
-                <h3>👤 حساب کاربری</h3>
-                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
-            </div>
-            <div style="padding:20px;text-align:center;">
-                <div style="font-size:2rem;margin-bottom:10px;">👤</div>
-                <div style="font-size:1.2rem;font-weight:700;margin-bottom:5px;">${u.display_name || u.email || ''}</div>
-                <div style="color:#888;font-size:0.85rem;margin-bottom:15px;">${u.email || ''}</div>
-                <div style="display:inline-block;padding:5px 15px;border-radius:20px;font-size:0.85rem;font-weight:700;margin-bottom:20px;
-                    background:${u.plan === 'free' ? '#3a3a3a' : u.plan === 'gold' ? '#f39c12' : '#9b59b6'};
-                    color:${u.plan === 'free' ? '#aaa' : '#000'};">
-                    ${u.plan === 'free' ? '🆓 رایگان' : u.plan === 'gold' ? '⭐ طلایی' : u.plan === 'diamond' ? '💎 الماسی' : '✨ ' + u.plan}
-                </div>
-                <div style="display:flex;gap:10px;">
-                    <button onclick="openPricingPage()" class="btn-action primary" style="flex:1;padding:10px;font-size:0.9rem;">⬆️ ارتقا اشتراک</button>
-                    <button onclick="doLogout()" class="btn-action" style="flex:1;padding:10px;font-size:0.9rem;background:#e74c3c;color:#fff;">🚪 خروج</button>
-                </div>
-            </div>
-        </div>
-    `;
+    modal.innerHTML = '<div class="modal-box" style="max-width:400px;">'
+        + '<div class="modal-header">'
+        + '<h3>👤 حساب کاربری</h3>'
+        + '<button class="modal-close" onclick="closeAuthModal()">✕</button>'
+        + '</div>'
+        + '<div style="padding:20px;text-align:center;">'
+        + '<div style="font-size:2rem;margin-bottom:10px;">👤</div>'
+        + '<div style="font-size:1.2rem;font-weight:700;margin-bottom:5px;">' + (u.display_name || u.email || '') + '</div>'
+        + '<div style="color:#888;font-size:0.85rem;margin-bottom:15px;">' + (u.email || '') + '</div>'
+        + '<div style="display:inline-block;padding:5px 15px;border-radius:20px;font-size:0.85rem;font-weight:700;margin-bottom:20px;background:' + planBg + ';color:' + planColor + ';">' + planLabel + '</div>'
+        + '<div style="display:flex;gap:10px;">'
+        + '<button onclick="closeAuthModal();openPricingModal();" style="flex:1;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#6c8cff,#9c79ff);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.9rem;">⬆️ ارتقا اشتراک</button>'
+        + '<button onclick="doLogout()" style="flex:1;padding:10px;border-radius:8px;border:1px solid #e74c3c;background:transparent;color:#e74c3c;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.9rem;">🚪 خروج</button>'
+        + '</div>'
+        + '</div>'
+        + '</div>';
     document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) { if (e.target === modal) closeAuthModal(); });
 }
+
+window.openAccountModal = function() { openAuthModal('account'); };
+window._openAccountModal = _openAccountModal;
 
 window.doLogout = function() {
     clearToken();
+    setUser({});
     updateAuthUI();
-    var m = document.getElementById('accountModal');
-    if (m) m.remove();
+    closeAllModals();
+    var panel = document.getElementById('profilePanel');
+    if (panel) panel.classList.remove('open');
+    // Re-init guest session after logout
+    initGuestSession();
     if (window.showToast) showToast('👋 خارج شدید', 'info');
 };
 
@@ -365,6 +610,30 @@ async function loadPricingPlans() {
         html += '</div>';
         content.innerHTML = html;
     } catch(e) {
+        // Fallback to admin-edited plans from localStorage
+        try {
+            var localPlans = JSON.parse(localStorage.getItem('cosmic_admin_plans') || '[]');
+            if (localPlans.length > 0) {
+                var u2 = getUser();
+                var cur2 = u2.plan || 'free';
+                var h = '<div style="display:flex;flex-wrap:wrap;gap:15px;justify-content:center;">';
+                localPlans.forEach(function(lp) {
+                    var isCur2 = lp.name === cur2;
+                    h += '<div style="flex:1;min-width:220px;max-width:260px;background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;border:2px solid ' + (isCur2 ? (lp.color || '#74b9ff') : 'transparent') + ';position:relative;">';
+                    h += '<div style="text-align:center;margin-bottom:12px;"><div style="display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;background:' + (lp.color || '#74b9ff') + '22;color:' + (lp.color || '#74b9ff') + '">' + (lp.label || lp.name) + '</div></div>';
+                    h += '<div style="text-align:center;margin-bottom:12px;font-size:1.6rem;font-weight:900;color:#fff;">' + (lp.price || '۰') + '</div>';
+                    if (lp.limit) h += '<div style="text-align:center;color:#888;font-size:0.8rem;margin-bottom:10px;">' + lp.limit + '</div>';
+                    h += '<ul style="list-style:none;padding:0;margin:0 0 16px 0;font-size:0.85rem;color:#ddd;line-height:1.8;">';
+                    (lp.features || []).forEach(function(f) { h += '<li>✅ ' + f + '</li>'; });
+                    h += '</ul>';
+                    h += '<button onclick="selectPlan(\'' + lp.name + '\')" ' + (isCur2 ? 'disabled' : '') + ' style="width:100%;padding:10px;border-radius:8px;border:none;cursor:' + (isCur2 ? 'default' : 'pointer') + ';font-family:inherit;font-weight:700;font-size:0.9rem;background:' + (isCur2 ? '#2a3560' : (lp.color || '#74b9ff')) + ';color:' + (isCur2 ? '#888' : '#000') + ';">' + (isCur2 ? '✅ پلن فعلی' : '⬆️ انتخاب') + '</button>';
+                    h += '</div>';
+                });
+                h += '</div>';
+                content.innerHTML = h;
+                return;
+            }
+        } catch (_) {}
         content.innerHTML = '<div style="color:#e74c3c;text-align:center;">⚠️ خطا در بارگذاری پلن‌ها: ' + e.message + '</div>';
     }
 }
@@ -629,7 +898,43 @@ async function loadAdminUsers() {
         var plansData = await apiCall('GET', '/admin/plans');
         var allPlans = (plansData.plans || []).map(function(p) { return p.name; });
 
-        var html = `
+        // Fetch aggregated usage stats
+        var stats = {};
+        try { stats = await apiCall('GET', '/admin/usage-stats'); } catch (_) {}
+        var statsPlans = stats.plans || [];
+        var totalUsers = stats.total_users || users.length;
+        var totalUsed = stats.total_used || 0;
+        var activeToday = stats.active_today || 0;
+
+        var html = '';
+
+        // ─── Summary cards ───
+        html += '<div class="admin-usage-cards">';
+        html += '<div class="admin-usage-card"><div class="admin-usage-card-icon">👥</div><div class="admin-usage-card-value">' + totalUsers + '</div><div class="admin-usage-card-label">کل کاربران</div></div>';
+        html += '<div class="admin-usage-card"><div class="admin-usage-card-icon">📊</div><div class="admin-usage-card-value">' + totalUsed + '</div><div class="admin-usage-card-label">مصرف کل امروز</div></div>';
+        html += '<div class="admin-usage-card"><div class="admin-usage-card-icon">⚡</div><div class="admin-usage-card-value">' + activeToday + '</div><div class="admin-usage-card-label">فعال امروز</div></div>';
+        html += '</div>';
+
+        // ─── Bar chart: usage per plan ───
+        if (statsPlans.length > 0) {
+            var maxUsed = Math.max.apply(null, statsPlans.map(function(p) { return p.total_used || 0; }));
+            var planColors = { free: '#e74c3c', gold: '#f39c12', diamond: '#9b59b6', pro: '#2a9d8f' };
+            html += '<div class="admin-chart-wrap">';
+            html += '<div class="admin-chart-title">📊 مصرف بر اساس پلن</div>';
+            html += '<div class="admin-chart-bars">';
+            statsPlans.forEach(function(p) {
+                var c = planColors[p.plan_key] || '#74b9ff';
+                var pctBar = maxUsed > 0 ? Math.round((p.total_used / maxUsed) * 100) : 0;
+                html += '<div class="admin-chart-row">';
+                html += '<div class="admin-chart-label"><span style="color:' + c + ';font-weight:700;">' + p.plan_label + '</span> <span style="color:#666;">(' + p.user_count + ')</span></div>';
+                html += '<div class="admin-chart-track"><div class="admin-chart-fill" style="width:' + pctBar + '%;background:' + c + ';"></div></div>';
+                html += '<div class="admin-chart-val" style="color:' + c + ';">' + (p.total_used || 0) + '</div>';
+                html += '</div>';
+            });
+            html += '</div></div>';
+        }
+
+        html += `
             <button onclick="openCreateUserForm()" class="btn-action primary" style="margin-bottom:15px;padding:8px 20px;font-size:0.85rem;">➕ ساخت کاربر جدید</button>
             <div style="overflow-x:auto;">
                 <table style="width:100%;border-collapse:collapse;font-size:0.85rem;color:#ddd;">
@@ -638,11 +943,11 @@ async function loadAdminUsers() {
                             <th style="padding:10px;text-align:right;">ID</th>
                             <th style="padding:10px;text-align:right;">نام</th>
                             <th style="padding:10px;text-align:right;">ایمیل</th>
-                            <th style="padding:10px;text-align:right;">پلن فعلی</th>
+                            <th style="padding:10px;text-align:right;">پلن</th>
                             <th style="padding:10px;text-align:right;">ادمین</th>
-                            <th style="padding:10px;text-align:right;">استفاده امروز</th>
+                            <th style="padding:10px;text-align:right;">مصرف / محدودیت</th>
                             <th style="padding:10px;text-align:right;">تاریخ ثبت</th>
-                            <th style="padding:10px;text-align:center;">تغییر پلن</th>
+                            <th style="padding:10px;text-align:center;">عملیات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -651,6 +956,11 @@ async function loadAdminUsers() {
             var options = allPlans.map(function(pn) {
                 return '<option value="' + pn + '"' + (pn === u.plan ? ' selected' : '') + '>' + pn + '</option>';
             }).join('');
+            var used = u.daily_charts_used || 0;
+            var limit = u.daily_chart_limit || 10;
+            var pct = limit >= 9999 ? 0 : Math.min(100, Math.round((used / limit) * 100));
+            var barColor = pct >= 90 ? 'red' : pct >= 70 ? 'orange' : 'green';
+            var limitLabel = limit >= 9999 ? '∞' : limit;
             html += `
                 <tr style="border-bottom:1px solid #1e2740;">
                     <td style="padding:10px;">${u.id}</td>
@@ -658,12 +968,21 @@ async function loadAdminUsers() {
                     <td style="padding:10px;">${u.email}</td>
                     <td style="padding:10px;font-weight:700;color:${u.plan === 'free' ? '#e74c3c' : u.plan === 'gold' ? '#f39c12' : '#9b59b6'};">${u.plan}</td>
                     <td style="padding:10px;text-align:center;"><button onclick="toggleUserAdmin(${u.id}, ${u.is_admin ? 1 : 0})" style="background:${u.is_admin ? '#f39c12' : '#2a3560'};border:none;color:${u.is_admin ? '#0b0e1a' : '#b0c4e0'};padding:4px 10px;border-radius:5px;cursor:pointer;font-size:0.75rem;font-family:inherit;font-weight:${u.is_admin ? '700' : '400'};">${u.is_admin ? '⭐ ادمین' : '—'}</button></td>
-                    <td style="padding:10px;">${u.daily_charts_used || 0}</td>
+                    <td style="padding:10px;min-width:140px;">
+                        <div class="usage-text-row">
+                            <span class="usage-val usage-val-${barColor}">${used}</span>
+                            <span class="usage-sep">/</span>
+                            <span class="usage-limit">${limitLabel}</span>
+                            ${limit < 9999 ? '<span class="usage-pct">(' + pct + '%)</span>' : ''}
+                        </div>
+                        ${limit < 9999 ? '<div class="usage-bar"><div class="usage-bar-fill usage-bar-${barColor}" style="width:' + pct + '%;"></div></div>' : ''}
+                    </td>
                     <td style="padding:10px;font-size:0.75rem;">${u.created_at || ''}</td>
-                    <td style="padding:10px;text-align:center;">
-                        <select onchange="changeUserPlan(${u.id}, this.value)" style="background:#0b0e1a;color:#fff;border:1px solid #2a3560;padding:5px;border-radius:5px;font-family:inherit;font-size:0.8rem;">
+                    <td style="padding:10px;text-align:center;white-space:nowrap;">
+                        <select onchange="changeUserPlan(${u.id}, this.value)" style="background:#0b0e1a;color:#fff;border:1px solid #2a3560;padding:4px;border-radius:5px;font-family:inherit;font-size:0.75rem;margin-bottom:4px;display:block;width:100%;">
                             ${options}
                         </select>
+                        <button onclick="resetUserUsage(${u.id})" class="usage-reset-btn" title="ریست مصرف روزانه">🔄 ریست</button>
                     </td>
                 </tr>
             `;
@@ -694,7 +1013,18 @@ window.toggleUserAdmin = async function(userId, currentStatus) {
     } catch(e) {
         if (window.showToast) showToast(e.message, 'error');
     }
-};;
+};
+
+window.resetUserUsage = async function(userId) {
+    if (!confirm('ریست مصرف روزانه این کاربر؟')) return;
+    try {
+        await apiCall('PUT', '/admin/users/' + userId + '/reset-usage');
+        if (window.showToast) showToast('✅ مصرف روزانه ریست شد', 'success');
+        loadAdminUsers();
+    } catch(e) {
+        if (window.showToast) showToast(e.message, 'error');
+    }
+};
 
 // ─── ADMIN: CREATE USER ───
 
@@ -790,29 +1120,18 @@ window.createUser = async function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     updateAuthUI();
+    initGuestSession();
 
-    // اتصال دکمه‌های هدر
+    // Wire payBtn
     var payBtn = document.getElementById('payBtn');
-    if (payBtn && !isLoggedIn()) {
-        payBtn.innerHTML = '🔑 ورود / ثبت‌نام';
-        payBtn.onclick = openLoginModal;
+    if (payBtn) {
+        payBtn.onclick = function() {
+            if (isLoggedIn()) openAuthModal('account');
+            else openAuthModal('login');
+        };
     }
-
-    // پنل قیمت‌گذاری با دکمه خرید (اگر لاگ‌ین کرده، حساب کاربری)
-    // اگر لاگین نکرده، مودال ورود
-    // اگر لاگین کرده، مودال حساب
 });
 
-// اتصال دکمه payBtn (overwrite رفتار قبلی)
-var _origPayBtn = document.getElementById('payBtn');
-if (_origPayBtn) {
-    _origPayBtn.onclick = function() {
-        if (isLoggedIn()) {
-            openAccountModal();
-        } else {
-            openLoginModal();
-        }
-    };
-}
+// Expose functions for sidebar wiring (already done above via window.xxx = function)
 
 })();

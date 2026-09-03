@@ -429,6 +429,16 @@ var QualityOfLife = (function () {
     }
 
     function submit() {
+        // ─── Premium gating ───
+        var _u = {};
+        try { _u = JSON.parse(localStorage.getItem('cosmic_user') || '{}'); } catch(_) {}
+        if ((_u.plan || 'free') === 'free') {
+            if (window.showToast) showToast('💎 برای مشاهده نتایج، اشتراک طلایی تهیه کنید', 'warning');
+            else alert('💎 برای مشاهده نتایج، اشتراک طلایی تهیه کنید');
+            if (window.openPricingModal) window.openPricingModal();
+            else if (window.openLoginModal) window.openLoginModal();
+            return;
+        }
         saveAnswers();
         currentStep = totalSteps + 1; // Show results
         var scores = calcScores();

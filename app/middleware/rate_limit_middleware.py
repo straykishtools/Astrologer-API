@@ -7,8 +7,10 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from app.models import (
     decode_token, get_user_by_id, check_daily_limit, increment_daily_usage,
     atomic_check_and_increment, decrement_daily_usage,
+    guest_check_and_increment, guest_decrement,
     get_all_plans, get_plan_by_name,
 )
+import hashlib
 import logging
 import json
 import time
@@ -194,7 +196,7 @@ class RateLimitMiddleware:
                 break
         is_premium = matched_keyword is not None
 
-        # اگر کاربر نیست — محدودیت مهمان بر اساس IP
+        # اگر کاربر نیست — محدودیت مهمان: اولویت با fingerprint (هویت سمت سرور)، fallback به IP
         if not user:
             if is_premium:
                 response = JSONResponse(
@@ -203,7 +205,50 @@ class RateLimitMiddleware:
                 )
                 await response(scope, receive, send)
                 return
-            # محدودیت روزانه مهمان
+
+            # هویت مهمان سمت سرور: اگر fingerprint ارسال شده، quota از جدول guest_sessions خونده میشه
+            fp_header = headers.get(b"x-guest-fingerprint", b"").decode().strip()
+            if fp_header:
+                fp_hash = hashlib.sha256(fp_header.encode()).hexdigest()[:48]
+                try:
+                    info = guest_check_and_increment(fp_hash)
+                except Exception:
+                    # در صورت خطای دیتابیس، fallback به محدودیت IP تا سرویس از کار نیفته
+                    guest_ip = _get_guest_ip(scope)
+                    allowed, count, limit = _check_guest_limit(guest_ip)
+                    if not allowed:
+                        response = JSONResponse(
+                            status_code=429,
+                            content={"status": "ERROR", "message": f"محدودیت روزانه مهمان ({limit} چارت) تمام شده. لطفاً وارد شوید.", "used": count, "limit": limit},
+                        )
+                        await response(scope, receive, send)
+                        return
+                    try:
+                        await self.app(scope, receive, send)
+                    except Exception:
+                        _decrement_guest(guest_ip)
+                        raise
+                    return
+                if not info["allowed"]:
+                    response = JSONResponse(
+                        status_code=429,
+                        content={
+                            "status": "ERROR",
+                            "message": f"محدودیت روزانه مهمان ({info['limit']} چارت) تمام شده. لطفاً وارد شوید.",
+                            "used": info["used"],
+                            "limit": info["limit"],
+                        },
+                    )
+                    await response(scope, receive, send)
+                    return
+                try:
+                    await self.app(scope, receive, send)
+                except Exception:
+                    guest_decrement(fp_hash)
+                    raise
+                return
+
+            # fallback: محدودیت روزانه مهمان بر اساس IP (قدیمی)
             guest_ip = _get_guest_ip(scope)
             allowed, count, limit = _check_guest_limit(guest_ip)
             if not allowed:

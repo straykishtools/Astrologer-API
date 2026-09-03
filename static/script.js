@@ -448,6 +448,46 @@ async function updateLocation(lat, lng) {
 // ================================================================
 //   HEADER ACTIONS
 // ================================================================
+// ─── Actions Dropdown ───
+(function() {
+    var menuBtn = document.getElementById('actionsMenuBtn');
+    var menu = document.getElementById('actionsMenu');
+    if (menuBtn && menu) {
+        menuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menu.classList.toggle('open');
+        });
+        document.addEventListener('click', function(e) {
+            if (!menu.contains(e.target) && e.target !== menuBtn) {
+                menu.classList.remove('open');
+            }
+        });
+        menu.querySelectorAll('.topbar-actions-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                menu.classList.remove('open');
+            });
+        });
+    }
+})();
+// ─── Profile / Plans Dropdown ───
+(function() {
+    var trigger = document.getElementById('payBtn');
+    var panel = document.getElementById('profilePanel');
+    if (!trigger || !panel) return;
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        // Close actions menu if open
+        var am = document.getElementById('actionsMenu');
+        if (am) am.classList.remove('open');
+        panel.classList.toggle('open');
+    });
+    document.addEventListener('click', function(e) {
+        if (!panel.contains(e.target) && e.target !== trigger && !trigger.contains(e.target)) {
+            panel.classList.remove('open');
+        }
+    });
+})();
+
 document.getElementById('saveBtn').addEventListener('click', () => {
     const content = document.getElementById('result');
     if (!content || content.style.display === 'none') {
@@ -506,9 +546,7 @@ document.getElementById('shareBtn').addEventListener('click', () => {
     }
 });
 
-document.getElementById('payBtn').addEventListener('click', () => {
-    alert('🌟 نسخه‌ی کامل با تفسیر پیشرفته، یوگاها و داشاها به‌زودی در دسترس خواهد بود.');
-});
+
 
 
 
@@ -1583,6 +1621,19 @@ function renderPlanetGrid(subj) {
 //   MAIN CALC BUTTON (TAB-AWARE)
 // ================================================================
 calcBtn.addEventListener('click', async function() {
+    // ─── Premium gating: block only when user tries to USE the tool ───
+    var PREMIUM_TOOLS = ['composite', 'solar-return', 'lunar-return', 'qol'];
+    if (PREMIUM_TOOLS.indexOf(currentTab) >= 0) {
+        var _u = {};
+        try { _u = JSON.parse(localStorage.getItem('cosmic_user') || '{}'); } catch(_) {}
+        if ((_u.plan || 'free') === 'free') {
+            if (window.showToast) showToast('💎 برای استفاده از این ابزار، اشتراک طلایی تهیه کنید', 'warning');
+            else alert('💎 برای استفاده از این ابزار، اشتراک طلایی تهیه کنید');
+            if (window.openPricingModal) window.openPricingModal();
+            else if (window.openLoginModal) window.openLoginModal();
+            return;
+        }
+    }
     var resultDiv = document.getElementById('result');
     var statusDiv = document.getElementById('status');
     resultDiv.style.display = 'block';
@@ -1642,10 +1693,17 @@ async function fetchWithCache(url, payload) {
         }
     } catch (_) {}
     // Fetch from API
-    var resp = await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    var headers = {'Content-Type':'application/json'};
+    // Guest (not logged in): attach fingerprint so server enforces per-identity quota
+    if (window.getGuestFingerprint && window.isGuestLoggedOut()) {
+        headers['X-Guest-Fingerprint'] = window.getGuestFingerprint();
+    }
+    var resp = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(payload) });
     if (!resp.ok) { var err = await resp.json(); throw new Error(err.message || err.detail || 'خطا'); }
     var data = await resp.json();
     if (data.status !== 'OK') throw new Error(data.message || 'خطا');
+    // Refresh guest quota display after consuming one
+    if (window.refreshGuestUsage) window.refreshGuestUsage();
     // Cache it
     _chartCache[key] = data;
     try { sessionStorage.setItem(key, JSON.stringify(data)); } catch (_) {}

@@ -2,6 +2,7 @@
 """
 روت‌های احراز هویت: ثبت‌نام، ورود، پروفایل، ذخیره/دریافت چارت
 """
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, Header
 from typing import Optional
 from app.models import (
@@ -139,6 +140,49 @@ def get_daily_limit(user=Depends(get_current_user)):
     return check_daily_limit(user["id"])
 
 
+@router.get("/usage")
+def get_usage_stats(user=Depends(get_current_user)):
+    """آمار لحظه‌ای مصرف چارت بر اساس پلن کاربر"""
+    from app.models import get_db
+    conn = get_db()
+    u = conn.execute("SELECT * FROM users WHERE id = ?", (user["id"],)).fetchone()
+    conn.close()
+    if not u:
+        raise HTTPException(status_code=404, detail="کاربر یافت نشد")
+
+    limit_info = check_daily_limit(user["id"])
+    plan_name = u["plan"]
+
+    # Get plan details
+    conn2 = get_db()
+    plan_row = conn2.execute(
+        "SELECT * FROM plans WHERE name = ? AND is_active = 1",
+        (plan_name,),
+    ).fetchone()
+    conn2.close()
+
+    plan_details = {}
+    if plan_row:
+        plan_details = {
+            "name": plan_row["name"],
+            "display_name": plan_row["display_name"],
+            "daily_chart_limit": plan_row["daily_chart_limit"],
+            "can_save_charts": bool(plan_row["can_save_charts"]),
+            "can_access_premium": bool(plan_row["can_access_premium"]),
+        }
+
+    return {
+        "used": limit_info["used"],
+        "limit": limit_info["limit"],
+        "remaining": limit_info["remaining"],
+        "allowed": limit_info["allowed"],
+        "plan": plan_name,
+        "plan_details": plan_details,
+        "is_admin": bool(u["is_admin"]),
+        "reset_at": u["daily_charts_reset_at"],
+    }
+
+
 # ─── روت‌های ذخیره چارت (فقط کاربران ویژه) ───
 
 @router.post("/charts/save", response_model=ChartResponse)
@@ -172,44 +216,8 @@ def get_charts(user=Depends(get_current_user)):
     if not plan or not plan["can_save_charts"]:
         return {"charts": [], "message": "برای ذخیره چارت، اشتراک خود را ارتقا دهید"}
 
+    return {"charts": get_user_charts(user["id"])}
 
-def get_daily_limit(user=Depends(get_current_user)):
-    """چک کردن محدودیت روزانه"""
-    return check_daily_limit(user["id"])
-
-
-# ─── روت‌های ذخیره چارت (فقط کاربران ویژه) ───
-
-@router.post("/charts/save", response_model=ChartResponse)
-def save_chart_endpoint(data: SaveChartRequest, user=Depends(get_current_user)):
-    """ذخیره چارت (بر اساس پلن کاربر)"""
-    plan = get_user_plan(user["id"])
-    if not plan or not plan["can_save_charts"]:
-        raise HTTPException(status_code=403, detail="ذخیره چارت در پلن شما فعال نیست. اشتراک خود را ارتقا دهید.")
-
-    chart = db_save_chart(
-        user_id=user["id"],
-        chart_type=data.chart_type,
-        title=data.title or "",
-        input_data=data.input_data,
-        result_data=data.result_data,
-    )
-    return ChartResponse(
-        id=chart["id"],
-        chart_type=chart["chart_type"],
-        title=chart["title"],
-        input_data=chart["input_data"],
-        result_data=chart["result_data"],
-        created_at=chart["created_at"],
-    )
-
-
-@router.get("/charts")
-def get_charts(user=Depends(get_current_user)):
-    """لیست چارت‌های ذخیره‌شده"""
-    plan = get_user_plan(user["id"])
-    if not plan or not plan["can_save_charts"]:
-        return {"charts": [], "message": "برای ذخیره چارت، اشتراک خود را ارتقا دهید"}
 
 @router.put("/change-password")
 def change_user_password(data: ChangePassword, user=Depends(get_current_user)):
@@ -225,7 +233,249 @@ def change_user_password(data: ChangePassword, user=Depends(get_current_user)):
         raise HTTPException(status_code=400, detail="رمز عبور امروزی اشتباه است")
     return {"status": "ok", "message": "رمز عبور تغییر کرد"}
 
-    return {"charts": get_user_charts(user["id"])}
+
+@router.post("/forgot-password")
+def forgot_password(data: dict):
+    """درخواست بازیابی رمز عبور
+
+    همیشه پیام موفقیت برمی‌گرداند (حتی اگر ایمیل وجود نداشته باشد)
+    تا اطلاعات کاربر فاش نشود.
+    """
+    email = (data.get("email") or "").lower().strip()
+    if not email or "@" not in email:
+        # Still return success to prevent enumeration
+        return {"status": "ok", "message": "اگر ایمیل معتبری وارد کرده باشید، لینک بازیابی ارسال شد."}
+
+    from app.models import get_db
+    conn = get_db()
+    user = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
+    conn.close()
+
+    # Always return success — never reveal whether email exists
+    return {"status": "ok", "message": "اگر ایمیل معتبری وارد کرده باشید، لینک بازیابی ارسال شد."}
+
+
+# ============================================================
+# روت‌های کاربر مهمان: هویت سمت سرور + quota
+# ============================================================
+
+import secrets
+import hashlib
+
+
+def _generate_guest_token():
+    """تولید یک guest identifier یکتا از ترکیب fingerprint سمت کلاینت + random salt"""
+    return secrets.token_urlsafe(32)
+
+
+@router.post("/guest-session")
+def create_guest_session(data: dict):
+    """ایجاد یا بازیابی session مهمان
+
+    سمت کلاینت یک "fingerprint" (ترکیب user-agent + یک رشته تصادفی ذخیره‌شده در localStorage)
+    ارسال می‌شود. سرور بر اساس آن یک هویت مهمان server-side ایجاد می‌کند.
+    """
+    from app.models import get_db
+
+    fingerprint = (data.get("fingerprint") or "").strip()
+    if not fingerprint:
+        fingerprint = _generate_guest_token()
+
+    # Hash the fingerprint for privacy (don't store raw browser fingerprint)
+    fp_hash = hashlib.sha256(fingerprint.encode()).hexdigest()[:48]
+
+    conn = get_db()
+
+    # Ensure guest_sessions table exists
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS guest_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fingerprint_hash TEXT UNIQUE NOT NULL,
+            daily_charts_used INTEGER DEFAULT 0,
+            daily_charts_reset_at TEXT DEFAULT '',
+            linked_user_id INTEGER DEFAULT NULL,
+            created_at TEXT DEFAULT (datetime('now')),
+            last_seen_at TEXT DEFAULT (datetime('now'))
+        )
+    """)
+    conn.commit()
+
+    guest = conn.execute(
+        "SELECT * FROM guest_sessions WHERE fingerprint_hash = ?",
+        (fp_hash,),
+    ).fetchone()
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    if guest:
+        # Check if daily reset needed
+        if guest["daily_charts_reset_at"] != today:
+            conn.execute(
+                "UPDATE guest_sessions SET daily_charts_used = 0, daily_charts_reset_at = ?, last_seen_at = datetime('now') WHERE id = ?",
+                (today, guest["id"]),
+            )
+            conn.commit()
+            used = 0
+        else:
+            used = guest["daily_charts_used"] or 0
+            conn.execute(
+                "UPDATE guest_sessions SET last_seen_at = datetime('now') WHERE id = ?",
+                (guest["id"],),
+            )
+            conn.commit()
+    else:
+        # New guest
+        conn.execute(
+            "INSERT INTO guest_sessions (fingerprint_hash, daily_charts_used, daily_charts_reset_at) VALUES (?, 0, ?)",
+            (fp_hash, today),
+        )
+        conn.commit()
+        used = 0
+
+    conn.close()
+
+    # Guest plan: free with 5 charts per day
+    guest_limit = 5
+    remaining = max(0, guest_limit - used)
+
+    return {
+        "guest_token": fingerprint,
+        "daily_charts_used": used,
+        "daily_chart_limit": guest_limit,
+        "remaining": remaining,
+        "allowed": remaining > 0,
+    }
+
+
+@router.post("/guest/check-limit")
+def guest_check_limit(data: dict):
+    """بررسی محدودیت روزانه مهمان"""
+    from app.models import get_db
+
+    fingerprint = (data.get("fingerprint") or "").strip()
+    if not fingerprint:
+        raise HTTPException(status_code=400, detail="fingerprint لازم است")
+
+    fp_hash = hashlib.sha256(fingerprint.encode()).hexdigest()[:48]
+    conn = get_db()
+    guest = conn.execute(
+        "SELECT * FROM guest_sessions WHERE fingerprint_hash = ?",
+        (fp_hash,),
+    ).fetchone()
+    conn.close()
+
+    today = datetime.now().strftime("%Y-%m-%d")
+    used = 0
+    if guest and guest["daily_charts_reset_at"] == today:
+        used = guest["daily_charts_used"] or 0
+
+    guest_limit = 5
+    return {
+        "used": used,
+        "limit": guest_limit,
+        "remaining": max(0, guest_limit - used),
+        "allowed": used < guest_limit,
+    }
+
+
+@router.post("/guest/increment")
+def guest_increment_usage(data: dict):
+    """افزایش شمارنده مصرف مهمان (فقط سمت سرور)"""
+    from app.models import get_db
+
+    fingerprint = (data.get("fingerprint") or "").strip()
+    if not fingerprint:
+        raise HTTPException(status_code=400, detail="fingerprint لازم است")
+
+    fp_hash = hashlib.sha256(fingerprint.encode()).hexdigest()[:48]
+    today = datetime.now().strftime("%Y-%m-%d")
+    conn = get_db()
+    guest = conn.execute(
+        "SELECT * FROM guest_sessions WHERE fingerprint_hash = ?",
+        (fp_hash,),
+    ).fetchone()
+
+    if not guest:
+        conn.close()
+        raise HTTPException(status_code=404, detail="session مهمان یافت نشد")
+
+    if guest["daily_charts_reset_at"] != today:
+        conn.execute(
+            "UPDATE guest_sessions SET daily_charts_used = 1, daily_charts_reset_at = ? WHERE id = ?",
+            (today, guest["id"]),
+        )
+        new_used = 1
+    else:
+        current = guest["daily_charts_used"] or 0
+        guest_limit = 5
+        if current >= guest_limit:
+            conn.close()
+            raise HTTPException(status_code=429, detail="محدودیت روزانه مهمان تمام شده")
+        conn.execute(
+            "UPDATE guest_sessions SET daily_charts_used = ? WHERE id = ?",
+            (current + 1, guest["id"]),
+        )
+        new_used = current + 1
+
+    conn.commit()
+    conn.close()
+
+    return {"status": "ok", "daily_charts_used": new_used, "daily_chart_limit": 5}
+
+
+@router.post("/guest/claim")
+def claim_guest_session(data: dict, user=Depends(get_current_user)):
+    """اتصال session مهمان به حساب کاربری واقعی
+
+    وقتی کاربر مهمان login می‌کند، این endpoint فراخوانی می‌شود تا:
+    1. مصرف باقی‌مانده مهمان به حساب واقعی منتقل شود
+    2. session مهمان علامت‌گذاری شود که قبلاً claim شده
+    """
+    from app.models import get_db
+
+    fingerprint = (data.get("fingerprint") or "").strip()
+    if not fingerprint:
+        return {"status": "ok", "message": "fingerprint ارسال نشد — بدون migrated"}
+
+    fp_hash = hashlib.sha256(fingerprint.encode()).hexdigest()[:48]
+    today = datetime.now().strftime("%Y-%m-%d")
+    conn = get_db()
+
+    guest = conn.execute(
+        "SELECT * FROM guest_sessions WHERE fingerprint_hash = ?",
+        (fp_hash,),
+    ).fetchone()
+
+    if not guest or guest["linked_user_id"]:
+        conn.close()
+        return {"status": "ok", "message": "بازدید قبلاً متصل شده یا یافت نشد"}
+
+    # Transfer guest usage to user if same day
+    guest_used = 0
+    if guest["daily_charts_reset_at"] == today:
+        guest_used = guest["daily_charts_used"] or 0
+
+    if guest_used > 0:
+        user_row = conn.execute("SELECT daily_charts_used, daily_charts_reset_at FROM users WHERE id = ?", (user["id"],)).fetchone()
+        if user_row:
+            if user_row["daily_charts_reset_at"] == today:
+                new_used = (user_row["daily_charts_used"] or 0) + guest_used
+            else:
+                new_used = guest_used
+            conn.execute(
+                "UPDATE users SET daily_charts_used = ?, daily_charts_reset_at = ? WHERE id = ?",
+                (new_used, today, user["id"]),
+            )
+
+    # Mark guest as linked
+    conn.execute(
+        "UPDATE guest_sessions SET linked_user_id = ? WHERE id = ?",
+        (user["id"], guest["id"]),
+    )
+    conn.commit()
+    conn.close()
+
+    return {"status": "claimed", "migrated_usage": guest_used}
 
 
 @router.delete("/charts/{chart_id}")
@@ -343,11 +593,19 @@ def admin_delete_plan(plan_id: int, admin=Depends(get_admin_user)):
 
 @router.get("/admin/users")
 def admin_list_users(admin=Depends(get_admin_user), limit: int = 100):
-    """لیست همه کاربران — فقط ادمین"""
+    """لیست همه کاربران به همراه محدودیت پلن — فقط ادمین"""
     from app.models import get_db
     conn = get_db()
     users = conn.execute(
-        "SELECT id, email, display_name, plan, is_admin, daily_charts_used, created_at FROM users ORDER BY created_at DESC LIMIT ?",
+        """
+        SELECT u.id, u.email, u.display_name, u.plan, u.is_admin,
+               u.daily_charts_used, u.daily_charts_reset_at, u.created_at,
+               COALESCE(p.daily_chart_limit, 10) AS daily_chart_limit,
+               COALESCE(p.display_name, u.plan) AS plan_display_name
+        FROM users u
+        LEFT JOIN plans p ON u.plan = p.name AND p.is_active = 1
+        ORDER BY u.created_at DESC LIMIT ?
+        """,
         (limit,),
     ).fetchall()
     conn.close()
@@ -439,3 +697,134 @@ def admin_toggle_user_admin(user_id: int, admin=Depends(get_admin_user)):
     conn.commit()
     conn.close()
     return {"status": "updated", "user_id": user_id, "is_admin": bool(new_status)}
+
+
+@router.put("/admin/users/{user_id}/reset-usage")
+def admin_reset_user_usage(user_id: int, admin=Depends(get_admin_user)):
+    """ریست مصرف روزانه یک کاربر — فقط ادمین"""
+    from app.models import get_db
+    today = datetime.now().strftime("%Y-%m-%d")
+    conn = get_db()
+    cursor = conn.execute(
+        "UPDATE users SET daily_charts_used = 0, daily_charts_reset_at = ? WHERE id = ?",
+        (today, user_id),
+    )
+    conn.commit()
+    conn.close()
+    if cursor.rowcount == 0:
+        raise HTTPException(status_code=404, detail="کاربر یافت نشد")
+    return {"status": "reset", "user_id": user_id}
+
+
+# ============================================================
+# روت‌های ادمین: آمار کلی مصرف
+# ============================================================
+
+@router.get("/admin/usage-stats")
+def admin_usage_stats(admin=Depends(get_admin_user)):
+    """آمار کلی مصرف تمام کاربران — فقط ادمین"""
+    from app.models import get_db
+    conn = get_db()
+
+    # Total users
+    total_users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+
+    # Users per plan
+    plan_rows = conn.execute(
+        """
+        SELECT COALESCE(p.display_name, u.plan) AS plan_label,
+               u.plan AS plan_key,
+               COUNT(*) AS user_count,
+               SUM(COALESCE(u.daily_charts_used, 0)) AS total_used,
+               COALESCE(MAX(p.daily_chart_limit), 10) AS plan_limit
+        FROM users u
+        LEFT JOIN plans p ON u.plan = p.name AND p.is_active = 1
+        GROUP BY u.plan
+        ORDER BY user_count DESC
+        """
+    ).fetchall()
+    plans_breakdown = [dict(r) for r in plan_rows]
+
+    # Overall totals
+    total_used = sum(p["total_used"] for p in plans_breakdown)
+    active_today = conn.execute(
+        "SELECT COUNT(*) FROM users WHERE daily_charts_used > 0 AND daily_charts_reset_at = ?",
+        (datetime.now().strftime("%Y-%m-%d"),),
+    ).fetchone()[0]
+
+    conn.close()
+    return {
+        "total_users": total_users,
+        "total_used": total_used,
+        "active_today": active_today,
+        "plans": plans_breakdown,
+    }
+
+
+# ─── Endpoint: Seed / Promote Admin ───
+
+ADMIN_SEED_SECRET = "cosmic-admin-seed-2024"
+
+
+@router.post("/seed-admin")
+def seed_admin_user(data: dict):
+    """ایجاد یا ارتقای کاربر ادمین پیش‌فرض
+
+    این endpoint بدون نیاز به احراز هویت کار می‌کند و برای راه‌اندازی اولیه سیستم طراحی شده.
+
+    - **secret**: رمز مخفی (پیش‌فرض: cosmic-admin-seed-2024)
+    - **email**: ایمیل ادمین (پیش‌فرض: admin@cosmic.ir)
+    - **password**: رمز عبور ادمین (پیش‌فرض: admin123)
+    """
+    from app.models import get_db, hash_password
+
+    secret = data.get("secret", "")
+    if secret != ADMIN_SEED_SECRET:
+        raise HTTPException(status_code=403, detail="رمز مخفی اشتباه است")
+
+    email = data.get("email", "admin@cosmic.ir")
+    password = data.get("password", "admin123")
+
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل ۶ کاراکتر باشد")
+
+    conn = get_db()
+    user = conn.execute("SELECT id, is_admin FROM users WHERE email = ?", (email.lower().strip(),)).fetchone()
+
+    if user:
+        # User exists — promote to admin if not already
+        if user["is_admin"]:
+            conn.close()
+            return {
+                "status": "already_admin",
+                "message": f"کاربر {email} قبلاً ادمین است",
+                "user_id": user["id"],
+            }
+        conn.execute("UPDATE users SET is_admin = 1 WHERE id = ?", (user["id"]))
+        conn.commit()
+        conn.close()
+        return {
+            "status": "promoted",
+            "message": f"کاربر {email} به ادمین ارتقا یافت",
+            "user_id": user["id"],
+        }
+    else:
+        # User doesn't exist — create as admin
+        try:
+            conn.execute(
+                "INSERT INTO users (email, password_hash, display_name, plan, is_admin) VALUES (?, ?, ?, ?, ?)",
+                (email.lower().strip(), hash_password(password), "مدیر سیستم", "pro", 1),
+            )
+            conn.commit()
+            new_user = conn.execute("SELECT id FROM users WHERE email = ?", (email.lower().strip(),)).fetchone()
+            conn.close()
+            return {
+                "status": "created",
+                "message": f"کاربر ادمین {email} با موفقیت ایجاد شد",
+                "user_id": new_user["id"],
+                "email": email,
+                "password": password,
+            }
+        except Exception as e:
+            conn.close()
+            raise HTTPException(status_code=500, detail=f"خطا در ایجاد کاربر: {str(e)}")

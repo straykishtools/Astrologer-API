@@ -47,10 +47,10 @@ function navigate(route) {
             <div class="landing-orb-container"><canvas id="landingOrbCanvas" width="120" height="120"></canvas></div>
             <h1 class="landing-title">Cosmic Oracle</h1>
             <p class="landing-subtitle">رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای</p>
-            <p class="landing-desc">پانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد</p>
+            <p class="landing-desc">شانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد</p>
             <button class="landing-cta" onclick="navigate('app')">🚀 شروع رایگان</button>
             <div class="landing-stats">
-                <div class="landing-stat"><div class="landing-stat-num">۱۵+</div><div class="landing-stat-label">ابزار تخصصی</div></div>
+                <div class="landing-stat"><div class="landing-stat-num">۱۶+</div><div class="landing-stat-label">ابزار تخصصی</div></div>
                 <div class="landing-stat"><div class="landing-stat-num">۲۷</div><div class="landing-stat-label">ناکشاترا</div></div>
                 <div class="landing-stat"><div class="landing-stat-num">۱۲</div><div class="landing-stat-label">برج فلکی</div></div>
                 <div class="landing-stat"><div class="landing-stat-num">۱۰۰+</div><div class="landing-stat-label">حرکت یوگا</div></div>
@@ -80,7 +80,7 @@ function navigate(route) {
             <h2 class="landing-section-title">✨ چرا کیهان‌نگر؟</h2>
             <div class="landing-features-grid">
                 <div class="landing-feature-card lc-1"><div class="lfc-icon">🪐</div><div class="lfc-title">موتور ودیک حرفه‌ای</div><div class="lfc-desc">محاسبات دقیق بر اساس موتور Kerykeion با پشتیبانی از تقویم ودیک</div></div>
-                <div class="landing-feature-card lc-2"><div class="lfc-icon">📊</div><div class="lfc-title">۱۵+ ابزار تخصصی</div><div class="lfc-desc">از چارت تولد تا سیناستری، کامپوزیت، ترانزیت، تاروت و فال حافظ</div></div>
+                <div class="landing-feature-card lc-2"><div class="lfc-icon">📊</div><div class="lfc-title">۱۶+ ابزار تخصصی</div><div class="lfc-desc">از چارت تولد تا سیناستری، کامپوزیت، ترانزیت، تاروت و فال حافظ</div></div>
                 <div class="landing-feature-card lc-3"><div class="lfc-icon">🆓</div><div class="lfc-title">رایگان شروع کنید</div><div class="lfc-desc">چارت تولد کامل، تاروت و فال حافظ کاملاً رایگان</div></div>
                 <div class="landing-feature-card lc-4"><div class="lfc-icon">📈</div><div class="lfc-title">تفسیر هوشمند</div><div class="lfc-desc">تفسیر فارسی کامل با امتیاز و سطوح سازگاری</div></div>
             </div>

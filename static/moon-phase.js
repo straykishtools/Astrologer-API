@@ -6,6 +6,96 @@
 
 function _moonEsc(s) { var d = document.createElement('div'); d.appendChild(document.createTextNode(s || '')); return d.innerHTML; }
 
+// ================================================================
+//   RELIABLE PHASE DERIVATION
+//   The API response sometimes buckets the phase name incorrectly
+//   (e.g. "Last Quarter" while the Moon is waning gibbous), reports
+//   no ecliptic longitude, and its age_days is anchored to the wrong
+//   event. We therefore derive the phase name/emoji from the (correct)
+//   illumination % + waxing/waning stage, and compute the Moon's
+//   ecliptic longitude ourselves (Meeus truncated series).
+// ================================================================
+var _SYNODIC_MONTH = 29.53058770576;
+var _PHASE_BANDS = [
+    { max: 1.84566,  name: 'New Moon',        emoji: '🌑' },
+    { max: 7.38265,  name: 'Waxing Crescent', emoji: '🌒' },
+    { max: 9.22831,  name: 'First Quarter',   emoji: '🌓' },
+    { max: 14.76530, name: 'Waxing Gibbous',  emoji: '🌔' },
+    { max: 16.61096, name: 'Full Moon',       emoji: '🌕' },
+    { max: 22.14795, name: 'Waning Gibbous',  emoji: '🌖' },
+    { max: 23.99361, name: 'Last Quarter',    emoji: '🌗' },
+    { max: 29.53059, name: 'Waning Crescent', emoji: '🌘' }
+];
+var _MOON_SIGN_FA = {
+    'Ari': 'حمل ♈', 'Tau': 'ثور ♉', 'Gem': 'جوزا ♊', 'Can': 'سرطان ♋',
+    'Leo': 'اسد ♌', 'Vir': 'سنبله ♍', 'Lib': 'میزان ♎', 'Sco': 'عقرب ♏',
+    'Sgr': 'قوس ♐', 'Cap': 'جدی ♑', 'Aqr': 'دلو ♒', 'Psc': 'حوت ♓'
+};
+
+function _toFiniteNum(v) {
+    var n = parseFloat(String(v));
+    return isFinite(n) ? n : NaN;
+}
+
+// m.phase = 0..1 fraction of the synodic cycle (0 = new, 0.5 = full).
+// m.illumination = e.g. '61%' (reliable). m.stage = 'waxing'/'waning'.
+function _moonPhaseFromApi(m) {
+    var f = NaN;
+    var illum = _toFiniteNum(m.illumination) / 100;
+    var ph = _toFiniteNum(m.phase);
+    if (isFinite(ph) && ph > 0 && ph < 1) {
+        f = ph;
+    } else if (isFinite(illum)) {
+        var a = Math.acos(Math.max(-1, Math.min(1, 1 - 2 * illum))) / (2 * Math.PI); // 0..0.5
+        var stage = String(m.stage || '').toLowerCase();
+        if (stage === 'waning') f = 1 - a;
+        else if (stage === 'waxing') f = a;
+        else f = illum > 0.99 ? 0.5 : (illum <= 0.5 ? a : 1 - a);
+    } else {
+        f = 0.5;
+    }
+    if (!(illum >= 0 && illum <= 1)) illum = (1 - Math.cos(2 * Math.PI * f)) / 2;
+    var ageDays = f * _SYNODIC_MONTH;
+    var band = _PHASE_BANDS[_PHASE_BANDS.length - 1];
+    for (var i = 0; i < _PHASE_BANDS.length; i++) {
+        if (ageDays < _PHASE_BANDS[i].max) { band = _PHASE_BANDS[i]; break; }
+    }
+    return { f: f, illumination: illum, ageDays: ageDays, name: band.name, emoji: band.emoji };
+}
+
+// Approximate Moon ecliptic longitude, Meeus ch. 47 truncated series (~0.1 deg).
+function _moonEclipticLongitude(utcMs) {
+    var jd = utcMs / 86400000 + 2440587.5;
+    var T = (jd - 2451545.0) / 36525;
+    var Lp = 218.3164477 + 481267.88123421 * T;
+    var D = 297.8501921 + 445267.1114034 * T;
+    var M = 357.5291092 + 35999.0502909 * T;
+    var Mp = 134.9633964 + 477198.8675055 * T;
+    var F = 93.2720950 + 483202.0175233 * T;
+    function sdeg(x) { return Math.sin(x * Math.PI / 180); }
+    var lam = Lp
+        + 6.288774 * sdeg(Mp)
+        + 1.274027 * sdeg(2 * D - Mp)
+        + 0.658314 * sdeg(2 * D)
+        + 0.213618 * sdeg(2 * Mp)
+        - 0.185116 * sdeg(M)
+        - 0.114332 * sdeg(2 * F)
+        + 0.058793 * sdeg(2 * (D - Mp))
+        + 0.057066 * sdeg(2 * D - 2 * Mp + M)
+        + 0.053322 * sdeg(2 * D + Mp)
+        + 0.045758 * sdeg(2 * D - M)
+        - 0.040923 * sdeg(Mp - M)
+        - 0.034720 * sdeg(D)
+        - 0.030383 * sdeg(Mp + M);
+    return ((lam % 360) + 360) % 360;
+}
+
+function _signFromLongitude(lam) {
+    var abbrs = ['Ari', 'Tau', 'Gem', 'Can', 'Leo', 'Vir', 'Lib', 'Sco', 'Sgr', 'Cap', 'Aqr', 'Psc'];
+    var abbr = abbrs[Math.floor(lam / 30) % 12];
+    return { abbr: abbr, fa: _MOON_SIGN_FA[abbr] };
+}
+
 function getMoonPhaseForm() {
     var today = new Date();
     var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
@@ -34,9 +124,9 @@ function getMoonPhaseForm() {
 var LUNAR_MANSIONS = [
     { name: 'شرط', nameEn: 'Sharat', start: 0, emoji: '🌟', desc: 'Auspice of discernment — governed by the heart of the Scorpion, strengthens judgment and awareness.', suitable: ['شروع کارهای جدید', 'تصمیم‌گیری'], unsuitable: ['سفر طولانی'] },
     { name: 'زبانه', nameEn: 'Zubana', start: 12.857, emoji: '🔥', desc: 'Auspice of balance and equilibrium — favors resolving disputes and making fair deals.', suitable: ['حل اختلاف', 'معامله'], unsuitable: ['عجله در کار'] },
-    { name: '陟昧', nameEn: 'Iklil', start: 25.714, emoji: '👑', desc: 'The Crown — celestial crest marking a peak of honor, favored for weddings and celebrations.', suitable: ['ازدواج', 'جشن'], unsuitable: ['تطعیل'] },
+    { name: 'اکلیل', nameEn: 'Iklil', start: 25.714, emoji: '👑', desc: 'The Crown — celestial crest marking a peak of honor, favored for weddings and celebrations.', suitable: ['ازدواج', 'جشن'], unsuitable: ['تطعیل'] },
     { name: 'قلب', nameEn: 'Qalb', start: 38.571, emoji: '❤️', desc: 'The Heart of the Scorpion — a powerful, intense mansion; ideal for major undertakings but risky for travel.', suitable: ['شروع پروژه بزرگ', 'تصمیمات مهم'], unsuitable: ['سفر', 'مذاکرات حساس'] },
-    { name: '重磅', nameEn: 'Shawla', start: 51.429, emoji: '🦂', desc: 'The Scorpion's Tail — fierce and combative energy; suited for defense, competition, and vigorous sports.', suitable: ['جنگ و دفاع', 'ورزش'], unsuitable: ['ازدواج', 'معامله'] },
+    { name: 'شوله', nameEn: 'Shawla', start: 51.429, emoji: '🦂', desc: 'The Scorpion\'s Tail — fierce and combative energy; suited for defense, competition, and vigorous sports.', suitable: ['جنگ و دفاع', 'ورزش'], unsuitable: ['ازدواج', 'معامله'] },
     { name: 'نعائم', nameEn: 'Naaim', start: 64.286, emoji: '🌟', desc: 'The Pleiades — mansion of comfort, rest, and enjoyment; auspicious for leisure and pleasure.', suitable: ['استراحت', 'لذت'], unsuitable: ['کار سنگین'] },
     { name: 'بقره', nameEn: 'Baqara', start: 77.143, emoji: '♉', desc: 'The Cow — Taurus mansion symbolizing fertility and abundance; favors agriculture and acquiring land.', suitable: ['کشاورزی', 'خرید ملک'], unsuitable: ['سفر دریایی'] },
     { name: 'دبران', nameEn: 'Dabaran', start: 90, emoji: '⭐', desc: 'The Follower — Aldebaran mansion; favors continuing existing work and pursuing follow-through.', suitable: ['ادامه کار', 'پیگیری'], unsuitable: ['شروع جدید'] },
@@ -84,7 +174,7 @@ function submitMoonPhase() {
     var dateVal = document.getElementById('moonPhaseDate').value;
     var lat = parseFloat(document.getElementById('moonPhaseLat').value) || 35.6892;
     var lng = parseFloat(document.getElementById('moonPhaseLng').value) || 51.3890;
-    var tz = 3.5; // Tehran
+    var tz = 'Asia/Tehran'; // API rejects numeric offsets; must be a valid IANA timezone
 
     var parts = dateVal.split('-');
     var year = parseInt(parts[0]);
@@ -123,44 +213,42 @@ function submitMoonPhase() {
 
 function displayMoonPhase(overview, dateVal, lat, lng) {
     var moon = overview.moon || {};
-    var sun = overview.sun || {};
-    var phaseName = moon.phase_name || 'نامشخص';
-    var emoji = moon.emoji || '🌙';
-    var illumination = moon.illumination || '۰٪';
-    var age = moon.age_days || 0;
-    var stage = moon.stage || '';
-    var moonSign = moon.zodiac ? (moon.zodiac.sign || '') : '';
-    var moonSignFa = translateMoonSign(moonSign);
+    var info = _moonPhaseFromApi(moon);
 
-    // Calculate lunar mansion from moon's zodiac position
-    var moonAbsPos = moon.zodiac ? (moon.zodiac.abs_pos || moon.zodiac.position || 0) : 0;
-    var mansion = getLunarMansion(moonAbsPos);
+    // Ecliptic longitude of the Moon for the requested noon (Iran time, UTC+3:30)
+    var parts = String(dateVal || '').split('-');
+    var gY = parseInt(parts[0]);
+    var gM = parseInt(parts[1]);
+    var gD = parseInt(parts[2]);
+    var utcMs = isFinite(gY) ? Date.UTC(gY, (gM || 1) - 1, gD || 1, 8, 30, 0) : Date.now();
+    var moonLon = _moonEclipticLongitude(utcMs);
+    var lonSign = _signFromLongitude(moonLon);
+    var mansion = getLunarMansion(moonLon);
 
-    var phaseFa = MOON_PHASE_FA[phaseName] || _moonEsc(phaseName);
+    // Sign: prefer the API's real moon sign, fall back to the computed longitude
+    var apiSign = (moon.zodiac && moon.zodiac.moon_sign) ? moon.zodiac.moon_sign : '';
+    var moonSignFa = _MOON_SIGN_FA[apiSign] || lonSign.fa || apiSign;
 
-    // Persian date approximation
-    var pv = window.PersianDate;
-    var persianDate = '';
-    if (pv) {
-        try {
-            var pd = new pv([year, month, day]);
-            persianDate = pd.format('YYYY/MM/DD');
-        } catch(e) { persianDate = dateVal; }
-    } else {
-        persianDate = dateVal;
-    }
+    var phaseFa = MOON_PHASE_FA[info.name] || info.name;
+    var illumPct = Math.round(info.illumination * 100);
+    var ageDays = Math.round(info.ageDays);
+    var stageFa = info.f < 0.5 ? 'رو به رشد (نیمه اول ماه)' : 'رو به زوال (نیمه دوم ماه)';
+
+    // Persian digits for the date label
+    var dateLabel = String(dateVal || '');
+    try { dateLabel = dateLabel.replace(/\d/g, function(ch) { return '۰۱۲۳۴۵۶۷۸۹'[ch]; }); } catch(_) {}
 
     var html = '<div class="moon-result">';
 
     // Main phase card
     html += '<div class="moon-phase-main">';
-    html += '<div class="moon-emoji-large">' + _moonEsc(emoji) + '</div>';
+    html += '<div class="moon-emoji-large">' + _moonEsc(info.emoji) + '</div>';
     html += '<div class="moon-phase-name">' + _moonEsc(phaseFa) + '</div>';
-    html += '<div class="moon-illumination">💡 درصد روشنایی: ' + _moonEsc(String(illumination)) + '</div>';
-    html += '<div class="moon-date">📅 تاریخ: ' + _moonEsc(dateVal) + '</div>';
-    html += '<div class="moon-age">🌙 سن ماه: ' + _moonEsc(String(age)) + ' روز</div>';
-    if (stage) html += '<div class="moon-stage">📈 مرحله: ' + _moonEsc(translateStage(stage)) + '</div>';
-    if (moonSignFa) html += '<div class="moon-sign">♈ برج ماه: ' + _moonEsc(moonSignFa) + '</div>';
+    html += '<div class="moon-illumination">💡 درصد روشنایی: ' + illumPct + '٪</div>';
+    html += '<div class="moon-date">📅 تاریخ: ' + _moonEsc(dateLabel) + '</div>';
+    html += '<div class="moon-age">🌙 سن ماه: ' + ageDays + ' روز (از ' + Math.round(_SYNODIC_MONTH) + ' روز)</div>';
+    html += '<div class="moon-stage">📈 مرحله: ' + _moonEsc(stageFa) + '</div>';
+    if (moonSignFa) html += '<div class="moon-sign">✨ برج ماه: ' + _moonEsc(moonSignFa) + '</div>';
     html += '</div>';
 
     // Lunar mansion card
@@ -193,7 +281,7 @@ function displayMoonPhase(overview, dateVal, lat, lng) {
     // Phase visualization
     html += '<div class="moon-phase-visual">';
     html += '<h4>📊 نمودار فاز ماه</h4>';
-    html += renderMoonPhaseSVG(moon.phase || 0, moonAbsPos);
+    html += renderMoonPhaseSVG(info.f, moonLon);
     html += '</div>';
 
     html += '</div>';
@@ -201,32 +289,34 @@ function displayMoonPhase(overview, dateVal, lat, lng) {
     document.getElementById('moonPhaseResult').innerHTML = html;
 }
 
-function renderMoonPhaseSVG(phase, position) {
-    var cx = 80, cy = 80, r = 60;
-    // phase: 0=New, 0.5=Full, 1=New
-    var illumination = phase || 0;
-    var svg = '<svg viewBox="0 0 160 160" width="160" height="160" style="display:block;margin:10px auto;">';
-    // Background circle (dark)
-    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#0a0f1e" stroke="rgba(221,192,112,0.3)" stroke-width="1"/>';
-    // Illumination
-    if (illumination <= 0.5) {
-        // Waxing: light on right
-        var litWidth = r * 2 * (illumination * 2);
-        svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#f0e6b0"/>';
-        svg += '<ellipse cx="' + (cx + r - litWidth) + '" cy="' + cy + '" rx="' + (r - litWidth) + '" ry="' + r + '" fill="#0a0f1e"/>';
-    } else {
-        // Waning: light on left
-        var litWidth2 = r * 2 * ((1 - illumination) * 2);
-        svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#f0e6b0"/>';
-        svg += '<ellipse cx="' + (cx - r + litWidth2) + '" cy="' + cy + '" rx="' + (r - litWidth2) + '" ry="' + r + '" fill="#0a0f1e"/>';
+function _phaseEmojiForF(f) {
+    var age = f * _SYNODIC_MONTH;
+    for (var i = 0; i < _PHASE_BANDS.length; i++) {
+        if (age < _PHASE_BANDS[i].max) return _PHASE_BANDS[i].emoji;
     }
-    // Glow effect
-    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 4) + '" fill="none" stroke="rgba(240,230,176,0.2)" stroke-width="3"/>';
-    // Position indicator
-    var posRad = (position - 90) * Math.PI / 180;
-    var dotX = cx + (r + 12) * Math.cos(posRad);
-    var dotY = cy + (r + 12) * Math.sin(posRad);
-    svg += '<circle cx="' + dotX + '" cy="' + dotY + '" r="3" fill="#ddc070"/>';
+    return '🌘';
+}
+
+function renderMoonPhaseSVG(phaseFrac, position) {
+    // f: 0 = new moon, 0.5 = full moon, 1 = next new moon
+    var f = isFinite(phaseFrac) ? phaseFrac : 0;
+    f = Math.max(0, Math.min(1, f));
+    var L = (1 - Math.cos(2 * Math.PI * f)) / 2; // illuminated fraction 0..1
+    var emoji = _phaseEmojiForF(f);
+    var cx = 70, cy = 70, r = 54, stroke = 9;
+    var circ = 2 * Math.PI * r;
+    var svg = '<svg viewBox="0 0 140 140" width="150" height="150" style="display:block;margin:10px auto;">';
+    // Background disc
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + stroke / 2) + '" fill="#0a0f1e" stroke="rgba(221,192,112,0.25)" stroke-width="1"/>';
+    // Track ring
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="' + stroke + '"/>';
+    // Illumination arc (starts at 12 o'clock, clockwise)
+    if (L > 0.001) {
+        var len = circ * L;
+        svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#f0e6b0" stroke-width="' + stroke + '" stroke-linecap="round" stroke-dasharray="' + len + ' ' + circ + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"/>';
+    }
+    // Phase emoji in the center
+    svg += '<text x="' + cx + '" y="' + (cy + 21) + '" text-anchor="middle" font-size="52">' + emoji + '</text>';
     svg += '</svg>';
     return svg;
 }

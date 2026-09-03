@@ -1,0 +1,390 @@
+/* ================================================================
+   YOGA v3 — جزئیات، سیستم روابط، جلسه‌ساز و تمرین هدایت‌شده
+   ادامه‌ی پالت طراحی موجود (style.css) — RTL-first
+   ================================================================ */
+
+/* ─── کارت‌های پنهان (tertiary) ─── */
+.yoga-card-tertiary { box-shadow: inset 0 0 0 1px rgba(160, 160, 220, 0.18); }
+.yoga-card-tertiary .yoga-card-img { filter: saturate(0.6); }
+
+/* ─── چیپ‌های معنایی روابط ─── */
+.yk-chip {
+    display: inline-flex; align-items: center;
+    padding: 1px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 600; line-height: 1.6;
+}
+.yk-rel-var  { background: rgba(162, 155, 254, 0.16); color: #c3bdfe; border: 1px solid rgba(162, 155, 254, 0.35); }
+.yk-rel-prep { background: rgba(246, 194, 96, 0.14); color: #f6d896; border: 1px solid rgba(246, 194, 96, 0.3); }
+.yk-rel-in   { background: rgba(110, 207, 151, 0.12); color: #8ee0b2; border: 1px solid rgba(110, 207, 151, 0.3); }
+.yk-rel-out  { background: rgba(116, 185, 255, 0.12); color: #9cc9ff; border: 1px solid rgba(116, 185, 255, 0.3); }
+.yk-rel-both { background: rgba(221, 192, 112, 0.14); color: #f0dca0; border: 1px solid rgba(221, 192, 112, 0.35); }
+
+/* ─── بخش‌های رابطه در صفحه جزئیات ─── */
+.yk-rel-section { position: relative; overflow: hidden; }
+.yk-section-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+}
+.yk-section-icon {
+    width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, rgba(221, 192, 112, 0.18), rgba(162, 155, 254, 0.14));
+    border: 1px solid var(--line-strong);
+    font-size: 15px;
+}
+.yk-section-head h3 { font-size: 15px; color: var(--gold-200); margin: 0; }
+.yk-section-count {
+    margin-inline-start: auto; font-size: 11px; color: var(--ink-dim);
+    background: rgba(16, 26, 61, 0.6); padding: 2px 10px; border-radius: 20px;
+    border: 1px solid var(--line);
+}
+.yk-rel-hint { font-size: 11px; color: var(--ink-dim); margin: 2px 0 10px; line-height: 1.7; }
+
+/* تغییرات: شبکه‌ی کارت */
+.yk-rel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 4px;
+}
+.yk-rel-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+
+.yoga-rel-item {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(10, 18, 44, 0.55);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+.yoga-rel-item:hover {
+    border-color: rgba(221, 192, 112, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.25);
+}
+.yk-rel-grid .yoga-rel-item {
+    flex-direction: column; text-align: center; padding: 10px 8px; gap: 8px;
+}
+.yoga-rel-item.locked { opacity: 0.62; }
+.yoga-rel-thumb {
+    position: relative; width: 54px; height: 54px; flex-shrink: 0;
+    border-radius: 12px; overflow: hidden;
+    background: rgba(7, 12, 31, 0.6);
+    border: 1px solid var(--line);
+}
+.yk-rel-grid .yoga-rel-thumb { width: 100%; aspect-ratio: 1; height: auto; border-radius: 12px 12px 4px 4px; }
+.yoga-rel-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.yoga-rel-lock { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(7, 12, 31, 0.45); font-size: 18px; }
+.yoga-rel-body { flex: 1; min-width: 0; text-align: start; }
+.yoga-rel-name { font-size: 13px; font-weight: 700; color: var(--gold-200); line-height: 1.4; }
+.yoga-rel-en { font-size: 11px; color: var(--ink-dim); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.yoga-rel-meta { font-size: 11px; color: var(--ink-dim); margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-start; }
+.yk-rel-grid .yoga-rel-meta { justify-content: center; }
+.yoga-rel-arrow {
+    margin-inline-start: auto; color: var(--gold-400);
+    font-size: 22px; opacity: 0.6; flex-shrink: 0; transform: rotate(180deg);
+}
+.yk-rel-grid .yoga-rel-arrow { display: none; }
+
+/* ─── سانسکریت ─── */
+.yk-sanskrit { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; padding: 4px 0 0; }
+.yk-sanskrit-deva { font-size: 15px; color: #d9c07c; order: -1; }
+.yk-sanskrit-words {
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px;
+}
+.yk-sanskrit-word {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(16, 26, 61, 0.45);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 3px 6px 3px 12px;
+    font-size: 11px;
+}
+.yk-sanskrit-word-idx {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(221, 192, 112, 0.16); color: var(--gold-300);
+    display: flex; align-items: center; justify-content: center; font-size: 10px;
+}
+.yk-sanskrit-word-latin { font-style: italic; color: var(--gold-200); }
+.yk-sanskrit-word-fa { color: var(--ink-dim); }
+
+/* ─── نام‌های دیگر ─── */
+.yk-aka-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 8px 0 2px; }
+.yk-aka-label { font-size: 11px; color: var(--ink-dim); }
+.yk-aka-fa { color: var(--gold-300); }
+
+.yk-vis { border-color: rgba(221, 192, 112, 0.35); color: var(--gold-300); }
+
+/* ─── اعلان ارتقا ─── */
+.yk-upgrade-note {
+    margin: 10px 0; padding: 10px 14px;
+    background: rgba(231, 76, 60, 0.08);
+    border: 1px solid rgba(231, 76, 60, 0.25);
+    border-radius: 12px;
+    color: #f0a99f; font-size: 12px; line-height: 1.8;
+}
+
+/* ─── اقدام‌های جزئیات ─── */
+.yk-detail-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 8px; }
+.yk-act-btn {
+    padding: 8px 16px; border-radius: 12px;
+    border: 1px solid var(--line-strong);
+    background: rgba(16, 26, 61, 0.5);
+    color: var(--ink); font-size: 13px; font-family: 'Vazirmatn', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+}
+.yk-act-btn:hover { border-color: var(--gold-400); color: var(--gold-200); }
+.yk-act-btn.active, .yk-act-btn.active:hover { color: #ff8a80; border-color: rgba(231, 76, 60, 0.5); }
+.yk-start-flow-btn {
+    display: block; width: 100%; padding: 12px 18px;
+    border-radius: 14px; border: 1px solid var(--gold-400);
+    background: linear-gradient(135deg, rgba(221, 192, 112, 0.16), rgba(162, 155, 254, 0.12));
+    color: var(--gold-200); font-size: 14px; font-weight: 700;
+    font-family: 'Vazirmatn', sans-serif; cursor: pointer; transition: all 0.2s;
+}
+.yk-start-flow-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(221, 192, 112, 0.28), rgba(162, 155, 254, 0.2));
+    box-shadow: 0 4px 20px rgba(201, 162, 39, 0.18);
+    transform: translateY(-1px);
+}
+.yk-start-flow-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ─── ارجاع‌های //...// داخل توضیحات ─── */
+.yk-desc-p { line-height: 2.1 !important; }
+.yk-desc-ref {
+    display: inline-block; margin: 0 1px; padding: 0 8px;
+    color: var(--gold-200); background: rgba(221, 192, 112, 0.08);
+    border: 1px solid rgba(221, 192, 112, 0.25);
+    border-radius: 8px; cursor: pointer; text-decoration: none;
+    transition: background 0.2s;
+}
+.yk-desc-ref:hover { background: rgba(221, 192, 112, 0.18); }
+.yk-desc-ref-broken, .yk-desc-ref-static { color: var(--ink-dim); }
+
+/* ─── یادداشت سمت ─── */
+.yk-side-note {
+    position: absolute; bottom: 10px; inset-inline: 10px;
+    font-size: 11px; text-align: center; color: #f0e4c0;
+    background: rgba(7, 12, 31, 0.78);
+    border: 1px solid rgba(221, 192, 112, 0.25);
+    padding: 5px 10px; border-radius: 10px;
+}
+
+/* ═══════════ جریان روزانه ═══════════ */
+.yk-flow-sub { font-size: 12px; color: var(--ink-dim); font-weight: 400; }
+.yk-daily-flow { counter-reset: none; }
+.yk-flow-step {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 30% 30%, rgba(221, 192, 112, 0.35), rgba(201, 162, 39, 0.15));
+    border: 1px solid rgba(221, 192, 112, 0.45);
+    color: #ffe9b0; font-size: 13px; font-weight: 800;
+    box-shadow: 0 0 14px rgba(201, 162, 39, 0.25);
+}
+
+/* ═══════════ جلسه‌ساز تمرین (hub) ═══════════ */
+.yk-hub {
+    max-width: 860px; margin: 0 auto; padding: 8px 4px 32px;
+    color: var(--ink);
+}
+.yk-hub-head h3 { font-size: 22px; color: var(--gold-200); margin: 0 0 6px; font-family: 'Cinzel', serif; }
+.yk-hub-sub { font-size: 13px; color: var(--ink-dim); margin: 0 0 18px; line-height: 1.8; }
+.yk-hub-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.yk-hub-item {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(12, 20, 48, 0.6);
+    border: 1px solid var(--line);
+    border-radius: 16px; padding: 8px 12px;
+    transition: border-color 0.2s;
+}
+.yk-hub-item:hover { border-color: rgba(221, 192, 112, 0.4); }
+.yk-hub-item.locked { opacity: 0.66; }
+.yk-hub-idx {
+    width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(221, 192, 112, 0.12); border: 1px solid rgba(221, 192, 112, 0.3);
+    color: var(--gold-300); font-size: 12px; font-weight: 700;
+}
+.yk-hub-thumb {
+    width: 46px; height: 46px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+    background: rgba(7, 12, 31, 0.6); border: 1px solid var(--line);
+}
+.yk-hub-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.yk-hub-info { flex: 1; min-width: 0; }
+.yk-hub-name { font-size: 14px; font-weight: 700; color: var(--gold-200); }
+.yk-hub-sub { font-size: 11px; color: var(--ink-dim); margin: 2px 0 0; }
+.yk-hub-ops { display: flex; gap: 6px; flex-shrink: 0; }
+.yk-hub-op {
+    width: 30px; height: 30px; border-radius: 9px;
+    border: 1px solid var(--line-strong);
+    background: rgba(16, 26, 61, 0.5);
+    color: var(--ink-dim); cursor: pointer; font-size: 13px;
+    transition: all 0.2s;
+}
+.yk-hub-op:hover:not(:disabled) { border-color: var(--gold-400); color: var(--gold-200); }
+.yk-hub-op.danger:hover:not(:disabled) { border-color: rgba(231, 76, 60, 0.6); color: #ff8a80; }
+.yk-hub-op:disabled { opacity: 0.3; cursor: default; }
+.yk-hub-empty {
+    padding: 28px 18px; text-align: center; color: var(--ink-dim); font-size: 14px;
+    border: 1px dashed var(--line-strong); border-radius: 16px; margin-bottom: 16px;
+    background: rgba(12, 20, 48, 0.3); line-height: 2;
+}
+.yk-hub-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.yk-hub-action {
+    padding: 9px 16px; border-radius: 12px;
+    border: 1px solid var(--gold-400);
+    background: linear-gradient(135deg, rgba(221, 192, 112, 0.2), rgba(162, 155, 254, 0.14));
+    color: var(--gold-200); font-size: 13px; font-weight: 600;
+    font-family: 'Vazirmatn', sans-serif; cursor: pointer; transition: all 0.2s;
+}
+.yk-hub-action:hover { box-shadow: 0 4px 18px rgba(201, 162, 39, 0.2); transform: translateY(-1px); }
+.yk-hub-action.ghost {
+    border-color: var(--line-strong); background: rgba(16, 26, 61, 0.4);
+    color: var(--ink-dim); font-weight: 400;
+}
+.yk-hub-action.ghost:hover { color: #ff8a80; border-color: rgba(231, 76, 60, 0.4); }
+.yk-hub-action.disabled { opacity: 0.4; pointer-events: none; }
+.yk-hub-section-title {
+    font-size: 13px; color: var(--gold-200); font-weight: 700;
+    margin: 16px 0 10px; display: flex; align-items: center; gap: 8px;
+}
+.yk-hub-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.yk-hub-chip {
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--line); background: rgba(16, 26, 61, 0.4);
+    color: var(--ink); font-size: 12px; font-family: 'Vazirmatn', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+}
+.yk-hub-chip:hover { border-color: var(--gold-400); color: var(--gold-200); background: rgba(221, 192, 112, 0.08); }
+.yk-hub-chip.alt { border-style: dashed; }
+.yk-hub-settings {
+    margin: 18px 0; padding: 14px 16px;
+    background: rgba(12, 20, 48, 0.35);
+    border: 1px solid var(--line); border-radius: 16px;
+}
+.yk-hub-settings-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.yk-hub-settings-row:last-child { margin-bottom: 0; }
+.yk-hub-settings-row > span { font-size: 13px; color: var(--ink-dim); min-width: 120px; }
+.yk-hub-settings-row > div { display: flex; gap: 6px; flex-wrap: wrap; }
+.yk-hub-start {
+    display: block; width: 100%; padding: 16px;
+    border-radius: 18px; border: none;
+    background: linear-gradient(135deg, #caa53d, #9c7c1f 60%, #8a6c16);
+    color: #141a30; font-size: 17px; font-weight: 800;
+    font-family: 'Vazirmatn', sans-serif; cursor: pointer;
+    box-shadow: 0 8px 30px rgba(201, 162, 39, 0.3);
+    transition: all 0.25s;
+}
+.yk-hub-start:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(201, 162, 39, 0.4); }
+.yk-hub-start:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+/* ═══════════ تمرین هدایت‌شده ─── افزونه‌های جدید ═══════════ */
+.yp-content { max-width: 980px; margin: 0 auto; }
+.yp-pose-image-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.yp-side-switch {
+    display: inline-flex; gap: 4px; padding: 4px;
+    background: rgba(7, 12, 31, 0.55);
+    border: 1px solid var(--line-strong); border-radius: 20px;
+    visibility: hidden; /* toggled to visible by JS when pose is two-sided with both images */
+}
+.yp-side-btn {
+    padding: 5px 16px; border-radius: 16px; border: none;
+    background: transparent; color: var(--ink-dim);
+    font-size: 12px; font-family: 'Vazirmatn', sans-serif; cursor: pointer;
+    transition: all 0.2s;
+}
+.yp-side-btn.active { background: var(--gold-500); color: #141a30; font-weight: 700; }
+
+.yp-context {
+    font-size: 11px; color: var(--ink-dim); margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    background: rgba(221, 192, 112, 0.07);
+    border: 1px solid rgba(221, 192, 112, 0.15);
+    padding: 3px 12px; border-radius: 20px;
+}
+.yp-context strong { color: var(--gold-300); font-weight: 700; }
+.yp-context-start { background: rgba(110, 207, 151, 0.08); border-color: rgba(110, 207, 151, 0.2); }
+.yp-context-end { background: rgba(116, 185, 255, 0.08); border-color: rgba(116, 185, 255, 0.2); }
+.yp-pose-meta {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    font-size: 11px; color: var(--ink-dim); margin-top: 8px;
+}
+.yp-pose-meta span {
+    background: rgba(16, 26, 61, 0.5); padding: 3px 10px;
+    border-radius: 14px; border: 1px solid var(--line);
+}
+
+.yp-session-progress {
+    display: flex; gap: 6px; justify-content: center; align-items: center;
+    margin: 10px auto 4px; max-width: 600px; flex-wrap: wrap;
+}
+.yp-sp-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all 0.3s;
+}
+.yp-sp-dot.done { background: rgba(110, 207, 151, 0.7); border-color: rgba(110, 207, 151, 0.9); }
+.yp-sp-dot.cur {
+    background: var(--gold-500); border-color: #ffe9b0;
+    box-shadow: 0 0 12px rgba(221, 192, 112, 0.8);
+    transform: scale(1.35);
+}
+
+/* راهنمای حرکت */
+.yp-instructions {
+    width: 100%; max-width: 680px; margin: 14px auto 0;
+    display: flex; flex-direction: column; gap: 10px;
+}
+.yp-instr-card {
+    background: rgba(10, 18, 44, 0.66);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px 18px;
+    backdrop-filter: blur(8px);
+    max-height: 220px; overflow-y: auto;
+}
+.yp-instr-card p { margin: 0; font-size: 13px; line-height: 2.1; color: #cfd8ef; }
+.yp-instr-benefits { border-color: rgba(110, 207, 151, 0.22); }
+.yp-instr-title {
+    font-size: 12px; font-weight: 800; color: var(--gold-300);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.yp-instr-empty { color: var(--ink-dim) !important; }
+
+/* اتمام جلسه */
+.yp-complete-card { max-width: 620px; text-align: center; }
+.yp-complete-recap {
+    display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
+    margin: 18px 0;
+}
+.yp-recap-item {
+    position: relative; width: 52px; height: 52px;
+    border-radius: 12px; overflow: hidden;
+    border: 2px solid rgba(110, 207, 151, 0.5);
+    opacity: 0.85;
+}
+.yp-recap-item.last { border-color: var(--gold-400); box-shadow: 0 0 16px rgba(221, 192, 112, 0.5); opacity: 1; }
+.yp-recap-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.yp-recap-num {
+    position: absolute; top: 3px; inset-inline-start: 3px;
+    background: rgba(7, 12, 31, 0.75);
+    font-size: 10px; color: #fff; padding: 1px 5px; border-radius: 7px;
+}
+.yp-complete-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.yp-ghost {
+    background: transparent; border: 1px solid var(--line-strong);
+    color: var(--ink-dim) !important; padding: 12px 20px;
+    font-family: 'Vazirmatn', sans-serif;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+    .yk-hub { padding: 4px 0 20px; }
+    .yp-instr-card { max-height: 180px; }
+    .yoga-rel-thumb { width: 46px; height: 46px; }
+    .yoga-detail { gap: 14px; }
+    .yk-detail-actions { flex-direction: column; }
+    .yk-act-btn { width: 100%; }
+}

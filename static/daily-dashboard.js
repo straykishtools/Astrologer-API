@@ -33,11 +33,16 @@ var ELEMENT_THEMES = {
 // ─── تقویم شمسی (رویدادها) ───
 var SOLAR_EVENTS = [
     { month: 1, day: 1, name: 'نوروز', emoji: '🌱', desc: 'آغاز سال نو شمسی — فصل تازه‌ای برای رشد و نو شدن' },
+    { month: 1, day: 12, name: 'روز جمهوری اسلامی', emoji: '🇮🇷', desc: 'سالروز تأسیس جمهوری اسلامی ایران' },
     { month: 1, day: 13, name: 'سیزده بدر', emoji: '🌿', desc: 'روز طبیعت — از خانه بیرون برو و انرژی بگیر' },
-    { month: 3, day: 15, name: 'تیرگان', emoji: '💧', desc: 'جشن آب و پاکیزگی — تصفیه ذهن و بدن' },
-    { month: 6, day: 31, name: 'شب چله', emoji: '🔥', desc: 'شب یلدا — طولانی‌ترین شب سال، زمان خانواده و انار' },
-    { month: 9, day: 5, name: 'شب یلدا (تقویم قمری)', emoji: '🍎', desc: 'شب چله — خوردن انار و حافظ خوانی' },
-    { month: 11, day: 29, name: 'چهارشنبه سوری', emoji: '🎆', desc: 'جشن آتش — پاک‌سازی و نو شدن' }
+    { month: 3, day: 15, name: 'قیام ۱۵ خرداد', emoji: '✊', desc: 'بزرگداشت قیام تاریخی مردم در سال ۱۳۴۲' },
+    { month: 4, day: 13, name: 'تیرگان', emoji: '💧', desc: 'جشن آب و پاکیزگی — تصفیه ذهن و بدن' },
+    { month: 6, day: 31, name: 'تاسوعا', emoji: '🕌', desc: 'عزاداری تاسوعای حسینی' },
+    { month: 7, day: 10, name: 'مهرگان', emoji: '🌸', desc: 'جشن مهر و دوستی — روز عشق و پیوند' },
+    { month: 10, day: 30, name: 'شب یلدا', emoji: '🍎', desc: 'شب چله — طولانی‌ترین شب سال، خوردن انار و حافظ خوانی' },
+    { month: 11, day: 22, name: '۲۲ بهمن', emoji: '🎉', desc: 'سالروز پیروزی انقلاب اسلامی' },
+    { month: 11, day: 29, name: 'چهارشنبه سوری', emoji: '🎆', desc: 'جشن آتش — پاک‌سازی و نو شدن' },
+    { month: 12, day: 29, name: 'شب چهارشنبه سوری', emoji: '🔥', desc: 'آخرین چهارشنبه سال — جشن آتش و نو شدن' }
 ];
 
 // ─── پیام‌های روزانه ───
@@ -113,14 +118,15 @@ function getSolarMonthDay() {
     return { month: jM, day: jD, year: jY };
 }
 
-function getUpcomingSolarEvent() {
+function getUpcomingSolarEvents(count) {
+    count = count || 2;
     var sd = getSolarMonthDay();
     var events = SOLAR_EVENTS.slice().sort(function (a, b) {
         var aDiff = (a.month > sd.month || (a.month === sd.month && a.day >= sd.day)) ? (a.month - sd.month) * 31 + (a.day - sd.day) : (12 - sd.month + a.month) * 31 + (30 - sd.day + a.day);
         var bDiff = (b.month > sd.month || (b.month === sd.month && b.day >= sd.day)) ? (b.month - sd.month) * 31 + (b.day - sd.day) : (12 - sd.month + b.month) * 31 + (30 - sd.day + b.day);
         return aDiff - bDiff;
     });
-    return events[0] || null;
+    return events.slice(0, count);
 }
 
 // ─── دریافت حیوان سال ───
@@ -149,7 +155,7 @@ function renderDashboard(containerId) {
     var bio = calcBiorhythm(getDayOfYear());
     var tarot = TAROT_CARDS[new Date().getDate() % TAROT_CARDS.length];
     var msg = DAILY_MESSAGES[new Date().getDate() % DAILY_MESSAGES.length];
-    var event = getUpcomingSolarEvent();
+    var events = getUpcomingSolarEvents(2);
     var solarDate = getSolarDate();
 
     var zodiacHtml = zodiac
@@ -159,16 +165,26 @@ function renderDashboard(containerId) {
     function bioBar(val, label, color) {
         var w = Math.abs(val);
         var side = val >= 0 ? 'right' : 'left';
-        return '<div class="dd-bio-row"><span class="dd-bio-label">' + label + '</span><div class="dd-bio-bar"><div class="dd-bio-fill" style="width:' + w + '%;background:' + color + ';float:' + side + '"></div><div class="dd-bio-center"></div></div><span class="dd-bio-val" style="color:' + color + '">' + val + '</span></div>';
+        var pct = (val >= 0 ? '+' : '') + val + '%';
+        return '<div class="dd-bio-row"><span class="dd-bio-label">' + label + '</span><div class="dd-bio-bar"><div class="dd-bio-fill" style="width:' + w + '%;background:' + color + ';float:' + side + '"></div><div class="dd-bio-center"></div></div><span class="dd-bio-val" style="color:' + color + '">' + pct + '</span></div>';
     }
 
     var yogaHtml = zodiac
         ? '<div class="dd-yoga"><div class="dd-yoga-title">🧘 حرکت پیشنهادی امروز</div><div class="dd-yoga-pose">' + zodiac.yogaName + '</div><div class="dd-yoga-desc">' + zodiac.yogaDesc + ' (' + zodiac.yogaPose + ')</div></div>'
         : '';
 
-    var eventHtml = event
-        ? '<div class="dd-event"><span class="dd-event-emoji">' + event.emoji + '</span><div><div class="dd-event-name">' + event.name + '</div><div class="dd-event-desc">' + event.desc + '</div></div></div>'
-        : '';
+    var eventHtml = '';
+    if (events.length > 0) {
+        eventHtml = '<div class="dd-card dd-event-card">';
+        events.forEach(function (ev, i) {
+            eventHtml += '<div class="dd-event">';
+            eventHtml += '<span class="dd-event-emoji">' + ev.emoji + '</span>';
+            eventHtml += '<div><div class="dd-event-name">' + ev.name + '</div>';
+            eventHtml += '<div class="dd-event-desc">' + ev.desc + '</div></div></div>';
+            if (i < events.length - 1) eventHtml += '<div class="dd-event-sep"></div>';
+        });
+        eventHtml += '</div>';
+    }
 
     el.innerHTML =
         '<div class="dd-grid">' +
@@ -190,7 +206,7 @@ function renderDashboard(containerId) {
                 '<div class="dd-tarot-msg">' + tarot.message + '</div>' +
             '</div>' +
             (yogaHtml ? '<div class="dd-card">' + yogaHtml + '</div>' : '') +
-            (eventHtml ? '<div class="dd-card dd-event-card">' + eventHtml + '</div>' : '') +
+            eventHtml +
         '</div>';
 
     // اعمال تم عنصر

@@ -176,6 +176,15 @@ def init_db():
             sort_order INTEGER DEFAULT 0,
             created_at TEXT DEFAULT (datetime('now'))
         );
+        CREATE TABLE IF NOT EXISTS guest_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fingerprint_hash TEXT UNIQUE NOT NULL,
+            daily_charts_used INTEGER DEFAULT 0,
+            daily_charts_reset_at TEXT DEFAULT '',
+            linked_user_id INTEGER DEFAULT NULL,
+            created_at TEXT DEFAULT (datetime('now')),
+            last_seen_at TEXT DEFAULT (datetime('now'))
+        );
     """)
     # درج پلن‌های پیش‌فرض اگر هنوز وجود ندارند
     defaults = [
@@ -191,6 +200,23 @@ def init_db():
                 d,
             )
     conn.commit()
+
+    # ─── Seed default admin user if none exists ───
+    admin_exists = conn.execute("SELECT id FROM users WHERE email = ?", ("admin@cosmic.ir",)).fetchone()
+    if not admin_exists:
+        try:
+            conn.execute(
+                "INSERT INTO users (email, password_hash, display_name, plan, is_admin) VALUES (?, ?, ?, ?, ?)",
+                ("admin@cosmic.ir", hash_password("admin123"), "مدیر سیستم", "pro", 1),
+            )
+            conn.commit()
+        except sqlite3.IntegrityError:
+            pass
+    else:
+        # Ensure existing admin user has is_admin flag set
+        conn.execute("UPDATE users SET is_admin = 1 WHERE email = ? AND is_admin = 0", ("admin@cosmic.ir",))
+        conn.commit()
+
     conn.close()
 
 
@@ -431,6 +457,74 @@ def atomic_check_and_increment(user_id: int) -> dict:
     except Exception:
         conn.close()
         raise
+
+
+def guest_check_and_increment(fp_hash: str, limit: int = 5) -> dict:
+    """اتمیک چک و افزایش مصرف روزانه مهمان بر اساس fingerprint هش‌شده
+
+    مثل atomic_check_and_increment ولی برای جدول guest_sessions.
+    حد مهمان پیش‌فرض 5 چارت در روز است.
+    """
+    conn = get_db()
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        guest = conn.execute(
+            "SELECT * FROM guest_sessions WHERE fingerprint_hash = ?",
+            (fp_hash,),
+        ).fetchone()
+
+        if not guest:
+            # مهمان جدید
+            conn.execute(
+                "INSERT INTO guest_sessions (fingerprint_hash, daily_charts_used, daily_charts_reset_at) VALUES (?, 0, ?)",
+                (fp_hash, today),
+            )
+            conn.commit()
+            used = 0
+        elif guest["daily_charts_reset_at"] != today:
+            conn.execute(
+                "UPDATE guest_sessions SET daily_charts_used = 0, daily_charts_reset_at = ? WHERE id = ?",
+                (today, guest["id"]),
+            )
+            conn.commit()
+            used = 0
+        else:
+            used = guest["daily_charts_used"] or 0
+
+        if used >= limit:
+            conn.close()
+            return {
+                "allowed": False,
+                "used": used,
+                "limit": limit,
+                "remaining": 0,
+            }
+
+        cursor = conn.execute(
+            "UPDATE guest_sessions SET daily_charts_used = daily_charts_used + 1 WHERE id = ? AND daily_charts_used < ?",
+            (guest["id"], limit),
+        )
+        conn.commit()
+        if cursor.rowcount == 0:
+            conn.close()
+            return {"allowed": False, "used": limit, "limit": limit, "remaining": 0}
+
+        conn.close()
+        return {"allowed": True, "used": used + 1, "limit": limit, "remaining": max(0, limit - used - 1)}
+    except Exception:
+        conn.close()
+        raise
+
+
+def guest_decrement(fp_hash: str):
+    """برگرداندن مصرف مهمان در صورت خطا"""
+    conn = get_db()
+    conn.execute(
+        "UPDATE guest_sessions SET daily_charts_used = MAX(0, daily_charts_used - 1) WHERE fingerprint_hash = ?",
+        (fp_hash,),
+    )
+    conn.commit()
+    conn.close()
 
 
 # ─── توابع چارت ذخیره‌شده ───

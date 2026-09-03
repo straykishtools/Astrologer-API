@@ -2876,6 +2876,33 @@ html, body {
 .yoga-daily-item-add { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--gold-400); background: transparent; color: var(--gold-200); font-size: 18px; cursor: pointer; transition: all 0.2s; }
 .yoga-daily-item-add:hover { background: var(--gold-400); color: var(--lapis-950); }
 
+/* ─── دکمه شروع تمرین ─── */
+.yoga-daily-start-wrap { margin-top: 24px; padding: 4px 0 8px; }
+.yoga-daily-start-btn {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 18px 24px;
+    border: 2px solid var(--gold-400);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(108,92,231,0.12), rgba(221,192,112,0.12));
+    color: var(--gold-200);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Vazirmatn', sans-serif;
+}
+.yoga-daily-start-btn:hover {
+    background: linear-gradient(135deg, rgba(108,92,231,0.25), rgba(221,192,112,0.25));
+    border-color: var(--gold-300);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(221,192,112,0.15);
+}
+.yoga-daily-start-icon { font-size: 28px; }
+.yoga-daily-start-text { font-size: 16px; font-weight: 700; color: var(--gold-200); }
+.yoga-daily-start-sub { font-size: 12px; color: var(--ink-dim); }
+
 /* ─── تنفس و مدیتیشن ─── */
 .yoga-breath { padding: 8px 0; }
 .yoga-breath h3 { font-size: 18px; color: var(--gold-200); margin-bottom: 8px; }
@@ -3122,6 +3149,40 @@ html, body {
 .zodiac-emoji { font-size: 22px; }
 .zodiac-text { font-size: 13px; font-weight: 600; color: var(--gold-200); white-space: nowrap; }
 .zodiac-date { font-size: 11px; color: var(--ink-dim); white-space: nowrap; padding-right: 8px; border-right: 1px solid var(--line); }
+.zodiac-bio { display: flex; align-items: center; gap: 4px; padding-right: 6px; border-right: 1px solid var(--line); margin-right: 2px; }
+.zodiac-bio-item { display: flex; align-items: center; gap: 2px; font-size: 12px; cursor: default; position: relative; }
+.bio-anim-in { animation: bioPulseIn 0.5s ease both; }
+@keyframes bioPulseIn {
+    0% { opacity: 0; transform: scale(0.5) translateY(4px); }
+    60% { opacity: 1; transform: scale(1.15) translateY(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.zodiac-bio-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+/* Inline biorhythm sparkline on hover */
+.zodiac-bio {
+    overflow: visible;
+    flex-wrap: nowrap;
+}
+.zodiac-bio-sparkline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(10, 14, 34, 0.92);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 8px;
+    padding: 3px 8px;
+    margin-left: 4px;
+    animation: sparkFadeIn 0.15s ease;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+@keyframes sparkFadeIn { from { opacity: 0; transform: scaleX(0.6); } to { opacity: 1; transform: scaleX(1); } }
+.zbs-label { font-size: 10px; font-weight: 700; white-space: nowrap; }
+.zbs-next { font-size: 9px; color: var(--ink-dim); white-space: nowrap; }
 
 /* ============================================================
    ZODIAC MODAL
@@ -3882,6 +3943,14 @@ html, body {
     color: #aab2cd;
     margin-top: 2px;
 }
+.dd-event + .dd-event {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(221,192,112,0.1);
+}
+.dd-event-sep {
+    display: none;
+}
 /* ============================================================
    BREATH MODULE — صفحه مستقل تنفس و مدیتیشن
    ============================================================ */
@@ -4055,6 +4124,13 @@ html, body {
 /* ============================================================
    YOGA PRACTICE — تمرین پیشرفته یوگا
    ============================================================ */
+#yogaPracticePanel {
+    position: relative;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 16px;
+}
 .yp-bg {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;

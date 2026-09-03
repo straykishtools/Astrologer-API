@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&family=Cinzel:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static/style.css">
     <link rel="stylesheet" href="static/date-wheel-picker.css">
+    <link rel="stylesheet" href="static/yoga-v3.css?v=1">
 
     <style>
         /* ============================================================
@@ -548,16 +549,11 @@
 
         .menu-toggle:hover { border-color: var(--gold-400); }
 
-        .topbar-brand {
-            font-family: "Cinzel", serif;
-            font-weight: 700;
-            font-size: 17px;
-            letter-spacing: 0.12em;
-            background: linear-gradient(180deg, var(--gold-200), var(--gold-500));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            white-space: nowrap;
+        .topbar-visualizer {
+            height: 32px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            opacity: 0.8;
         }
 
         .topbar-spacer { flex: 1; }
@@ -611,6 +607,527 @@
             background: linear-gradient(180deg, var(--gold-200), var(--gold-400) 60%, var(--gold-500));
             box-shadow: 0 8px 28px -6px rgba(201, 162, 39, 0.7);
         }
+
+        /* ─── Icon-only topbar buttons ─── */
+        .tb-icon-only {
+            padding: 8px 10px !important;
+            font-size: 16px;
+            min-width: 0;
+            line-height: 1;
+        }
+
+        /* ─── Top Bar Actions Dropdown ─── */
+        .topbar-actions-dropdown { position: relative; }
+        .topbar-actions-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            min-width: 160px;
+            background: rgba(12, 18, 42, 0.96);
+            border: 1px solid var(--line-strong);
+            border-radius: 14px;
+            padding: 6px 0;
+            z-index: 5000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px) scale(0.96);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+        .topbar-actions-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .topbar-actions-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--ink-dim);
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 9px 16px;
+            cursor: pointer;
+            text-align: right;
+            direction: rtl;
+            transition: background 0.15s, color 0.15s;
+        }
+        .topbar-actions-item:hover {
+            background: rgba(221, 192, 112, 0.1);
+            color: var(--gold-200);
+        }
+        .topbar-actions-icon { font-size: 15px; width: 20px; text-align: center; }
+
+        /* ─── Cosmic Status Dropdown ─── */
+        .cosmic-status-dropdown { position: relative; }
+        .cosmic-status-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 310px;
+            background: rgba(10, 15, 35, 0.97);
+            border: 1px solid var(--line-strong);
+            border-radius: 18px;
+            z-index: 5000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.95);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(221, 192, 112, 0.08);
+            overflow: hidden;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        .cosmic-status-panel.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .cs-header {
+            padding: 16px 18px 12px;
+            background: linear-gradient(135deg, rgba(37, 53, 107, 0.4), rgba(16, 26, 61, 0.3));
+            border-bottom: 1px solid var(--line);
+        }
+        .cs-header-title {
+            font-family: 'Reem Kufi', 'Vazirmatn', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gold-200);
+        }
+        .cs-header-date {
+            font-size: 11px;
+            color: var(--ink-dim);
+            margin-top: 4px;
+        }
+        .cs-section { padding: 12px 18px; }
+        .cs-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cs-row-emoji { font-size: 28px; flex-shrink: 0; }
+        .cs-row-info { flex: 1; min-width: 0; }
+        .cs-row-label { font-size: 11px; color: var(--ink-dim); margin-bottom: 2px; }
+        .cs-row-value { font-size: 14px; font-weight: 700; color: var(--gold-200); }
+        .cs-row-badge {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--gold-300);
+            background: rgba(221, 192, 112, 0.1);
+            padding: 4px 10px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+        .cs-moon-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 2px;
+            margin: 10px 0 4px;
+            overflow: hidden;
+        }
+        .cs-moon-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5b4fc4, #a29bfe, #f3e5b8);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        .cs-row-sub { font-size: 11px; color: var(--ink-dim); margin-top: 6px; }
+        .cs-divider { height: 1px; background: var(--line); margin: 0 18px; }
+        .cs-row-double { display: flex; gap: 16px; }
+        .cs-half { flex: 1; display: flex; align-items: center; gap: 8px; }
+        .cs-half-emoji { font-size: 22px; flex-shrink: 0; }
+        .cs-half-text { min-width: 0; }
+        .cs-half-label { font-size: 10px; color: var(--ink-dim); }
+        .cs-half-value { font-size: 12px; font-weight: 700; color: var(--gold-200); margin-top: 1px; }
+        .cs-section-title { font-size: 11px; font-weight: 700; color: var(--gold-200); margin-bottom: 8px; }
+        .cs-moon-week { display: flex; gap: 2px; justify-content: space-between; }
+        .cs-moon-day {
+            flex: 1; text-align: center; padding: 4px 0;
+            border-radius: 8px; transition: background 0.2s;
+        }
+        .cs-moon-day:hover { background: rgba(255,255,255,0.04); }
+        .cs-moon-today { background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.25); }
+        .cs-moon-day-emoji { font-size: 16px; }
+        .cs-moon-day-label { font-size: 8px; color: var(--ink-dim); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cs-moon-today .cs-moon-day-label { color: var(--gold-200); font-weight: 700; }
+        .cs-eclipse { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--ink-dim); margin-top: 4px; }
+        .cs-eclipse-icon { font-size: 13px; }
+        .cs-eclipse-type { color: var(--gold-200); font-weight: 600; }
+        .cs-phase-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 11px; }
+        .cs-phase-name { color: var(--ink); }
+        .cs-phase-date { color: var(--ink-dim); font-size: 10px; }
+        .cs-eclipse-countdown {
+            display: flex; align-items: center; gap: 4px; margin-top: 6px;
+            padding: 4px 8px; border-radius: 8px;
+            background: rgba(201,162,39,0.08); border: 1px solid rgba(201,162,39,0.15);
+            font-size: 11px; color: var(--gold-200); font-weight: 600;
+        }
+        .cs-cd-icon { font-size: 13px; animation: csCdPulse 2s ease infinite; }
+        @keyframes csCdPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* ─── Yoga Celebration Animation ─── */
+        @keyframes ysConfettiBurst {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-40px) scale(0.3); }
+        }
+        @keyframes ysGlowPulse {
+            0% { box-shadow: 0 0 0 0 rgba(201,162,39,0.4); }
+            50% { box-shadow: 0 0 20px 8px rgba(201,162,39,0.2); }
+            100% { box-shadow: 0 0 0 0 rgba(201,162,39,0); }
+        }
+        .ys-celebration {
+            position: relative; overflow: visible;
+            animation: ysGlowPulse 1.5s ease 1;
+        }
+        .ys-confetti-particle {
+            position: absolute; font-size: 14px;
+            pointer-events: none;
+            animation: ysConfettiBurst 1s ease forwards;
+        }
+
+        /* ─── Yoga Summary Dropdown ─── */
+        .yoga-summary-dropdown { position: relative; }
+        .yoga-summary-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 320px;
+            background: rgba(10, 15, 35, 0.97);
+            border: 1px solid var(--line-strong);
+            border-radius: 18px;
+            z-index: 5000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.95);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(221, 192, 112, 0.08);
+            overflow: hidden;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .yoga-summary-panel.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .ys-header {
+            padding: 16px 18px 12px;
+            background: linear-gradient(135deg, rgba(162, 155, 254, 0.15), rgba(221, 192, 112, 0.08));
+            border-bottom: 1px solid var(--line);
+        }
+        .ys-header-title {
+            font-family: 'Reem Kufi', 'Vazirmatn', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gold-200);
+        }
+        .ys-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 1px;
+            background: var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+        .ys-stat {
+            background: rgba(10, 15, 35, 0.97);
+            padding: 12px 6px;
+            text-align: center;
+        }
+        .ys-stat-num {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gold-300);
+        }
+        .ys-stat-label {
+            font-size: 10px;
+            color: var(--ink-dim);
+            margin-top: 2px;
+        }
+        .ys-section { padding: 14px 18px; }
+        .ys-divider { height: 1px; background: var(--line); margin: 0; }
+        .ys-progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .ys-progress-label { font-size: 12px; color: var(--ink-dim); }
+        .ys-progress-pct { font-size: 13px; font-weight: 800; color: var(--gold-300); }
+        .ys-progress-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }        .ys-progress-fill { height: 100%; background: linear-gradient(90deg, #2ecc71, #a29bfe); border-radius: 3px; transition: width 0.5s ease; }
+        .ys-stat-streak { position: relative; }
+        .ys-streak-fire {
+            font-size: 12px;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 2px;
+            animation: fireFlicker 1.5s ease-in-out infinite;
+        }
+        .ys-fire-sm { font-size: 12px; }
+        .ys-fire-md { font-size: 15px; animation-duration: 1.2s; }
+        .ys-fire-lg { font-size: 18px; animation-duration: 0.9s; filter: drop-shadow(0 0 4px rgba(231,76,60,0.5)); }
+        @keyframes fireFlicker {
+            0%, 100% { transform: scale(1) translateY(0); opacity: 1; }
+            25% { transform: scale(1.05) translateY(-1px); opacity: 0.9; }
+            50% { transform: scale(0.98) translateY(1px); opacity: 1; }
+            75% { transform: scale(1.03) translateY(-0.5px); opacity: 0.95; }
+        }
+        .ys-weekly-row {
+            display: flex; justify-content: space-between; gap: 2px;
+        }
+        .ys-weekly-day {
+            flex: 1; text-align: center; padding: 6px 2px;
+            border-radius: 8px; transition: background 0.2s;
+        }
+        .ys-weekly-day:hover { background: rgba(255,255,255,0.03); }
+        .ys-weekly-done { background: rgba(46,204,113,0.08); }
+        .ys-weekly-today { background: rgba(201,162,39,0.1); border: 1px solid rgba(201,162,39,0.2); }
+        .ys-weekly-today.ys-weekly-done { background: rgba(46,204,113,0.12); border-color: rgba(46,204,113,0.25); }
+        .ys-weekly-icon { font-size: 14px; line-height: 1.2; }
+        .ys-weekly-label { font-size: 9px; color: var(--ink-dim); margin-top: 2px; }
+        .ys-weekly-today .ys-weekly-label { color: var(--gold-200); font-weight: 700; }
+        .ys-weekly-done .ys-weekly-label { color: #2ecc71; }
+        .ys-weekly-count {
+            font-size: 9px; font-weight: 700; color: #2ecc71;
+            margin-top: 1px;
+        }
+
+
+        .ys-progress-sub { font-size: 10px; color: var(--ink-dim); margin-top: 5px; }
+        .ys-rec { display: flex; align-items: center; gap: 10px; }
+        .ys-rec-emoji { font-size: 30px; flex-shrink: 0; }
+        .ys-rec-info { flex: 1; min-width: 0; }
+        .ys-rec-label { font-size: 10px; color: var(--ink-dim); }
+        .ys-rec-name { font-size: 14px; font-weight: 700; color: var(--gold-200); margin-top: 2px; }
+        .ys-rec-desc { font-size: 11px; color: var(--ink-dim); margin-top: 2px; }
+        .ys-rec-start {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(162, 155, 254, 0.25), rgba(221, 192, 112, 0.2));
+            border: 1px solid var(--line-strong);
+            color: var(--gold-200);
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.12s;
+        }
+        .ys-rec-start:hover { background: linear-gradient(135deg, rgba(162, 155, 254, 0.35), rgba(221, 192, 112, 0.3)); }
+        .ys-rec-start:active { transform: scale(0.97); }
+        .ys-links { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .ys-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 4px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            color: var(--ink-dim);
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, transform 0.12s;
+        }
+        .ys-link:hover { background: rgba(221, 192, 112, 0.08); border-color: var(--gold-400); color: var(--gold-200); transform: translateY(-1px); }
+        .ys-link:active { transform: scale(0.96); }
+        .ys-link-icon { font-size: 20px; }
+        .ys-link-text { font-size: 10px; }
+
+        /* ─── Top Bar Profile / Plans Dropdown ─── */
+        .topbar-profile-dropdown { position: relative; }
+        .topbar-profile-trigger { display: flex; align-items: center; gap: 7px; }
+        .topbar-profile-avatar {
+            width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            border-radius: 50%;
+            background: rgba(162, 155, 254, 0.15);
+            flex-shrink: 0;
+        }
+        .topbar-profile-label { font-size: 13px; font-weight: 600; }
+        .topbar-profile-plan {
+            font-size: 9px; font-weight: 700;
+            padding: 1px 6px; border-radius: 6px;
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--gold-400);
+            display: none;
+        }
+        .topbar-profile-plan.visible { display: inline-block; }
+
+        .topbar-profile-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 320px;
+            background: rgba(10, 15, 35, 0.97);
+            border: 1px solid var(--line-strong);
+            border-radius: 20px;
+            z-index: 5000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.95);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(221, 192, 112, 0.08);
+            overflow: hidden;
+        }
+        .topbar-profile-panel.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .tpp-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 18px 18px 14px;
+            background: linear-gradient(135deg, rgba(37, 53, 107, 0.4), rgba(16, 26, 61, 0.3));
+        }
+        .tpp-avatar {
+            width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(162, 155, 254, 0.2), rgba(221, 192, 112, 0.15));
+            border: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+        .tpp-info { flex: 1; min-width: 0; }
+        .tpp-name {
+            font-size: 14px; font-weight: 700;
+            color: var(--gold-200);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .tpp-email {
+            font-size: 11px; color: var(--ink-dim);
+            margin-top: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .tpp-plan-badge {
+            padding: 4px 10px; border-radius: 10px;
+            font-size: 10px; font-weight: 700;
+            white-space: nowrap;
+        }
+        .tpp-divider {
+            height: 1px;
+            background: var(--line);
+            margin: 0 18px;
+        }
+        .tpp-section-title {
+            padding: 12px 18px 6px;
+            font-size: 12px; font-weight: 700;
+            color: var(--gold-300);
+        }
+        .tpp-plans {
+            display: flex; gap: 8px;
+            padding: 4px 18px 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .tpp-plans::-webkit-scrollbar { display: none; }
+        .tpp-plan-card {
+            flex: 1 1 0;
+            min-width: 88px;
+            text-align: center;
+            padding: 12px 6px 10px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
+        }
+        .tpp-plan-card:hover {
+            border-color: var(--line-strong);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-1px);
+        }
+        .tpp-plan-card.tpp-plan-featured {
+            border-color: rgba(243, 156, 18, 0.35);
+            background: linear-gradient(160deg, rgba(243, 156, 18, 0.08), rgba(221, 192, 112, 0.04));
+        }
+        .tpp-plan-card.tpp-plan-current {
+            border-color: rgba(46, 204, 113, 0.5);
+            box-shadow: 0 0 12px rgba(46, 204, 113, 0.12);
+        }
+        .tpp-plan-popular {
+            position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+            font-size: 8px; font-weight: 700;
+            padding: 1px 8px; border-radius: 6px;
+            background: var(--gold-500); color: var(--lapis-950);
+            white-space: nowrap;
+        }
+        .tpp-plan-icon { font-size: 20px; margin-bottom: 4px; }
+        .tpp-plan-name {
+            font-size: 11px; font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 3px;
+        }
+        .tpp-plan-price {
+            font-size: 11px; font-weight: 800;
+            color: var(--gold-200);
+        }
+        .tpp-plan-unit {
+            font-size: 8px; font-weight: 500;
+            color: var(--ink-dim);
+        }
+        .tpp-plan-limit {
+            font-size: 8px; color: var(--ink-dim);
+            margin-top: 3px;
+        }
+        .tpp-plan-check {
+            font-size: 12px; color: #2ecc71; margin-top: 4px;
+        }
+        .tpp-features {
+            padding: 6px 18px 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+        .tpp-feature {
+            font-size: 10.5px; color: var(--ink-dim);
+            padding: 4px 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .tpp-feature span { font-size: 13px; }
+        .tpp-actions {
+            padding: 12px 18px 16px;
+            display: flex; gap: 8px;
+        }
+        .tpp-btn {
+            flex: 1;
+            border: none; border-radius: 12px;
+            padding: 10px 14px;
+            font-family: "Vazirmatn", sans-serif;
+            font-size: 12px; font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.12s, box-shadow 0.2s;
+        }
+        .tpp-btn:active { transform: scale(0.97); }
+        .tpp-btn-primary {
+            background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+            color: var(--lapis-950);
+            box-shadow: 0 4px 16px rgba(201, 162, 39, 0.3);
+        }
+        .tpp-btn-primary:hover { box-shadow: 0 6px 22px rgba(201, 162, 39, 0.45); }
+        .tpp-btn-ghost {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+        .tpp-btn-ghost:hover { background: rgba(231, 76, 60, 0.18); }
 
         /* ============================================================
            صفحات
@@ -1218,6 +1735,103 @@
 
         .cosmic .yoga-controls button:hover { border-color: var(--gold-400); color: var(--gold-200); }
         .cosmic .yoga-controls input[type="range"] { accent-color: var(--gold-500); }
+        .yoga-duration-presets {
+            margin-top: 10px;
+        }
+        .yoga-duration-presets label {
+            display: block; font-size: 12px; color: var(--ink-dim);
+            margin-bottom: 6px; font-weight: 600;
+        }
+        .yoga-dur-btns {
+            display: flex; gap: 4px; flex-wrap: wrap;
+        }
+        .yoga-dur-btn {
+            padding: 5px 12px; border-radius: 8px;
+            border: 1px solid var(--line-strong);
+            background: rgba(22, 34, 77, 0.5);
+            color: var(--ink-dim); font-size: 11px;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .yoga-dur-btn:hover { border-color: var(--gold-400); color: var(--gold-200); }
+        .yoga-dur-btn.active {
+            background: rgba(201, 162, 39, 0.2);
+            border-color: var(--gold-400); color: var(--gold-200); font-weight: 700;
+        }
+
+        /* ─── Meditation Timer ─── */
+        .med-timer {
+            background: rgba(18, 22, 46, 0.7);
+            border: 1px solid var(--line-strong);
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 14px;
+        }
+        .med-timer-header {
+            font-size: 14px; font-weight: 700; color: var(--gold-200);
+            margin-bottom: 12px; text-align: center;
+        }
+        .med-timer-row {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 10px;
+        }
+        .med-timer-row label {
+            font-size: 12px; color: var(--ink-dim); width: 50px; flex-shrink: 0;
+        }
+        .med-timer-durations {
+            display: flex; gap: 4px; flex-wrap: wrap; flex: 1;
+        }
+        .med-dur-btn {
+            padding: 4px 10px; border-radius: 8px;
+            border: 1px solid var(--line-strong);
+            background: rgba(22, 34, 77, 0.5);
+            color: var(--ink-dim); font-size: 11px;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .med-dur-btn:hover { border-color: var(--gold-400); color: var(--gold-200); }
+        .med-dur-btn.active {
+            background: rgba(201, 162, 39, 0.2);
+            border-color: var(--gold-400); color: var(--gold-200); font-weight: 700;
+        }
+        .med-select {
+            flex: 1; padding: 6px 10px; border-radius: 8px;
+            border: 1px solid var(--line-strong);
+            background: rgba(7, 12, 31, 0.6); color: var(--ink);
+            font-family: 'Vazirmatn', sans-serif; font-size: 12px;
+        }
+        .med-timer-countdown {
+            text-align: center; font-family: 'Cinzel', serif;
+            font-size: 36px; font-weight: 700; color: var(--gold-200);
+            padding: 10px 0; letter-spacing: 0.05em;
+        }
+        .med-timer-phase {
+            text-align: center; font-size: 13px; color: var(--ink-dim);
+            min-height: 20px; margin-bottom: 8px;
+        }
+        .med-timer-phase .phase-ambient { color: #74b9ff; }
+        .med-timer-phase .phase-breathing { color: var(--gold-200); }
+        .med-timer-phase .phase-bell { color: #a29bfe; }
+        .med-timer-progress {
+            height: 4px; background: rgba(255,255,255,0.06);
+            border-radius: 2px; margin-bottom: 12px; overflow: hidden;
+        }
+        .med-timer-progress-bar {
+            height: 100%; background: linear-gradient(90deg, var(--gold-500), var(--gold-200));
+            border-radius: 2px; transition: width 1s linear; width: 0%;
+        }
+        .med-timer-start {
+            width: 100%; padding: 10px; border-radius: 10px;
+            border: none; font-family: 'Vazirmatn', sans-serif;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500));
+            color: var(--lapis-950); transition: all 0.2s;
+        }
+        .med-timer-start:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,162,39,0.3); }
+        .med-timer-start.running {
+            background: rgba(201,162,39,0.15);
+            border: 1px solid var(--gold-500); color: var(--gold-200);
+        }
 
         /* ============================================================
            مودال نقشه — نمایش با کلاس .active (طبق script.js)
@@ -1324,6 +1938,10 @@
             body.cosmic.sidebar-open .sidebar { transform: translateX(0); }
             .cosmic-main { margin-right: 0; }
             .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+            /* Hide zodiac text, keep emoji + bio dots */
+            .zodiac-text, .zodiac-date { display: none !important; }
+            .zodiac-bio { border-right: none; padding-right: 0; }
+            .topbar-player { display: none !important; }
         }
 
         @media (max-width: 640px) {
@@ -1335,17 +1953,337 @@
             .hero-stats { gap: 8px; }
             .hero-stat { flex: 1 1 44%; max-width: none; }
             .hero-stat + .hero-stat { border-right: none; }
-            .topbar { padding: 8px 12px; gap: 8px; }
-            .topbar-brand { font-size: 15px; }
-            .cosmic .header-actions { gap: 6px; }
-            .cosmic .btn-action { padding: 7px 11px; font-size: 12px; }
+            .topbar { padding: 8px 12px; gap: 6px; }
+            .topbar-visualizer { height: 24px; width: 80px; }
+            .topbar-player { padding: 3px 6px; gap: 4px; }
+            .topbar-player .apw-track { max-width: 80px; font-size: 10px; }
+            .cosmic .header-actions { gap: 4px; }
+            .cosmic .btn-action { padding: 6px 8px; font-size: 11px; }
             .cosmic .form-card { padding: 18px 14px 22px; }
             .cosmic .form-card::before { inset: 6px; border-radius: 17px; }
             .cosmic .tab-btn { font-size: 12px; padding: 7px 12px; }
             .cosmic .form-title { font-size: 18px; }
             .cosmic .btn-primary { font-size: 15px; padding: 14px 18px; }
             .section-heading { font-size: 21px; }
+            /* Hide cosmic status on small screens */
+            .cosmic-status-dropdown { display: none !important; }
+            .zodiac-date { display: none !important; }
+            .zodiac-bio { border-right: none; padding-right: 0; margin-right: 0; }
+            .topbar-visualizer { width: 60px; }
+            .topbar-player { display: none !important; }
         }
+
+        @media (max-width: 480px) {
+            .topbar { padding: 6px 10px; gap: 4px; }
+            .topbar-visualizer { width: 48px; height: 20px; }
+            .tb-icon-only { padding: 6px 7px !important; font-size: 14px; }
+            .zodiac-bio { display: none !important; }
+            .zodiac-display { padding-right: 0; border-right: none; margin-right: 0; }
+            .header-actions { gap: 3px !important; }
+        }
+
+        /* ─── Badge filtered state (search active) ─── */
+        .sb-badge.admin-badge-filtered {
+            background: rgba(253, 203, 110, 0.25);
+            color: #fdcb6e;
+            animation: badgePulse 0.6s ease-in-out 2;
+        }
+
+        /* ─── Admin Panel ─── */
+        .admin-page { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+        .admin-page-title { font-family: 'Cinzel', serif; font-size: 26px; color: var(--gold-200); margin-bottom: 4px; }
+        .admin-page-sub { color: var(--ink-dim); font-size: 13px; margin-bottom: 28px; }
+
+        /* Stats row */
+        .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
+        .admin-stat-card {
+            background: rgba(18, 22, 46, 0.85);
+            border: 1px solid var(--line-strong);
+            border-radius: 14px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+        .admin-stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,162,39,0.1); }
+        .admin-stat-icon { font-size: 28px; margin-bottom: 8px; }
+        .admin-stat-value { font-family: 'Cinzel', serif; font-size: 30px; color: var(--gold-200); font-weight: 700; }
+        .admin-stat-label { font-size: 12px; color: var(--ink-dim); margin-top: 4px; }
+
+        /* Tabs */
+        .admin-tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--line-strong); padding-bottom: 10px; }
+        .admin-tab {
+            background: transparent; border: none; color: var(--ink-dim); font-family: 'Vazirmatn', sans-serif;
+            font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 10px 10px 0 0;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .admin-tab:hover { color: var(--gold-300); background: rgba(221,192,112,0.06); }
+        .admin-tab.active { color: var(--gold-200); background: rgba(221,192,112,0.12); border-bottom: 2px solid var(--gold-400); }
+
+        /* Toolbar */
+        .admin-toolbar { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
+        .admin-search {
+            flex: 1; padding: 9px 14px; border-radius: 12px; border: 1px solid var(--line-strong);
+            background: rgba(7, 12, 31, 0.6); color: var(--ink); font-family: 'Vazirmatn', sans-serif;
+            font-size: 13px; outline: none; direction: rtl;
+        }
+        .admin-search:focus { border-color: var(--gold-400); }
+
+        /* Buttons */
+        .admin-btn {
+            padding: 8px 18px; border-radius: 10px; border: 1px solid var(--line-strong);
+            background: rgba(18, 22, 46, 0.85); color: var(--ink-dim); font-family: 'Vazirmatn', sans-serif;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .admin-btn:hover { border-color: var(--gold-400); color: var(--gold-200); }
+        .admin-btn-primary { background: rgba(201,162,39,0.15); border-color: var(--gold-400); color: var(--gold-200); }
+        .admin-btn-primary:hover { background: rgba(201,162,39,0.25); }
+        .admin-icon-btn {
+            background: none; border: none; cursor: pointer; font-size: 15px; padding: 4px 6px;
+            border-radius: 6px; transition: background 0.2s;
+        }
+        .admin-icon-btn:hover { background: rgba(221,192,112,0.1); }
+        .admin-icon-btn-danger:hover { background: rgba(255,118,117,0.15); }
+
+        /* Table */
+        .admin-table-wrap { overflow-x: auto; }
+        .admin-table {
+            width: 100%; border-collapse: collapse; font-size: 13px;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        .admin-table th {
+            text-align: right; padding: 10px 12px; color: var(--gold-300);
+            border-bottom: 2px solid var(--line-strong); font-weight: 700; font-size: 12px;
+            white-space: nowrap;
+        }
+        .admin-table td {
+            padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--ink); vertical-align: middle;
+        }
+        .admin-table tr:hover td { background: rgba(221,192,112,0.03); }
+
+        /* Plans */
+        .admin-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .admin-plan-card {
+            background: rgba(18, 22, 46, 0.85); border: 1px solid var(--line-strong);
+            border-radius: 14px; padding: 24px 18px; transition: transform 0.2s;
+        }
+        .admin-plan-card:hover { transform: translateY(-2px); }
+        .admin-plan-badge { display: inline-block; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+        .admin-plan-price { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold-200); margin-bottom: 6px; }
+        .admin-plan-limit { font-size: 11px; color: var(--ink-dim); margin-bottom: 14px; }
+        .admin-plan-features { list-style: none; padding: 0; margin: 0; }
+        .admin-plan-features li { font-size: 12px; color: var(--ink-dim); padding: 3px 0; }
+
+        /* Settings */
+        .admin-settings-form { max-width: 500px; }
+        .admin-setting-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .admin-setting-row label { font-size: 13px; color: var(--ink); }
+        .admin-input {
+            padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line-strong);
+            background: rgba(7, 12, 31, 0.6); color: var(--ink); font-family: 'Vazirmatn', sans-serif;
+            font-size: 13px; outline: none; width: 200px; direction: rtl;
+        }
+        .admin-input:focus { border-color: var(--gold-400); }        select.admin-input { width: 216px; }
+
+        /* ─── Admin Usage Chart & Stats ─── */
+        .admin-usage-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .admin-usage-card {
+            background: rgba(18, 22, 46, 0.85); border: 1px solid var(--line-strong);
+            border-radius: 12px; padding: 16px; text-align: center;
+            transition: transform 0.2s;
+        }
+        .admin-usage-card:hover { transform: translateY(-2px); }
+        .admin-usage-card-icon { font-size: 24px; margin-bottom: 6px; }
+        .admin-usage-card-value { font-family: 'Cinzel', serif; font-size: 26px; color: var(--gold-200); font-weight: 700; }
+        .admin-usage-card-label { font-size: 11px; color: var(--ink-dim); margin-top: 4px; }
+
+        .admin-chart-wrap {
+            background: rgba(18, 22, 46, 0.85); border: 1px solid var(--line-strong);
+            border-radius: 14px; padding: 18px; margin-bottom: 20px;
+        }
+        .admin-chart-title { font-size: 14px; font-weight: 700; color: var(--gold-200); margin-bottom: 14px; }
+        .admin-chart-bars { display: flex; flex-direction: column; gap: 10px; }
+        .admin-chart-row { display: flex; align-items: center; gap: 10px; }
+        .admin-chart-label { width: 120px; font-size: 12px; flex-shrink: 0; }
+        .admin-chart-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+        .admin-chart-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        .admin-chart-val { width: 40px; font-size: 12px; font-weight: 700; text-align: left; }
+
+        /* ─── Usage Bar (per-user table) ─── */
+        .usage-text-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .usage-val { font-weight: 700; font-size: 0.85rem; }
+        .usage-val-red { color: #e74c3c; }
+        .usage-val-orange { color: #f39c12; }
+        .usage-val-green { color: #2ecc71; }
+        .usage-sep { color: #666; }
+        .usage-limit { color: #888; }
+        .usage-pct { color: #666; font-size: 0.7rem; }
+        .usage-bar { height: 4px; background: #1e2740; border-radius: 2px; overflow: hidden; }
+        .usage-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+        .usage-bar-red { background: #e74c3c; }
+        .usage-bar-orange { background: #f39c12; }
+        .usage-bar-green { background: #2ecc71; }
+        .usage-reset-btn {
+            background: #2a3560; border: none; color: #b0c4e0;
+            padding: 3px 8px; border-radius: 4px; cursor: pointer;
+            font-size: 0.7rem; font-family: inherit; margin-top: 3px;
+        }
+        .usage-reset-btn:hover { background: #3a4570; }
+
+        /* ─── Audio Visualizer Enhancements ─── */
+        .topbar-visualizer {
+            height: 32px; border-radius: 8px; flex-shrink: 0;
+            opacity: 0; transition: opacity 0.6s ease; cursor: pointer;
+        }
+        .topbar-visualizer.active { opacity: 0.85; }
+        .topbar-visualizer:hover { opacity: 1; }
+        .topbar-visualizer.glowing { filter: drop-shadow(0 0 6px rgba(221,192,112,0.5)); }
+
+        /* ─── Topbar Player Strip ─── */
+        .topbar-player {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(22, 34, 77, 0.4); border: 1px solid rgba(221,192,112,0.12);
+            border-radius: 10px; padding: 4px 8px;
+            font-family: 'Vazirmatn', sans-serif;
+            flex-shrink: 0;
+        }
+        .topbar-player .apw-btn {
+            font-size: 13px; padding: 2px 4px;
+        }
+        .topbar-player .apw-track {
+            font-size: 11px; max-width: 120px; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+        }
+        .topbar-player .apw-volume { width: 50px; height: 3px; }
+        .audio-player-widget { display: none; }
+
+
+
+        /* Toggle switch */
+        .admin-toggle { position: relative; display: inline-block; width: 42px; height: 22px; cursor: pointer; }
+        .admin-toggle input { opacity: 0; width: 0; height: 0; }
+        .admin-toggle-slider {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 22px; transition: 0.3s;
+        }
+        .admin-toggle-slider::before {
+            content: '';
+            position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px;
+            background: var(--ink-dim); border-radius: 50%; transition: 0.3s;
+        }
+        .admin-toggle input:checked + .admin-toggle-slider { background: rgba(201,162,39,0.4); }
+        .admin-toggle input:checked + .admin-toggle-slider::before { transform: translateX(20px); background: var(--gold-200); }
+
+        /* Modal */
+        .admin-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(4px);
+        }
+        .admin-modal-overlay.visible { opacity: 1; }
+        .admin-modal {
+            background: #12162e; border: 1px solid var(--line-strong); border-radius: 16px;
+            width: 420px; max-width: 90vw; max-height: 80vh; overflow-y: auto;
+        }
+        .admin-modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px; border-bottom: 1px solid var(--line-strong);
+        }
+        .admin-modal-header h3 { font-family: 'Vazirmatn', sans-serif; font-size: 15px; color: var(--gold-200); margin: 0; }
+        .admin-modal-close {
+            background: none; border: none; color: var(--ink-dim); font-size: 18px;
+            cursor: pointer; padding: 4px 8px; border-radius: 6px;
+        }
+        .admin-modal-close:hover { background: rgba(255,118,117,0.15); color: #ff7675; }
+        .admin-modal-body { padding: 20px; }
+        .admin-form-row { margin-bottom: 14px; }
+        .admin-form-row label { display: block; font-size: 12px; color: var(--ink-dim); margin-bottom: 4px; }
+        .admin-form-row .admin-input { width: 100%; box-sizing: border-box; }
+        .admin-modal-footer {
+            display: flex; justify-content: flex-end; gap: 8px;
+            padding: 14px 20px; border-top: 1px solid var(--line-strong);
+        }
+
+        /* Toast */
+        .admin-toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(18, 22, 46, 0.95); border: 1px solid var(--gold-400);
+            color: var(--gold-200); padding: 10px 24px; border-radius: 12px;
+            font-family: 'Vazirmatn', sans-serif; font-size: 13px; z-index: 10000;
+            opacity: 0; transition: all 0.3s; backdrop-filter: blur(8px);
+        }
+        .admin-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .admin-toast-error { border-color: #ff7675; color: #ff7675; }
+
+        /* ─── Global Audio Player Widget ─── */
+        .audio-player-widget {
+            position: fixed; bottom: 20px; left: 20px; z-index: 5000;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        .apw-main {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(18, 22, 46, 0.92); border: 1px solid rgba(221,192,112,0.2);
+            border-radius: 16px; padding: 8px 14px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            transition: all 0.3s;
+        }
+        .apw-main:hover { border-color: rgba(221,192,112,0.4); }
+        .apw-toggle {
+            background: none; border: none; font-size: 18px; cursor: pointer;
+            padding: 4px; border-radius: 8px; transition: background 0.2s;
+        }
+        .apw-toggle:hover { background: rgba(255,255,255,0.06); }
+        .apw-info { cursor: pointer; min-width: 80px; }
+        .apw-track { font-size: 12px; font-weight: 600; color: var(--gold-200); white-space: nowrap; }
+        .apw-time { font-size: 10px; color: var(--ink-dim); margin-top: 2px; }
+        .apw-controls { display: flex; gap: 4px; }
+        .apw-btn {
+            background: none; border: none; font-size: 14px; cursor: pointer;
+            padding: 4px 6px; border-radius: 8px; transition: background 0.2s; color: var(--ink-dim);
+        }
+        .apw-btn:hover { background: rgba(255,255,255,0.06); color: var(--gold-200); }
+        .apw-play { font-size: 18px; }
+        .apw-volume {
+            width: 70px; height: 4px; -webkit-appearance: none; appearance: none;
+            background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; cursor: pointer;
+        }
+        .apw-volume::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 12px; height: 12px;
+            background: var(--gold-400); border-radius: 50%; cursor: pointer;
+        }
+        .apw-playlist {
+            position: absolute; bottom: 100%; left: 0; margin-bottom: 8px;
+            background: rgba(18, 22, 46, 0.95); border: 1px solid rgba(221,192,112,0.2);
+            border-radius: 14px; padding: 12px; min-width: 260px;
+            backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            max-height: 350px; overflow-y: auto;
+        }
+        .apw-playlist-title { font-size: 13px; font-weight: 700; color: var(--gold-200); margin-bottom: 8px; }
+        .apw-playlist-item {
+            display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+            border-radius: 10px; cursor: pointer; transition: all 0.2s;
+            font-size: 12px; color: var(--ink-dim);
+        }
+        .apw-playlist-item:hover { background: rgba(221,192,112,0.08); color: var(--gold-200); }
+        .apw-playlist-item.active { background: rgba(221,192,112,0.12); color: var(--gold-200); font-weight: 600; }
+        .apw-pl-icon { font-size: 16px; width: 22px; text-align: center; }
+        .apw-pl-name { flex: 1; }
+        .apw-pl-cat { font-size: 10px; opacity: 0.5; }
+        .apw-pl-playing { color: var(--gold-400); animation: pulse 1s infinite; }
+        .apw-sfx-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .apw-sfx-title { font-size: 12px; font-weight: 600; color: var(--gold-200); margin-bottom: 6px; }
+        .apw-sfx-label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-dim); margin-bottom: 6px; }
+        .apw-sfx-label input { accent-color: var(--gold-400); }
+        @media (max-width: 768px) {
+            .audio-player-widget { bottom: 12px; left: 12px; }
+            .apw-main { padding: 6px 10px; gap: 6px; }
+            .apw-volume { width: 50px; }
+            .apw-playlist { min-width: 220px; }
+        }
+
     </style>
 </head>
 <body class="cosmic">
@@ -1373,9 +2311,10 @@
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
                     <span class="sb-section-icon">🏠</span>
                     <span class="sb-section-title">داشبورد</span>
+                    <span class="sb-badge">۲</span>
                     <span class="sb-chevron">‹</span>
                 </button>
-                <div class="sb-section-items open">
+                <div class="sb-section-items">
                     <button class="nav-item" data-nav="home"><span class="nav-emoji">🏠</span> صفحه اصلی</button>
                     <button class="nav-item" data-nav="dashboard"><span class="nav-emoji">📊</span> داشبورد کاربری</button>
                 </div>
@@ -1389,7 +2328,7 @@
                     <span class="sb-badge">۶</span>
                     <span class="sb-chevron">‹</span>
                 </button>
-                <div class="sb-section-items open">
+                <div class="sb-section-items">
                     <button class="nav-item" data-nav="birth"><span class="nav-emoji">🔮</span> چارت تولد</button>
                     <button class="nav-item" data-nav="synastry"><span class="nav-emoji">💕</span> سیناستری</button>
                     <button class="nav-item" data-nav="composite"><span class="nav-emoji">🔗</span> کامپوزیت</button>
@@ -1404,9 +2343,10 @@
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
                     <span class="sb-section-icon">🧬</span>
                     <span class="sb-section-title">حکمت ایرانی</span>
+                    <span class="sb-badge">۳</span>
                     <span class="sb-chevron">‹</span>
                 </button>
-                <div class="sb-section-items open">
+                <div class="sb-section-items">
                     <button class="nav-item" data-nav="mizaj"><span class="nav-emoji">🧬</span> مزاج‌شناسی</button>
                     <button class="nav-item" data-nav="abjad"><span class="nav-emoji">🔢</span> ابجد</button>
                     <button class="nav-item" data-nav="hafez"><span class="nav-emoji">🍃</span> فال حافظ</button>
@@ -1418,9 +2358,10 @@
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
                     <span class="sb-section-icon">🃏</span>
                     <span class="sb-section-title">شخصیت و پیش‌بینی</span>
+                    <span class="sb-badge">۶</span>
                     <span class="sb-chevron">‹</span>
                 </button>
-                <div class="sb-section-items open">
+                <div class="sb-section-items">
                     <button class="nav-item" data-nav="tarot"><span class="nav-emoji">🃏</span> تاروت</button>
                     <button class="nav-item" data-nav="numerology"><span class="nav-emoji">🔢</span> عددشناسی</button>
                     <button class="nav-item" data-nav="biorhythm"><span class="nav-emoji">🔬</span> بیوریتم</button>
@@ -1435,9 +2376,10 @@
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
                     <span class="sb-section-icon">🌌</span>
                     <span class="sb-section-title">جهان</span>
+                    <span class="sb-badge">۲</span>
                     <span class="sb-chevron">‹</span>
                 </button>
-                <div class="sb-section-items open">
+                <div class="sb-section-items">
                     <button class="nav-item" data-nav="nasa"><span class="nav-emoji">🌌</span> ناسا</button>
                     <button class="nav-item" data-nav="moon-phase"><span class="nav-emoji">🌙</span> فاز ماه</button>
                 </div>
@@ -1448,11 +2390,25 @@
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
                     <span class="sb-section-icon">🧘</span>
                     <span class="sb-section-title">بدن و ذهن</span>
+                    <span class="sb-badge">۲</span>
                     <span class="sb-chevron">‹</span>
                 </button>
-                <div class="sb-section-items open">
+                <div class="sb-section-items">
                     <button class="nav-item" data-nav="yoga"><span class="nav-emoji">📚</span> حرکات یوگا</button>
                     <button class="nav-item" data-nav="breath"><span class="nav-emoji">🌬️</span> تنفس و مدیتیشن</button>
+                </div>
+            </div>
+
+            <!-- ⚙️ مدیریت (فقط برای ادمین) -->
+            <div class="sb-section" data-section="admin" id="sbAdminSection" style="display:none;">
+                <button class="sb-section-header" onclick="toggleSbSection(this)">
+                    <span class="sb-section-icon">⚙️</span>
+                    <span class="sb-section-title">مدیریت</span>
+                    <span class="sb-badge">۳</span>
+                    <span class="sb-chevron">‹</span>
+                </button>
+                <div class="sb-section-items">
+                    <button class="nav-item" data-nav="admin"><span class="nav-emoji">👤</span> مدیریت کاربران</button>
                 </div>
             </div>
         </nav>
@@ -1478,10 +2434,34 @@
                 </div>
             </div>
             <div class="popup-divider"></div>
-            <a class="popup-item" id="popupAuthAction" onclick="closeUserPopup();">
+            <!-- Guest auth actions -->
+            <a class="popup-item" id="popupLogin" href="javascript:void(0)">
                 <span class="popup-item-icon">🔑</span>
-                <span class="popup-item-text">ورود / ثبت‌نام</span>
+                <span class="popup-item-text">ورود</span>
             </a>
+            <a class="popup-item" id="popupSignup" href="javascript:void(0)">
+                <span class="popup-item-icon">📝</span>
+                <span class="popup-item-text">ثبت‌نام</span>
+            </a>
+            <a class="popup-item" id="popupForgot" href="javascript:void(0)">
+                <span class="popup-item-icon">❓</span>
+                <span class="popup-item-text">فراموشی رمز عبور</span>
+            </a>
+            <a class="popup-item" id="popupBuyPlan" href="javascript:void(0)">
+                <span class="popup-item-icon">💎</span>
+                <span class="popup-item-text">خرید پلن</span>
+            </a>
+            <!-- Logged-in account actions -->
+            <a class="popup-item" id="popupAccountSettings" href="javascript:void(0)" style="display:none;">
+                <span class="popup-item-icon">⚙️</span>
+                <span class="popup-item-text">تنظیمات حساب</span>
+            </a>
+            <a class="popup-item" id="popupSubAction" href="javascript:void(0)" style="display:none;">
+                <span class="popup-item-icon">💎</span>
+                <span class="popup-item-text">اشتراک و ارتقا</span>
+            </a>
+            <!-- Always-visible items -->
+            <div class="popup-divider"></div>
             <a class="popup-item" onclick="closeUserPopup(); showPage('home');">
                 <span class="popup-item-icon">🏠</span>
                 <span class="popup-item-text">صفحه اصلی</span>
@@ -1489,10 +2469,6 @@
             <a class="popup-item" onclick="closeUserPopup(); showPage('dashboard');">
                 <span class="popup-item-icon">📊</span>
                 <span class="popup-item-text">داشبورد روزانه</span>
-            </a>
-            <a class="popup-item" id="popupSubAction" onclick="closeUserPopup();" style="display:none;">
-                <span class="popup-item-icon">💎</span>
-                <span class="popup-item-text">اشتراک و ارتقا</span>
             </a>
             <div class="popup-divider"></div>
             <a class="popup-item popup-item-danger" id="popupLogout" onclick="closeUserPopup();" style="display:none;">
@@ -1510,21 +2486,90 @@
         <div class="topbar">
             <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">☰</button>
             <canvas class="topbar-orb" id="topbarOrb" width="32" height="32"></canvas>
-            <div class="topbar-brand">Cosmic Oracle</div>
+            <canvas class="topbar-visualizer" id="topbarVisualizer" width="120" height="32"></canvas>
+            <div class="topbar-player" id="topbarPlayerSlot"></div>
             <div class="topbar-spacer"></div>
             <div class="header-actions">
-                <button class="btn-action primary" id="yogaEngineToggle">🧘 Yoga Engine</button>
+                <div class="yoga-summary-dropdown" id="yogaSummaryDropdown">
+                    <button class="btn-action primary tb-icon-only" id="yogaEngineToggle" title="یوگا">🧘</button>
+                    <div class="yoga-summary-panel" id="yogaSummaryPanel"></div>
+                </div>
                 <div class="zodiac-display" id="zodiacDisplay">
                     <div class="zodiac-trigger" id="zodiacTrigger">
                         <span class="zodiac-emoji" id="zodiacEmoji">🐉</span>
                         <span class="zodiac-text" id="zodiacText">ثبت نشده</span>
                         <span class="zodiac-date" id="zodiacDate"></span>
+                        <span class="zodiac-bio" id="zodiacBio"></span>
                     </div>
                 </div>
-                <button class="btn-action" id="payBtn">⭐ خرید</button>
-                <button class="btn-action" id="shareBtn">📤 اشتراک</button>
-                <button class="btn-action" id="saveBtn">💾 ذخیره</button>
-                <button class="btn-action" id="printBtn">🖨️ پرینت</button>
+                <div class="cosmic-status-dropdown" id="cosmicStatusDropdown">
+                    <button class="btn-action tb-icon-only" id="cosmicStatusBtn" title="وضعیت نجومی">🌌</button>
+                    <div class="cosmic-status-panel" id="cosmicStatusPanel"></div>
+                </div>
+                <div class="topbar-profile-dropdown" id="profileDropdown">
+                    <button class="btn-action topbar-profile-trigger tb-icon-only" id="payBtn">
+                        <span class="topbar-profile-avatar" id="profileAvatar">🔑</span>
+                        <span class="topbar-profile-label" id="profileLabel" style="display:none;"></span>
+                        <span class="topbar-profile-plan" id="profilePlanBadge"></span>
+                    </button>
+                    <div class="topbar-profile-panel" id="profilePanel">
+                        <div class="tpp-header">
+                            <div class="tpp-avatar" id="tppAvatar">👤</div>
+                            <div class="tpp-info">
+                                <div class="tpp-name" id="tppName">مهمان</div>
+                                <div class="tpp-email" id="tppEmail"></div>
+                            </div>
+                            <div class="tpp-plan-badge" id="tppPlanBadge"></div>
+                        </div>
+                        <div class="tpp-divider"></div>
+                        <div class="tpp-section-title">💎 پلن‌ها</div>
+                        <div class="tpp-plans" id="tppPlans">
+                            <div class="tpp-plan-card" data-plan="free" onclick="openPricingModal()">
+                                <div class="tpp-plan-icon">🆓</div>
+                                <div class="tpp-plan-name">رایگان</div>
+                                <div class="tpp-plan-price">۰ تومان</div>
+                                <div class="tpp-plan-limit">۱۰ چارت در روز</div>
+                                <div class="tpp-plan-check"></div>
+                            </div>
+                            <div class="tpp-plan-card tpp-plan-featured" data-plan="gold" onclick="openPricingModal()">
+                                <div class="tpp-plan-popular">محبوب</div>
+                                <div class="tpp-plan-icon">⭐</div>
+                                <div class="tpp-plan-name">طلایی</div>
+                                <div class="tpp-plan-price">۹۹,۰۰۰ <span class="tpp-plan-unit">تومان/ماه</span></div>
+                                <div class="tpp-plan-limit">نامحدود + ذخیره + پرینت</div>
+                                <div class="tpp-plan-check"></div>
+                            </div>
+                            <div class="tpp-plan-card" data-plan="diamond" onclick="openPricingModal()">
+                                <div class="tpp-plan-icon">💎</div>
+                                <div class="tpp-plan-name">الماسی</div>
+                                <div class="tpp-plan-price">۱۹۹,۰۰۰ <span class="tpp-plan-unit">تومان/ماه</span></div>
+                                <div class="tpp-plan-limit">همه چیز + تفسیر AI</div>
+                                <div class="tpp-plan-check"></div>
+                            </div>
+                        </div>
+                        <div class="tpp-features">
+                            <div class="tpp-feature"><span>🔮</span> چارت تولد حرفه‌ای</div>
+                            <div class="tpp-feature"><span>💕</span> سیناستری و کامپوزیت</div>
+                            <div class="tpp-feature"><span>☀️</span> بازگشت خورشیدی و ماهانه</div>
+                            <div class="tpp-feature"><span>📋</span> پرسشنامه کیفیت زندگی</div>
+                            <div class="tpp-feature"><span>💾</span> ذخیره و پرینت چارت‌ها</div>
+                            <div class="tpp-feature"><span>🤖</span> تفسیر هوش مصنوعی</div>
+                        </div>
+                        <div class="tpp-divider"></div>
+                        <div class="tpp-actions">
+                            <button class="tpp-btn tpp-btn-primary" id="tppMainAction">🔑 ورود / ثبت‌نام</button>
+                            <button class="tpp-btn tpp-btn-ghost" id="tppLogoutBtn" style="display:none;">🚪 خروج</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="topbar-actions-dropdown">
+                    <button class="btn-action" id="actionsMenuBtn">⋯</button>
+                    <div class="topbar-actions-menu" id="actionsMenu">
+                        <button class="topbar-actions-item" id="shareBtn"><span class="topbar-actions-icon">📤</span> اشتراک‌گذاری</button>
+                        <button class="topbar-actions-item" id="saveBtn"><span class="topbar-actions-icon">💾</span> ذخیره</button>
+                        <button class="topbar-actions-item" id="printBtn"><span class="topbar-actions-icon">🖨️</span> پرینت</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1578,7 +2623,7 @@
                 <p class="hero-sub">
                     رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای
                     <br>
-                    پانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد
+                    شانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد
                 </p>
 
                 <div class="hero-cta">
@@ -1589,7 +2634,7 @@
                 </div>
 
                 <div class="hero-stats">
-                    <div class="hero-stat"><div class="stat-num">۱۵</div><div class="stat-label">موتور محاسباتی</div></div>
+                    <div class="hero-stat"><div class="stat-num">۱۶</div><div class="stat-label">موتور محاسباتی</div></div>
                     <div class="hero-stat"><div class="stat-num">۲۷</div><div class="stat-label">ناکشاترا (ودیک)</div></div>
                     <div class="hero-stat"><div class="stat-num">۱۲</div><div class="stat-label">برج فلکی</div></div>
                     <div class="hero-stat"><div class="stat-num">۹</div><div class="stat-label">سیاره‌ی کلاسیک</div></div>
@@ -1708,6 +2753,13 @@
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
+                <div class="service-card" onclick="openService('moon-phase')">
+                    <div class="svc-top"><span class="svc-emoji">🌙</span><span class="svc-name">فاز ماه</span></div>
+                    <div class="svc-desc">فاز کنونی ماه، درصد روشنایی، سن ماه و ۲۸ منزل قمری را برای هر تاریخ و مکان ببینید؛ همراه با برج قمر و رویدادهای پیش‌رو.</div>
+                    <div class="svc-badges"><span class="svc-badge">قمری</span><span class="svc-badge">برخط</span></div>
+                    <span class="svc-open">باز کردن ←</span>
+                </div>
+
             </div>
 
             <!-- درباره -->
@@ -1777,7 +2829,8 @@
                 <div class="yoga-tabs">
                     <button class="yoga-tab active" data-tab="library">📚 کتابخانه حرکات</button>
                     <button class="yoga-tab" data-tab="daily">🌟 تمرین روزانه</button>
-                    <button class="yoga-tab" data-tab="practice">🧘 تمرین پیشرفته</button>
+                    <button class="yoga-tab" data-tab="practice">🧘 جلسه تمرین</button>
+                    <button class="yoga-tab" data-tab="breath">🌬️ تنفس و مدیتیشن</button>
                 </div>
                 <!-- فیلترها (فقط تب کتابخانه) -->
                 <div id="yogaFilters"></div>
@@ -1849,6 +2902,15 @@
             </div>
         </section>
 
+        <!-- ======================= صفحه مدیریت ======================= -->
+        <section class="page" id="pageAdmin" hidden>
+            <div class="admin-page">
+                <h2 class="admin-page-title">⚙️ پنل مدیریت</h2>
+                <p class="admin-page-sub">مدیریت کاربران، اشتراک‌ها و تنظیمات سیستم</p>
+                <div id="adminPanel"></div>
+            </div>
+        </section>
+
         <!-- ======================= صفحه لندینگ (بزرگ) ======================= -->
         <section class="page" id="pageLanding" hidden>
             <div class="landing-hero" id="landingHero">
@@ -1860,7 +2922,7 @@
                         <span class="landing-title-line">Cosmic</span>
                         <span class="landing-title-line accent">Oracle</span>
                     </h1>
-                    <p class="landing-sub">پانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد</p>
+                    <p class="landing-sub">شانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد</p>
                     <div class="landing-cta">
                         <button class="btn-landing primary" onclick="openService('birth')">🔮 چارت تولد</button>
                         <button class="btn-landing" onclick="openService('tarot')">🃏 تاروت</button>
@@ -1868,7 +2930,7 @@
                         <button class="btn-landing" onclick="openService('nasa')">🌌 ناسا</button>
                     </div>
                     <div class="landing-stats">
-                        <div class="lstat"><div class="lstat-num">۱۵</div><div class="lstat-label">موتور محاسباتی</div></div>
+                        <div class="lstat"><div class="lstat-num">۱۶</div><div class="lstat-label">موتور محاسباتی</div></div>
                         <div class="lstat"><div class="lstat-num">۲۷</div><div class="lstat-label">ناکشاترا</div></div>
                         <div class="lstat"><div class="lstat-num">۲۸۱</div><div class="lstat-label">حرکت یوگا</div></div>
                         <div class="lstat"><div class="lstat-num">۱۲</div><div class="lstat-label">برج فلکی</div></div>
@@ -1950,6 +3012,15 @@
                         <option value="kapalabhati">تنفس آتش (کاپالابهاتی)</option>
                     </select>
                 </div>
+                <div class="yoga-duration-presets">
+                    <label>مدت تمرین</label>
+                    <div class="yoga-dur-btns">
+                        <button class="yoga-dur-btn active" data-dur="0">نامحدود</button>
+                        <button class="yoga-dur-btn" data-dur="180">۳ دقیقه</button>
+                        <button class="yoga-dur-btn" data-dur="300">۵ دقیقه</button>
+                        <button class="yoga-dur-btn" data-dur="600">۱۰ دقیقه</button>
+                    </div>
+                </div>
             </div>
             <!-- بخش مراقبه -->
             <div class="yoga-panel-section" id="yogaMeditationSection">
@@ -1960,6 +3031,37 @@
                         <option value="silent">سکوت و تمرکز</option>
                         <option value="body_scan">اسکن بدن</option>
                     </select>
+                </div>
+                <!-- Med Timer -->
+                <div class="med-timer">
+                    <div class="med-timer-header">⏰ تایمر مدیتیشن</div>
+                    <div class="med-timer-row">
+                        <label>مدت</label>
+                        <div class="med-timer-durations">
+                            <button class="med-dur-btn" data-dur="300">۵ دقیقه</button>
+                            <button class="med-dur-btn active" data-dur="600">۱۰ دقیقه</button>
+                            <button class="med-dur-btn" data-dur="900">۱۵ دقیقه</button>
+                            <button class="med-dur-btn" data-dur="1200">۲۰ دقیقه</button>
+                            <button class="med-dur-btn" data-dur="1800">۳۰ دقیقه</button>
+                        </div>
+                    </div>
+                    <div class="med-timer-row">
+                        <label>موسیقی</label>
+                        <select id="medTrackSelect" class="med-select"></select>
+                    </div>
+                    <div class="med-timer-row">
+                        <label>تنفس</label>
+                        <select id="medBreathSelect" class="med-select">
+                            <option value="coherent" selected>هماهنگ (۵-۵)</option>
+                            <option value="478">۴-۷-۸ آرام‌بخش</option>
+                            <option value="relaxing">آرام‌بخش (۴-۶)</option>
+                            <option value="box">بوکس (۴-۴-۴-۴)</option>
+                        </select>
+                    </div>
+                    <div class="med-timer-countdown" id="medCountdown">۱۰:۰۰</div>
+                    <div class="med-timer-phase" id="medPhase"></div>
+                    <div class="med-timer-progress"><div class="med-timer-progress-bar" id="medProgressBar"></div></div>
+                    <button class="med-timer-start" id="medStartBtn" onclick="window.MeditationTimer.toggle()">▶ شروع مدیتیشن</button>
                 </div>
             </div>
             <!-- دایره تنفس (مشترک) -->
@@ -2034,17 +3136,109 @@
     <script src="static/persian-provinces.js"></script>
     <script src="static/date-wheel-picker.js?v=15"></script>
     <script src="static/city-selector.js?v=9"></script>
-    <script src="static/spa-router.js?v=1"></script>
+    <script src="static/spa-router.js?v=2"></script>
     <script src="static/script.js?v=13"></script>
-    <script src="static/yoga-library.js?v=1"></script>
-    <script src="static/yoga-engine.js?v=1"></script>
-    <script src="static/yoga-practice.js?v=1"></script>
+    <script src="static/yoga-core.js?v=1"></script>
+    <script src="static/yoga-library.js?v=4"></script>
+    <script src="static/yoga-engine.js?v=2"></script>
+    <script src="static/yoga-practice.js?v=5"></script>
+    <script src="static/admin-panel.js?v=1"></script>
     <script src="static/breath-module.js?v=1"></script>
     <script src="static/quality-of-life.js?v=1"></script>
-    <script src="static/moon-phase.js?v=1"></script>
+    <script src="static/moon-phase.js?v=4"></script>
     <script src="static/zodiac-display.js?v=1"></script>
+    <script src="static/cosmic-status.js?v=2"></script>
+    <script src="static/yoga-summary.js?v=1"></script>
     <script src="static/questionnaire.js?v=1"></script>
     <script src="static/daily-dashboard.js?v=1"></script>
+    <script src="static/audio-manager.js?v=1"></script>
+
+    <script>
+    /* ================================================================
+       MEDITATION TIMER — UI controller
+    ================================================================ */
+    window.MeditationTimer = (function() {
+        var duration = 600;
+        var running = false;
+
+        function init() {
+            // Populate track select
+            var sel = document.getElementById('medTrackSelect');
+            if (sel && window.AudioManager) {
+                var tracks = AudioManager.getTracks();
+                sel.innerHTML = '';
+                tracks.forEach(function(t) {
+                    var opt = document.createElement('option');
+                    opt.value = t.id;
+                    opt.textContent = t.icon + ' ' + t.name;
+                    sel.appendChild(opt);
+                });
+            }
+            // Duration buttons
+            document.querySelectorAll('.med-dur-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.med-dur-btn').forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    duration = parseInt(this.dataset.dur) || 600;
+                    updateCountdown(duration);
+                });
+            });
+        }
+
+        function updateCountdown(sec) {
+            var el = document.getElementById('medCountdown');
+            if (el) el.textContent = AudioManager ? AudioManager.medFormatTime(sec) : '00:00';
+        }
+
+        function updatePhase(phase) {
+            var el = document.getElementById('medPhase');
+            if (!el) return;
+            if (phase === 'ambient') el.innerHTML = '<span class="phase-ambient">🎵 موسیقی در حال پخش...</span>';
+            else if (phase === 'breathing') el.innerHTML = '<span class="phase-breathing">🌬️ راهنمای تنفس فعال شد</span>';
+            else if (phase === 'bell') el.innerHTML = '<span class="phase-bell">🔔 جلسه تمام شد — آرامش</span>';
+        }
+
+        function toggle() {
+            if (running) { stop(); return; }
+            start();
+        }
+
+        function start() {
+            if (!window.AudioManager) return;
+            running = true;
+            var trackSel = document.getElementById('medTrackSelect');
+            var breathSel = document.getElementById('medBreathSelect');
+            var btn = document.getElementById('medStartBtn');
+            if (btn) { btn.textContent = '⏹ پایان'; btn.classList.add('running'); }
+
+            AudioManager.medStart({
+                duration: duration,
+                track: trackSel ? trackSel.value : 'cosmic-drone',
+                breathPreset: breathSel ? breathSel.value : 'coherent',
+                onTick: function(rem) { updateCountdown(rem); },
+                onPhase: function(phase) { updatePhase(phase); },
+                onComplete: function() { stop(); }
+            });
+        }
+
+        function stop() {
+            running = false;
+            if (window.AudioManager) AudioManager.medStop();
+            var btn = document.getElementById('medStartBtn');
+            if (btn) { btn.textContent = '▶ شروع مدیتیشن'; btn.classList.remove('running'); }
+            updatePhase(null);
+        }
+
+        // Auto-init when DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        return { toggle: toggle, start: start, stop: stop, init: init };
+    })();
+    </script>
 
     <script>
     /* ================================================================
@@ -2103,6 +3297,7 @@
             var qol = document.getElementById('pageQoL');
             var dashboard = document.getElementById('pageDashboard');
             var landing = document.getElementById('pageLanding');
+            var admin = document.getElementById('pageAdmin');
             if (!home || !tools) return;
             // Hide all
             home.hidden = true;
@@ -2112,6 +3307,7 @@
             if (qol) qol.hidden = true;
             if (dashboard) dashboard.hidden = true;
             if (landing) landing.hidden = true;
+            if (admin) admin.hidden = true;
             // Show target
             if (name === 'home') {
                 home.hidden = false;
@@ -2128,6 +3324,9 @@
             } else if (name === 'dashboard') {
                 if (dashboard) dashboard.hidden = false;
                 if (window.DailyDashboard) window.DailyDashboard.init();
+            } else if (name === 'admin') {
+                if (admin) admin.hidden = false;
+                if (window.AdminPanel) window.AdminPanel.init();
             } else {
                 tools.hidden = false;
             }
@@ -2197,11 +3396,7 @@
         };
 
         /* کلیک روی برندِ نوار بالا → بازگشت به خانه */
-        var brand = document.querySelector('.topbar-brand');
-        if (brand) {
-            brand.style.cursor = 'pointer';
-            brand.addEventListener('click', function () { showPage('home'); });
-        }
+        // topbar-brand removed — visualizer takes its place
 
         document.getElementById('menuToggle').addEventListener('click', function () {
             if (body.classList.contains('sidebar-collapsed')) {
@@ -2221,6 +3416,31 @@
         });
 
         /* Sidebar search */
+        /* Dynamic badge count update */
+        function _toFaNum(n) {
+            var fa = '۰۱۲۳۴۵۶۷۸۹';
+            return String(n).split('').map(function (d) { return fa[parseInt(d)] || d; }).join('');
+        }
+        function updateSidebarBadges(filterQuery) {
+            var q = (filterQuery || '').toLowerCase().trim();
+            document.querySelectorAll('.sb-section').forEach(function (section) {
+                var badge = section.querySelector('.sb-badge');
+                var items = section.querySelectorAll('.sb-section-items .nav-item');
+                var total = items.length;
+                if (q.length === 0) {
+                    badge.textContent = _toFaNum(total);
+                    badge.classList.remove('admin-badge-filtered');
+                } else {
+                    var visible = 0;
+                    items.forEach(function (item) {
+                        if (!item.classList.contains('nav-hidden')) visible++;
+                    });
+                    badge.textContent = _toFaNum(visible) + '/' + _toFaNum(total);
+                    badge.classList.toggle('admin-badge-filtered', visible < total);
+                }
+            });
+        }
+
         var searchInput = document.getElementById('sidebarSearch');
         if (searchInput) {
             searchInput.addEventListener('input', function () {
@@ -2239,6 +3459,7 @@
                         }
                     });
                 }
+                updateSidebarBadges(this.value);
             });
         }
 
@@ -2262,18 +3483,54 @@
                     showPage('qol');
                     closeSidebar();
                 }
+                else if (target === 'admin') {
+                    showPage('admin');
+                    closeSidebar();
+                }
                 else window.openService(target);
             });
         });
 
         /* Section toggle function */
+        /* ─── Sidebar accordion: only one section open at a time ─── */
         window.toggleSbSection = function(header) {
             var items = header.nextElementSibling;
             if (!items) return;
             var isOpen = items.classList.contains('open');
-            items.classList.toggle('open');
-            header.classList.toggle('collapsed');
+
+            /* Close all other sections first */
+            document.querySelectorAll('.sb-section-items.open').forEach(function(el) {
+                if (el !== items) {
+                    el.classList.remove('open');
+                    el.previousElementSibling.classList.add('collapsed');
+                }
+            });
+
+            /* Toggle the clicked section */
+            if (isOpen) {
+                items.classList.remove('open');
+                header.classList.add('collapsed');
+            } else {
+                items.classList.add('open');
+                header.classList.remove('collapsed');
+            }
         };
+
+        /* Auto-open the section that contains the currently active nav item */
+        (function _autoOpenActiveSection() {
+            var activeNav = document.querySelector('.nav-item.active');
+            if (activeNav) {
+                var section = activeNav.closest('.sb-section');
+                if (section) {
+                    var items = section.querySelector('.sb-section-items');
+                    var hdr = section.querySelector('.sb-section-header');
+                    if (items && !items.classList.contains('open')) {
+                        items.classList.add('open');
+                        hdr.classList.remove('collapsed');
+                    }
+                }
+            }
+        })();
 
         /* ─── Micro-interactions: Tooltips ─── */
         var TOOL_DESC = {
@@ -2297,7 +3554,8 @@
             'nasa': 'تصویر نجومی روز و اطلاعات فضا',
             'moon-phase': 'فاز ماه و منازل قمری',
             'yoga': 'کتابخانه جامع حرکات یوگا',
-            'breath': 'تمرینات تنفسی و مدیتیشن'
+            'breath': 'تمرینات تنفسی و مدیتیشن',
+            'admin': 'مدیریت کاربران و تنظیمات سیستم'
         };
         var _tooltipEl = null;
         function createTooltip() {
@@ -2337,9 +3595,10 @@
                 /* Track last used */
                 try {
                     var lastUsed = JSON.parse(localStorage.getItem('sb_last_used') || '[]');
-                    var idx = lastUsed.indexOf(nav);
+                    var navKey = this.dataset.nav;
+                    var idx = lastUsed.indexOf(navKey);
                     if (idx >= 0) lastUsed.splice(idx, 1);
-                    lastUsed.unshift(nav);
+                    lastUsed.unshift(navKey);
                     if (lastUsed.length > 5) lastUsed.pop();
                     localStorage.setItem('sb_last_used', JSON.stringify(lastUsed));
                     updateStatusDots();
@@ -2453,6 +3712,8 @@
             /* ---------- راه‌اندازی ماژول‌های جدید ---------- */
             if (window.YogaEngine) window.YogaEngine.init();
             if (window.ZodiacDisplay) window.ZodiacDisplay.init();
+            if (window.CosmicStatus) window.CosmicStatus.init();
+            if (window.YogaSummary) window.YogaSummary.init();
             if (window.Questionnaire) window.Questionnaire.init();
             if (window.DailyDashboard) window.DailyDashboard.init();
 
@@ -2632,11 +3893,18 @@
                 var popupName = document.getElementById('popupName');
                 var popupRole = document.getElementById('popupRole');
                 var popupAvatar = document.getElementById('popupAvatar');
-                var popupAuth = document.getElementById('popupAuthAction');
+                // Guest items
+                var popupLogin = document.getElementById('popupLogin');
+                var popupSignup = document.getElementById('popupSignup');
+                var popupForgot = document.getElementById('popupForgot');
+                var popupBuyPlan = document.getElementById('popupBuyPlan');
+                // Logged-in items
+                var popupAccountSettings = document.getElementById('popupAccountSettings');
                 var popupSub = document.getElementById('popupSubAction');
                 var popupLogout = document.getElementById('popupLogout');
+                var adminSection = document.getElementById('sbAdminSection');
                 if (token && user.email) {
-                    // Logged in
+                    // ─── Logged in ───
                     var name = user.display_name || user.email.split('@')[0];
                     var plan = user.plan || 'free';
                     var planLabel = plan === 'gold' ? '⭐ طلایی' : plan === 'diamond' ? '💎 الماسی' : '🆓 رایگان';
@@ -2646,20 +3914,37 @@
                     if (popupName) popupName.textContent = name;
                     if (popupRole) popupRole.textContent = user.email + ' · ' + planLabel;
                     if (popupAvatar) popupAvatar.textContent = name.charAt(0);
-                    if (popupAuth) { popupAuth.querySelector('.popup-item-text').textContent = '⚙️ تنظیمات حساب'; popupAuth.querySelector('.popup-item-icon').textContent = '⚙️'; }
-                    if (popupSub) popupSub.style.display = '';
+                    // Guest items hidden
+                    if (popupLogin) popupLogin.style.display = 'none';
+                    if (popupSignup) popupSignup.style.display = 'none';
+                    if (popupForgot) popupForgot.style.display = 'none';
+                    if (popupBuyPlan) popupBuyPlan.style.display = 'none';
+                    // Account items shown
+                    if (popupAccountSettings) { popupAccountSettings.style.display = ''; popupAccountSettings.onclick = function() { closeUserPopup(); if (window.openAccountModal) window.openAccountModal(); }; }
+                    if (popupSub) { popupSub.style.display = ''; popupSub.onclick = function() { closeUserPopup(); if (window.openPricingModal) window.openPricingModal(); }; }
                     if (popupLogout) { popupLogout.style.display = ''; popupLogout.onclick = function() { closeUserPopup(); if (window.doLogout) window.doLogout(); else { localStorage.removeItem('cosmic_token'); localStorage.removeItem('cosmic_user'); updateSidebarAuth(); } }; }
+                    // Show admin section only for admins
+                    if (adminSection) adminSection.style.display = (user.is_admin === true || user.role === 'admin') ? '' : 'none';
                 } else {
-                    // Guest
+                    // ─── Guest ───
                     if (sbName) sbName.textContent = 'کاربر مهمان';
-                    if (sbRole) sbRole.textContent = 'ورود / ثبت‌نام';
+                    if (sbRole) sbRole.textContent = 'برای دسترسی کامل وارد شوید';
                     if (sbAvatar) sbAvatar.textContent = '👤';
                     if (popupName) popupName.textContent = 'کاربر مهمان';
-                    if (popupRole) popupRole.textContent = 'برای دسترسی کامل وارد شوید';
+                    // Show guest quota if available, else generic text
+                    if (popupRole) popupRole.textContent = (window.getGuestUsageLabel && window.getGuestUsageLabel()) || 'برای دسترسی کامل وارد شوید';
                     if (popupAvatar) popupAvatar.textContent = '👤';
-                    if (popupAuth) { popupAuth.querySelector('.popup-item-text').textContent = '🔑 ورود / ثبت‌نام'; popupAuth.querySelector('.popup-item-icon').textContent = '🔑'; popupAuth.onclick = function() { closeUserPopup(); if (window.openLoginModal) window.openLoginModal(); }; }
+                    // Guest items shown
+                    if (popupLogin) { popupLogin.style.display = ''; popupLogin.onclick = function() { closeUserPopup(); if (window.openLoginModal) window.openLoginModal(); }; }
+                    if (popupSignup) { popupSignup.style.display = ''; popupSignup.onclick = function() { closeUserPopup(); if (window.openSignupModal) window.openSignupModal(); }; }
+                    if (popupForgot) { popupForgot.style.display = ''; popupForgot.onclick = function() { closeUserPopup(); if (window.openForgotModal) window.openForgotModal(); }; }
+                    if (popupBuyPlan) { popupBuyPlan.style.display = ''; popupBuyPlan.onclick = function() { closeUserPopup(); if (window.openPricingModal) window.openPricingModal(); }; }
+                    // Account items hidden
+                    if (popupAccountSettings) popupAccountSettings.style.display = 'none';
                     if (popupSub) popupSub.style.display = 'none';
                     if (popupLogout) popupLogout.style.display = 'none';
+                    // Hide admin section for guests
+                    if (adminSection) adminSection.style.display = 'none';
                 }
             }
             updateSidebarAuth();
@@ -2667,6 +3952,9 @@
             setInterval(updateSidebarAuth, 3000);
         }
         wireAuthToSidebar();
+
+        /* ─── Audio Manager ─── */
+        if (window.AudioManager) AudioManager.init();
 
         /* ─── Premium Gating ─── */
         var PREMIUM_TOOLS = ['composite', 'solar-return', 'lunar-return', 'qol'];
@@ -2682,28 +3970,6 @@
             });
         }
         addPremiumBadges();
-        // Gate premium tools on click
-        document.querySelectorAll('.sidebar .nav-item[data-nav]').forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
-                var nav = this.getAttribute('data-nav');
-                if (PREMIUM_TOOLS.indexOf(nav) >= 0) {
-                    var user = {};
-                    try { user = JSON.parse(localStorage.getItem('cosmic_user') || '{}'); } catch(_) {}
-                    var plan = user.plan || 'free';
-                    if (plan === 'free') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        if (window.showToast) showToast('💎 برای دسترسی به این ابزار، اشتراک طلایی تهیه کنید', 'warning');
-                        else alert('💎 برای دسترسی به این ابزار، اشتراک طلایی تهیه کنید');
-                        if (window.openPricingModal) window.openPricingModal();
-                        else if (window.openLoginModal) window.openLoginModal();
-                        closeSidebar();
-                        return false;
-                    }
-                }
-            }, true);
-        });
 
     })();
     </script>
