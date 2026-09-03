@@ -7,6 +7,29 @@
 .yoga-card-tertiary { box-shadow: inset 0 0 0 1px rgba(160, 160, 220, 0.18); }
 .yoga-card-tertiary .yoga-card-img { filter: saturate(0.6); }
 
+/* هنگام فعال بودن چیپ هوشمند، چیپ‌های دستی غیرفعال می‌شوند */
+.yoga-filter-tags.yq-smart-active .yoga-tag[data-filter] {
+    opacity: 0.35;
+    pointer-events: none;
+}
+.yoga-filter-tags.yq-smart-active .yoga-tag[data-filter].active { opacity: 0.55; }
+
+/* ─── چیپ هوشمند «پیشنهاد برای من» ─── */
+.yoga-tag.smart {
+    border-style: dashed;
+    color: #e9d9a8;
+    background: rgba(221, 192, 112, 0.08);
+    font-weight: 700;
+}
+.yoga-tag.smart:hover { border-color: var(--gold-400); color: #ffe9b0; background: rgba(221, 192, 112, 0.14); }
+.yoga-tag.smart.active {
+    background: linear-gradient(135deg, rgba(221, 192, 112, 0.26), rgba(162, 155, 254, 0.16));
+    border-style: solid;
+    border-color: var(--gold-400);
+    color: #ffe9b0;
+    box-shadow: 0 0 14px rgba(201, 162, 39, 0.28);
+}
+
 /* ─── چیپ‌های معنایی روابط ─── */
 .yk-chip {
     display: inline-flex; align-items: center;

@@ -1,5 +1,5 @@
 // ================================================================
-//   YOGA TEST — تست تشخیص تمرین یوگا (۲۰ سوال وزندار)
+//   YOGA TEST — تست تشخیص تمرین یوگا (۱۰ سوال وزندار)
 //   پرسشهای غیرفنی → استنتاج سطح · نوع حرکت · دسته · علایق ثانویه
 //   منبع داده: YogaCore (yoga.txt — منبع واحد حقیقت)
 //   ذخیره: localStorage (yoga_test_done / yoga_test_results)
@@ -13,7 +13,7 @@ var LS_DONE = 'yoga_test_done';
 var LS_RESULTS = 'yoga_test_results';
 var LS_DISMISSED = 'yoga_test_dismissed';
 
-// ─── سوالات (۲۰ مورد، کاربرپسند و بدون اصطلاح فنی) ───
+// ─── سوالات (۱۰ مورد، کاربرپسند و بدون اصطلاح فنی) ───
 // گروهها: difficulty | movement | category | secondary | personal
 // پاسخها بهصورت حرف A..E ثبت میشوند و نگاشت در جداول SCORE/MOVE/CAT انجام میشود.
 var QUESTIONS = [
@@ -36,13 +36,6 @@ var QUESTIONS = [
         { v: 'C', label: 'کشش عمیق یک طرف بدن به پهلو' },
         { v: 'D', label: 'چرخاندن بالاتنه و ستون فقرات' }
     ] },
-    // Q4 — movement
-    { id: 4, group: 'movement', text: 'کدام حس بعد از تمرین برایت لذت‌بخش‌تر است؟', options: [
-        { v: 'A', label: 'باز شدن کامل شانه‌ها و سینه' },
-        { v: 'B', label: 'کشیده شدن تمام پشت بدن' },
-        { v: 'C', label: 'کشش ملایم در پهلوها' },
-        { v: 'D', label: 'سبک شدن و آزادی ستون فقرات' }
-    ] },
     // Q5 — secondary
     { id: 5, group: 'secondary', text: 'وقتی روی یک پا می‌ایستی، چه حسی داری؟', options: [
         { v: 'A', label: 'تعادل روی پاها را دوست دارم و برایم لذت‌بخش است' },
@@ -56,32 +49,12 @@ var QUESTIONS = [
         { v: 'C', label: 'وزنم بین دست‌ها و پاها تقسیم شود (چهار دست و پا)' },
         { v: 'D', label: 'وارونه و پرانرژی؛ سر پایین‌تر از قلب' }
     ] },
-    // Q7 — category
-    { id: 7, group: 'category', text: 'برای یک لحظه آرامش در میانه تمرین، کجا راحت‌تری؟', options: [
-        { v: 'A', label: 'نشسته با ستون فقرات صاف و تمرکز' },
-        { v: 'B', label: 'درازکشیده و کاملاً رها' },
-        { v: 'C', label: 'ثابت و متعادل روی پاها' }
-    ] },
     // Q8 — difficulty
     { id: 8, group: 'difficulty', text: 'بزرگ‌ترین چالش فعلی تو در تمرینات بدنی چیست؟', options: [
         { v: 'A', label: 'پیدا کردن فرم صحیح حرکت‌ها' },
         { v: 'B', label: 'نگه‌داشتن وضعیت برای مدت طولانی‌تر' },
         { v: 'C', label: 'کنترل دقیق و ظریف بدن' },
         { v: 'D', label: 'امتحان کردن حرکت‌های جدید و پیشرفته' }
-    ] },
-    // Q9 — movement
-    { id: 9, group: 'movement', text: 'اگر یک حرکت فقط یک ناحیه از بدن را خوب باز کند، دوست داری کدام ناحیه باشد؟', options: [
-        { v: 'A', label: 'جلوی بدن (سینه و شکم)' },
-        { v: 'B', label: 'پشت بدن (کمر و پشت پاها)' },
-        { v: 'C', label: 'یکی از طرفین بدن' },
-        { v: 'D', label: 'دور کمر و ستون فقرات' }
-    ] },
-    // Q10 — category
-    { id: 10, group: 'category', text: 'انرژی مورد علاقه‌ات در یک تمرین چیست؟', options: [
-        { v: 'A', label: 'فعال، ایستاده و پرتحرک' },
-        { v: 'B', label: 'آرام و نشسته' },
-        { v: 'C', label: 'رها و درازکشیده روی زمین' },
-        { v: 'D', label: 'فعال با تکیه بر دست‌ها و پاها' }
     ] },
     // Q11 — secondary
     { id: 11, group: 'secondary', text: 'دست‌های تو در حرکت‌ها بیشتر چه نقشی دارند؟', options: [
@@ -95,13 +68,6 @@ var QUESTIONS = [
         { v: 'B', label: 'چند حرکت را می‌شناسم و انجام می‌دهم' },
         { v: 'C', label: 'به‌طور منظم تمرین دارم' }
     ] },
-    // Q13 — secondary
-    { id: 13, group: 'secondary', text: 'بعد از یک تمرین خوب، دنبال چه حسی در بدن هستی؟', options: [
-        { v: 'A', label: 'بدن کشیده و باز' },
-        { v: 'B', label: 'ستون فقرات آزاد و چرخیده' },
-        { v: 'C', label: 'قدرت و کنترل عضلانی' },
-        { v: 'D', label: 'ذهن آرام و بدن رها' }
-    ] },
     // Q14 — movement
     { id: 14, group: 'movement', text: 'کدام حرکت برایت جذاب‌تر است؟', options: [
         { v: 'A', label: 'خم شدن به جلو و نزدیک شدن به پاها' },
@@ -110,12 +76,6 @@ var QUESTIONS = [
         { v: 'D', label: 'کشیده شدن بدن به طرفین' },
         { v: 'E', label: 'ثابت ماندن در یک تعادل زیبا' }
     ] },
-    // Q15 — difficulty
-    { id: 15, group: 'difficulty', text: 'به‌طور کلی چقدر در هفته فعالیت بدنی داری؟', options: [
-        { v: 'A', label: 'خیلی کم یا فقط گاهی' },
-        { v: 'B', label: 'متوسط؛ حدود دو تا سه بار در هفته' },
-        { v: 'C', label: 'زیاد و منظم؛ بیشتر روزهای هفته' }
-    ] },
     // Q16 — category
     { id: 16, group: 'category', text: 'دوست داری تمرین‌ات بیشتر روی کدام حالت بدن بگذرد؟', options: [
         { v: 'A', label: 'روی پاها و ایستاده' },
@@ -123,32 +83,6 @@ var QUESTIONS = [
         { v: 'C', label: 'به پشت درازکشیده' },
         { v: 'D', label: 'روی شکم' },
         { v: 'E', label: 'چهار دست و پا؛ دست‌ها و پاها روی زمین' }
-    ] },
-    // Q17 — difficulty
-    { id: 17, group: 'difficulty', text: 'حرکت‌های وارونه (سر پایین‌تر از قلب) چه حسی به تو می‌دهد؟', options: [
-        { v: 'A', label: 'دوست ندارم و دنبالش نیستم' },
-        { v: 'B', label: 'مشکلی ندارم اگر ساده و ایمن باشد' },
-        { v: 'C', label: 'استقبال می‌کنم و می‌خواهم یاد بگیرم' }
-    ] },
-    // Q18 — difficulty
-    { id: 18, group: 'difficulty', text: 'برای تو «تعادل» یعنی چه؟', options: [
-        { v: 'A', label: 'حرکت‌های پایدار و راحت' },
-        { v: 'B', label: 'تعادل ساده مثل حالت درخت' },
-        { v: 'C', label: 'تعادل چالش‌برانگیز روی یک پا' },
-        { v: 'D', label: 'تعادل روی دست‌ها' }
-    ] },
-    // Q19 — category
-    { id: 19, group: 'category', text: 'برای پایان یک تمرین، کدام حس را ترجیح می‌دهی؟', options: [
-        { v: 'A', label: 'نشسته و آرام' },
-        { v: 'B', label: 'درازکشیده و رها' },
-        { v: 'C', label: 'کشش آرام و کنترل‌شده' },
-        { v: 'D', label: 'ثابت ماندن با تمرکز و حضور ذهن' }
-    ] },
-    // Q20 — personal (اختیاری)
-    { id: 20, group: 'personal', optional: true, text: 'برای شخصی‌سازی بیشتر (اختیاری)، جنسیتت را اعلام می‌کنی؟', options: [
-        { v: 'A', label: 'زن' },
-        { v: 'B', label: 'مرد' },
-        { v: 'C', label: 'ترجیح می‌دهم اعلام نکنم' }
     ] }
 ];
 
@@ -157,26 +91,18 @@ var QUESTIONS = [
 var DIFF_SCORES = {
     1: { A: 1, B: 2, C: 3 },
     8: { A: 1, B: 2, C: 3, D: 3 },
-    12: { A: 1, B: 2, C: 3 },
-    15: { A: 1, B: 2, C: 3 },
-    17: { A: 1, B: 2, C: 3 },
-    18: { A: 1, B: 2, C: 3, D: 3 }
+    12: { A: 1, B: 2, C: 3 }
 };
 // سوالات نوع حرکت: حرف → زیردسته
 var MOVE_MAP = {
     3: { A: 'backbend', B: 'forward_bend', C: 'lateral_bend', D: 'twist' },
-    4: { A: 'backbend', B: 'forward_bend', C: 'lateral_bend', D: 'twist' },
-    9: { A: 'backbend', B: 'forward_bend', C: 'lateral_bend', D: 'twist' },
     14: { A: 'forward_bend', B: 'backbend', C: 'twist', D: 'lateral_bend', E: 'balancing' }
 };
 // سوالات دسته: حرف → دسته
 var CAT_MAP = {
     2: { A: 'standing', B: 'seated', C: 'supine' },
     6: { A: 'standing', B: 'supine', C: 'arm_leg_support', D: 'arm_balance_and_inversion' },
-    7: { A: 'seated', B: 'supine', C: 'standing' },
-    10: { A: 'standing', B: 'seated', C: 'supine', D: 'arm_leg_support' },
-    16: { A: 'standing', B: 'seated', C: 'supine', D: 'prone', E: 'arm_leg_support' },
-    19: { A: 'seated', B: 'supine', C: 'standing', D: 'standing' }
+    16: { A: 'standing', B: 'seated', C: 'supine', D: 'prone', E: 'arm_leg_support' }
 };
 // ترتیب برنده‌شدن در حالت تساوی
 var MOVE_TIEBREAK = ['forward_bend', 'backbend', 'twist', 'lateral_bend', 'balancing', 'neutral'];
@@ -187,7 +113,6 @@ var DIFF_THRESH = [
     { key: 'expert', max: 3.0 }
 ];
 
-var GENDER_LABELS = { A: 'زن', B: 'مرد', C: 'ترجیح می‌دهم اعلام نکنم' };
 
 // ─── وضعیت ───
 var answers = {};      // qid → حرف
@@ -264,14 +189,12 @@ function computeProfile() {
     var cCounts = majorityCounts(CAT_MAP);
     var catKey = pickWinner(cCounts, CAT_TIEBREAK) || 'standing';
 
-    // ۴) علایق ثانویه (Q5 / Q11 / Q13)
+    // ۴) علایق ثانویه (Q5 / Q11)
     var hints = { armBalance: false, twist: false, neutral: false, balancing: false, open: false };
-    var a5 = answers[5], a11 = answers[11], a13 = answers[13];
+    var a5 = answers[5], a11 = answers[11];
     if (a5 === 'C' || a11 === 'C') hints.armBalance = true;
-    if (a5 === 'A' || a13 === 'C') hints.balancing = true;
-    if (a11 === 'A' || a13 === 'D' || a5 === 'B') hints.neutral = true;
-    if (a13 === 'B') hints.twist = true;
-    if (a13 === 'A') hints.open = true;
+    if (a5 === 'A') hints.balancing = true;
+    if (a11 === 'A' || a5 === 'B') hints.neutral = true;
 
     // مدت پیشنهادی
     var minutes = diffKey === 'beginner' ? 12 : diffKey === 'intermediate' ? 18 : 25;
@@ -282,7 +205,6 @@ function computeProfile() {
         category: { key: catKey, fa: (C.CATEGORY_FA && C.CATEGORY_FA[catKey]) || catKey, icon: (C.catIcon && C.catIcon(catKey)) || '' },
         hints: hints,
         minutes: minutes,
-        gender: answers[20] ? (GENDER_LABELS[answers[20]] || '') : '',
         movementCounts: mCounts,
         categoryCounts: cCounts,
         recommended: [],
@@ -416,7 +338,7 @@ function ensureDom() {
                 '<div id="yqQuiz">' +
                     '<div class="yq-head">' +
                         '<div class="yq-head-title">🧘 به باشگاه یوگا خوش آمدید</div>' +
-                        '<div class="yq-head-sub">با پاسخ به ۲۰ پرسش کوتاه، بهترین تمرین را برای تو طراحی می‌کنیم.</div>' +
+                        '<div class="yq-head-sub">با پاسخ به ۱۰ پرسش کوتاه، بهترین تمرین را برای تو طراحی می‌کنیم.</div>' +
                     '</div>' +
                     '<div class="yq-progress">' +
                         '<div class="yq-progress-bar" id="yqProgressBar"></div>' +
@@ -621,7 +543,7 @@ function renderResults() {
     html += '<div class="yq-res-head">';
     html += '<div class="yq-res-icon">🧘</div>';
     html += '<h3 class="yq-res-title">تمرین شخصی‌سازی‌شده تو آماده است</h3>';
-    html += '<p class="yq-res-sub">بر اساس ' + C.faNum(20) + ' پاسخ تو، این حرکات بیشترین هماهنگی را با تو دارند.</p>';
+    html += '<p class="yq-res-sub">بر اساس ' + C.faNum(QUESTIONS.length) + ' پاسخ تو، این حرکات بیشترین هماهنگی را با تو دارند.</p>';
     html += '</div>';
     html += '<div class="yq-sum">';
     html += tile('سطح تمرین', r.difficulty.stars + ' ' + r.difficulty.fa, '🎯');
@@ -658,7 +580,8 @@ function renderResults() {
     }
     html += '<div class="yq-res-actions">';
     html += '<button class="yq-btn primary big" id="yqStartPractice">▶ شروع تمرین پیشنهادی</button>';
-    html += '<button class="yq-btn" id="yqRetake">🔄 انجام دوباره تست</button>';
+    html += '<button class="yq-btn" id="yqSmartLibrary">✨ کتابخانه با حرکات پیشنهادی من</button>';
+    html += '<button class="yq-btn ghost" id="yqRetake">🔄 انجام دوباره تست</button>';
     html += '<button class="yq-btn ghost" id="yqBrowse">مرور کتابخانه حرکات</button>';
     html += '</div>';
     html += '<div class="yq-res-foot">تمرینات پیشنهادی از «کتابخانه حرکات» انتخاب شده‌اند و با روابط واقعی حرکات به هم متصل می‌شوند.</div>';
@@ -672,6 +595,8 @@ function renderResults() {
     if (ret) ret.addEventListener('click', function () { retakeTest(); });
     var browse = document.getElementById('yqBrowse');
     if (browse) browse.addEventListener('click', function () { closeOverlay(); goToLibrary(); });
+    var smartLib = document.getElementById('yqSmartLibrary');
+    if (smartLib) smartLib.addEventListener('click', function () { goToLibrarySmart(); });
 }
 
 function tile(label, value, icon) {
@@ -710,6 +635,15 @@ function showWarnInResults(msg) {
 
 function goToLibrary() {
     if (window.YogaLibrary && window.YogaLibrary.showLibrary) window.YogaLibrary.showLibrary();
+}
+
+// بستن نتایج و رفتن به کتابخانه با چیپ «پیشنهاد برای من» فعال
+function goToLibrarySmart() {
+    closeOverlay();
+    if (window.YogaLibrary && window.YogaLibrary.showLibrary) window.YogaLibrary.showLibrary();
+    if (window.YogaLibrary && window.YogaLibrary.enableSmart) {
+        try { window.YogaLibrary.enableSmart(); } catch (e) {}
+    }
 }
 
 function openPoseDetail(name) {
@@ -758,7 +692,7 @@ function renderZone() {
                 '</div>' +
             '</div>';
     } else {
-        var oldNote = hasOldQuestionnaire() ? '<div class="yq-zone-note">نسخه قبلی تست را انجام داده‌ای — با تست جدید ۲۰ پرسشی، نتیجه دقیق‌تری می‌گیری.</div>' : '';
+        var oldNote = hasOldQuestionnaire() ? '<div class="yq-zone-note">نسخه قبلی تست را انجام داده‌ای — با تست جدید ۱۰ پرسشی، نتیجه دقیق‌تری می‌گیری.</div>' : '';
         zone.innerHTML =
             '<div class="yq-zone cta">' +
                 '<div class="yq-cta-text">' +

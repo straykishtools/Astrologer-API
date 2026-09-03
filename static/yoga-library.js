@@ -14,6 +14,9 @@ var currentView = 'grid', showTertiary = false, currentSort = 'name_fa';
 var currentFilters = { difficulty: [], subcategory: [], category: [], visibility: [], search: '' };
 var _inited = false, _activeTab = 'library', _dataLoaded = false;
 var activeDetailPose = null, activeDetailSide = 'R';
+var _smartOn = false, _smartSnapshot = null, _smartProfile = null;
+var SMART_LS = 'yoga_smart_on';
+var FILTER_LS = 'yoga_lib_filters';
 var PAGE_SIZE = 12, currentPage = 1;
 var _eventsBound = false;
 
@@ -26,9 +29,6 @@ var UI_CATEGORIES = [
     'standing', 'seated', 'supine', 'prone', 'arm_leg_support', 'arm_balance_and_inversion'
 ];
 
-// ─── پرسشنامه ───
-function getQA() { try { return JSON.parse(localStorage.getItem('yoga_questionnaire_answers')) || {}; } catch (e) { return {}; } }
-
 // ─── فیلتر و مرتب‌سازی ───
 function searchHaystack(p) {
     var bits = [p.name, p.name_fa, p.display_name, p.display_name_fa];
@@ -40,7 +40,43 @@ function searchHaystack(p) {
     return bits.join(' ').toLowerCase();
 }
 
+// ─── فیلتر هوشمند: مجموعه پیشنهادی بر اساس پروفایل تست ───
+function applySmartPredicate() {
+    var prof = _smartProfile;
+    filteredPoses = allPoses.filter(function (p) {
+        if (!p || p.visibility === 'tertiary') return false;
+        if (smartBandKeys(prof.difficulty.key).indexOf(p.difficulty) < 0) return false;
+        if (currentFilters.search) {
+            if (searchHaystack(p).indexOf(currentFilters.search.toLowerCase()) < 0) return false;
+        }
+        // تطبیق: نوع حرکت یا دسته (و استراحت‌های خوابیده/نشسته برای پروفایل‌های آرام)
+        if (p.subcategory === prof.movement.key) return true;
+        if (p.category === prof.category.key) return true;
+        if (p.category === 'supine' && p.subcategory === 'neutral') return true;
+        return false;
+    }).map(function (p) {
+        var s = 0;
+        if (p.subcategory === prof.movement.key) s += 42;
+        if (p.category === prof.category.key) s += 28;
+        var dDist = Math.abs((C.diffOrder(p.difficulty) || 1) - (C.diffOrder(prof.difficulty.key) || 1));
+        s += dDist === 0 ? 22 : dDist === 1 ? 8 : 0;
+        if (prof.hints && prof.hints.twist && p.subcategory === 'twist') s += 12;
+        if (prof.hints && prof.hints.armBalance && p.category === 'arm_balance_and_inversion') s += 10;
+        if (prof.hints && prof.hints.balancing && p.subcategory === 'balancing') s += 8;
+        if (p.visibility === 'primary') s += 6;
+        else if (p.visibility === 'secondary') s += 2;
+        return { name: p.name, p: p, s: s };
+    }).sort(function (a, b) {
+        if (b.s !== a.s) return b.s - a.s;
+        return C.nameFa(a.p).localeCompare(C.nameFa(b.p), 'fa');
+    }).map(function (r) { return r.p; });
+    currentPage = 1;
+    renderGrid();
+    updateCount();
+}
+
 function applyFilters() {
+    if (_smartOn && _smartProfile) { applySmartPredicate(); return; }
     filteredPoses = allPoses.filter(function (p) {
         if (!showTertiary && p.visibility === 'tertiary') return false;
         if (currentFilters.difficulty.length && currentFilters.difficulty.indexOf(p.difficulty) < 0) return false;
@@ -63,6 +99,74 @@ function applyFilters() {
     currentPage = 1;
     renderGrid();
     updateCount();
+    persistManual(); // ذخیره فیلترهای دستی برای بازدیدها و رفرش‌های بعدی
+}
+
+// ─── فیلتر هوشمند «پیشنهاد برای من» (بر اساس نتیجه تست تشخیص تمرین) ───
+function smartBandKeys(diffKey) {
+    var order = ['beginner', 'intermediate', 'expert'];
+    var keys = [];
+    for (var i = 0; i < order.length; i++) {
+        keys.push(order[i]);
+        if (order[i] === diffKey) break;
+    }
+    return keys;
+}
+
+// نتیجه کامل تست ذخیره‌شده (difficulty/movement/category/hints)
+function yogaSmartProfile() {
+    if (window.YogaTest && window.YogaTest.getResults) {
+        var r = window.YogaTest.getResults();
+        if (r && r.difficulty && r.difficulty.key && r.movement && r.movement.key && r.category && r.category.key) {
+            return r;
+        }
+    }
+    return null;
+}
+
+// همگام‌سازی کلاس active همه چیپ‌ها + حالت غیرفعال فیلترهای دستی هنگام فعال بودن چیپ هوشمند
+function syncTagUI() {
+    var tags = document.querySelectorAll('#yogaFilters .yoga-tag[data-filter]');
+    tags.forEach(function (t) {
+        var f = t.dataset.filter, v = t.dataset.value;
+        t.classList.toggle('active', !!(currentFilters[f] && currentFilters[f].indexOf(v) >= 0));
+    });
+    var chip = document.getElementById('yogaSmartChip');
+    if (chip) chip.classList.toggle('active', _smartOn);
+    var tagsBox = document.querySelector('#yogaFilters .yoga-filter-tags');
+    if (tagsBox) tagsBox.classList.toggle('yq-smart-active', _smartOn);
+}
+
+function applySmartFilter() {
+    var prof = yogaSmartProfile();
+    if (!prof) {
+        // هنوز تست انجام نشده: شروع تست تشخیص تمرین
+        if (window.YogaTest && window.YogaTest.openQuiz) window.YogaTest.openQuiz();
+        return;
+    }
+    if (_smartOn) {
+        _smartOn = false;
+        _smartProfile = null;
+        if (_smartSnapshot) {
+            currentFilters.difficulty = _smartSnapshot.difficulty.slice();
+            currentFilters.subcategory = _smartSnapshot.subcategory.slice();
+            currentFilters.category = _smartSnapshot.category.slice();
+            currentFilters.visibility = _smartSnapshot.visibility.slice();
+        }
+    } else {
+        _smartSnapshot = {
+            difficulty: currentFilters.difficulty.slice(),
+            subcategory: currentFilters.subcategory.slice(),
+            category: currentFilters.category.slice(),
+            visibility: currentFilters.visibility.slice()
+        };
+        _smartOn = true;
+        _smartProfile = prof;
+        currentFilters.search = currentFilters.search; // جستجو در حالت هوشمند هم ترکیب می‌شود
+    }
+    persistSmart(_smartOn); // ذخیره وضعیت چیپ برای رفرش‌ها و بازدیدهای بعدی
+    syncTagUI();
+    applyFilters();
 }
 
 function updateCount() {
@@ -79,6 +183,10 @@ function updateCount() {
 function renderFilters() {
     var el = document.getElementById('yogaFilters');
     if (!el) return;
+    // بازیابی چیپ هوشمند: اگر قبلاً فعال بوده و پروفایل تست موجود است، دوباره اعمال شود
+    restoreSmartState();
+    // اگر چیپ هوشمند فعال نیست، فیلترهای دستی ذخیره‌شده (سطح/نوع حرکت/دسته/نقش/جستجو) را برگردان
+    if (!_smartOn) restoreManual();
     var html = '<div class="yoga-filters-row">';
     html += '<input type="text" class="yoga-filter-search" id="yogaSearch" placeholder="🔍 جستجو در نام فارسی، انگلیسی، سانسکریت…" autocomplete="off">';
     html += '<select class="yoga-filter-select" id="yogaSort">';
@@ -90,7 +198,15 @@ function renderFilters() {
     html += '<button class="yoga-view-btn active" data-view="grid" title="نمای گرید">▦</button>';
     html += '<button class="yoga-view-btn" data-view="list" title="نمای لیست">☰</button>';
     html += '</div>';
-    html += '<div class="yoga-filter-tags">';
+    html += '<div class="yoga-filter-tags' + (_smartOn ? ' yq-smart-active' : '') + '">';
+    // چیپ هوشمند «پیشنهاد برای من»
+    var smartProf = yogaSmartProfile();
+    if (window.YogaTest && window.YogaTest.getResults) {
+        html += '<div class="yoga-filter-group">';
+        html += '<button class="yoga-tag smart' + (_smartOn ? ' active' : '') + '" id="yogaSmartChip" title="' +
+            (smartProf ? 'نمایش حرکات پیشنهادی بر اساس پروفایل تمرین تو — برای خاموش‌کردن دوباره کلیک کن' : 'ابتدا تست تشخیص تمرین (۱۰ پرسش) را کامل کن') + '">✨ پیشنهاد برای من</button>';
+        html += '</div>';
+    }
     html += '<div class="yoga-filter-group"><label>سطح:</label>';
     ['beginner', 'intermediate', 'expert'].forEach(function (d) {
         html += '<button class="yoga-tag" data-filter="difficulty" data-value="' + d + '">' + C.DIFFICULTY_STARS[d] + ' ' + C.DIFFICULTY_FA[d] + '</button>';
@@ -114,9 +230,18 @@ function renderFilters() {
     html += '<label class="yoga-tertiary-toggle"><input type="checkbox" id="yogaTertiaryToggle"> نمایش حرکات پنهان</label>';
     html += '</div>';
     el.innerHTML = html;
+    document.getElementById('yogaSearch').value = currentFilters.search || '';
     document.getElementById('yogaSearch').addEventListener('input', function () {
         currentFilters.search = this.value; applyFilters();
     });
+    // بازیابی ترجیحات نمایش: مرتب‌سازی / نمای گرید-لیست / نمایش حرکات پنهان
+    document.getElementById('yogaSort').value = currentSort;
+    document.getElementById('yogaTertiaryToggle').checked = showTertiary;
+    el.querySelectorAll('.yoga-view-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.view === currentView);
+    });
+    var gridWrapEl = document.getElementById('yogaGridWrap');
+    if (gridWrapEl) gridWrapEl.className = currentView === 'list' ? 'yoga-grid-wrap yoga-list-view' : 'yoga-grid-wrap';
     document.getElementById('yogaSort').addEventListener('change', function () {
         currentSort = this.value; applyFilters();
     });
@@ -128,21 +253,27 @@ function renderFilters() {
             var grid = document.getElementById('yogaGridWrap');
             if (grid) grid.className = currentView === 'list' ? 'yoga-grid-wrap yoga-list-view' : 'yoga-grid-wrap';
             renderGrid();
+            persistManual(); // نمای انتخابی (گرید/لیست) را برای بازدیدهای بعدی ذخیره کن
         });
     });
-    el.querySelectorAll('.yoga-tag').forEach(function (tag) {
+    el.querySelectorAll('.yoga-tag[data-filter]').forEach(function (tag) {
         tag.addEventListener('click', function () {
-            this.classList.toggle('active');
             var f = this.dataset.filter, v = this.dataset.value;
             var arr = currentFilters[f];
             var idx = arr.indexOf(v);
             if (idx >= 0) arr.splice(idx, 1); else arr.push(v);
+            syncTagUI();
             applyFilters();
         });
+    });
+    var smartChip = document.getElementById('yogaSmartChip');
+    if (smartChip) smartChip.addEventListener('click', function () {
+        applySmartFilter();
     });
     document.getElementById('yogaTertiaryToggle').addEventListener('change', function () {
         showTertiary = this.checked; applyFilters();
     });
+    syncTagUI(); // وضعیت فعال چیپ‌ها را بعد از رندر/بازیابی منعکس کن
 }
 
 function imgTag(pose, opts) {
@@ -428,16 +559,10 @@ function renderDailyPanel() {
     if (!el) return;
     var practice = C.getPracticeData();
     var favs = C.getFavs().length;
-    // حداکثر سطح مجاز: اول از نتیجه تست جدید (yoga-test.js)، بعد پرسشنامه قدیمی
+    // حداکثر سطح مجاز از نتیجه تست تشخیص (yoga-test.js)
     var maxDiff = 'beginner';
     var tmax = (window.YogaTest && window.YogaTest.maxDifficulty) ? window.YogaTest.maxDifficulty() : null;
-    if (tmax) {
-        maxDiff = tmax;
-    } else {
-        var exp = getQA().step_1 && getQA().step_1[0] ? getQA().step_1[0] : 'beginner';
-        if (exp === 'intermediate' || exp === 'advanced') maxDiff = 'intermediate';
-        if (exp === 'mentor') maxDiff = 'expert';
-    }
+    if (tmax) maxDiff = tmax;
 
     // توصیه روز: یک زنجیره متصل از حرکات
     var flow = C.buildFlow('auto', 6).filter(function (n) {
@@ -732,6 +857,85 @@ function notifyTest() {
     }
 }
 
+// ─── چیپ هوشمند: ذخیره/بازیابی وضعیت و فعال‌سازی برنامه‌ای ───
+function smartPersisted() { try { return localStorage.getItem(SMART_LS) === '1'; } catch (e) { return false; } }
+function persistSmart(v) { try { localStorage.setItem(SMART_LS, v ? '1' : '0'); } catch (e) {} }
+
+function turnSmartOn(prof) {
+    _smartSnapshot = {
+        difficulty: currentFilters.difficulty.slice(),
+        subcategory: currentFilters.subcategory.slice(),
+        category: currentFilters.category.slice(),
+        visibility: currentFilters.visibility.slice()
+    };
+    _smartOn = true;
+    _smartProfile = prof;
+    persistSmart(true);
+}
+function turnSmartOff() {
+    _smartOn = false;
+    _smartProfile = null;
+    if (_smartSnapshot) {
+        currentFilters.difficulty = _smartSnapshot.difficulty.slice();
+        currentFilters.subcategory = _smartSnapshot.subcategory.slice();
+        currentFilters.category = _smartSnapshot.category.slice();
+        currentFilters.visibility = _smartSnapshot.visibility.slice();
+    }
+    persistSmart(false);
+}
+
+// بعد از رفرش صفحه یا بازگشت به کتابخانه: اگر چیپ قبلاً روشن بوده و پروفایل موجود است، دوباره اعمال کن
+function restoreSmartState() {
+    if (!smartPersisted()) return;
+    var prof = yogaSmartProfile();
+    if (!prof) return;
+    if (_smartOn) _smartProfile = prof;
+    else turnSmartOn(prof);
+}
+
+// فعال‌سازی برنامه‌ای چیپ (مثلاً از دکمه «کتابخانه با حرکات پیشنهادی» در نتیجه تست)
+function enableSmartFilter() {
+    var prof = yogaSmartProfile();
+    if (!prof) return false;
+    if (_smartOn) _smartProfile = prof;
+    else turnSmartOn(prof);
+    syncTagUI();
+    applyFilters();
+    return true;
+}
+
+// ─── ذخیره/بازیابی فیلترهای دستی + ترجیحات نمایش (localStorage) ───
+var VALID_SORTS = { name_fa: 1, name_en: 1, difficulty: 1, category: 1 };
+function persistManual() {
+    try {
+        localStorage.setItem(FILTER_LS, JSON.stringify({
+            difficulty: currentFilters.difficulty.slice(),
+            subcategory: currentFilters.subcategory.slice(),
+            category: currentFilters.category.slice(),
+            visibility: currentFilters.visibility.slice(),
+            search: currentFilters.search || '',
+            sort: currentSort,
+            view: currentView,
+            showTertiary: !!showTertiary
+        }));
+    } catch (e) {}
+}
+function restoreManual() {
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem(FILTER_LS) || 'null'); } catch (e) {}
+    if (!raw || typeof raw !== 'object') return;
+    var groups = { difficulty: raw.difficulty, subcategory: raw.subcategory, category: raw.category, visibility: raw.visibility };
+    Object.keys(groups).forEach(function (k) {
+        if (Array.isArray(groups[k]) && groups[k].length) {
+            currentFilters[k] = groups[k].filter(function (x) { return typeof x === 'string'; }).slice();
+        }
+    });
+    if (typeof raw.search === 'string' && raw.search) currentFilters.search = raw.search;
+    if (typeof raw.sort === 'string' && VALID_SORTS[raw.sort]) currentSort = raw.sort;
+    if (raw.view === 'grid' || raw.view === 'list') currentView = raw.view;
+    if (typeof raw.showTertiary === 'boolean') showTertiary = raw.showTertiary;
+}
+
 // ─── API عمومی ───
 window.YogaLibrary = {
     init: init,
@@ -740,6 +944,7 @@ window.YogaLibrary = {
     closeDetail: closeDetail,
     switchTab: switchTab,
     refreshTabs: renderTabs,
-    setTab: function (t) { switchTab(t); }
+    setTab: function (t) { switchTab(t); },
+    enableSmart: enableSmartFilter
 };
 })();
