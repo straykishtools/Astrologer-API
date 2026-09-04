@@ -1,0 +1,1 @@
+"""Pydantic request/response schemas for the Cosmic Oracle user database API."""

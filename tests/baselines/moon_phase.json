@@ -13,37 +13,37 @@
       "detailed": {
         "illumination_details": {
           "percentage": 32.0,
-          "phase_angle": 290.64920649838996,
-          "visible_fraction": 0.3236772895463642
+          "phase_angle": 290.6490028413318,
+          "visible_fraction": 0.32367895261519586
         },
         "position": null,
         "upcoming_phases": {
           "first_quarter": {
             "last": {
-              "datestamp": "Fri, 08 Oct 1993 19:35:19 +0000",
+              "datestamp": "Fri, 08 Oct 1993 19:35:21 +0000",
               "days_ago": 2,
               "days_ahead": null,
               "description": null,
               "name": null,
-              "timestamp": 750108919
+              "timestamp": 750108921
             },
             "next": {
-              "datestamp": "Fri, 22 Oct 1993 08:52:01 +0000",
+              "datestamp": "Fri, 22 Oct 1993 08:52:02 +0000",
               "days_ago": null,
               "days_ahead": 12,
               "description": null,
               "name": null,
-              "timestamp": 751279921
+              "timestamp": 751279922
             }
           },
           "full_moon": {
             "last": {
-              "datestamp": "Thu, 16 Sep 1993 03:10:15 +0000",
+              "datestamp": "Thu, 16 Sep 1993 03:10:17 +0000",
               "days_ago": 24,
               "days_ahead": null,
               "description": null,
               "name": null,
-              "timestamp": 748149015
+              "timestamp": 748149017
             },
             "next": {
               "datestamp": "Sat, 30 Oct 1993 12:37:38 +0000",
@@ -56,12 +56,12 @@
           },
           "last_quarter": {
             "last": {
-              "datestamp": "Wed, 22 Sep 1993 19:32:06 +0000",
+              "datestamp": "Wed, 22 Sep 1993 19:32:03 +0000",
               "days_ago": 18,
               "days_ahead": null,
               "description": null,
               "name": null,
-              "timestamp": 748726326
+              "timestamp": 748726323
             },
             "next": {
               "datestamp": "Sun, 07 Nov 1993 06:35:50 +0000",
@@ -74,20 +74,20 @@
           },
           "new_moon": {
             "last": {
-              "datestamp": "Thu, 30 Sep 1993 18:53:51 +0000",
+              "datestamp": "Thu, 30 Sep 1993 18:53:49 +0000",
               "days_ago": 10,
               "days_ahead": null,
               "description": null,
               "name": null,
-              "timestamp": 749415231
+              "timestamp": 749415229
             },
             "next": {
-              "datestamp": "Fri, 15 Oct 1993 11:35:55 +0000",
+              "datestamp": "Fri, 15 Oct 1993 11:35:56 +0000",
               "days_ago": null,
               "days_ahead": 5,
               "description": null,
               "name": null,
-              "timestamp": 750684955
+              "timestamp": 750684956
             }
           }
         },
@@ -103,12 +103,12 @@
       "moonset": null,
       "moonset_timestamp": null,
       "next_lunar_eclipse": {
-        "datestamp": "Mon, 29 Nov 1993 06:26:06 +0000",
-        "timestamp": 754554366,
+        "datestamp": "Mon, 29 Nov 1993 06:26:07 +0000",
+        "timestamp": 754554367,
         "type": "Total Lunar Eclipse",
         "visibility_regions": null
       },
-      "phase": 0.8073589069399721,
+      "phase": 0.8073583412259218,
       "phase_name": "Waning Crescent",
       "stage": "waning",
       "zodiac": {
@@ -125,9 +125,9 @@
         "visibility_regions": null
       },
       "position": {
-        "altitude": 31.253598810766498,
-        "azimuth": 169.66711708015123,
-        "distance": 149364727.19422686
+        "altitude": 31.2536062855374,
+        "azimuth": 169.66711107707397,
+        "distance": 149364723.65480208
       },
       "solar_noon": "12:47",
       "sunrise": 750233758,

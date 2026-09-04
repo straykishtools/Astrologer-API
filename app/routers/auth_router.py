@@ -87,6 +87,19 @@ def register(data: UserRegister):
         raise HTTPException(status_code=409, detail="این ایمیل قبلاً ثبت شده")
 
     token = create_access_token({"user_id": user["id"], "email": user["email"]})
+
+    # Provision the Cosmic Oracle database row + send the verification email.
+    try:
+        from app.services.auth_service import provision_user_sync
+        from app.services.email_service import send_verification_email
+
+        _, v_token = provision_user_sync(data.email, data.display_name, data.password)
+        if v_token:
+            send_verification_email(data.email, v_token)
+    except Exception:
+        # Email/DB provisioning is best-effort — never block registration on it.
+        pass
+
     return TokenResponse(
         access_token=token,
         user=UserResponse(
@@ -234,25 +247,110 @@ def change_user_password(data: ChangePassword, user=Depends(get_current_user)):
     return {"status": "ok", "message": "رمز عبور تغییر کرد"}
 
 
+from sqlalchemy.ext.asyncio import AsyncSession as _AsyncSession
+from app.config.database import SessionLocal as _SessionLocal, get_db as _get_db
+from app.schemas.user import UserOut as _UserOut
+
+
 @router.post("/forgot-password")
-def forgot_password(data: dict):
+async def forgot_password(data: dict):
     """درخواست بازیابی رمز عبور
 
     همیشه پیام موفقیت برمی‌گرداند (حتی اگر ایمیل وجود نداشته باشد)
-    تا اطلاعات کاربر فاش نشود.
+    تا اطلاعات کاربر فاش نشود. در حالت توسعه، لینک بازیابی در کنسول چاپ می‌شود.
     """
     email = (data.get("email") or "").lower().strip()
     if not email or "@" not in email:
-        # Still return success to prevent enumeration
         return {"status": "ok", "message": "اگر ایمیل معتبری وارد کرده باشید، لینک بازیابی ارسال شد."}
 
-    from app.models import get_db
-    conn = get_db()
-    user = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
-    conn.close()
+    from app.services.auth_service import ensure_user, issue_verification_token
+    from app.services.email_service import send_password_reset_email
 
-    # Always return success — never reveal whether email exists
+    async with _SessionLocal() as db:
+        # Provision a matching row (no-op when it already exists) so any
+        # registered email can be verified/reset — enumeration-safe.
+        user = await ensure_user(db, email)
+        try:
+            token = await issue_verification_token(db, user)
+            await db.commit()
+            send_password_reset_email(email, token)
+        except Exception:
+            # Never fail the request; the response is always generic anyway.
+            pass
+
     return {"status": "ok", "message": "اگر ایمیل معتبری وارد کرده باشید، لینک بازیابی ارسال شد."}
+
+
+@router.post("/verify-email")
+async def verify_email(data: dict, db: _AsyncSession = Depends(_get_db)):
+    """تأیید ایمیل با توکن ارسال‌شده (۲۴ ساعت معتبر)"""
+    from app.services.auth_service import verify_email_token
+
+    token = (data.get("token") or "").strip()
+    if not token:
+        raise HTTPException(status_code=400, detail="توکن لازم است")
+    user = await verify_email_token(db, token)
+    await db.commit()
+    return {
+        "status": "ok",
+        "email_verified": True,
+        "user": _UserOut.model_validate(user).model_dump(mode="json"),
+    }
+
+
+@router.post("/resend-verification")
+async def resend_verification(data: dict):
+    """ارسال مجدد لینک تأیید ایمیل (بدون افشای وجود ایمیل)"""
+    from app.services.auth_service import ensure_user, issue_verification_token
+    from app.services.email_service import send_verification_email
+
+    email = (data.get("email") or "").lower().strip()
+    if not email or "@" not in email:
+        return {"status": "ok", "message": "اگر ایمیل معتبری وارد کرده باشید، لینک تأیید ارسال شد."}
+
+    async with _SessionLocal() as db:
+        user = await ensure_user(db, email)
+        try:
+            token = await issue_verification_token(db, user)
+            await db.commit()
+            send_verification_email(email, token)
+        except Exception:
+            pass
+
+    return {"status": "ok", "message": "اگر ایمیل معتبری وارد کرده باشید، لینک تأیید ارسال شد."}
+
+
+@router.get("/dev/emails")
+def dev_email_inbox():
+    """لیست ایمیل‌های اخیر صادرشده (فقط محیط توسعه/تست).
+
+    جایگزین خراشیدن لاگ کنسول: پیام‌های تأیید ایمیل و بازیابی رمز در حافظه
+    نگه‌داری و از اینجا قابل مشاهده هستند. در محیط production غیرفعال است.
+    """
+    import os as _os
+
+    if _os.getenv("ENV_TYPE") == "production":
+        raise HTTPException(status_code=404, detail="این مسیر فقط در محیط توسعه فعال است")
+    from app.services.email_service import get_inbox
+
+    return {"status": "ok", "count": len(get_inbox()), "emails": get_inbox()}
+
+
+@router.post("/reset-password")
+async def reset_password(data: dict, db: _AsyncSession = Depends(_get_db)):
+    """تعیین رمز عبور جدید با توکن بازیابی (۲۴ ساعت معتبر)"""
+    from app.services.auth_service import reset_password_with_token
+
+    token = (data.get("token") or "").strip()
+    new_password = data.get("new_password") or ""
+    if not token:
+        raise HTTPException(status_code=400, detail="توکن لازم است")
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل ۶ کاراکتر باشد")
+
+    await reset_password_with_token(db, token, new_password)
+    await db.commit()
+    return {"status": "ok", "message": "رمز عبور با موفقیت تغییر کرد. اکنون می‌توانید وارد شوید."}
 
 
 # ============================================================

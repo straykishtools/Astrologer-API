@@ -38,35 +38,35 @@
         "aspect": "trine",
         "aspect_degrees": 120,
         "aspect_movement": "Separating",
-        "diff": 119.56500509878333,
-        "orbit": 0.43499490121666895,
+        "diff": 119.56501676920065,
+        "orbit": 0.43498323079933243,
         "p1": 0,
-        "p1_abs_pos": 84.14946480378924,
+        "p1_abs_pos": 84.14945336465065,
         "p1_name": "Sun",
         "p1_owner": "Baseline Test Roma 1990",
-        "p1_speed": 0.9550993345928775,
+        "p1_speed": 0.9551005546726715,
         "p2": 35,
-        "p2_abs_pos": 203.71446990257257,
+        "p2_abs_pos": 203.7144701338513,
         "p2_name": "Spica",
         "p2_owner": "Baseline Test Roma 1990",
-        "p2_speed": -6.286559060283354e-05
+        "p2_speed": -6.0617825094898227e-05
       },
       {
         "aspect": "trine",
         "aspect_degrees": 120,
         "aspect_movement": "Applying",
-        "diff": 239.57375697555344,
-        "orbit": 0.42624302444656337,
+        "diff": 239.5738586441998,
+        "orbit": 0.42614135580021184,
         "p1": 1,
-        "p1_abs_pos": 345.6363872647175,
+        "p1_abs_pos": 345.6364878977143,
         "p1_name": "Moon",
         "p1_owner": "Baseline Test Roma 1990",
-        "p1_speed": 13.369157011888689,
+        "p1_speed": 13.369194495735348,
         "p2": 12,
-        "p2_abs_pos": 106.06263028916405,
+        "p2_abs_pos": 106.06262925351452,
         "p2_name": "Chiron",
         "p2_owner": "Baseline Test Roma 1990",
-        "p2_speed": 0.10124918146886328
+        "p2_speed": 0.1012493222570288
       }
     ],
     "chart_type": "Natal",
@@ -129,20 +129,20 @@
       "capella": null,
       "ceres": null,
       "chiron": {
-        "abs_pos": 106.06263028916405,
-        "declination": 16.251877920035444,
+        "abs_pos": 106.06262925351452,
+        "declination": 16.251877585086266,
         "element": "Water",
         "emoji": "♋️",
         "house": "Tenth_House",
         "magnitude": null,
         "name": "Chiron",
         "point_type": "AstrologicalPoint",
-        "position": 16.062630289164048,
+        "position": 16.062629253514515,
         "quality": "Cardinal",
         "retrograde": false,
         "sign": "Can",
         "sign_num": 3,
-        "speed": 0.10124918146886328
+        "speed": 0.1012493222570288
       },
       "city": "Rome",
       "day": 15,
@@ -262,7 +262,7 @@
       "lat": 41.9028,
       "lng": 12.4964,
       "lunar_phase": {
-        "degrees_between_s_m": 261.4869224609282,
+        "degrees_between_s_m": 261.48703453306365,
         "moon_emoji": "🌗",
         "moon_phase": 21,
         "moon_phase_name": "Last Quarter"
@@ -277,20 +277,20 @@
       "minute": 30,
       "month": 6,
       "moon": {
-        "abs_pos": 345.6363872647175,
-        "declination": -2.758439618642229,
+        "abs_pos": 345.6364878977143,
+        "declination": -2.7584032549592856,
         "element": "Water",
         "emoji": "♓️",
         "house": "Fifth_House",
         "magnitude": null,
         "name": "Moon",
         "point_type": "AstrologicalPoint",
-        "position": 15.636387264717484,
+        "position": 15.63648789771429,
         "quality": "Mutable",
         "retrograde": false,
         "sign": "Pis",
         "sign_num": 11,
-        "speed": 13.369157011888689
+        "speed": 13.369194495735348
       },
       "name": "Baseline Test Roma 1990",
       "nation": "IT",
@@ -378,36 +378,36 @@
         "speed": 310.945005651588
       },
       "spica": {
-        "abs_pos": 203.71446990257257,
-        "declination": -11.114758294439875,
+        "abs_pos": 203.7144701338513,
+        "declination": -11.114758465040438,
         "element": "Air",
         "emoji": "♎️",
         "house": "First_House",
         "magnitude": 0.97,
         "name": "Spica",
         "point_type": "AstrologicalPoint",
-        "position": 23.714469902572574,
+        "position": 23.714470133851307,
         "quality": "Cardinal",
         "retrograde": false,
         "sign": "Lib",
         "sign_num": 6,
-        "speed": -6.286559060283354e-05
+        "speed": -6.0617825094898227e-05
       },
       "sun": {
-        "abs_pos": 84.14946480378924,
-        "declination": 23.312818188352303,
+        "abs_pos": 84.14945336465065,
+        "declination": 23.31281243929162,
         "element": "Air",
         "emoji": "♊️",
         "house": "Ninth_House",
         "magnitude": null,
         "name": "Sun",
         "point_type": "AstrologicalPoint",
-        "position": 24.149464803789243,
+        "position": 24.149453364650654,
         "quality": "Mutable",
         "retrograde": false,
         "sign": "Gem",
         "sign_num": 2,
-        "speed": 0.9550993345928775
+        "speed": 0.9551005546726715
       },
       "tenth_house": {
         "abs_pos": 102.44815772060164,
@@ -470,5 +470,99 @@
       "zodiac_type": "Tropical"
     }
   },
-  "status": "OK"
+  "status": "OK",
+  "vedic_interpretations": {
+    "Moon": {
+      "bhava_interpretation": "ماه در خانه پنجم احساسات را با خلاقیت، فرزندان، آموزش و عشق پیوند می‌دهد. تخیل و هوش شهودی می‌تواند برجسته باشد و امور مربوط به فرزندان تأثیر عاطفی زیادی داشته باشد.",
+      "drishti": [
+        1,
+        5,
+        9
+      ],
+      "functional_nature": {
+        "description": "صاحب خانه‌های 10 · Kendra Lord · Benefic",
+        "houses": [
+          10
+        ],
+        "is_dusthana": false,
+        "is_kendra": true,
+        "is_maraka": false,
+        "is_trikona": false,
+        "is_yogakaraka": false,
+        "nature": "Benefic",
+        "type": "Kendra Lord"
+      },
+      "house": "Fifth",
+      "lordship": [
+        10
+      ],
+      "nakshatra": {
+        "deity": "Ahirbudhnya",
+        "end": 346.667,
+        "gana": "Manushya",
+        "index": 26,
+        "interpretation": "اوتارا بهادراپادا: صبور، معقول، متعادل، مدبر",
+        "lord": "Saturn",
+        "name": "Uttara Bhadrapada",
+        "name_fa": "اوتارا بهادراپادا",
+        "start": 333.333,
+        "symbol": "Two Faces",
+        "yoni": "Cow"
+      },
+      "planet": "Moon",
+      "planetary_strength": {
+        "description": "برج بی‌طرف (Pisces، صاحب: Jupiter)",
+        "score": 5,
+        "status": "Neutral"
+      },
+      "rashi_interpretation": null,
+      "sign": "Pis"
+    },
+    "Sun": {
+      "bhava_interpretation": "خورشید در خانه نهم بر باورها، دانش عالی، آموزگاران، سفرهای دور، معنویت و جست‌وجوی معنا تأکید می‌کند. فرد معمولاً تمایل دارد جهان‌بینی مستقلی ایجاد کند و از دانش و تجربه برای رشد شخصی استفاده کند. کیفیت خورشید و حاکم خانه نهم در نتیجه بسیار مهم است.",
+      "drishti": [
+        2,
+        6,
+        10
+      ],
+      "functional_nature": {
+        "description": "صاحب خانه‌های 11 · Mixed · Mixed / Neutral",
+        "houses": [
+          11
+        ],
+        "is_dusthana": false,
+        "is_kendra": false,
+        "is_maraka": false,
+        "is_trikona": false,
+        "is_yogakaraka": false,
+        "nature": "Mixed / Neutral",
+        "type": "Mixed"
+      },
+      "house": "Ninth",
+      "lordship": [
+        11
+      ],
+      "nakshatra": {
+        "deity": "Aditi",
+        "end": 93.333,
+        "gana": "Deva",
+        "index": 7,
+        "interpretation": "پونارواسو: خوش‌بین، سخاوتمند، معنوی، بازگشت‌دهنده",
+        "lord": "Jupiter",
+        "name": "Punarvasu",
+        "name_fa": "پونارواسو",
+        "start": 80.0,
+        "symbol": "Bow",
+        "yoni": "Cat"
+      },
+      "planet": "Sun",
+      "planetary_strength": {
+        "description": "برج بی‌طرف (Gemini، صاحب: Mercury)",
+        "score": 5,
+        "status": "Neutral"
+      },
+      "rashi_interpretation": null,
+      "sign": "Gem"
+    }
+  }
 }

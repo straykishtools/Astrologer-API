@@ -1198,3 +1198,79 @@ For issues or questions:
 -   GitHub: [Astrologer-API](https://github.com/g-battaglia/Astrologer-API)
 -   Email: kerykeion.astrology@gmail.com
 -   Website: [kerykeion.net](https://www.kerykeion.net/)
+
+---
+
+## Cosmic Oracle Database (Phase 1)
+
+User-facing endpoints backed by the async SQLAlchemy database (`cosmic.db`).
+All require a Bearer token from `/api/v5/auth/register` or `/api/v5/auth/login`.
+The JWT is validated with the same secret as the legacy auth layer; a matching
+row is provisioned in the new `users` table on first authenticated request.
+
+### User
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| GET | `/api/v5/user/profile` | Default profile (birth data + preferences) |
+| PUT | `/api/v5/user/profile` | Upsert default profile (name, birth date, city, lat/lng, timezone, zodiac/house system) |
+| GET | `/api/v5/user/settings` | App preferences (theme, language, reminder) |
+| PUT | `/api/v5/user/settings` | Update preferences |
+| GET | `/api/v5/user/dashboard` | Aggregated stats: streaks, recent charts, yoga summary, tarot history |
+| GET | `/api/v5/user/charts` | List saved charts (filter by `chart_type`, `limit`, `offset`) |
+| GET | `/api/v5/user/charts/{chart_id}` | Single saved chart |
+| POST | `/api/v5/user/charts/save` | Save a chart result (`chart_data` JSON; legacy `input_data`/`result_data` strings accepted) |
+| DELETE | `/api/v5/user/charts/{chart_id}` | Delete a saved chart |
+
+### Yoga
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| POST | `/api/v5/yoga/session` | Record a practice session (asanas/breathing/meditation) + bump streak |
+| GET | `/api/v5/yoga/history` | Practice history (newest first) |
+| GET | `/api/v5/yoga/stats` | Totals, minutes, current/longest streak, most-practiced poses |
+| GET | `/api/v5/yoga/favorites` | Favorite poses |
+| POST | `/api/v5/yoga/favorite` | Mark a pose as favorite (`pose_id`, `pose_name`) |
+| DELETE | `/api/v5/yoga/favorite/{pose_id}` | Remove a favorite |
+
+### Tarot
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| POST | `/api/v5/tarot/history` | Save a draw (`spread_type`, `card_ids`, `reversed`, `question`) + bump streak |
+| GET | `/api/v5/tarot/history` | Draw history (newest first) |
+
+### Migrations
+
+Schema is managed with Alembic (`alembic/`). Apply with:
+
+```bash
+alembic upgrade head
+```
+
+The app also auto-creates missing tables on startup for development.
+
+### Email verification & password reset
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| POST | `/api/v5/auth/verify-email` | Verify email with a 24h token (`{token}`) |
+| POST | `/api/v5/auth/resend-verification` | Re-issue the verification email (`{email}`) |
+| POST | `/api/v5/auth/forgot-password` | Issue a reset token + email (`{email}`; always returns the same generic response) |
+| POST | `/api/v5/auth/reset-password` | Set a new password (`{token, new_password}`; updates both DBs) |
+
+Email is delivered via SMTP when `SMTP_HOST` is set; otherwise the message
+(including the link) is printed to the server console — dev mode.
+
+### Seeded data (initial migration)
+
+`alembic upgrade head` from a fresh checkout seeds:
+
+- Plans `free` / `gold` / `diamond` (mirror of the legacy catalog)
+- Admin user `admin@cosmic.ir` / `admin123` (`is_admin=true`, `email_verified=true`)
+
+### Dev tools (not available in production)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| GET | `/api/v5/auth/dev/emails` | Recently emitted verification/reset emails (in-memory ring buffer, newest first) — 404 when `ENV_TYPE=production` |

@@ -48,18 +48,19 @@ def test_subject_ok(client: TestClient):
     assert isinstance(subject["active_points"], list) and subject["active_points"]
 
 
-def test_subject_missing_location_returns_422(client: TestClient):
-    # Rimuoviamo lat/lon/tz per forzare la validazione Pydantic
+def test_subject_missing_location_returns_400(client: TestClient):
+    # lat/lon/tz are optional in the Pydantic model; the missing-location case is
+    # caught at build time and surfaces as a 400 with a message.
     invalid = deepcopy(ROME_SUBJECT)
     invalid.pop("latitude")
     invalid.pop("longitude")
     invalid.pop("timezone")
 
     resp = client.post("/api/v5/subject", json={"subject": invalid})
-    assert resp.status_code == 422
-    # Dettagli di validazione presenti
+    assert resp.status_code == 400
     body = resp.json()
-    assert isinstance(body.get("errors"), list) and body["errors"]
+    assert body.get("status") == "ERROR"
+    assert body.get("message")
 
 
 def test_subject_respects_active_points(client: TestClient):

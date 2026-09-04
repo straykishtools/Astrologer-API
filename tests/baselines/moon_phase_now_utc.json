@@ -13,8 +13,8 @@
       "detailed": {
         "illumination_details": {
           "percentage": 30.0,
-          "phase_angle": 293.8562883446584,
-          "visible_fraction": 0.2977780133250811
+          "phase_angle": 293.8561184897266,
+          "visible_fraction": 0.29777936894936274
         },
         "position": null,
         "upcoming_phases": {
@@ -38,20 +38,20 @@
           },
           "full_moon": {
             "last": {
-              "datestamp": "Wed, 08 May 2024 03:21:58 +0000",
+              "datestamp": "Wed, 08 May 2024 03:21:56 +0000",
               "days_ago": 24,
               "days_ahead": null,
               "description": null,
               "name": null,
-              "timestamp": 1715138518
+              "timestamp": 1715138516
             },
             "next": {
-              "datestamp": "Sat, 22 Jun 2024 01:07:53 +0000",
+              "datestamp": "Sat, 22 Jun 2024 01:07:52 +0000",
               "days_ago": null,
               "days_ahead": 21,
               "description": null,
               "name": null,
-              "timestamp": 1719018473
+              "timestamp": 1719018472
             }
           },
           "last_quarter": {
@@ -64,12 +64,12 @@
               "timestamp": 1715773680
             },
             "next": {
-              "datestamp": "Fri, 28 Jun 2024 21:53:24 +0000",
+              "datestamp": "Fri, 28 Jun 2024 21:53:25 +0000",
               "days_ago": null,
               "days_ahead": 27,
               "description": null,
               "name": null,
-              "timestamp": 1719611604
+              "timestamp": 1719611605
             }
           },
           "new_moon": {
@@ -82,12 +82,12 @@
               "timestamp": 1716472388
             },
             "next": {
-              "datestamp": "Thu, 06 Jun 2024 12:37:42 +0000",
+              "datestamp": "Thu, 06 Jun 2024 12:37:44 +0000",
               "days_ago": null,
               "days_ahead": 5,
               "description": null,
               "name": null,
-              "timestamp": 1717677462
+              "timestamp": 1717677464
             }
           }
         },
@@ -108,7 +108,7 @@
         "type": "Partial Lunar Eclipse",
         "visibility_regions": null
       },
-      "phase": 0.8162674676240512,
+      "phase": 0.8162669958047961,
       "phase_name": "Waning Crescent",
       "stage": "waning",
       "zodiac": {
@@ -125,9 +125,9 @@
         "visibility_regions": null
       },
       "position": {
-        "altitude": 60.02968259936088,
-        "azimuth": 194.98776816080004,
-        "distance": 151708222.7694045
+        "altitude": 60.02967887956346,
+        "azimuth": 194.9877685872098,
+        "distance": 151708226.46131876
       },
       "solar_noon": "11:58",
       "sunrise": 1717213706,

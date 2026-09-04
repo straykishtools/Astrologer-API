@@ -12,3 +12,7 @@ pydantic-settings
 httpx>=0.28.0
 jdatetime
 PyJWT>=2.8.0
+sqlalchemy>=2.0.52
+aiosqlite>=0.22.1
+alembic>=1.19.1
+bcrypt>=5.0.0

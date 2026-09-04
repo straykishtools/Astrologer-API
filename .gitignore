@@ -133,3 +133,8 @@ site-docs
 .DS_Store
 rapidapi.json
 .opencode/plans
+
+# SQLite databases (runtime artifacts)
+*.db
+*.sqlite
+*.sqlite3

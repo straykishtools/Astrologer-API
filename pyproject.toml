@@ -16,9 +16,19 @@ dependencies = [
     "typing-extensions",
     "pyjwt>=2.10.1",
     "kerykeion>=5.12.9",
+    "sqlalchemy>=2.0.52",
+    "aiosqlite>=0.22.1",
+    "alembic>=1.19.1",
+    "bcrypt>=5.0.0",
 ]
 
 [dependency-groups]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# gemini_test.py at the repo root is a standalone script (needs openai/requests), not a pytest test.
+norecursedirs = ["venv", ".venv", "node_modules", "Stellar-Cartography"]
+
+[project.optional-dependencies]
 dev = [
     "black",
     "pytest",

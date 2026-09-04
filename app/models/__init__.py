@@ -311,6 +311,24 @@ def change_password(user_id: int, current_password: str, new_password: str) -> b
     conn.close()
     return True
 
+
+def reset_password_by_email(email: str, new_password: str) -> bool:
+    """Set a new password for the legacy user row (used by reset-password flow).
+
+    Unlike change_password, this does not require the current password — the
+    caller is responsible for validating the reset token first.
+    """
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "UPDATE users SET password_hash = ? WHERE email = ?",
+            (hash_password(new_password), (email or "").strip().lower()),
+        )
+        conn.commit()
+        return cursor.rowcount > 0
+    finally:
+        conn.close()
+
 def authenticate_user(email: str, password: str) -> Optional[dict]:
     conn = get_db()
     user = conn.execute("SELECT * FROM users WHERE email = ?", (email.lower().strip(),)).fetchone()
@@ -694,3 +712,28 @@ class ChangePassword(BaseModel):
     """Model for password change"""
     current_password: str
     new_password: str
+
+
+# ─── SQLAlchemy ORM models (Cosmic Oracle database — app/config/database.py) ───
+# Kept at the bottom of the package __init__ so the legacy synchronous layer
+# above keeps working unchanged while the new ORM tables are also importable
+# as ``app.models.<name>`` and registered on ``app.models.Base.metadata``.
+from app.models.base import Base  # noqa: E402,F401
+from app.models.chart import ChartHistory  # noqa: E402,F401
+from app.models.plan import Plan  # noqa: E402,F401
+from app.models.tarot import TarotHistory  # noqa: E402,F401
+from app.models.user import User, UserProfile, UserSettings  # noqa: E402,F401
+from app.models.yoga import DailyStreak, YogaFavorite, YogaPractice  # noqa: E402,F401
+
+__all__ = [
+    "Base",
+    "User",
+    "UserProfile",
+    "UserSettings",
+    "ChartHistory",
+    "YogaPractice",
+    "YogaFavorite",
+    "DailyStreak",
+    "TarotHistory",
+    "Plan",
+]

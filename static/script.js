@@ -2364,6 +2364,20 @@ function getTarotForm() {
 
 // ---------- Tarot API Calls ----------
 
+// Save a draw to the user's tarot history (logged-in users only, fire-and-forget)
+function saveTarotHistory(spreadType, drawn, question) {
+    const token = localStorage.getItem('cosmic_token');
+    if (!token) return;
+    const cardIds = (drawn || []).map(function (d) { return d.card && d.card.id; });
+    const reversed = (drawn || []).map(function (d) { return !!(d.is_reversed); });
+    if (cardIds.length === 0) return;
+    fetch('/api/v5/tarot/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ spread_type: spreadType, card_ids: cardIds, reversed: reversed, question: question || null })
+    }).catch(function () {});
+}
+
 async function submitDailyCard() {
     const resultDiv = document.getElementById('tarotDailyResult');
     resultDiv.innerHTML = makeShimmerLoading('⏳ در حال دریافت کارت روزانه...');
@@ -2372,6 +2386,7 @@ async function submitDailyCard() {
         const data = await res.json();
         if (data.status === 'success') {
             displayTarotCard(data.data, resultDiv);
+            saveTarotHistory('daily', [data.data]);
         } else {
             resultDiv.innerHTML = `<p style="color: #ff6b6b;">❌ خطا: ${data.detail}</p>`;
         }
@@ -2393,6 +2408,7 @@ async function submitDrawCards() {
         const data = await res.json();
         if (data.status === 'success') {
             displayTarotCards(data.data, resultDiv);
+            saveTarotHistory('custom', data.data);
         } else {
             resultDiv.innerHTML = `<p style="color: #ff6b6b;">❌ خطا: ${data.detail}</p>`;
         }
@@ -2409,6 +2425,7 @@ async function submitThreeCard() {
         const data = await res.json();
         if (data.status === 'success') {
             displayTarotSpread(data.data, resultDiv);
+            saveTarotHistory('three-card', (data.data.positions || []).map(function (p) { return p.card; }));
         } else {
             resultDiv.innerHTML = `<p style="color: #ff6b6b;">❌ خطا: ${data.detail}</p>`;
         }
@@ -2425,6 +2442,7 @@ async function submitCelticCross() {
         const data = await res.json();
         if (data.status === 'success') {
             displayTarotSpread(data.data, resultDiv);
+            saveTarotHistory('celtic-cross', (data.data.positions || []).map(function (p) { return p.card; }));
         } else {
             resultDiv.innerHTML = `<p style="color: #ff6b6b;">❌ خطا: ${data.detail}</p>`;
         }

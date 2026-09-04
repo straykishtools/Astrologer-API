@@ -5,6 +5,8 @@ without introducing abstractions. Goal: reach 100% coverage.
 
 from __future__ import annotations
 
+import asyncio
+
 import pytest
 
 
@@ -116,6 +118,7 @@ def test_calculate_return_chart_data_branches(monkeypatch: pytest.MonkeyPatch):
         lng = 0.0
         lat = 51.5
         tz_str = "Europe/London"
+        sun = object()  # required by calculate_return_chart_data's validation guard
 
     class Factory:
         def next_return_from_iso_formatted_time(self, iso, return_type):
@@ -130,6 +133,12 @@ def test_calculate_return_chart_data_branches(monkeypatch: pytest.MonkeyPatch):
     # Patchiamo per evitare calcoli reali
     monkeypatch.setattr(r, "build_subject", lambda *a, **k: Natal(), raising=True)  # type: ignore
     monkeypatch.setattr(r, "build_return_factory", lambda natal, body: Factory(), raising=True)  # type: ignore
+    # calculate_return_chart_data is async and resolves locations first.
+    async def _noop_resolve(*a, **k):
+        return None
+
+    monkeypatch.setattr(r, "resolve_location_for_subject", _noop_resolve, raising=True)
+    monkeypatch.setattr(r, "resolve_location_for_return_location", _noop_resolve, raising=True)
     monkeypatch.setattr(r.ChartDataFactory, "create_single_wheel_return_chart_data", lambda *a, **k: ChartData(), raising=True)
     monkeypatch.setattr(r.ChartDataFactory, "create_return_chart_data", lambda *a, **k: ChartData(), raising=True)
 
@@ -147,10 +156,12 @@ def test_calculate_return_chart_data_branches(monkeypatch: pytest.MonkeyPatch):
             "iso_datetime": "2024-01-01T00:00:00Z",
             "month": None,
             "year": None,
+            "return_location": None,
             "wheel_type": "single",
         },
     )()
-    assert isinstance(r.calculate_return_chart_data(req_iso, "Solar"), ChartData)
+    result_iso = asyncio.run(r.calculate_return_chart_data(req_iso, "Solar"))
+    assert isinstance(result_iso, ChartData)
 
     # Ramo month+year + dual wheel
     req_my = type(
@@ -167,7 +178,9 @@ def test_calculate_return_chart_data_branches(monkeypatch: pytest.MonkeyPatch):
             "month": 6,
             "day": 15,
             "year": 2024,
+            "return_location": None,
             "wheel_type": "dual",
         },
     )()
-    assert isinstance(r.calculate_return_chart_data(req_my, "Lunar"), ChartData)
+    result_my = asyncio.run(r.calculate_return_chart_data(req_my, "Lunar"))
+    assert isinstance(result_my, ChartData)

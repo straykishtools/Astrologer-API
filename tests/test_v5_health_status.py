@@ -18,10 +18,8 @@ def test_health(client: TestClient):
 
 
 def test_status_root(client: TestClient):
+    # The root serves the SPA frontend (index.html), not an API payload.
     resp = client.get("/")
     assert resp.status_code == 200
-    body = resp.json()
-    # Verifica chiara dei campi attesi
-    assert body.get("status") == "OK"
-    assert "environment" in body
-    assert "debug" in body
+    assert "text/html" in resp.headers.get("content-type", "")
+    assert "Cosmic Oracle" in resp.text

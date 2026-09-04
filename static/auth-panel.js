@@ -209,13 +209,13 @@ function updateAuthUI() {
             tppPlanBadge.style.background = plan.bg;
             tppPlanBadge.style.color = plan.color;
         }
-n        // Mark current plan card
+        // Mark current plan card
         document.querySelectorAll('.tpp-plan-card').forEach(function(card) {
             card.classList.remove('tpp-plan-current');
             var planName = card.getAttribute('data-plan');
             if (planName === planKey) card.classList.add('tpp-plan-current');
         });
-n        // Main action button
+        // Main action button
         if (tppMainAction) {
             if (planKey === 'free') {
                 tppMainAction.textContent = '⬆️ ارتقا به طلایی';
@@ -225,7 +225,7 @@ function updateAuthUI() {
                 tppMainAction.onclick = function() { openPricingModal(); };
             }
         }
-n        // Logout button
+        // Logout button
         if (tppLogoutBtn) {
             tppLogoutBtn.style.display = 'block';
             tppLogoutBtn.onclick = function() {

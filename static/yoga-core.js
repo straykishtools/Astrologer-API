@@ -368,10 +368,43 @@ function getFavs() {
     try { return JSON.parse(localStorage.getItem('yoga_favs') || '[]'); } catch (e) { return []; }
 }
 function saveFavs(f) { try { localStorage.setItem('yoga_favs', JSON.stringify(f)); } catch (e) {} }
+
+// Stable numeric id derived from the pose name (poses have no numeric id in the dataset).
+function poseId(name) {
+    var s = String(name || '');
+    var h = 0;
+    for (var i = 0; i < s.length; i++) {
+        h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    }
+    return Math.abs(h) % 2147483647;
+}
+
+// Fire-and-forget sync helpers (only when the user is logged in).
+function _authToken() { try { return localStorage.getItem('cosmic_token') || ''; } catch (e) { return ''; } }
+function _apiJson(method, url, body) {
+    var t = _authToken();
+    if (!t) return Promise.resolve(null);
+    var opts = {
+        method: method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    return fetch(url, opts).catch(function () { return null; });
+}
+function _syncFavorite(name, added) {
+    var pid = poseId(name);
+    if (added) {
+        _apiJson('POST', '/api/v5/yoga/favorite', { pose_id: pid, pose_name: name });
+    } else {
+        _apiJson('DELETE', '/api/v5/yoga/favorite/' + pid);
+    }
+}
 function toggleFav(name) {
     var f = getFavs(), i = f.indexOf(name);
     if (i >= 0) f.splice(i, 1); else f.push(name);
-    saveFavs(f); return f;
+    saveFavs(f);
+    _syncFavorite(name, i < 0);
+    return f;
 }
 function isFav(name) { return getFavs().indexOf(name) >= 0; }
 
@@ -449,6 +482,16 @@ function recordPractice(durationMinutes, meta) {
     log.sessions.push({ type: meta.type || 'yoga', date: new Date().toISOString(), duration: minutes });
     log.totalMinutes = (log.totalMinutes || 0) + minutes;
     saveSummaryLog(log);
+    // 3) server sync (logged-in users only, fire-and-forget)
+    var catMap = { yoga: 'asanas', breath: 'breathing', breathing: 'breathing', meditation: 'meditation' };
+    var poseName = meta.poseName || (meta.type === 'yoga' ? meta.poseName : null) || null;
+    _apiJson('POST', '/api/v5/yoga/session', {
+        pose_id: poseName ? poseId(poseName) : null,
+        pose_name: poseName || null,
+        category: catMap[meta.type] || 'asanas',
+        duration_seconds: minutes * 60,
+        completed: true
+    });
     // refresh the dropdown if open
     if (window.YogaSummary) {
         try { if (YogaSummary.refresh) YogaSummary.refresh(); } catch (e) {}
@@ -618,7 +661,7 @@ return {
     getSession: getSession, saveSession: saveSession, setSession: setSession,
     addToSession: addToSession, removeFromSession: removeFromSession, moveInSession: moveInSession,
     getPracticeData: getPracticeData, practicedToday: practicedToday,
-    recordPractice: recordPractice,
+    recordPractice: recordPractice, poseId: poseId,
     // access
     canAccess: canAccess, accessLevel: accessLevel,
     // flow

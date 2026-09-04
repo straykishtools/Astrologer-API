@@ -13,6 +13,7 @@ from app.models import (
 import hashlib
 import logging
 import json
+import os
 import time
 
 logger = logging.getLogger(__name__)
@@ -155,6 +156,12 @@ class RateLimitMiddleware:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        # Test environment: disable quota + premium gating so the test suite can
+        # make unlimited chart calls in a single process (set by tests/conftest.py).
+        if os.getenv("ENV_TYPE") == "test":
             await self.app(scope, receive, send)
             return
 

@@ -218,6 +218,40 @@ async function loadDashboardCharts() {
         return;
     }
 
+    // Live stats from the Cosmic Oracle database (Phase 1)
+    var statsHtml = '';
+    try {
+        var dashResp = await fetch('/api/v5/user/dashboard', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (dashResp.ok) {
+            var dash = await dashResp.json();
+            var y = dash.yoga || {};
+            var t = dash.tarot || {};
+            var c = dash.charts || {};
+            var streakMap = {};
+            (dash.streaks || []).forEach(function (s) { streakMap[s.streak_type] = s.current_streak || 0; });
+            var fa = function (n) { return String(n == null ? 0 : n).replace(/[0-9]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[+d]; }); };
+            var cards = [
+                { icon: '🔥', label: 'استریک یوگا', value: fa(streakMap.yoga || y.streak) + ' روز' },
+                { icon: '🧘', label: 'جلسات یوگا', value: fa(y.total_sessions || 0) + ' جلسه' },
+                { icon: '⏱️', label: 'زمان تمرین', value: fa(y.total_minutes || 0) + ' دقیقه' },
+                { icon: '🔮', label: 'دست‌های تاروت', value: fa(t.total_draws || 0) },
+                { icon: '📊', label: 'چارت‌های ذخیره‌شده', value: fa((c.total || 0) + (dash.legacy_charts || []).length) },
+                { icon: '⚡', label: 'استریک تاروت', value: fa(streakMap.tarot || 0) + ' روز' }
+            ];
+            statsHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px;">' +
+                cards.map(function (cd) {
+                    return '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px;text-align:center;">' +
+                        '<div style="font-size:1.5rem;">' + cd.icon + '</div>' +
+                        '<div style="font-size:1.3rem;font-weight:800;color:#fff;margin-top:4px;">' + cd.value + '</div>' +
+                        '<div style="color:#888;font-size:0.78rem;margin-top:2px;">' + cd.label + '</div></div>';
+                }).join('') + '</div>';
+        }
+    } catch (e) { /* stats are best-effort */ }
+
+    if (statsHtml) content.innerHTML = statsHtml;
+
     try {
         var resp = await fetch('/api/v5/auth/charts', {
             headers: { 'Authorization': 'Bearer ' + token }
@@ -253,12 +287,12 @@ async function loadDashboardCharts() {
                 html += '</div>';
             });
             html += '</div>';
-            content.innerHTML = html;
+            content.innerHTML = (content.innerHTML || '') + html;
         } else {
-            content.innerHTML = '<div style="text-align:center;padding:40px;"><div style="font-size:3rem;margin-bottom:15px;">📭</div><p style="color:#888;">هنوز چارتی ذخیره نشده.</p><p style="color:#666;font-size:0.8rem;margin-top:5px;">با اشتراک طلایی می‌تونید چارت‌ها رو ذخیره کنید.</p><button onclick="navigate(\'app\')" style="background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;margin-top:15px;">شروع محاسبه</button></div>';
+            content.innerHTML = (content.innerHTML || '') + '<div style="text-align:center;padding:40px;"><div style="font-size:3rem;margin-bottom:15px;">📭</div><p style="color:#888;">هنوز چارتی ذخیره نشده.</p><p style="color:#666;font-size:0.8rem;margin-top:5px;">با اشتراک طلایی می‌تونید چارت‌ها رو ذخیره کنید.</p><button onclick="navigate(\'app\')" style="background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;margin-top:15px;">شروع محاسبه</button></div>';
         }
     } catch(e) {
-        content.innerHTML = '<div style="text-align:center;color:#e74c3c;padding:40px;">⚠️ خطا: ' + escapeHtml(e.message) + '</div>';
+        content.innerHTML = (content.innerHTML || '') + '<div style="text-align:center;color:#e74c3c;padding:40px;">⚠️ خطا: ' + escapeHtml(e.message) + '</div>';
     }
 }
 
@@ -303,10 +337,90 @@ window.deleteSavedChart = async function(chartId) {
     } catch(e) { alert('خطا: ' + e.message); }
 };
 
+// ─── Email verification / password reset pages ───
+function openAuthActionPage(kind, token) {
+    var modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.id = 'authActionModal';
+    modal.style.display = 'flex';
+
+    if (kind === 'verify-email') {
+        modal.innerHTML = `
+            <div class="modal-box" style="max-width:400px;">
+                <div class="modal-header"><h3>📧 تأیید ایمیل</h3></div>
+                <div style="padding:24px;text-align:center;" id="authActionBody">
+                    <div style="font-size:2rem;margin-bottom:10px;">⏳</div>
+                    <p style="color:#b0c4e0;">در حال تأیید ایمیل شما...</p>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+        fetch('/api/v5/auth/verify-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token })
+        }).then(function (r) { return r.json(); }).then(function (data) {
+            var body = document.getElementById('authActionBody');
+            if (data && data.email_verified) {
+                body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">✅</div><p style="color:#2ecc71;font-weight:700;">ایمیل شما تأیید شد!</p><button onclick="document.getElementById(\'authActionModal\').remove()" style="margin-top:15px;background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;">ادامه</button>';
+            } else {
+                body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">' + ((data && (data.detail || data.message)) || 'توکن نامعتبر یا منقضی شده') + '</p>';
+            }
+        }).catch(function () {
+            var body = document.getElementById('authActionBody');
+            body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">خطا در ارتباط با سرور</p>';
+        });
+    } else if (kind === 'reset-password') {
+        modal.innerHTML = `
+            <div class="modal-box" style="max-width:400px;">
+                <div class="modal-header"><h3>🔑 تعیین رمز عبور جدید</h3></div>
+                <div style="padding:24px;">
+                    <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">رمز عبور جدید (حداقل ۶ کاراکتر)</label>
+                    <input type="password" id="resetNewPassword" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;" placeholder="••••••">
+                    <div id="authActionError" style="color:#e74c3c;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
+                    <button onclick="window.submitPasswordReset('${token}')" style="width:100%;margin-top:15px;padding:12px;border-radius:8px;border:none;background:linear-gradient(135deg,#6c8cff,#9c79ff);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">ذخیره رمز جدید</button>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+    }
+}
+
+window.submitPasswordReset = async function (token) {
+    var password = document.getElementById('resetNewPassword').value;
+    var errEl = document.getElementById('authActionError');
+    if (!password || password.length < 6) { errEl.textContent = 'رمز باید حداقل ۶ کاراکتر باشد'; return; }
+    try {
+        var resp = await fetch('/api/v5/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token, new_password: password })
+        });
+        var data = await resp.json();
+        if (resp.ok) {
+            var modal = document.getElementById('authActionModal');
+            if (modal) modal.remove();
+            if (window.showToast) showToast('✅ رمز عبور تغییر کرد — اکنون وارد شوید', 'success');
+            if (window.openLoginModal) openLoginModal();
+        } else {
+            errEl.textContent = data.detail || data.message || 'خطا';
+        }
+    } catch (e) { errEl.textContent = 'خطا در ارتباط با سرور'; }
+};
+
+function handleAuthActionRoute(raw) {
+    // raw like "verify-email?token=abc123"
+    var m = raw.match(/^(verify-email|reset-password)\?token=([^&]+)/);
+    if (!m) return false;
+    openAuthActionPage(m[1], decodeURIComponent(m[2]));
+    showApp();
+    return true;
+}
+
 // ─── Router ───
 function handleRoute() {
     var r = getHashRoute();
     var route = r.route;
+
+    if (handleAuthActionRoute(route)) return;
 
     if (route === '' || route === '/') {
         showLanding();

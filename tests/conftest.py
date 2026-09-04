@@ -22,6 +22,11 @@ from fastapi.testclient import TestClient
 # Imposta l'ambiente di test prima di importare l'app
 os.environ["ENV_TYPE"] = "test"
 
+# Isola il database SQLAlchemy (Cosmic Oracle) dal file di sviluppo:
+# ogni processo pytest usa un database in-memory dedicato.
+if "COSMIC_DB_URL" not in os.environ:
+    os.environ["COSMIC_DB_URL"] = "sqlite+aiosqlite:///:memory:"
+
 # Rende importabile la root del repository quando pytest cambia CWD
 path.append(str(Path(__file__).parent.parent))
 
