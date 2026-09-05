@@ -673,3 +673,212 @@
 @media (prefers-reduced-motion: reduce) {
     .yq-shell { animation: none; }
 }
+
+/* ═══════════ Yoga Player (تمرینهای آماده XML) ═══════════ */
+.yp-note { color: var(--gold-300, #b8a05a); font-size: 12px; opacity: .85; }
+
+.yp-selector-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.yp-selector-head h3 { margin: 0; font-size: 18px; }
+
+.yp-practice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.yp-practice-card {
+    background: var(--card-bg, #141a2a); border: 1px solid var(--gold-500, #8a6d1f);
+    border-radius: 12px; padding: 14px; text-align: center; cursor: pointer;
+    color: inherit; font-family: inherit; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.yp-practice-card:hover { transform: translateY(-2px); border-color: var(--gold-300, #b8a05a); }
+.yp-practice-card.active { border-color: var(--gold-300, #b8a05a); box-shadow: 0 0 0 2px rgba(184,160,90,.25); background: rgba(184,160,90,.08); }
+.yp-card-name { font-weight: 700; margin-bottom: 6px; }
+.yp-card-dur { font-size: 12px; opacity: .8; }
+.yp-card-count { font-size: 11px; opacity: .6; margin-top: 4px; }
+.yp-chip {
+    display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px;
+    border: 1px solid var(--gold-500, #8a6d1f); color: var(--gold-300, #b8a05a); margin: 2px;
+}
+
+.yp-settings {
+    display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center;
+    background: rgba(184,160,90,.06); border: 1px solid rgba(184,160,90,.2);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;
+}
+.yp-set { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.yp-set-label { font-size: 13px; opacity: .85; }
+.yp-levels, .yp-dur-btns { display: flex; gap: 6px; }
+.yp-level-btn, .yp-dur-btn {
+    background: transparent; border: 1px solid var(--gold-500, #8a6d1f); color: inherit;
+    border-radius: 8px; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 13px;
+}
+.yp-level-btn.active, .yp-dur-btn.active { background: var(--gold-500, #8a6d1f); color: #fff; }
+.yp-bg-select {
+    background: #101526; color: inherit; border: 1px solid var(--gold-500, #8a6d1f);
+    border-radius: 8px; padding: 6px 10px; font-family: inherit;
+}
+.yp-start-btn {
+    background: linear-gradient(135deg, #b8860b, #8a6d1f); color: #fff; border: none;
+    border-radius: 10px; padding: 10px 26px; font-size: 15px; font-weight: 700; cursor: pointer;
+    font-family: inherit; margin-right: auto;
+}
+.yp-start-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* پخشکننده */
+.yp-topbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.yp-title { font-weight: 700; font-size: 16px; }
+.yp-badges, .yp-step { font-size: 12px; opacity: .8; }
+.yp-step { margin-right: auto; }
+.yp-progress { height: 6px; background: rgba(255,255,255,.08); border-radius: 6px; overflow: hidden; margin-bottom: 18px; }
+.yp-progress-fill { height: 100%; background: linear-gradient(90deg, #b8860b, #f5d78e); transition: width .2s linear; }
+
+.yp-main { display: flex; gap: 24px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+.yp-stage { text-align: center; flex: 1 1 320px; max-width: 460px; }
+.yp-img { max-width: 100%; max-height: 340px; border-radius: 14px; background: rgba(0,0,0,.25); }
+.yp-pose-name { font-size: 20px; font-weight: 700; margin-top: 10px; }
+.yp-pose-sanskrit { font-size: 13px; opacity: .65; direction: ltr; }
+.yp-side { display: inline-block; font-size: 12px; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--gold-500, #8a6d1f); margin-top: 8px; }
+
+.yp-breath { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 0 0 180px; }
+.yp-breath .yoga-circle { width: 150px; height: 150px; }
+.yp-breath-text { font-size: 26px; font-weight: 700; }
+.yp-count { font-size: 14px; opacity: .85; }
+.yp-phrase { font-size: 12px; color: var(--gold-300, #b8a05a); }
+
+.yp-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+.yp-btn {
+    background: transparent; border: 1px solid var(--gold-500, #8a6d1f); color: inherit;
+    border-radius: 10px; padding: 9px 20px; cursor: pointer; font-family: inherit; font-size: 14px;
+}
+.yp-btn:hover { border-color: var(--gold-300, #b8a05a); }
+.yp-btn.primary { background: rgba(184,160,90,.15); }
+.yp-btn.danger { border-color: #c0392b; color: #e74c3c; }
+.yp-elapsed { text-align: center; font-size: 12px; opacity: .6; direction: ltr; }
+.yp-done { text-align: center; font-size: 17px; padding: 26px; }
+
+/* مربی */
+.yp-coach-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.yp-coach-head h3 { margin: 0; font-size: 18px; }
+.yp-coach-stats { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+.yp-stat { background: rgba(184,160,90,.07); border: 1px solid rgba(184,160,90,.2); border-radius: 10px; padding: 10px 18px; text-align: center; min-width: 90px; }
+.yp-stat b { display: block; font-size: 20px; color: var(--gold-300, #b8a05a); }
+.yp-stat span { font-size: 12px; opacity: .75; }
+.yp-coach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.yp-coach-card { background: var(--card-bg, #141a2a); border: 1px solid rgba(184,160,90,.25); border-radius: 12px; padding: 16px; }
+.yp-card-desc { font-size: 12px; opacity: .75; margin: 6px 0 10px; line-height: 1.7; }
+.yp-card-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.yp-card-actions { display: flex; gap: 8px; }
+.yp-coach-detail { margin-top: 12px; border-top: 1px dashed rgba(184,160,90,.25); padding-top: 10px; }
+.yp-analyze-desc { font-size: 12px; opacity: .8; line-height: 1.8; margin-bottom: 8px; }
+.yp-analyze-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; font-size: 12px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+.yp-analyze-row:last-child { border-bottom: none; }
+
+/* ═══════ Yoga Player v2 — کارت‌های حرفه‌ای، مربی‌ها، پلیر کامل ═══════ */
+.yp-practice-card { display: flex; flex-direction: column; align-items: stretch; text-align: right; min-height: 190px; }
+.yp-card-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+.yp-card-name { margin-bottom: 0; font-size: 15px; }
+.yp-lock { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: rgba(201,162,39,.12); color: var(--gold-300,#b8a05a); border: 1px solid rgba(201,162,39,.4); white-space: nowrap; }
+.yp-card-meta { margin-bottom: 6px; }
+.yp-chip.dim { opacity: .6; }
+.yp-card-desc { margin: 4px 0 8px; line-height: 1.65; }
+.yp-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; margin-top: auto; }
+.yp-card-dur { font-size: 12px; opacity: .85; }
+.yp-instructor { font-size: 11px; opacity: .7; }
+.yp-card-count { margin-top: 6px; font-size: 11px; opacity: .6; }
+.yp-start-btn { margin-top: 10px; width: 100%; }
+.yp-start-btn.locked { border-color: rgba(201,162,39,.5); background: rgba(201,162,39,.08); opacity: .9; }
+
+.yp-top-left { display: flex; flex-direction: column; gap: 2px; }
+.yp-pct { font-size: 18px; font-weight: 700; color: var(--gold-300,#b8a05a); margin-right: auto; }
+.yp-timer-big { font-size: 26px; font-weight: 700; color: var(--gold-300,#b8a05a); margin-top: 10px; direction: ltr; }
+.yp-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* مربی‌ها */
+.yp-instructors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.yp-instructor-card {
+    background: var(--card-bg, #141a2a); border: 1px solid rgba(184,160,90,.22); border-radius: 14px;
+    padding: 16px 14px; text-align: center; transition: transform .15s ease, border-color .15s ease;
+}
+.yp-instructor-card:hover { transform: translateY(-2px); border-color: var(--gold-300,#b8a05a); }
+.yp-instructor-avatar {
+    width: 52px; height: 52px; margin: 0 auto 8px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(201,162,39,.25), rgba(221,192,112,.08));
+    border: 1px solid var(--gold-500,#8a6d1f); display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; color: var(--gold-300,#b8a05a);
+}
+.yp-instructor-name { font-weight: 700; margin-bottom: 2px; }
+.yp-instructor-spec { font-size: 12px; opacity: .8; margin-bottom: 6px; }
+.yp-instructor-bio { font-size: 11px; opacity: .65; line-height: 1.7; margin-top: 8px; }
+.yp-coach-sub { margin: 6px 0 10px; font-size: 15px; opacity: .9; }
+
+/* پلیر + مودال پایان */
+.yp-main { position: relative; }
+.yp-done-modal { position: fixed; inset: 0; z-index: 9998; display: flex; align-items: center; justify-content: center; background: rgba(5,8,20,.72); backdrop-filter: blur(4px); padding: 20px; }
+.yp-done-card {
+    background: #12162e; border: 1px solid var(--gold-500,#8a6d1f); border-radius: 18px;
+    padding: 28px 26px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+}
+.yp-done-icon { font-size: 44px; }
+.yp-done-card h3 { margin: 8px 0 16px; color: var(--gold-300,#b8a05a); }
+.yp-done-stats { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+.yp-done-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ═══ دکمه‌ی پیش‌نمایش کارت تمرین ═══ */
+.yp-card-actions { display: flex; gap: 8px; }
+.yp-card-actions .yp-start-btn, .yp-card-actions .yp-preview-btn { flex: 1; margin-top: 10px; }
+.yp-preview-btn {
+    padding: 9px 12px; border-radius: 12px; border: 1px solid var(--line-strong);
+    background: rgba(116, 185, 255, 0.08); color: var(--gold-200, #d9c07a);
+    font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.yp-preview-btn:hover { background: rgba(116, 185, 255, 0.18); border-color: var(--gold-300, #b8a05a); }
+
+/* ═══ محیط پلیر — هاله‌ی رنگ پس‌زمینه‌ی تمرین ═══ */
+.yp-player { position: relative; overflow: hidden; }
+.yp-player::before {
+    content: ''; position: absolute; top: -120px; left: -60px; right: -60px; height: 340px;
+    background: radial-gradient(ellipse 65% 100% at 50% 0%, var(--yp-accent, rgba(184,160,90,.35)), transparent 70%);
+    pointer-events: none; z-index: 0; transition: background .6s ease;
+}
+.yp-player > * { position: relative; z-index: 1; }
+
+/* ═══ صفحه‌ی اختصاصی تمرین (محیط + جزئیات) ═══ */
+.yp-detail { border-radius: 18px; overflow: hidden; border: 1px solid var(--line); margin-bottom: 18px; background: var(--yp-detail-accent, rgba(184,160,90,.06)); }
+.yp-detail-hero { padding: 22px 20px 16px; background: linear-gradient(160deg, var(--yp-detail-color, rgba(184,160,90,.35)) 0%, transparent 55%), rgba(7,12,31,.35); border-bottom: 1px solid var(--line); }
+.yp-detail-back { background: none; border: none; color: var(--gold-200); font-size: 12px; cursor: pointer; padding: 0 0 10px; font-family: inherit; opacity: .85; }
+.yp-detail-back:hover { opacity: 1; }
+.yp-detail-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.yp-detail-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+.yp-lock.free { background: rgba(110,207,151,.1); color: #6fcf97; border-color: rgba(110,207,151,.35); }
+.yp-detail-bg { font-size: 12px; opacity: .75; }
+.yp-detail-body { padding: 18px 20px; }
+.yp-detail-desc { font-size: 13px; line-height: 2; opacity: .9; margin: 0 0 14px; }
+.yp-detail-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.yp-detail-stat { flex: 1 1 120px; text-align: center; padding: 10px 6px; background: rgba(7,12,31,.45); border: 1px solid var(--line); border-radius: 12px; }
+.yp-detail-stat b { display: block; font-size: 17px; color: var(--gold-300, #b8a05a); }
+.yp-detail-stat span { font-size: 11px; opacity: .7; }
+.yp-detail-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.yp-detail-actions .yp-start-btn { flex: 1 1 220px; }
+
+/* ═══ پیش‌نمایش سریع — overlay پلیر واقعی ═══ */
+.yp-preview-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(5,8,20,.78); backdrop-filter: blur(5px); padding: 18px; }
+.yp-preview-shell {
+    background: rgba(7, 12, 31, 0.97); border: 1px solid var(--line-strong); border-radius: 18px;
+    width: min(680px, 96vw); max-height: 92vh; display: flex; flex-direction: column; overflow: hidden;
+}
+.yp-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.yp-preview-head h3 { margin: 0; font-size: 15px; color: var(--gold-200); }
+.yp-preview-note { font-size: 12px; color: var(--ink-dim); }
+.yp-preview-x { background: rgba(255,255,255,.06); border: 1px solid var(--line-strong); color: #eee; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 13px; }
+.yp-preview-x:hover { background: rgba(255,118,117,.2); color: #ff7675; }
+.yp-preview-host { padding: 16px; overflow-y: auto; flex: 1; }
+.yp-preview-host .yp-player { margin: 0; }
+
+/* ─── نوار پیشروی/جستجو در پلیر ─── */
+.yp-seek { position: relative; height: 12px; cursor: pointer; overflow: visible; margin-bottom: 4px; }
+.yp-seek .yp-progress-fill { position: relative; }
+.yp-progress-knob {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #f5d78e; border: 2px solid #b8860b;
+    box-shadow: 0 0 6px rgba(184, 134, 11, .7);
+    pointer-events: none; transition: left .1s linear;
+}
+.yp-seek-labels { display: flex; justify-content: space-between; font-size: 12px; opacity: .75; direction: ltr; margin-bottom: 14px; }
+.yp-seek-labels .yp-time-cur { color: var(--gold-300, #b8a05a); }

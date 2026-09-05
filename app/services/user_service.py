@@ -111,6 +111,17 @@ async def get_yoga_summary(db: AsyncSession, user: User) -> dict:
         "practiced_today": bool(last and last.practice_date == date.today()),
         "most_practiced": most_practiced,
         "by_category": dict(by_category),
+        "recent": [
+            {
+                "pose_name": s.pose_name,
+                "category": s.category,
+                "duration_seconds": s.duration_seconds or 0,
+                "practice_date": s.practice_date.isoformat(),
+                "completed": bool(s.completed),
+                "notes": s.notes,
+            }
+            for s in sessions[:6]
+        ],
     }
 
 

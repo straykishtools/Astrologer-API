@@ -116,6 +116,19 @@ class AdminCreateUser(BaseModel):
     is_admin: bool = False
 
 
+class ProfileUpdate(BaseModel):
+    """به‌روزرسانی پروفایل توسط خود کاربر"""
+    display_name: Optional[str] = None
+    email: Optional[str] = None
+
+
+class AdminUserEdit(BaseModel):
+    """ویرایش کاربر توسط ادمین — فقط فیلدهای ارسال‌شده تغییر می‌کنند"""
+    display_name: Optional[str] = None
+    plan: Optional[str] = None
+    is_admin: Optional[bool] = None
+
+
 # ─── دیتابیس SQLite ───
 
 def get_db():
@@ -723,7 +736,13 @@ from app.models.chart import ChartHistory  # noqa: E402,F401
 from app.models.plan import Plan  # noqa: E402,F401
 from app.models.tarot import TarotHistory  # noqa: E402,F401
 from app.models.user import User, UserProfile, UserSettings  # noqa: E402,F401
-from app.models.yoga import DailyStreak, YogaFavorite, YogaPractice  # noqa: E402,F401
+from app.models.yoga import (  # noqa: E402,F401
+    DailyStreak,
+    YogaFavorite,
+    YogaInstructor,
+    YogaPractice,
+    YogaPracticeCatalog,
+)
 
 __all__ = [
     "Base",
@@ -733,6 +752,8 @@ __all__ = [
     "ChartHistory",
     "YogaPractice",
     "YogaFavorite",
+    "YogaInstructor",
+    "YogaPracticeCatalog",
     "DailyStreak",
     "TarotHistory",
     "Plan",

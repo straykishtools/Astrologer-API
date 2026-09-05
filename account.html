@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تنظیمات حساب — Cosmic Oracle</title>
+<style>
+    :root {
+        --bg: #0b0e1a; --panel: #12152b; --panel-2: #1e2740; --border: #2a3560;
+        --ink: #e8ecff; --ink-dim: #b0c4e0; --accent: #f39c12; --accent-2: #6c8cff; --danger: #e74c3c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif; }
+    body { background: radial-gradient(1200px 600px at 70% -10%, #171c3a 0%, var(--bg) 55%); color: var(--ink); min-height: 100vh; }
+    .topbar { display: flex; align-items: center; gap: 14px; padding: 14px 22px; background: rgba(18,21,43,0.85); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); }
+    .topbar h1 { font-size: 1.05rem; } .topbar h1 span { color: var(--accent); }
+    .topbar .spacer { flex: 1; }
+    .tb-btn { padding: 8px 16px; border-radius: 30px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--ink-dim); font-size: 0.82rem; cursor: pointer; transition: 0.25s ease; text-decoration: none; display: inline-block; }
+    .tb-btn:hover { background: rgba(255,255,255,0.07); color: #fff; border-color: rgba(108,140,255,0.35); }
+    .tb-btn.danger { color: #ff8f8f; border-color: rgba(231,76,60,0.35); }
+    .tb-btn.danger:hover { background: rgba(231,76,60,0.12); }
+    .wrap { max-width: 680px; margin: 26px auto 60px; padding: 0 18px; }
+    .card { background: rgba(18,21,43,0.75); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 18px; }
+    .card h2 { font-size: 0.95rem; color: var(--accent); margin-bottom: 16px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; margin-bottom: 5px; font-size: 0.8rem; color: var(--ink-dim); }
+    .inp { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-size: 0.85rem; outline: none; font-family: inherit; }
+    .inp:focus { border-color: var(--accent-2); }
+    .btn { padding: 10px 20px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink-dim); font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+    .btn:hover { color: #fff; border-color: rgba(108,140,255,0.4); }
+    .btn.primary { background: var(--accent); color: #0b0e1a; font-weight: 700; border-color: var(--accent); }
+    .btn.primary:hover { filter: brightness(1.1); }
+    .form-err { color: var(--danger); font-size: 0.8rem; margin-top: 10px; min-height: 1.2em; }
+    .form-ok { color: #7be3a8; font-size: 0.8rem; margin-top: 10px; min-height: 1.2em; }
+    .badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
+    .plan-free { background: rgba(255,255,255,0.08); color: var(--ink-dim); }
+    .plan-gold { background: rgba(243,156,18,0.15); color: #ffca6b; }
+    .plan-diamond { background: rgba(155,89,182,0.2); color: #d2a8ff; }
+    .plan-vip { background: rgba(221,192,112,0.2); color: #f0dfa8; }
+    .usage-bar { height: 10px; border-radius: 20px; background: rgba(255,255,255,0.06); overflow: hidden; margin: 10px 0 6px; }
+    .usage-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--accent-2), var(--accent)); transition: width 0.5s ease; }
+    .kv { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed rgba(42,53,96,0.5); font-size: 0.84rem; }
+    .kv:last-child { border-bottom: none; }
+    .kv .k { color: var(--ink-dim); }
+    .muted { color: var(--ink-dim); font-size: 0.78rem; }
+    .guard-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .guard-card { background: rgba(18,21,43,0.9); border: 1px solid var(--border); border-radius: 18px; padding: 34px 30px; width: 100%; max-width: 380px; text-align: center; }
+    .guard-card .logo { font-size: 2.4rem; margin-bottom: 10px; }
+    .guard-card h2 { font-size: 1.05rem; margin-bottom: 6px; }
+    .guard-card p { color: var(--ink-dim); font-size: 0.82rem; margin-bottom: 20px; }
+    .hidden { display: none !important; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--panel-2); border: 1px solid var(--border); color: var(--ink); padding: 12px 20px; border-radius: 12px; font-size: 0.85rem; z-index: 200; opacity: 0; transform: translateY(10px); transition: 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: rgba(46,204,113,0.5); }
+    .toast.error { border-color: rgba(231,76,60,0.5); }
+</style>
+</head>
+<body>
+<div class="guard-wrap" id="guardScreen">
+    <div class="guard-card">
+        <div class="logo">👤</div>
+        <h2>تنظیمات حساب Cosmic Oracle</h2>
+        <p>برای مشاهده‌ی تنظیمات، وارد حساب خود شوید</p>
+        <input class="inp" type="email" id="guardEmail" placeholder="ایمیل" autocomplete="username" style="margin-bottom:12px;">
+        <input class="inp" type="password" id="guardPassword" placeholder="رمز عبور" autocomplete="current-password" style="margin-bottom:12px;">
+        <button class="btn primary" onclick="guardLogin()" style="width:100%;padding:12px;">ورود</button>
+        <div class="form-err" id="guardError" style="text-align:center;"></div>
+        <a class="tb-btn" href="/" style="margin-top:14px;">← بازگشت به سایت</a>
+    </div>
+</div>
+
+<div id="pageScreen" class="hidden">
+    <div class="topbar">
+        <h1>⚙️ تنظیمات حساب <span>Cosmic Oracle</span></h1>
+        <div class="spacer"></div>
+        <a class="tb-btn" href="/">🏠 سایت</a>
+        <button class="tb-btn danger" onclick="doLogout()">🚪 خروج</button>
+    </div>
+    <div class="wrap">
+
+        <div class="card">
+            <h2>👤 پروفایل</h2>
+            <div class="field"><label>نام نمایشی</label><input class="inp" id="profName"></div>
+            <div class="field"><label>ایمیل</label><input class="inp" id="profEmail" type="email"></div>
+            <button class="btn primary" onclick="saveProfile()">💾 ذخیره پروفایل</button>
+            <div class="form-err" id="profError"></div>
+        </div>
+
+        <div class="card">
+            <h2>💎 اشتراک و مصرف</h2>
+            <div id="planInfo"></div>
+        </div>
+
+        <div class="card">
+            <h2>🔐 تغییر رمز عبور</h2>
+            <div class="field"><label>رمز عبور فعلی</label><input class="inp" type="password" id="pwCurrent" autocomplete="current-password"></div>
+            <div class="field"><label>رمز جدید (حداقل ۶ کاراکتر)</label><input class="inp" type="password" id="pwNew" autocomplete="new-password"></div>
+            <div class="field"><label>تکرار رمز جدید</label><input class="inp" type="password" id="pwConfirm" autocomplete="new-password"></div>
+            <button class="btn primary" onclick="changePassword()">🔒 تغییر رمز</button>
+            <div class="form-err" id="pwError"></div>
+            <div class="form-ok" id="pwOk"></div>
+        </div>
+
+        <p class="muted" style="text-align:center;">Cosmic Oracle — حساب کاربری شما</p>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="static/account-page.js"></script>
+</body>
+</html>

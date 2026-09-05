@@ -7,9 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&family=Cinzel:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/style.css?v=1">
     <link rel="stylesheet" href="static/date-wheel-picker.css">
-    <link rel="stylesheet" href="static/yoga-v3.css?v=3">
+    <link rel="stylesheet" href="static/yoga-v3.css?v=7">
 
     <style>
         /* ============================================================
@@ -2394,7 +2394,7 @@
                     <span class="sb-chevron">‹</span>
                 </button>
                 <div class="sb-section-items">
-                    <button class="nav-item" data-nav="yoga"><span class="nav-emoji">📚</span> حرکات یوگا</button>
+                    <button class="nav-item" data-nav="yoga"><span class="nav-emoji">🧘</span> کتابخانه یوگا</button>
                     <button class="nav-item" data-nav="breath"><span class="nav-emoji">🌬️</span> تنفس و مدیتیشن</button>
                 </div>
             </div>
@@ -2830,6 +2830,7 @@
                     <button class="yoga-tab active" data-tab="library">📚 کتابخانه حرکات</button>
                     <button class="yoga-tab" data-tab="daily">🌟 تمرین روزانه</button>
                     <button class="yoga-tab" data-tab="practice">🧘 جلسه تمرین</button>
+                    <button class="yoga-tab" data-tab="coach">👨‍🏫 مربی یوگا</button>
                     <button class="yoga-tab" data-tab="breath">🌬️ تنفس و مدیتیشن</button>
                 </div>
                 <!-- نوار تست تشخیص تمرین -->
@@ -2847,6 +2848,10 @@
                 <div id="yogaBreathPanel" style="display:none;"></div>
                 <!-- پنل تمرین پیشرفته -->
                 <div id="yogaPracticePanel" style="display:none;"></div>
+                <!-- پنل تمرین‌های آماده (پخش‌کننده XML) -->
+                <div id="yogaPlayerPanel" style="display:none;"></div>
+                <!-- پنل مربی یوگا -->
+                <div id="yogaCoachPanel" style="display:none;"></div>
                 <!-- صفحه جزئیات -->
                 <div id="yogaDetail" style="display:none;"></div>
             </div>
@@ -3138,12 +3143,14 @@
     <script src="static/persian-provinces.js"></script>
     <script src="static/date-wheel-picker.js?v=15"></script>
     <script src="static/city-selector.js?v=9"></script>
-    <script src="static/spa-router.js?v=2"></script>
+    <script src="static/spa-router.js?v=3"></script>
     <script src="static/script.js?v=13"></script>
-    <script src="static/yoga-core.js?v=1"></script>
-    <script src="static/yoga-library.js?v=10"></script>
+    <script src="static/yoga-data-loader.js?v=1"></script>
+    <script src="static/yoga-core.js?v=2"></script>
+    <script src="static/yoga-library.js?v=14"></script>
     <script src="static/yoga-engine.js?v=2"></script>
     <script src="static/yoga-practice.js?v=5"></script>
+    <script src="static/yoga-player.js?v=15"></script>
     <script src="static/admin-panel.js?v=1"></script>
     <script src="static/breath-module.js?v=1"></script>
     <script src="static/quality-of-life.js?v=1"></script>
@@ -3152,7 +3159,7 @@
     <script src="static/cosmic-status.js?v=2"></script>
     <script src="static/yoga-summary.js?v=1"></script>
     <script src="static/yoga-test.js?v=3"></script>
-    <script src="static/daily-dashboard.js?v=1"></script>
+    <script src="static/daily-dashboard.js?v=2"></script>
     <script src="static/audio-manager.js?v=1"></script>
 
     <script>

@@ -1274,3 +1274,30 @@ Email is delivered via SMTP when `SMTP_HOST` is set; otherwise the message
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | GET | `/api/v5/auth/dev/emails` | Recently emitted verification/reset emails (in-memory ring buffer, newest first) — 404 when `ENV_TYPE=production` |
+
+### Yoga catalog & practice engine (XML data system)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| GET | `/api/v5/yoga/poses` | Pose catalog from `static/yoga-data/poses.json` (filters: `difficulty`, `category`) |
+| GET | `/api/v5/yoga/moves` | Transition graph from `static/yoga-data/moves.json` (from/to poses + breath) |
+| GET | `/api/v5/yoga/practices` | Ready-made practices (ocean, desert, mountain, sun_salutation_a/b) with durations & difficulties |
+| GET | `/api/v5/yoga/practices/{name}` | Full session script for one practice (head + body steps with loops/difficulty branches) |
+| POST | `/api/v5/yoga/generate` | Dynamic practice: `{level, duration, background}` → generated sequence from the move graph (always closes with Corpse) |
+| POST | `/api/v5/yoga/practices/parse-xml` | Admin: parse an uploaded session XML (`{xml}`) → head/steps/name for pre-filling the form; also returns `format_version` + `warnings` for unknown/legacy session versions |
+| POST | `/api/v5/yoga/practices/validate-steps` | Admin: validate the raw steps-JSON text (`{text}`) → line/column-referenced errors (same shape as parse-xml) |
+| POST | `/api/v5/yoga/practices/from-xml` | Admin: create a practice directly from session XML (`{xml, name?, name_fa?, tier?}`) with Persian-name fallback; returns `warnings` for unknown/legacy session versions |
+
+Static data: `static/yoga-data/*.json` are generated from the XML/TXT session files by `yoga_importer.py` (run `./venv/Scripts/python.exe yoga_importer.py` to regenerate).
+
+### Account & admin panel (real API, replaces localStorage fakes)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| PUT | `/api/v5/auth/profile` | Update own profile (display_name / email) — 409 on email conflict, 401 unauth |
+| PUT | `/api/v5/auth/admin/users/{id}` | Admin edit user (plan / is_admin / display_name) — 403 non-admin, 400 demote self, 404 bad plan |
+| DELETE | `/api/v5/auth/admin/users/{id}` | Admin delete user — 400 delete self; deleted user's JWT → 401 |
+| POST | `/api/v5/auth/admin/users/{id}/reset-usage` | Reset a user's daily chart usage to 0 |
+| GET | `/api/v5/auth/admin/stats` | `{total_users, total_admins, per_plan:[{plan,count}]}` — admin only |
+| GET | `/admin.html` | Standalone admin panel page (`static/admin.html` → `admin-panel.js`) |
+| GET | `/account.html` | Standalone account settings page (`static/account.html` → `account-page.js`) |

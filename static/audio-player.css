@@ -1,0 +1,207 @@
+/* ═══════════════════════════════════════════════════════════
+   AUDIO PLAYER — ویجت پخش موسیقی (تم تیره/طلایی کیهانی)
+   استایل‌های #audioPlayerWidget در نوار بالا + پلی‌لیست شیشه‌ای
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── ویجت فشرده نوار بالا ─── */
+#audioPlayerWidget {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(221, 192, 112, 0.15);
+    backdrop-filter: blur(8px);
+    position: relative;
+}
+
+.apw-btn,
+.apw-play {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 6px;
+    border-radius: 8px;
+    color: var(--ink, #e8e2f4);
+    transition: background 0.2s, transform 0.15s;
+    line-height: 1;
+}
+.apw-btn:hover,
+.apw-play:hover {
+    background: rgba(221, 192, 112, 0.12);
+    transform: scale(1.08);
+}
+.apw-play {
+    font-size: 16px;
+    background: rgba(221, 192, 112, 0.15);
+}
+
+.apw-info {
+    min-width: 90px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    direction: rtl;
+}
+.apw-track {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink, #e8e2f4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.apw-time {
+    font-size: 10px;
+    color: var(--ink-dim, #9a8fb8);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ─── نوار پیشرفت (پخش زنده) ─── */
+.apw-progress {
+    flex: 1;
+    min-width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    overflow: hidden;
+}
+.apw-progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #c9a227, #f0d98c);
+    transition: width 0.3s linear;
+}
+
+/* ─── اسلایدر ولوم ─── */
+.apw-volume {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 64px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.12);
+    outline: none;
+    cursor: pointer;
+}
+.apw-volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #c9a227;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(201, 162, 39, 0.5);
+}
+.apw-volume::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: none;
+    border-radius: 50%;
+    background: #c9a227;
+    cursor: pointer;
+}
+
+/* ─── پلی‌لیست کشویی (شیشه‌ای) ─── */
+.apw-playlist {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    width: 250px;
+    max-height: 320px;
+    overflow-y: auto;
+    border-radius: 14px;
+    background: rgba(20, 16, 31, 0.92);
+    border: 1px solid rgba(221, 192, 112, 0.25);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(16px);
+    padding: 10px;
+    z-index: 1000;
+    animation: apwFadeIn 0.22s ease;
+}
+@keyframes apwFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.apw-playlist-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #c9a227;
+    padding: 4px 6px 8px;
+    border-bottom: 1px solid rgba(221, 192, 112, 0.15);
+    margin-bottom: 6px;
+}
+
+.apw-playlist-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 12px;
+    color: var(--ink, #e8e2f4);
+}
+.apw-playlist-item:hover {
+    background: rgba(221, 192, 112, 0.1);
+}
+.apw-playlist-item.active {
+    background: rgba(221, 192, 112, 0.16);
+    border: 1px solid rgba(221, 192, 112, 0.25);
+}
+.apw-pl-icon { font-size: 14px; }
+.apw-pl-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.apw-pl-cat  { font-size: 10px; color: var(--ink-dim, #9a8fb8); }
+.apw-pl-playing { color: #c9a227; animation: apwPulse 1s infinite; }
+@keyframes apwPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+}
+
+/* ─── بخش افکت‌ها ─── */
+.apw-sfx-section {
+    border-top: 1px solid rgba(221, 192, 112, 0.15);
+    margin-top: 6px;
+    padding: 8px 6px 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.apw-sfx-label {
+    font-size: 11px;
+    color: var(--ink-dim, #9a8fb8);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* ─── حالت شناور (وقتی در topbar نباشد) ─── */
+.audio-player-widget {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    z-index: 900;
+    background: rgba(20, 16, 31, 0.92);
+    border: 1px solid rgba(221, 192, 112, 0.3);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+    padding: 8px 12px;
+}
+
+/* ─── موبایل: جمع‌وجور ─── */
+@media (max-width: 640px) {
+    #audioPlayerWidget .apw-volume,
+    #audioPlayerWidget .apw-info { display: none; }
+    #audioPlayerWidget { gap: 4px; padding: 3px 6px; }
+    .audio-player-widget .apw-volume { display: none; }
+    .audio-player-widget .apw-info { display: block; max-width: 110px; }
+}

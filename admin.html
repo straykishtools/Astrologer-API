@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل مدیریت — Cosmic Oracle</title>
+<style>
+    :root {
+        --bg: #0b0e1a; --panel: #12152b; --panel-2: #1e2740; --border: #2a3560;
+        --ink: #e8ecff; --ink-dim: #b0c4e0; --accent: #f39c12; --accent-2: #6c8cff;
+        --danger: #e74c3c; --ok: #2ecc71;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif; }
+    body { background: radial-gradient(1200px 600px at 70% -10%, #171c3a 0%, var(--bg) 55%); color: var(--ink); min-height: 100vh; }
+    .topbar { display: flex; align-items: center; gap: 14px; padding: 14px 22px; background: rgba(18,21,43,0.85); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); }
+    .topbar h1 { font-size: 1.05rem; }
+    .topbar h1 span { color: var(--accent); }
+    .topbar .spacer { flex: 1; }
+    .tb-btn { padding: 8px 16px; border-radius: 30px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--ink-dim); font-size: 0.82rem; cursor: pointer; transition: 0.25s ease; text-decoration: none; display: inline-block; }
+    .tb-btn:hover { background: rgba(255,255,255,0.07); color: #fff; border-color: rgba(108,140,255,0.35); }
+    .tb-btn.danger { color: #ff8f8f; border-color: rgba(231,76,60,0.35); }
+    .tb-btn.danger:hover { background: rgba(231,76,60,0.12); }
+    .wrap { max-width: 1150px; margin: 26px auto 60px; padding: 0 18px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab-btn { padding: 10px 22px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink-dim); font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+    .tab-btn.active { background: var(--accent); color: #0b0e1a; font-weight: 700; border-color: var(--accent); }
+    .tab-btn:hover:not(.active) { color: #fff; border-color: rgba(108,140,255,0.35); }
+    .card { background: rgba(18,21,43,0.75); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 18px; }
+    .hidden { display: none !important; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+    .search { flex: 1; min-width: 220px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-size: 0.85rem; outline: none; }
+    .search:focus { border-color: var(--accent-2); }
+    .btn { padding: 9px 18px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink-dim); font-size: 0.82rem; cursor: pointer; transition: 0.2s; }
+    .btn:hover { color: #fff; border-color: rgba(108,140,255,0.4); }
+    .btn.primary { background: var(--accent); color: #0b0e1a; font-weight: 700; border-color: var(--accent); }
+    .btn.primary:hover { filter: brightness(1.1); }
+    .btn.danger { color: #ff8f8f; border-color: rgba(231,76,60,0.4); }
+    .btn.danger:hover { background: rgba(231,76,60,0.12); }
+    .btn.mini { padding: 5px 10px; font-size: 0.75rem; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th { text-align: right; color: var(--ink-dim); font-weight: 600; padding: 10px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 10px 8px; border-bottom: 1px solid rgba(42,53,96,0.45); vertical-align: middle; }
+    tr:hover td { background: rgba(108,140,255,0.04); }
+    .table-scroll { overflow-x: auto; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+    .badge.admin { background: rgba(231,76,60,0.15); color: #ff8f8f; }
+    .badge.plan-free { background: rgba(255,255,255,0.08); color: var(--ink-dim); }
+    .badge.plan-gold { background: rgba(243,156,18,0.15); color: #ffca6b; }
+    .badge.plan-diamond { background: rgba(155,89,182,0.2); color: #d2a8ff; }
+    .badge.plan-vip { background: rgba(221,192,112,0.2); color: #f0dfa8; }
+    .badge.on { background: rgba(46,204,113,0.15); color: #7be3a8; }
+    .badge.off { background: rgba(255,255,255,0.07); color: #8892b0; }
+    .plan-select, .inp { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-size: 0.8rem; font-family: inherit; outline: none; }
+    .plan-select:focus, .inp:focus { border-color: var(--accent-2); }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+    .stat { background: var(--panel-2); border: 1px solid var(--border); border-radius: 14px; padding: 18px; text-align: center; }
+    .stat .num { font-size: 1.7rem; font-weight: 800; color: var(--accent); }
+    .stat .lbl { font-size: 0.78rem; color: var(--ink-dim); margin-top: 4px; }
+    .muted { color: var(--ink-dim); font-size: 0.78rem; }
+</style>
+</head>
+<body>
+<div class="guard-wrap" id="guardScreen">
+    <div class="guard-card">
+        <div class="logo">🔧</div>
+        <h2>پنل مدیریت Cosmic Oracle</h2>
+        <p>برای دسترسی، با حساب ادمین وارد شوید</p>
+        <input class="inp" type="email" id="guardEmail" placeholder="ایمیل ادمین" autocomplete="username" style="width:100%;margin-bottom:12px;padding:11px 14px;">
+        <input class="inp" type="password" id="guardPassword" placeholder="رمز عبور" autocomplete="current-password" style="width:100%;margin-bottom:12px;padding:11px 14px;">
+        <button class="btn primary" onclick="guardLogin()" style="width:100%;padding:12px;">ورود به پنل</button>
+        <div class="form-err" id="guardError" style="color:var(--danger);font-size:0.8rem;margin-top:10px;text-align:center;min-height:1.2em;"></div>
+        <a class="tb-btn" href="/" style="margin-top:14px;">← بازگشت به سایت</a>
+    </div>
+</div>
+
+<div id="panelScreen" class="hidden">
+    <div class="topbar">
+        <h1>🔧 پنل مدیریت <span>Cosmic Oracle</span></h1>
+        <div class="spacer"></div>
+        <span class="muted" id="whoami"></span>
+        <a class="tb-btn" href="/">🏠 سایت</a>
+        <a class="tb-btn" href="/account.html">👤 حساب من</a>
+        <button class="tb-btn danger" onclick="doLogout()">🚪 خروج</button>
+    </div>
+    <div class="wrap">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="users" onclick="switchTab('users')">👥 کاربران</button>
+            <button class="tab-btn" data-tab="plans" onclick="switchTab('plans')">💎 پلن‌ها</button>
+            <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">📊 آمار</button>
+        </div>
+
+        <section id="tab-users">
+            <div class="card">
+                <div class="toolbar">
+                    <input class="search" id="userSearch" placeholder="🔍 جستجو بر اساس ایمیل یا نام..." oninput="renderUsers()">
+                    <button class="btn primary" onclick="openUserForm()">➕ کاربر جدید</button>
+                    <button class="btn" onclick="loadAll()">🔄 بازخوانی</button>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr>
+                            <th>#</th><th>ایمیل</th><th>نام نمایشی</th><th>پلن</th>
+                            <th>سطح</th><th>مصرف امروز</th><th>عضویت</th><th>عملیات</th>
+                        </tr></thead>
+                        <tbody id="usersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-plans" class="hidden">
+            <div class="card">
+                <div class="toolbar">
+                    <span class="muted">مقادیر و سطوح دسترسی هر پلن را مدیریت کنید</span>
+                    <div style="flex:1"></div>
+                    <button class="btn primary" onclick="openPlanForm()">➕ پلن جدید</button>
+                    <button class="btn" onclick="loadAll()">🔄 بازخوانی</button>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr>
+                            <th>نام</th><th>عنوان</th><th>ماهانه</th><th>سالانه</th>
+                            <th>سقف روزانه</th><th>ذخیره چارت</th><th>پرمیوم</th>
+                            <th>مسیرهای ویژه</th><th>وضعیت</th><th>ترتیب</th><th>عملیات</th>
+                        </tr></thead>
+                        <tbody id="plansBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-stats" class="hidden">
+            <div class="stats-grid" id="statsGrid"></div>
+        </section>
+    </div>
+</div>
+<style>
+    .modal-overlay { position: fixed; inset: 0; background: rgba(4,6,14,0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .modal-header h3 { font-size: 0.95rem; color: var(--accent); }
+    .modal-close { background: none; border: none; color: var(--ink-dim); font-size: 1.1rem; cursor: pointer; }
+    .modal-body { padding: 20px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; margin-bottom: 5px; font-size: 0.8rem; color: var(--ink-dim); }
+    .field .inp { width: 100%; }
+    .row2 { display: flex; gap: 10px; }
+    .row2 .field { flex: 1; }
+    .checks { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+    .checks label { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--ink-dim); cursor: pointer; }
+    .form-err { color: var(--danger); font-size: 0.8rem; margin-top: 10px; text-align: center; min-height: 1.2em; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--panel-2); border: 1px solid var(--border); color: var(--ink); padding: 12px 20px; border-radius: 12px; font-size: 0.85rem; z-index: 200; opacity: 0; transform: translateY(10px); transition: 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: rgba(46,204,113,0.5); }
+    .toast.error { border-color: rgba(231,76,60,0.5); }
+    .guard-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .guard-card { background: rgba(18,21,43,0.9); border: 1px solid var(--border); border-radius: 18px; padding: 34px 30px; width: 100%; max-width: 380px; text-align: center; }
+    .guard-card .logo { font-size: 2.4rem; margin-bottom: 10px; }
+    .guard-card h2 { color: var(--ink); font-size: 1.05rem; margin-bottom: 6px; }
+    .guard-card p { color: var(--ink-dim); font-size: 0.82rem; margin-bottom: 20px; }
+</style>
+
+<!-- ── مودال ویرایش کاربر ── -->
+<div class="modal-overlay" id="userModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="userModalTitle">ویرایش کاربر</h3>
+            <button class="modal-close" onclick="closeModal('userModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="field"><label>ایمیل</label><input class="inp" id="uEmail"></div>
+            <div class="field"><label>نام نمایشی</label><input class="inp" id="uName"></div>
+            <div class="row2">
+                <div class="field"><label>پلن</label><select class="inp" id="uPlan"></select></div>
+                <div class="field"><label>سطح دسترسی</label>
+                    <select class="inp" id="uAdmin">
+                        <option value="false">کاربر عادی</option>
+                        <option value="true">ادمین</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn primary" style="width:100%;padding:12px;" onclick="saveUserEdit()">💾 ذخیره تغییرات</button>
+            <div class="form-err" id="userFormError"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── مودال پلن ── -->
+<div class="modal-overlay" id="planModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="planModalTitle">پلن جدید</h3>
+            <button class="modal-close" onclick="closeModal('planModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="row2">
+                <div class="field"><label>نام (لاتین، یکتا)</label><input class="inp" id="pName"></div>
+                <div class="field"><label>عنوان نمایشی</label><input class="inp" id="pDisplayName"></div>
+            </div>
+            <div class="row2">
+                <div class="field"><label>قیمت ماهانه (تومان)</label><input class="inp" type="number" id="pMonthly" min="0" value="0"></div>
+                <div class="field"><label>قیمت سالانه (تومان)</label><input class="inp" type="number" id="pYearly" min="0" value="0"></div>
+            </div>
+            <div class="row2">
+                <div class="field"><label>سقف چارت روزانه</label><input class="inp" type="number" id="pDailyLimit" min="1" value="10"></div>
+                <div class="field"><label>ترتیب نمایش</label><input class="inp" type="number" id="pSort" min="0" value="0"></div>
+            </div>
+            <div class="field"><label>مسیرهای ویژه (با کاما)</label><input class="inp" id="pPremiumPaths" placeholder="composite,solar-return"></div>
+            <div class="field"><label>ویژگی‌ها (با کاما)</label><textarea class="inp" id="pFeatures" rows="3"></textarea></div>
+            <div class="checks">
+                <label><input type="checkbox" id="pCanSave"> ذخیره چارت</label>
+                <label><input type="checkbox" id="pCanPremium"> دسترسی پرمیوم</label>
+                <label><input type="checkbox" id="pActive" checked> فعال</label>
+            </div>
+            <button class="btn primary" style="width:100%;padding:12px;" onclick="savePlanForm()">💾 ذخیره پلن</button>
+            <div class="form-err" id="planFormError"></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="static/admin-panel.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پیش‌نمایش داشبورد روزانه (حالت قفل‌شده)</title>
+<link rel="stylesheet" href="static/style.css">
+<style>
+  body { background: radial-gradient(circle at 50% 0%, #16204a, #0b0e1a 70%); min-height: 100vh; margin: 0; padding: 24px; font-family: "Vazirmatn", sans-serif; }
+  .dash-head { max-width: 1000px; margin: 0 auto 14px; color: #f3e5b8; }
+</style>
+</head>
+<body>
+  <div class="dash-head">
+    <h2 class="dash-title">📊 داشبورد روزانه</h2>
+    <div class="dash-date">سه‌شنبه ۱۱ شهریور ۱۴۰۴</div>
+  </div>
+
+  <!-- نمونه وضعیت gated (کاربر غیر پرمیوم): همه کارت‌ها محو، فقط بخش تقویم واضح -->
+  <div id="dailyDashboard" class="daily-dashboard">
+    <div class="dd-grid">
+      <div class="dd-card dd-main dd-card--locked">
+        <div class="dd-date">📅 سه‌شنبه ۱۱ شهریور ۱۴۴</div>
+        <div class="dd-message">🌟 امروز زمان خوبی برای شروع یک عادت جدید است.</div>
+        <div class="dd-zodiac"><span class="dd-zodiac-emoji">🐉</span><div><div class="dd-zodiac-name">اژدها <span class="dd-zodiac-element" style="color:#e74c3c">آتش</span></div><div class="dd-zodiac-personality">قوی و خوش‌شانس</div></div></div>
+      </div>
+      <div class="dd-card dd-bio-card dd-card--locked">
+        <div class="dd-card-title">📊 بیوریتم امروز</div>
+        <div class="dd-bio-row"><span class="dd-bio-label">فیزیکی 💪</span><div class="dd-bio-bar"><div class="dd-bio-fill" style="width:42%;background:#e74c3c;float:right"></div><div class="dd-bio-center"></div></div><span class="dd-bio-val" style="color:#e74c3c">42</span></div>
+        <div class="dd-bio-row"><span class="dd-bio-label">عاطفی 💕</span><div class="dd-bio-bar"><div class="dd-bio-fill" style="width:18%;background:#e84393;float:right"></div><div class="dd-bio-center"></div></div><span class="dd-bio-val" style="color:#e84393">18</span></div>
+        <div class="dd-bio-row"><span class="dd-bio-label">ذهنی 🧠</span><div class="dd-bio-bar"><div class="dd-bio-fill" style="width:67%;background:#5b8dee;float:right"></div><div class="dd-bio-center"></div></div><span class="dd-bio-val" style="color:#5b8dee">67</span></div>
+      </div>
+      <div class="dd-card dd-tarot dd-card--locked">
+        <div class="dd-card-title">🔮 فال امروز</div>
+        <div class="dd-tarot-emoji">☀️</div>
+        <div class="dd-tarot-name">خورشید</div>
+        <div class="dd-tarot-msg">شادی و موفقیت در راه است. روز درخشانی در پیش داری!</div>
+      </div>
+      <div class="dd-card dd-card--locked">
+        <div class="dd-yoga"><div class="dd-yoga-title">🧘 حرکت پیشنهادی امروز</div><div class="dd-yoga-pose">پوزیشن اژدها</div><div class="dd-yoga-desc">باز کردن لگن (Dragon Pose)</div></div>
+      </div>
+      <!-- بخش تقویم (رویداد شمسی) — تنها بخش غیرمحو؛ حالا نزدیک‌ترین مناسبت‌ها درست نمایش داده می‌شود -->
+      <div class="dd-card dd-event-card dd-card--free">
+        <div class="dd-event"><span class="dd-event-emoji">🌾</span><div><div class="dd-event-name">مهرگان</div><div class="dd-event-desc">جشن مهر و دوستی — برداشت و شکرگزاری (نزدیک‌ترین مناسبت از امروز)</div></div></div>
+        <div class="dd-event"><span class="dd-event-emoji">🔥</span><div><div class="dd-event-name">شب یلدا (چله)</div><div class="dd-event-desc">طولانی‌ترین شب سال — زمان خانواده، انار و حافظ‌خوانی (آذر/دی)</div></div></div>
+      </div>
+      <!-- لایهٔ قفل روی همه -->
+      <div class="dd-gate-overlay">
+        <div class="dd-gate-box" role="button" tabindex="0" aria-label="لطفا اشتراک تهیه یا وارد شوید">
+          <div class="dd-gate-icon">🔒</div>
+          <div class="dd-gate-text">لطفا اشتراک تهیه یا وارد شوید</div>
+          <button type="button" class="dd-gate-btn">ورود / اشتراک</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

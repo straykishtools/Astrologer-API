@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تنظیمات حساب — Cosmic Oracle</title>
+<style>
+    :root {
+        --bg: #0b0e1a; --panel: #131729; --line: #232a45; --ink: #e8e6f2;
+        --ink-dim: #8b8fa8; --gold: #c9a227; --gold-2: #ddc070; --red: #ff7675; --green: #55efc4;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0; min-height: 100vh; background: radial-gradient(1200px 600px at 50% -10%, #1a2140 0%, var(--bg) 60%);
+        color: var(--ink); font-family: Vazirmatn, Tahoma, sans-serif;
+    }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { color: var(--gold-2); }
+    .hidden { display: none !important; }
+
+    /* ─── گارد ورود ─── */
+    #guardScreen { display: none; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .guard-card {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+        padding: 40px 34px; width: 100%; max-width: 380px; text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    .guard-card h1 { font-size: 22px; margin: 0 0 6px; color: var(--gold-2); }
+    .guard-card p.sub { color: var(--ink-dim); font-size: 13px; margin: 0 0 24px; }
+    .guard-card input {
+        width: 100%; margin-bottom: 12px; padding: 12px 14px; border-radius: 10px;
+        border: 1px solid var(--line); background: #0d1120; color: var(--ink); font-size: 14px; direction: ltr; text-align: left;
+    }
+    .guard-card input:focus { outline: none; border-color: var(--gold); }
+    .guard-error { color: var(--red); font-size: 13px; min-height: 18px; margin-bottom: 10px; }
+    .btn-gold {
+        width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer;
+        background: linear-gradient(135deg, var(--gold), var(--gold-2)); color: #1a1500;
+        font-weight: 700; font-size: 15px;
+    }
+    .btn-gold:hover { filter: brightness(1.1); }
+    .guard-card .back { display: block; margin-top: 16px; font-size: 13px; }
+
+    /* ─── صفحه‌ی حساب ─── */
+    #pageScreen { max-width: 720px; margin: 0 auto; padding: 34px 20px 60px; }
+    .acct-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+    .acct-head h1 { font-size: 24px; margin: 0; color: var(--gold-2); }
+    .acct-head a { font-size: 13px; }
+    .acct-card {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+        padding: 24px; margin-bottom: 18px;
+    }
+    .acct-card h2 { font-size: 16px; margin: 0 0 18px; color: var(--gold-2); }
+    .field-row { margin-bottom: 14px; }
+    .field-row label { display: block; font-size: 13px; color: var(--ink-dim); margin-bottom: 6px; }
+    .field-row input {
+        width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--line);
+        background: #0d1120; color: var(--ink); font-size: 14px;
+    }
+    .field-row input:focus { outline: none; border-color: var(--gold); }
+    .field-row input[dir="ltr"] { direction: ltr; text-align: left; }
+    .form-err { color: var(--red); font-size: 13px; min-height: 18px; }
+    .form-ok { color: var(--green); font-size: 13px; min-height: 18px; }
+    .btn-outline {
+        padding: 10px 22px; border-radius: 10px; cursor: pointer; font-size: 14px;
+        border: 1px solid var(--gold); color: var(--gold-2); background: transparent; font-weight: 600;
+    }
+    .btn-outline:hover { background: rgba(201,162,39,.12); }
+
+    /* ─── پلن و مصرف (خروجی account-page.js) ─── */
+    .muted { color: var(--ink-dim); font-size: 13px; }
+    .badge { display: inline-block; padding: 3px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+    .badge.plan-free { background: rgba(116,185,255,.15); color: #74b9ff; }
+    .badge.plan-gold, .badge.plan-pro { background: rgba(221,192,112,.15); color: var(--gold-2); }
+    .badge.plan-diamond { background: rgba(85,239,196,.15); color: var(--green); }
+    .usage-bar { height: 8px; border-radius: 6px; background: #0d1120; overflow: hidden; margin: 12px 0 8px; }
+    .usage-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--gold), var(--gold-2)); }
+    .kv { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+    .kv .k { color: var(--ink-dim); }
+    .mono { font-family: Consolas, monospace; direction: ltr; unicode-bidi: embed; }
+
+    /* ─── توست ─── */
+    #toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+        background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+        padding: 12px 22px; font-size: 14px; opacity: 0; transition: all .3s; z-index: 99; white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.success { border-color: var(--green); color: var(--green); }
+</style>
+</head>
+<body>
+
+    <!-- ======================= گارد ورود ======================= -->
+    <div id="guardScreen">
+        <div class="guard-card">
+            <h1>🔮 Cosmic Oracle</h1>
+            <p class="sub">برای دسترسی به تنظیمات حساب وارد شوید</p>
+            <input type="email" id="guardEmail" placeholder="ایمیل" autocomplete="email">
+            <input type="password" id="guardPassword" placeholder="رمز عبور" autocomplete="current-password">
+            <div class="guard-error" id="guardError"></div>
+            <button class="btn-gold" onclick="guardLogin()">ورود</button>
+            <a class="back" href="/">← بازگشت به رصدخانه</a>
+        </div>
+    </div>
+
+    <!-- ======================= صفحه‌ی حساب ======================= -->
+    <div id="pageScreen" class="hidden">
+        <div class="acct-head">
+            <h1>⚙️ تنظیمات حساب</h1>
+            <a href="javascript:void(0)" onclick="doLogout()">خروج از حساب ←</a>
+        </div>
+
+        <div class="acct-card">
+            <h2>👤 پروفایل</h2>
+            <div class="field-row">
+                <label>نام نمایشی</label>
+                <input type="text" id="profName" placeholder="نام شما">
+            </div>
+            <div class="field-row">
+                <label>ایمیل</label>
+                <input type="email" id="profEmail" dir="ltr" placeholder="you@example.com">
+            </div>
+            <div class="form-err" id="profError"></div>
+            <button class="btn-outline" onclick="saveProfile()">💾 ذخیره پروفایل</button>
+        </div>
+
+        <div class="acct-card">
+            <h2>💎 اشتراک و مصرف</h2>
+            <div id="planInfo"><p class="muted">در حال بارگذاری...</p></div>
+        </div>
+
+        <div class="acct-card">
+            <h2>🔒 تغییر رمز عبور</h2>
+            <div class="field-row">
+                <label>رمز فعلی</label>
+                <input type="password" id="pwCurrent" autocomplete="current-password">
+            </div>
+            <div class="field-row">
+                <label>رمز جدید (حداقل ۶ کاراکتر)</label>
+                <input type="password" id="pwNew" autocomplete="new-password">
+            </div>
+            <div class="field-row">
+                <label>تکرار رمز جدید</label>
+                <input type="password" id="pwConfirm" autocomplete="new-password">
+            </div>
+            <div class="form-err" id="pwError"></div>
+            <div class="form-ok" id="pwOk"></div>
+            <button class="btn-outline" onclick="changePassword()">تغییر رمز</button>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="static/account-page.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+[
+ {
+  "name": "ocean",
+  "locked": false,
+  "downloaded": true,
+  "displayName": "Ocean",
+  "description": "An Ocean practice is a high intensity interval training practice (HITT) which cycles between waves of intense vinyasa flow, strong holding postures, and opening poses.\n\n\"Find a wave, your wave, your own personal pranic wave and ride it to freedom of the mind, body and spirit…\"",
+  "style": "vinyasa",
+  "durations": [
+   30,
+   45,
+   60
+  ],
+  "difficulties": [
+   0,
+   1,
+   2
+  ],
+  "poseCount": 399
+ },
+ {
+  "name": "desert",
+  "locked": false,
+  "downloaded": true,
+  "displayName": "Desert",
+  "description": "A Desert practice has the specific focus to unwind the mind, unravel the body, and more importantly to open the heart.  The path to freedom in the Desert practice is through flexibility and detoxification.  As the body opens and the flexibility improves, blocked pranic energy ignites the detoxification and the healing processes.\n\n\"In the Desert you have the space to unwind, unravel, spill out on the Desert floor and heal.\"",
+  "style": "yin",
+  "durations": [
+   30,
+   45,
+   60
+  ],
+  "difficulties": [
+   0,
+   1,
+   2
+  ],
+  "poseCount": 437
+ },
+ {
+  "name": "mountain",
+  "locked": false,
+  "downloaded": true,
+  "displayName": "Mountain",
+  "description": "Mountain is a power based practice that strengthens the body and the mind by instilling a sense of self-discipline, staying power, and one pointed concentration.  In the Mountain practice we move slowly with less vinyasa flow between postures.  In addition, we hold our poses significantly longer; do more arm balances as well as other strength building postures.\n\n\"Your practice begins when you want to come out of a pose.\"",
+  "style": "ashtanga",
+  "durations": [
+   30,
+   45,
+   60
+  ],
+  "difficulties": [
+   0,
+   1,
+   2
+  ],
+  "poseCount": 391
+ },
+ {
+  "name": "sun_salutation_a",
+  "locked": false,
+  "downloaded": true,
+  "displayName": "Sun Salutation A",
+  "description": "The Gaia Flow Yoga variation of Surya Namaskara Ka, Sun Salutation A, is a series of postures, performed in a graceful and reciprocal flow of movement and breath, which build strength, increase flexibility and support a sense of well-being.  This slow-paced series encourages an inward meditative practice of healing and expansion on many levels.",
+  "style": "power",
+  "durations": [
+   2,
+   4,
+   6,
+   8,
+   10,
+   20,
+   30,
+   108
+  ],
+  "difficulties": [
+   0,
+   1,
+   2
+  ],
+  "poseCount": 143
+ },
+ {
+  "name": "sun_salutation_b",
+  "locked": false,
+  "downloaded": true,
+  "displayName": "Sun Salutation B",
+  "description": "The Gaia Flow Yoga variation of Surya Namaskara Kha, Sun Salutation B, is a series of postures, performed in a rigorous Vinyasa flow with fiery breath-work, that stimulate the metabolism and move stagnant energy.  This fast paced series encourages cardiovascular conditioning, detoxification and stress release.",
+  "style": "power",
+  "durations": [
+   2,
+   4,
+   6,
+   8,
+   10,
+   20,
+   30,
+   108
+  ],
+  "difficulties": [
+   0,
+   1,
+   2
+  ],
+  "poseCount": 115
+ }
+]

@@ -1,0 +1,3158 @@
+[
+ {
+  "name": "childtraditional_to_boxneutral",
+  "fromPose": "Child Traditional",
+  "toPose": "Box Neutral",
+  "breath": "none"
+ },
+ {
+  "name": "birdofparadiserevolved_to_birdofparadiserevolvedpreparation",
+  "fromPose": "Bird Of Paradise Revolved",
+  "toPose": "Bird Of Paradise Revolved Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "birdofparadiserevolvedpreparation_to_birdofparadiserevolved",
+  "fromPose": "Bird Of Paradise Revolved Preparation",
+  "toPose": "Bird Of Paradise Revolved",
+  "breath": "none"
+ },
+ {
+  "name": "birdofparadiserevolvedpreparation_to_lungetwistextendedbound",
+  "fromPose": "Bird Of Paradise Revolved Preparation",
+  "toPose": "Lunge Twist Extended Bound",
+  "breath": "none"
+ },
+ {
+  "name": "birdofparadiserevolvedpreparation_to_warriortwistextendedbound",
+  "fromPose": "Bird Of Paradise Revolved Preparation",
+  "toPose": "Warrior Twist Extended Bound",
+  "breath": "none"
+ },
+ {
+  "name": "lungetwistextendedbound_to_birdofparadiserevolvedpreparation",
+  "fromPose": "Lunge Twist Extended Bound",
+  "toPose": "Bird Of Paradise Revolved Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "warriortwistextendedbound_to_birdofparadiserevolvedpreparation",
+  "fromPose": "Warrior Twist Extended Bound",
+  "toPose": "Bird Of Paradise Revolved Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "bridge_to_brigelegup",
+  "fromPose": "Bridge",
+  "toPose": "Bridge Leg Up",
+  "breath": "none",
+  "soundName": "wheel_to_wheellegup",
+  "soundTwosided": true
+ },
+ {
+  "name": "bridgelegup_to_bridge",
+  "fromPose": "Bridge Leg Up",
+  "toPose": "Bridge",
+  "breath": "none",
+  "soundName": "wheellegup_to_wheel",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungehandsonmatflying_to_eightangle",
+  "fromPose": "Lunge Hands On Mat Flying",
+  "toPose": "Eight Angle",
+  "breath": "none"
+ },
+ {
+  "name": "eightangle_to_lungehandsonmatflying",
+  "fromPose": "Eight Angle",
+  "toPose": "Lunge Hands On Mat Flying",
+  "breath": "none"
+ },
+ {
+  "name": "downwarddoglegup_to_flyingmanrevolved",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Flying Man Revolved",
+  "breath": "inhale"
+ },
+ {
+  "name": "flyingmanrevolved_to_downwarddoglegup",
+  "fromPose": "Flying Man Revolved",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "none"
+ },
+ {
+  "name": "halfmoon_to_halfmoonbound",
+  "fromPose": "Half Moon",
+  "toPose": "Half Moon Bound",
+  "breath": "none"
+ },
+ {
+  "name": "halfmoonbound_to_halfmoon",
+  "fromPose": "Half Moon Bound",
+  "toPose": "Half Moon",
+  "breath": "none"
+ },
+ {
+  "name": "lotushalf_to_lotusfull",
+  "fromPose": "Lotus Half",
+  "toPose": "Lotus Full",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescent_to_lungecrescentforwardbend",
+  "fromPose": "Lunge Crescent",
+  "toPose": "Lunge Crescent Forward Bend",
+  "breath": "exhale",
+  "soundName": "warriorIhandssteepled_to_warriorIhandssteepledforward",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungecrescent_to_lungecrescenttwist",
+  "fromPose": "Lunge Crescent",
+  "toPose": "Lunge Crescent Twist",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescentforwardbend_to_lungecrescent",
+  "fromPose": "Lunge Crescent Forward Bend",
+  "toPose": "Lunge Crescent",
+  "breath": "inhale",
+  "soundName": "warriorIhandssteepledforward_to_warriorIhandssteepled",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungecrescenttwist_to_lungecrescenttwistreverse",
+  "fromPose": "Lunge Crescent Twist",
+  "toPose": "Lunge Crescent Twist Reverse",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescenttwist_to_lungecrescent",
+  "fromPose": "Lunge Crescent Twist",
+  "toPose": "Lunge Crescent",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescenttwist_to_lunge",
+  "fromPose": "Lunge Crescent Twist",
+  "toPose": "Lunge",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescenttwistreverse_to_lungecrescenttwist",
+  "fromPose": "Lunge Crescent Twist Reverse",
+  "toPose": "Lunge Crescent Twist",
+  "breath": "none"
+ },
+ {
+  "name": "warriorIkneeling_to_lungecrescentkneelingforwardbend",
+  "fromPose": "Warrior I Kneeling",
+  "toPose": "Lunge Crescent Kneeling Forward Bend",
+  "breath": "exhale",
+  "soundName": "warriorIhandssteepled_to_warriorIhandssteepledforward",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIkneeling_to_lungecrescenttwist",
+  "fromPose": "Warrior I Kneeling",
+  "toPose": "Lunge Crescent Kneeling Twist",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescentkneelingforwardbend_to_warriorIkneeling",
+  "fromPose": "Lunge Crescent Kneeling Forward Bend",
+  "toPose": "Warrior I Kneeling",
+  "breath": "inhale",
+  "soundName": "warriorIhandssteepledforward_to_warriorIhandssteepled",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungecrescentkneelingtwist_to_lungecrescentkneelingtwistreverse",
+  "fromPose": "Lunge Crescent Kneeling Twist",
+  "toPose": "Lunge Crescent Kneeling Twist Reverse",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescentkneelingtwist_to_warriorIkneeling",
+  "fromPose": "Lunge Crescent Kneeling Twist",
+  "toPose": "Warrior I Kneeling",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescentkneelingtwist_to_lungekneeling",
+  "fromPose": "Lunge Crescent Kneeling Twist",
+  "toPose": "Lunge Kneeling",
+  "breath": "none"
+ },
+ {
+  "name": "lungecrescenttwistreverse_to_lungecrescenttwist",
+  "fromPose": "Lunge Crescent Kneeling Twist Reverse",
+  "toPose": "Lunge Crescent Kneeling Twist",
+  "breath": "none"
+ },
+ {
+  "name": "downwarddoglegupstackhips_to_wildthing",
+  "fromPose": "Downward Dog Leg Up Stack Hips",
+  "toPose": "Wild Thing",
+  "breath": "none"
+ },
+ {
+  "name": "wildthing_to_downwarddoglegup",
+  "fromPose": "Wild Thing",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "none"
+ },
+ {
+  "name": "plankside_to_planksideextended",
+  "fromPose": "Plank Side",
+  "toPose": "Plank Side Extended",
+  "breath": "none"
+ },
+ {
+  "name": "planksideextended_to_plankside",
+  "fromPose": "Plank Side Extended",
+  "toPose": "Plank Side",
+  "breath": "none"
+ },
+ {
+  "name": "crow_to_fourlimbedstaff",
+  "fromPose": "Crow",
+  "toPose": "Four Limbed Staff",
+  "breath": "none"
+ },
+ {
+  "name": "standingkneetochest_to_standinghandtotoe",
+  "fromPose": "Standing Knee To Chest",
+  "toPose": "Standing Hand To Toe",
+  "breath": "none"
+ },
+ {
+  "name": "standingkneetochest_to_standingheadtokneepreparation",
+  "fromPose": "Standing Knee To Chest",
+  "toPose": "Standing Head To Knee Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "pigeonforwardbend_to_pigeonhalf",
+  "fromPose": "Pigeon Forward Bend",
+  "toPose": "Pigeon Half",
+  "breath": "none"
+ },
+ {
+  "name": "pigeonflying_to_tree",
+  "fromPose": "Pigeon Flying",
+  "toPose": "Tree",
+  "breath": "none"
+ },
+ {
+  "name": "standingheadtokneepreparation_to_standinghandtotoe",
+  "fromPose": "Standing Head To Knee Preparation",
+  "toPose": "Standing Hand To Toe",
+  "breath": "none"
+ },
+ {
+  "name": "standinghandtotoe_to_standinghandtotoeextended",
+  "fromPose": "Standing Hand To Toe",
+  "toPose": "Standing Hand To Toe Extended",
+  "breath": "none"
+ },
+ {
+  "name": "standinghandtotoeextended_to_mountain",
+  "fromPose": "Standing Hand To Toe Extended",
+  "toPose": "Mountain",
+  "breath": "none"
+ },
+ {
+  "name": "standinghandtotoeextended_to_standinghandtotoe",
+  "fromPose": "Standing Hand To Toe Extended",
+  "toPose": "Standing Hand To Toe",
+  "breath": "none"
+ },
+ {
+  "name": "supinespinaltwist_to_corpse",
+  "fromPose": "Supine Spinal Twist",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "windremoving_to_supinespinaltwist",
+  "fromPose": "Wind Removing",
+  "toPose": "Supine Spinal Twist",
+  "breath": "none"
+ },
+ {
+  "name": "pigeonfull_to_pigeonking",
+  "fromPose": "Pigeon Full",
+  "toPose": "Pigeon King",
+  "breath": "none"
+ },
+ {
+  "name": "pigeonking_to_kneepile",
+  "fromPose": "Pigeon King",
+  "toPose": "Knee Pile",
+  "breath": "none",
+  "soundName": "pigeonfull_to_kneepile",
+  "soundTwosided": false
+ },
+ {
+  "name": "pyramidkneeling_to_warriorIkneeling",
+  "fromPose": "Pyramid Kneeling",
+  "toPose": "Warrior I Kneeling",
+  "breath": "inhale"
+ },
+ {
+  "name": "pyramidkneeling_to_lungekneeling",
+  "fromPose": "Pyramid Kneeling",
+  "toPose": "Lunge Kneeling",
+  "breath": "inhale"
+ },
+ {
+  "name": "warriorIkneeling_to_pyramidkneeling",
+  "fromPose": "Warrior I Kneeling",
+  "toPose": "Pyramid Kneeling",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorIkneeling_to_lungekneeling",
+  "fromPose": "Warrior I Kneeling",
+  "toPose": "Lunge Kneeling",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorIkneeling_to_lungekneelingprayer",
+  "fromPose": "Warrior I Kneeling",
+  "toPose": "Lunge Kneeling Prayer",
+  "breath": "none",
+  "soundName": "mountainarmsup_to_mountain",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungekneeling_to_pyramidkneeling",
+  "fromPose": "Lunge Kneeling",
+  "toPose": "Pyramid Kneeling",
+  "breath": "exhale"
+ },
+ {
+  "name": "lungekneelingprayer_to_lungekneelingtwist",
+  "fromPose": "Lunge Kneeling Prayer",
+  "toPose": "Lunge Kneeling Twist",
+  "breath": "none",
+  "soundName": "warriorprayer_to_warriortwist",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungekneelingprayer_to_warriorIkneeling",
+  "fromPose": "Lunge Kneeling Prayer",
+  "toPose": "Warrior I Kneeling",
+  "breath": "none"
+ },
+ {
+  "name": "lungekneelingtwist_to_lungekneelingtwistextended",
+  "fromPose": "Lunge Kneeling Twist",
+  "toPose": "Lunge Kneeling Twist Extended",
+  "breath": "none",
+  "soundName": "warriortwist_to_warriortwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungekneelingtwist_to_lungekneelingprayer",
+  "fromPose": "Lunge Kneeling Twist",
+  "toPose": "Lunge Kneeling Prayer",
+  "breath": "none",
+  "soundName": "chairtwist_to_chairprayer",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungekneelingtwistextended_to_lungekneelingtwist",
+  "fromPose": "Lunge Kneeling Twist Extended",
+  "toPose": "Lunge Kneeling Twist",
+  "breath": "none",
+  "soundName": "warriortwistextended_to_warriortwist",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungekneelingtwistextended_to_lungekneelingtwistextendedbound",
+  "fromPose": "Lunge Kneeling Twist Extended",
+  "toPose": "Lunge Kneeling Twist Extended Bound",
+  "breath": "none",
+  "soundName": "chairtwistextended_to_chairtwistbind",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungekneelingtwistextendedbound_to_lungekneelingtwistextended",
+  "fromPose": "Lunge Kneeling Twist Extended Bound",
+  "toPose": "Lunge Kneeling Twist Extended",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_chairtwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungecrescent_to_lungeprayer",
+  "fromPose": "Lunge Crescent",
+  "toPose": "Lunge Prayer",
+  "breath": "none",
+  "soundName": "mountainarmsup_to_mountain",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungecrescent_to_warriorIII",
+  "fromPose": "Lunge Crescent",
+  "toPose": "Warrior III",
+  "breath": "exhale"
+ },
+ {
+  "name": "lungeprayer_to_lungetwist",
+  "fromPose": "Lunge Prayer",
+  "toPose": "Lunge Twist",
+  "breath": "none",
+  "soundName": "warriorprayer_to_warriortwist",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungeprayer_to_lungecrescent",
+  "fromPose": "Lunge Prayer",
+  "toPose": "Lunge Crescent",
+  "breath": "none"
+ },
+ {
+  "name": "lungetwist_to_lungetwistextended",
+  "fromPose": "Lunge Twist",
+  "toPose": "Lunge Twist Extended",
+  "breath": "none",
+  "soundName": "warriortwist_to_warriortwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungetwist_to_lungeprayer",
+  "fromPose": "Lunge Twist",
+  "toPose": "Lunge Prayer",
+  "breath": "none",
+  "soundName": "chairtwist_to_chairprayer",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungetwistextended_to_lungetwist",
+  "fromPose": "Lunge Twist Extended",
+  "toPose": "Lunge Twist",
+  "breath": "none",
+  "soundName": "warriortwistextended_to_warriortwist",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungetwistextended_to_lungetwistextendedbound",
+  "fromPose": "Lunge Twist Extended",
+  "toPose": "Lunge Twist Extended Bound",
+  "breath": "none",
+  "soundName": "chairtwistextended_to_chairtwistbind",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungetwistextendedbound_to_lungetwistextended",
+  "fromPose": "Lunge Twist Extended Bound",
+  "toPose": "Lunge Twist Extended",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_chairtwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "boxneutral_to_catbalance",
+  "fromPose": "Box Neutral",
+  "toPose": "Cat Balance",
+  "breath": "none"
+ },
+ {
+  "name": "catbalance_to_boxneutral",
+  "fromPose": "Cat Balance",
+  "toPose": "Box Neutral",
+  "breath": "none"
+ },
+ {
+  "name": "catbalance_to_bowhalf",
+  "fromPose": "Cat Balance",
+  "toPose": "Bow Half",
+  "breath": "none"
+ },
+ {
+  "name": "bowhalf_to_boxneutral",
+  "fromPose": "Bow Half",
+  "toPose": "Box Neutral",
+  "breath": "none"
+ },
+ {
+  "name": "bowhalf_to_catbalance",
+  "fromPose": "Bow Half",
+  "toPose": "Cat Balance",
+  "breath": "none"
+ },
+ {
+  "name": "seatedonheelsprayertwist_to_seatedonheelstwistbound",
+  "fromPose": "Seated On Heels Prayer Twist",
+  "toPose": "Seated On Heels Twist Bound",
+  "breath": "none",
+  "soundName": "chairtwistextended_to_chairtwistbind",
+  "soundTwosided": false
+ },
+ {
+  "name": "seatedonheelstwistbound_to_seatedonheelsprayertwist",
+  "fromPose": "Seated On Heels Twist Bound",
+  "toPose": "Seated On Heels Prayer Twist",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_chairtwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "mountain_to_standingkneetochest",
+  "fromPose": "Mountain",
+  "toPose": "Standing Knee To Chest",
+  "breath": "none"
+ },
+ {
+  "name": "pigeonhalf_to_pigeonforwardbend",
+  "fromPose": "Pigeon Half",
+  "toPose": "Pigeon Forward Bend",
+  "breath": "none"
+ },
+ {
+  "name": "herorecliningextended_to_hero",
+  "fromPose": "Hero Reclining Extended",
+  "toPose": "Hero",
+  "breath": "none"
+ },
+ {
+  "name": "heroreclining_to_herorecliningextended",
+  "fromPose": "Hero Reclining",
+  "toPose": "Hero Reclining Extended",
+  "breath": "none"
+ },
+ {
+  "name": "seatedonheelsprayer_to_seatedonheelsprayertwist",
+  "fromPose": "Seated On Heels Prayer",
+  "toPose": "Seated On Heels Prayer Twist",
+  "breath": "none",
+  "soundName": "warriorprayer_to_warriortwist",
+  "soundTwosided": true
+ },
+ {
+  "name": "seatedonheelsprayertwist_to_sidecrowpreparation",
+  "fromPose": "Seated On Heels Prayer Twist",
+  "toPose": "Crow Side Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "seatedonheelsprayertwist_to_seatedonheelsprayer",
+  "fromPose": "Seated On Heels Prayer Twist",
+  "toPose": "Seated On Heels Prayer",
+  "breath": "none",
+  "soundName": "chairtwist_to_chairprayer",
+  "soundTwosided": false
+ },
+ {
+  "name": "sidecrowpreparation_to_sidecrow",
+  "fromPose": "Crow Side Preparation",
+  "toPose": "Crow Side",
+  "breath": "none"
+ },
+ {
+  "name": "sidecrowpreparation_to_seatedonheelsprayertwist",
+  "fromPose": "Crow Side Preparation",
+  "toPose": "Seated On Heels Prayer Twist",
+  "breath": "none"
+ },
+ {
+  "name": "sidecrow_to_sidecrowpreparation",
+  "fromPose": "Crow Side",
+  "toPose": "Crow Side Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "supinepigeon_to_corpse",
+  "fromPose": "Supine Pigeon",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "corpse_to_supinepigeon",
+  "fromPose": "Corpse",
+  "toPose": "Supine Pigeon",
+  "breath": "none"
+ },
+ {
+  "name": "corpse_to_supinehandtotoe",
+  "fromPose": "Corpse",
+  "toPose": "Supine Hand To Toe",
+  "breath": "none"
+ },
+ {
+  "name": "corpse_to_supineboundangle",
+  "fromPose": "Corpse",
+  "toPose": "Supine Bound Angle",
+  "breath": "none"
+ },
+ {
+  "name": "supinehandtotoe_to_supinehandtotoeextended",
+  "fromPose": "Supine Hand To Toe",
+  "toPose": "Supine Hand To Toe Extended",
+  "breath": "none"
+ },
+ {
+  "name": "supinehandtotoe_to_corpse",
+  "fromPose": "Supine Hand To Toe",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "supinehandtotoe_to_corpse",
+  "fromPose": "Supine Hand To Toe Extended",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "supineboundangle_to_corpse",
+  "fromPose": "Supine Bound Angle",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "lordofthedance_to_lordofthedance",
+  "fromPose": "Lord Of The Dance",
+  "toPose": "Lord Of The Dance Full",
+  "breath": "none"
+ },
+ {
+  "name": "lordofthedancefull_to_mountain",
+  "fromPose": "Lord Of The Dance Full",
+  "toPose": "Mountain",
+  "breath": "none"
+ },
+ {
+  "name": "warriortwistextended_to_warriortwistextendedbound",
+  "fromPose": "Warrior Twist Extended",
+  "toPose": "Warrior Twist Extended Bound",
+  "breath": "none",
+  "soundName": "chairtwistextended_to_chairtwistbind",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriortwistextendedbound_to_warriortwistextended",
+  "fromPose": "Warrior Twist Extended Bound",
+  "toPose": "Warrior Twist Extended",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_chairtwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "staff_to_table",
+  "fromPose": "Staff",
+  "toPose": "Table",
+  "breath": "none"
+ },
+ {
+  "name": "table_to_staff",
+  "fromPose": "Table",
+  "toPose": "Staff",
+  "breath": "none"
+ },
+ {
+  "name": "table_to_plankupward",
+  "fromPose": "Table",
+  "toPose": "Plank Upward",
+  "breath": "none"
+ },
+ {
+  "name": "blissfulbaby_to_corpse",
+  "fromPose": "Blissful Baby",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "boatfull_to_corse",
+  "fromPose": "Boat Full",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "boathalf_to_corse",
+  "fromPose": "Boat Half",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "boathalf_to_boatfull",
+  "fromPose": "Boat Half",
+  "toPose": "Boat Full",
+  "breath": "none"
+ },
+ {
+  "name": "bow_to_corpsefront",
+  "fromPose": "Bow",
+  "toPose": "Corpse Front",
+  "breath": "none"
+ },
+ {
+  "name": "bow_to_bowpreparation",
+  "fromPose": "Bow",
+  "toPose": "Bow Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "bowpreparation_to_bow",
+  "fromPose": "Bow Preparation",
+  "toPose": "Bow",
+  "breath": "none"
+ },
+ {
+  "name": "bowpreparation_to_corpsefront",
+  "fromPose": "Bow Preparation",
+  "toPose": "Corpse Front",
+  "breath": "none"
+ },
+ {
+  "name": "boxhandtoankle_to_boxneutral",
+  "fromPose": "Box Hand To Ankle",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "boxhandtoankle_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "boxneutral_to_boxhandtoankle",
+  "fromPose": "Box Neutral",
+  "toPose": "Box Hand To Ankle",
+  "breath": "none",
+  "soundName": "boxneutral_to_boxhandtoankle",
+  "soundTwosided": true
+ },
+ {
+  "name": "boxneutral_to_child",
+  "fromPose": "Box Neutral",
+  "toPose": "Child",
+  "breath": "none",
+  "soundName": "boxneutral_to_child",
+  "soundTwosided": false
+ },
+ {
+  "name": "boxneutral_to_childwide",
+  "fromPose": "Box Neutral",
+  "toPose": "Child Wide",
+  "breath": "none",
+  "soundName": "boxneutral_to_childwide",
+  "soundTwosided": false
+ },
+ {
+  "name": "boxneutral_to_dog",
+  "fromPose": "Box Neutral",
+  "toPose": "Dog",
+  "breath": "inhale"
+ },
+ {
+  "name": "boxneutral_to_dolphin",
+  "fromPose": "Box Neutral",
+  "toPose": "Dolphin",
+  "breath": "none",
+  "soundName": "boxneutral_to_dolphin",
+  "soundTwosided": false
+ },
+ {
+  "name": "boxneutral_to_downwarddog",
+  "fromPose": "Box Neutral",
+  "toPose": "Downward Dog",
+  "breath": "exhale",
+  "soundName": "boxneutral_to_downwarddog",
+  "soundTwosided": false
+ },
+ {
+  "name": "boxneutral_to_pigeonhalf",
+  "fromPose": "Box Neutral",
+  "toPose": "Pigeon Half",
+  "breath": "none",
+  "soundName": "boxneutral_to_pigeonhalf",
+  "soundTwosided": true
+ },
+ {
+  "name": "boxneutral_to_seatedforwardbendpreparation",
+  "fromPose": "Box Neutral",
+  "toPose": "Seated Forward Bend Preparation",
+  "breath": "none",
+  "soundName": "boxneutral_to_seatedforwardbendpreparation",
+  "soundTwosided": false
+ },
+ {
+  "name": "boxneutral_to_puppyextened",
+  "fromPose": "Box Neutral",
+  "toPose": "Puppy Extended",
+  "breath": "none"
+ },
+ {
+  "name": "boxneutral_to_corpsefront",
+  "fromPose": "Box Neutral",
+  "toPose": "Corpse Front",
+  "breath": "none"
+ },
+ {
+  "name": "bridge_to_corpse",
+  "fromPose": "Bridge",
+  "toPose": "Corpse",
+  "breath": "none",
+  "soundName": "wheel_to_corpse",
+  "soundTwosided": false
+ },
+ {
+  "name": "bridge_to_wheel",
+  "fromPose": "Bridge",
+  "toPose": "Wheel",
+  "breath": "none",
+  "soundName": "corpse_to_wheel",
+  "soundTwosided": false
+ },
+ {
+  "name": "camel_to_hero",
+  "fromPose": "Camel",
+  "toPose": "Hero",
+  "breath": "none"
+ },
+ {
+  "name": "camel_to_pigeon",
+  "fromPose": "Camel",
+  "toPose": "Pigeon",
+  "breath": "none"
+ },
+ {
+  "name": "cat_to_dog",
+  "fromPose": "Cat",
+  "toPose": "Dog",
+  "breath": "inhale"
+ },
+ {
+  "name": "cat_to_boxneutral",
+  "fromPose": "Cat",
+  "toPose": "Box Neutral",
+  "breath": "inhale",
+  "soundName": "cat_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "chair_to_forwardbend",
+  "fromPose": "Chair",
+  "toPose": "Forward Bend",
+  "breath": "exhale"
+ },
+ {
+  "name": "chair_to_forwardbenddeep",
+  "fromPose": "Chair",
+  "toPose": "Forward Bend Deep",
+  "breath": "exhale",
+  "soundName": "chair_to_forwardbenddeep",
+  "soundTwosided": false
+ },
+ {
+  "name": "chair_to_chairprayer",
+  "fromPose": "Chair",
+  "toPose": "Chair Prayer",
+  "breath": "none",
+  "soundName": "chair_to_chairprayer",
+  "soundTwosided": false
+ },
+ {
+  "name": "chair_to_mountain",
+  "fromPose": "Chair",
+  "toPose": "Mountain",
+  "breath": "exhale"
+ },
+ {
+  "name": "chairprayer_to_chair",
+  "fromPose": "Chair Prayer",
+  "toPose": "Chair",
+  "breath": "inhale"
+ },
+ {
+  "name": "chairprayer_to_chairtwist",
+  "fromPose": "Chair Prayer",
+  "toPose": "Chair Twist",
+  "breath": "none",
+  "soundName": "chairprayer_to_chairtwist",
+  "soundTwosided": true
+ },
+ {
+  "name": "chairtwist_to_chairprayer",
+  "fromPose": "Chair Twist",
+  "toPose": "Chair Prayer",
+  "breath": "none",
+  "soundName": "chairtwist_to_chairprayer",
+  "soundTwosided": false
+ },
+ {
+  "name": "chairtwist_to_chairtwistextended",
+  "fromPose": "Chair Twist",
+  "toPose": "Chair Twist Extended",
+  "breath": "none",
+  "soundName": "chairtwist_to_chairtwistextended",
+  "soundTwosided": true
+ },
+ {
+  "name": "chairtwistextended_to_chairtwist",
+  "fromPose": "Chair Twist Extended",
+  "toPose": "Chair Twist",
+  "breath": "none",
+  "soundName": "chairtwistextended_to_chairtwist",
+  "soundTwosided": false
+ },
+ {
+  "name": "chairtwistextended_to_chairtwistbind",
+  "fromPose": "Chair Twist Extended",
+  "toPose": "Chair Twist Bind",
+  "breath": "none",
+  "soundName": "chairtwistextended_to_chairtwistbind",
+  "soundTwosided": false
+ },
+ {
+  "name": "chairtwistbind_to_chairtwistextended",
+  "fromPose": "Chair Twist Bind",
+  "toPose": "Chair Twist Extended",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_chairtwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "chairtwistbind_to_chairtwistbindup",
+  "fromPose": "Chair Twist Bind",
+  "toPose": "Chair Twist Bind Up",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_chairtwistbindup",
+  "soundTwosided": true
+ },
+ {
+  "name": "chairtwistbind_to_lungebind",
+  "fromPose": "Chair Twist Bind",
+  "toPose": "Lunge Bind",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_lungebind",
+  "soundTwosided": true
+ },
+ {
+  "name": "chairtwistbindup_to_chairtwistbind",
+  "fromPose": "Chair Twist Bind Up",
+  "toPose": "Chair Twist Bind",
+  "breath": "none",
+  "soundName": "chairtwistbindup_to_chairtwistbind",
+  "soundTwosided": true
+ },
+ {
+  "name": "child_to_upwarddog",
+  "fromPose": "Child",
+  "toPose": "Upward Dog",
+  "breath": "inhale"
+ },
+ {
+  "name": "child_to_boxneutral",
+  "fromPose": "Child",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "childwide_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "childwide_to_childwidesidelean",
+  "fromPose": "Child Wide",
+  "toPose": "Child Wide Side Lean",
+  "breath": "exhale",
+  "soundName": "childwide_to_childwidesidelean",
+  "soundTwosided": true
+ },
+ {
+  "name": "childwide_to_boxneutral",
+  "fromPose": "Child Wide",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "childwide_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "childwidesidelean_to_childwide",
+  "fromPose": "Child Wide Side Lean",
+  "toPose": "Child Wide",
+  "breath": "inhale",
+  "soundName": "childwidesidelean_to_childwide",
+  "soundTwosided": false
+ },
+ {
+  "name": "childwidestart_to_childwidestart",
+  "fromPose": "Child Wide Start",
+  "toPose": "Child Wide Start",
+  "breath": "none"
+ },
+ {
+  "name": "childwidestart_to_childwide",
+  "fromPose": "Child Wide Start",
+  "toPose": "Child Wide",
+  "breath": "none",
+  "soundName": "childwidestart_to_childwide",
+  "soundTwosided": false
+ },
+ {
+  "name": "crow_to_crowflying",
+  "fromPose": "Crow",
+  "toPose": "Crow Flying",
+  "breath": "none",
+  "soundName": "crow_to_crowflying",
+  "soundTwosided": true
+ },
+ {
+  "name": "crow_to_seatedonheelshandsonmatopenedknees",
+  "fromPose": "Crow",
+  "toPose": "Seated On Heels Hands On Mat Opened Knees",
+  "breath": "exhale",
+  "soundName": "crow_to_seatedonheelshandsonmatopenedknees",
+  "soundTwosided": false
+ },
+ {
+  "name": "crowflying_to_crow",
+  "fromPose": "Crow Flying",
+  "toPose": "Crow",
+  "breath": "none",
+  "soundName": "downwarddoglegup_to_downwarddog",
+  "soundTwosided": true
+ },
+ {
+  "name": "cobra_to_corpsefront",
+  "fromPose": "Cobra",
+  "toPose": "Corpse Front",
+  "breath": "none"
+ },
+ {
+  "name": "corpse_to_bridge",
+  "fromPose": "Corpse",
+  "toPose": "Bridge",
+  "breath": "none",
+  "soundName": "corpse_to_bridge",
+  "soundTwosided": false
+ },
+ {
+  "name": "corpse_to_corpsedoublelegraise",
+  "fromPose": "Corpse",
+  "toPose": "Corpse Double Leg Raise",
+  "breath": "none",
+  "soundName": "corpse_to_corpsedoublelegraise",
+  "soundTwosided": false
+ },
+ {
+  "name": "corpse_to_savasana",
+  "fromPose": "Corpse",
+  "toPose": "Savasana",
+  "breath": "none",
+  "soundName": "corpse_to_savasana",
+  "soundTwosided": false
+ },
+ {
+  "name": "corpse_to_turtle",
+  "fromPose": "Corpse",
+  "toPose": "Turtle",
+  "breath": "none",
+  "soundName": "corpse_to_turtle",
+  "soundTwosided": false
+ },
+ {
+  "name": "corpse_to_wheel",
+  "fromPose": "Corpse",
+  "toPose": "Wheel",
+  "breath": "none",
+  "soundName": "corpse_to_wheel",
+  "soundTwosided": false
+ },
+ {
+  "name": "corpse_to_windremoving",
+  "fromPose": "Corpse",
+  "toPose": "Wind Removing",
+  "breath": "none"
+ },
+ {
+  "name": "corpse_to_blissfulbaby",
+  "fromPose": "Corpse",
+  "toPose": "Blissful Baby",
+  "breath": "none"
+ },
+ {
+  "name": "corpse_to_boathalf",
+  "fromPose": "Corpse",
+  "toPose": "Boat Half",
+  "breath": "none"
+ },
+ {
+  "name": "corpse_to_boatfull",
+  "fromPose": "Corpse",
+  "toPose": "Boat Full",
+  "breath": "none"
+ },
+ {
+  "name": "corpse_to_fish",
+  "fromPose": "Corpse",
+  "toPose": "Fish",
+  "breath": "none"
+ },
+ {
+  "name": "corpsedoublelegraise_to_corpse",
+  "fromPose": "Corpse Double Leg Raise",
+  "toPose": "Corpse",
+  "breath": "none",
+  "soundName": "corpsedoublelegraise_to_corpse",
+  "soundTwosided": false
+ },
+ {
+  "name": "corpsedoublelegraise_to_shoulderstandsupported",
+  "fromPose": "Corpse Double Leg Raise",
+  "toPose": "Shoulderstand Supported",
+  "breath": "none",
+  "soundName": "corpsedoublelegraise_to_shoulderstandsupported",
+  "soundTwosided": false
+ },
+ {
+  "name": "corpsefront_to_boxneutral",
+  "fromPose": "Corpse Front",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "childwide_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "corpsefront_to_bowpreparation",
+  "fromPose": "Corpse Front",
+  "toPose": "Bow Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "corpsefront_to_locust",
+  "fromPose": "Corpse Front",
+  "toPose": "Locust",
+  "breath": "none"
+ },
+ {
+  "name": "corpsefront_to_locusthalf",
+  "fromPose": "Corpse Front",
+  "toPose": "Locust Half",
+  "breath": "none"
+ },
+ {
+  "name": "corpsefront_to_cobra",
+  "fromPose": "Corpse Front",
+  "toPose": "Cobra",
+  "breath": "none"
+ },
+ {
+  "name": "corpsefront_to_plank",
+  "fromPose": "Corpse Front",
+  "toPose": "Plank",
+  "breath": "none"
+ },
+ {
+  "name": "corpsefront_to_sphinx",
+  "fromPose": "Corpse Front",
+  "toPose": "Sphinx",
+  "breath": "none"
+ },
+ {
+  "name": "deafman_to_corpse",
+  "fromPose": "Deaf Man",
+  "toPose": "Corpse",
+  "breath": "none",
+  "soundName": "deafman_to_corpse",
+  "soundTwosided": false
+ },
+ {
+  "name": "dolphin_to_dolphinlegup",
+  "fromPose": "Dolphin",
+  "toPose": "Dolphin Leg Up",
+  "breath": "none",
+  "soundName": "wheel_to_wheellegup",
+  "soundTwosided": true
+ },
+ {
+  "name": "dolphin_to_featheredpeacock",
+  "fromPose": "Dolphin",
+  "toPose": "Feathered Peacock",
+  "breath": "none",
+  "soundName": "dolphin_to_featheredpeacock",
+  "soundTwosided": true
+ },
+ {
+  "name": "dolphin_to_splitswide",
+  "fromPose": "Dolphin",
+  "toPose": "Splits Wide",
+  "breath": "none"
+ },
+ {
+  "name": "dolphinlegup_to_dolphin",
+  "fromPose": "Dolphin Leg Up",
+  "toPose": "Dolphin",
+  "breath": "none",
+  "soundName": "wheellegup_to_wheel",
+  "soundTwosided": true
+ },
+ {
+  "name": "dog_to_cat",
+  "fromPose": "Dog",
+  "toPose": "Cat",
+  "breath": "exhale"
+ },
+ {
+  "name": "downwarddog_to_boxneutral",
+  "fromPose": "Downward Dog",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "downwarddog_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddog_to_downwarddogontoes",
+  "fromPose": "Downward Dog",
+  "toPose": "Downward Dog On Toes",
+  "breath": "inhale",
+  "soundName": "downwarddog_to_downwarddogontoes",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddog_to_downwarddogbentknees",
+  "fromPose": "Downward Dog",
+  "toPose": "Downward Dog Bent Knees",
+  "breath": "inhale",
+  "soundName": "downwarddog_to_downwarddogbentknees",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddog_to_downwarddoghandtoankle",
+  "fromPose": "Downward Dog",
+  "toPose": "Downward Dog Hand To Ankle",
+  "breath": "none",
+  "soundName": "downwarddog_to_downwarddoghandtoankle",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddog_to_downwarddoglegup",
+  "fromPose": "Downward Dog",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "inhale",
+  "soundName": "downwarddog_to_downwarddoglegup",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddog_to_headstandtripod",
+  "fromPose": "Downward Dog",
+  "toPose": "Headstand Tripod",
+  "breath": "none"
+ },
+ {
+  "name": "downwarddog_to_plank",
+  "fromPose": "Downward Dog",
+  "toPose": "Plank",
+  "breath": "none",
+  "soundName": "downwarddog_to_plank",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddog_to_plankkneeling",
+  "fromPose": "Downward Dog",
+  "toPose": "Plank Kneeling",
+  "breath": "none",
+  "soundName": "downwarddog_to_plankkneeling",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddog_to_splitswide",
+  "fromPose": "Downward Dog",
+  "toPose": "Splits Wide",
+  "breath": "none"
+ },
+ {
+  "name": "downwarddog_to_warriorI",
+  "fromPose": "Downward Dog",
+  "toPose": "Warrior I",
+  "breath": "inhale"
+ },
+ {
+  "name": "downwarddog_to_forwardbendhalfway",
+  "fromPose": "Downward Dog",
+  "toPose": "Forward Bend Half Way",
+  "breath": "inhale"
+ },
+ {
+  "name": "downwarddogbentknees_to_downwarddog",
+  "fromPose": "Downward Dog Bent Knees",
+  "toPose": "Downward Dog",
+  "breath": "exhale"
+ },
+ {
+  "name": "downwarddogbentknees_to_forwardbend-step",
+  "fromPose": "Downward Dog Bent Knees",
+  "toPose": "Forward Bend",
+  "breath": "exhale",
+  "soundName": "downwarddogbentknees_to_forwardbend-step",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddogbentknees_to_forwardbend-float",
+  "fromPose": "Downward Dog Bent Knees",
+  "toPose": "Forward Bend",
+  "breath": "exhale",
+  "soundName": "downwarddogbentknees_to_forwardbend-float",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddogbentknees_to_lungekneeling",
+  "fromPose": "Downward Dog Bent Knees",
+  "toPose": "Lunge Kneeling",
+  "breath": "exhale",
+  "soundName": "downwarddogbentknees_to_lungekneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddogbentknees_to_lunge",
+  "fromPose": "Downward Dog Bent Knees",
+  "toPose": "Lunge",
+  "breath": "exhale",
+  "soundName": "downwarddogbentknees_to_lunge",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddogbentknees_to_downwarddogkneetoforehead",
+  "fromPose": "Downward Dog Bent Knees",
+  "toPose": "Downward Dog Knee To Forehead",
+  "breath": "exhale"
+ },
+ {
+  "name": "downwarddoghamstring_to_downwarddogontoes",
+  "fromPose": "Downward Dog Hamstring",
+  "toPose": "Downward Dog On Toes",
+  "breath": "inhale",
+  "soundName": "downwarddog_to_downwarddogontoes",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddoghandtoankle_to_downwarddog",
+  "fromPose": "Downward Dog Hand To Ankle",
+  "toPose": "Downward Dog",
+  "breath": "none",
+  "soundName": "downwarddoghandtoankle_to_downwarddog",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddogkneetoforehead_to_planklegup",
+  "fromPose": "Downward Dog Knee To Forehead",
+  "toPose": "Plank Leg Up",
+  "breath": "inhale",
+  "soundName": "downwarddogkneetoforehead_to_planklegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddogkneetoforehead_to_planklegup-pushup",
+  "fromPose": "Downward Dog Knee To Forehead",
+  "toPose": "Plank Leg Up",
+  "breath": "inhale",
+  "soundName": "downwarddogkneetoforehead_to_planklegup-pushup",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddogkneetoforehead_to_downwarddoglegup",
+  "fromPose": "Downward Dog Knee To Forehead",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "inhale"
+ },
+ {
+  "name": "downwarddogkneetoforehead_to_lunge",
+  "fromPose": "Downward Dog Knee To Forehead",
+  "toPose": "Lunge",
+  "breath": "none"
+ },
+ {
+  "name": "downwarddogkneetoforehead_to_lungekneeling",
+  "fromPose": "Downward Dog Knee To Forehead",
+  "toPose": "Lunge Kneeling",
+  "breath": "none"
+ },
+ {
+  "name": "downwarddogkneetoforeheadkneeling_to_planklegupkneeling",
+  "fromPose": "Downward Dog Knee To Forehead Kneeling",
+  "toPose": "Plank Leg Up Kneeling",
+  "breath": "inhale",
+  "soundName": "downwarddogkneetoforehead_to_planklegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddoglegup_to_downwarddog",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Downward Dog",
+  "breath": "none",
+  "soundName": "downwarddoglegup_to_downwarddog",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddoglegup_to_downwarddoglegupstackhips",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Downward Dog Leg Up Stack Hips",
+  "breath": "exhale",
+  "soundName": "downwarddoglegup_to_downwarddoglegupstackhips",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddoglegup_to_lunge",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Lunge",
+  "breath": "exhale",
+  "soundName": "downwarddoglegup_to_lunge",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddoglegup_to_lungekneeling",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Lunge Kneeling",
+  "breath": "exhale"
+ },
+ {
+  "name": "downwarddoglegup_to_lungehandsonmat",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Lunge Hands On Mat",
+  "breath": "inhale"
+ },
+ {
+  "name": "downwarddoglegup_to_lungehandsonmatflying",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Lunge Hands On Mat Flying",
+  "breath": "inhale",
+  "soundName": "downwarddoglegup_to_lungehandsonmatflying",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddoglegup_to_pigeonhalf",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Pigeon Half",
+  "breath": "exhale",
+  "soundName": "boxneutral_to_pigeonhalf",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddoglegup_to_planklegup",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Plank Leg Up",
+  "breath": "inhale",
+  "soundName": "downwarddoglegup_to_planklegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddoglegup_to_planklegup-pushup",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Plank Leg Up",
+  "breath": "inhale",
+  "soundName": "downwarddogkneetoforehead_to_planklegup-pushup",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddoglegup_to_planklegupkneeling",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Plank Leg Up Kneeling",
+  "breath": "inhale",
+  "soundName": "downwarddoglegup_to_planklegupkneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddoglegup_to_splitsfront",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Splits Front",
+  "breath": "exhale"
+ },
+ {
+  "name": "downwarddoglegup_to_downwarddogkneetoforehead",
+  "fromPose": "Downward Dog Leg Up",
+  "toPose": "Downward Dog Knee To Forehead",
+  "breath": "exhale"
+ },
+ {
+  "name": "downwarddoglegupkneeling_to_planklegupkneeling",
+  "fromPose": "Downward Dog Leg Up Kneeling",
+  "toPose": "Plank Leg Up Kneeling",
+  "breath": "inhale",
+  "soundName": "downwarddoglegup_to_planklegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddoglegupstackhips_to_wheelflip",
+  "fromPose": "Downward Dog Leg Up Stack Hips",
+  "toPose": "Wheel Flip",
+  "breath": "none",
+  "soundName": "downwarddoglegupstackhips_to_wheelflip",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddoglegupstackhips_to_downwarddoglegup",
+  "fromPose": "Downward Dog Leg Up Stack Hips",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "none",
+  "soundName": "downwarddoglegupstackhips_to_downwarddoglegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddogontoes_to_downwarddog",
+  "fromPose": "Downward Dog On Toes",
+  "toPose": "Downward Dog",
+  "breath": "exhale",
+  "soundName": "downwarddogontoes_to_downwarddog",
+  "soundTwosided": false
+ },
+ {
+  "name": "downwarddogontoes_to_downwarddoghamstring",
+  "fromPose": "Downward Dog On Toes",
+  "toPose": "Downward Dog Hamstring",
+  "breath": "exhale",
+  "soundName": "downwarddogontoes_to_downwarddoghamstring",
+  "soundTwosided": true
+ },
+ {
+  "name": "downwarddogstart_to_downwarddogstart",
+  "fromPose": "Downward Dog Start",
+  "toPose": "Downward Dog Start",
+  "breath": "none"
+ },
+ {
+  "name": "downwarddogstart_to_downwarddog",
+  "fromPose": "Downward Dog Start",
+  "toPose": "Downward Dog",
+  "breath": "none",
+  "soundName": "downwarddogstart_to_downwarddog",
+  "soundTwosided": false
+ },
+ {
+  "name": "eagle_to_mountain",
+  "fromPose": "Eagle",
+  "toPose": "Mountain",
+  "breath": "none"
+ },
+ {
+  "name": "featheredpeacock_to_dolphin",
+  "fromPose": "Feathered Peacock",
+  "toPose": "Dolphin",
+  "breath": "none",
+  "soundName": "featheredpeacock_to_dolphin",
+  "soundTwosided": false
+ },
+ {
+  "name": "featheredpeacock_to_scorpion",
+  "fromPose": "Feathered Peacock",
+  "toPose": "Scorpion",
+  "breath": "none"
+ },
+ {
+  "name": "firefly_to_splitswide",
+  "fromPose": "Firefly",
+  "toPose": "Splits Wide",
+  "breath": "none"
+ },
+ {
+  "name": "fish_to_corpse",
+  "fromPose": "Fish",
+  "toPose": "Corpse",
+  "breath": "none"
+ },
+ {
+  "name": "forwardbend_to_chair",
+  "fromPose": "Forward Bend",
+  "toPose": "Chair",
+  "breath": "inhale"
+ },
+ {
+  "name": "forwardbend_to_lunge",
+  "fromPose": "Forward Bend",
+  "toPose": "Lunge",
+  "breath": "none",
+  "soundName": "forwardbend_to_lunge",
+  "soundTwosided": true
+ },
+ {
+  "name": "forwardbend_to_lungekneeling",
+  "fromPose": "Forward Bend",
+  "toPose": "Lunge Kneeling",
+  "breath": "none",
+  "soundName": "forwardbend_to_lungekneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "forwardbend_to_forwardbendhalfway",
+  "fromPose": "Forward Bend",
+  "toPose": "Forward Bend Half Way",
+  "breath": "inhale",
+  "soundName": "forwardbend_to_forwardbendhalfway",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbend_to_mountainarmsup",
+  "fromPose": "Forward Bend",
+  "toPose": "Mountain Arms Up",
+  "breath": "inhale",
+  "soundName": "forwardbend_to_mountainarmsup",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbend_to_splitsstanding",
+  "fromPose": "Forward Bend",
+  "toPose": "Splits Standing",
+  "breath": "inhale"
+ },
+ {
+  "name": "forwardbenddeep_to_chair",
+  "fromPose": "Forward Bend Deep",
+  "toPose": "Chair",
+  "breath": "inhale",
+  "soundName": "forwardbenddeep_to_chair",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbenddeep_to_forwardbendhalfway",
+  "fromPose": "Forward Bend Deep",
+  "toPose": "Forward Bend Half Way",
+  "breath": "inhale",
+  "soundName": "forwardbend_to_forwardbendhalfway",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbenddeep_to_mountainarmsup",
+  "fromPose": "Forward Bend Deep",
+  "toPose": "Mountain Arms Up",
+  "breath": "inhale",
+  "soundName": "forwardbend_to_mountainarmsup",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbendhalfway_to_forwardbenddeep",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Forward Bend Deep",
+  "breath": "exhale",
+  "soundName": "forwardbendhalfway_to_forwardbenddeep",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbendhalfway_to_forwardbend",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Forward Bend",
+  "breath": "exhale"
+ },
+ {
+  "name": "forwardbendhalfway_to_gorilla",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Gorilla",
+  "breath": "exhale"
+ },
+ {
+  "name": "forwardbendhalfway_to_plank",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Plank",
+  "breath": "exhale",
+  "soundName": "downwarddog_to_plank",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbendhalfway_to_plankkneeling",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Plank Kneeling",
+  "breath": "exhale",
+  "soundName": "downwarddog_to_plankkneeling",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbendhalfway_to_fourlimbedstaff-step",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Four Limbed Staff",
+  "breath": "exhale",
+  "soundName": "forwardbendhalfway_to_fourlimbedstaff-step",
+  "soundTwosided": true
+ },
+ {
+  "name": "forwardbendhalfway_to_fourlimbedstaff-float",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Four Limbed Staff",
+  "breath": "exhale",
+  "soundName": "forwardbendhalfway_to_fourlimbedstaff-float",
+  "soundTwosided": false
+ },
+ {
+  "name": "forwardbendhalfway_to_lunge",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Lunge",
+  "breath": "exhale",
+  "soundName": "forwardbend_to_lunge",
+  "soundTwosided": true
+ },
+ {
+  "name": "forwardbendhalfway_to_lungekneeling",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Lunge Kneeling",
+  "breath": "exhale",
+  "soundName": "forwardbend_to_lungekneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "forwardbendhalfway_to_seatedonheelsprayer",
+  "fromPose": "Forward Bend Half Way",
+  "toPose": "Seated On Heels Prayer",
+  "breath": "exhale",
+  "soundName": "forwardbendhalfway_to_seatedonheelsprayer",
+  "soundTwosided": false
+ },
+ {
+  "name": "fourlimbedstaff_to_upwarddog",
+  "fromPose": "Four Limbed Staff",
+  "toPose": "Upward Dog",
+  "breath": "inhale",
+  "soundName": "fourlimbedstaff_to_upwarddog",
+  "soundTwosided": false
+ },
+ {
+  "name": "halfmoon_to_warriorII",
+  "fromPose": "Half Moon",
+  "toPose": "Warrior II",
+  "breath": "none"
+ },
+ {
+  "name": "halfmoon_to_forwardbend",
+  "fromPose": "Half Moon",
+  "toPose": "Forward Bend",
+  "breath": "none"
+ },
+ {
+  "name": "halfmoon_to_splitsstanding",
+  "fromPose": "Half Moon",
+  "toPose": "Splits Standing",
+  "breath": "none"
+ },
+ {
+  "name": "halfmoonrevolved_to_splitsstanding",
+  "fromPose": "Half Moon Revolved",
+  "toPose": "Splits Standing",
+  "breath": "none"
+ },
+ {
+  "name": "handstand_to_handstandscorpion",
+  "fromPose": "Handstand",
+  "toPose": "Handstand Scorpion",
+  "breath": "none"
+ },
+ {
+  "name": "handstand_to_handstandsplits",
+  "fromPose": "Handstand",
+  "toPose": "Handstand Splits",
+  "breath": "none"
+ },
+ {
+  "name": "handstand_to_fourlimbedstaff",
+  "fromPose": "Handstand",
+  "toPose": "Four Limbed Staff",
+  "breath": "none"
+ },
+ {
+  "name": "handstand_to_lungehandsonmatflying",
+  "fromPose": "Handstand",
+  "toPose": "Lunge Hands On Mat Flying",
+  "breath": "none"
+ },
+ {
+  "name": "handstandscorpion_to_handstand",
+  "fromPose": "Handstand Scorpion",
+  "toPose": "Handstand",
+  "breath": "none"
+ },
+ {
+  "name": "handstandsplits_to_handstand",
+  "fromPose": "Handstand Splits",
+  "toPose": "Handstand",
+  "breath": "none"
+ },
+ {
+  "name": "headstandsupportedpreparation_to_headstandsupported",
+  "fromPose": "Headstand Supported Preparation",
+  "toPose": "Headstand Supported",
+  "breath": "none"
+ },
+ {
+  "name": "headstandtripod_to_headstandtripodkneesonelbows",
+  "fromPose": "Headstand Tripod",
+  "toPose": "Headstand Tripod Knees On Elbows",
+  "breath": "none",
+  "soundName": "headstandtripod_to_headstandtripodkneesonelbows",
+  "soundTwosided": false
+ },
+ {
+  "name": "headstandtripod_to_headstandtripodspirallegs",
+  "fromPose": "Headstand Tripod",
+  "toPose": "Headstand Tripod Spiral Legs",
+  "breath": "none",
+  "soundName": "headstandtripod_to_headstandtripodspirallegs",
+  "soundTwosided": false
+ },
+ {
+  "name": "headstandtripod_to_downwarddog",
+  "fromPose": "Headstand Tripod",
+  "toPose": "Downward Dog",
+  "breath": "none"
+ },
+ {
+  "name": "headstandtripodkneesonelbows_to_headstandtripod",
+  "fromPose": "Headstand Tripod Knees On Elbows",
+  "toPose": "Headstand Tripod",
+  "breath": "none",
+  "soundName": "headstandtripodkneesonelbows_to_headstandtripod",
+  "soundTwosided": false
+ },
+ {
+  "name": "headstandtripodkneesonelbows_to_splitswide",
+  "fromPose": "Headstand Tripod Knees On Elbows",
+  "toPose": "Splits Wide",
+  "breath": "none"
+ },
+ {
+  "name": "headstandtripodpreparation_to_headstandtripodkneesonelbows",
+  "fromPose": "Headstand Tripod Preparation",
+  "toPose": "Headstand Tripod Knees On Elbows",
+  "breath": "none",
+  "soundName": "headstandtripodpreparation_to_headstandtripodkneesonelbows",
+  "soundTwosided": false
+ },
+ {
+  "name": "headstandtripodspirallegs_to_headstandtripod",
+  "fromPose": "Headstand Tripod Spiral Legs",
+  "toPose": "Headstand Tripod",
+  "breath": "none",
+  "soundName": "headstandtripodspirallegs_to_headstandtripod",
+  "soundTwosided": false
+ },
+ {
+  "name": "hero_to_heroreclining",
+  "fromPose": "Hero",
+  "toPose": "Hero Reclining",
+  "breath": "none"
+ },
+ {
+  "name": "hero_to_camel",
+  "fromPose": "Hero",
+  "toPose": "Camel",
+  "breath": "none"
+ },
+ {
+  "name": "heroreclining_to_hero",
+  "fromPose": "Hero Reclining",
+  "toPose": "Hero",
+  "breath": "none"
+ },
+ {
+  "name": "kneepile_to_boxneutral",
+  "fromPose": "Knee Pile",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "kneepile_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "kneepile_to_kneepilebind",
+  "fromPose": "Knee Pile",
+  "toPose": "Knee Pile Bind",
+  "breath": "none",
+  "soundName": "kneepile_to_kneepilebind",
+  "soundTwosided": true
+ },
+ {
+  "name": "kneepile_to_marichiI",
+  "fromPose": "Knee Pile",
+  "toPose": "Marichi I",
+  "breath": "none",
+  "soundName": "kneepile_to_marichiI",
+  "soundTwosided": true
+ },
+ {
+  "name": "kneepilebind_to_kneepile",
+  "fromPose": "Knee Pile Bind",
+  "toPose": "Knee Pile",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_chairtwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "locust_to_corpsefront",
+  "fromPose": "Locust",
+  "toPose": "Corpse Front",
+  "breath": "none"
+ },
+ {
+  "name": "locusthalf_to_corpsefront",
+  "fromPose": "Locust Half",
+  "toPose": "Corpse Front",
+  "breath": "none"
+ },
+ {
+  "name": "lordofthedance_to_mountain",
+  "fromPose": "Lord Of The Dance",
+  "toPose": "Mountain",
+  "breath": "none"
+ },
+ {
+  "name": "lunge_to_forwardbend",
+  "fromPose": "Lunge",
+  "toPose": "Forward Bend",
+  "breath": "none",
+  "soundName": "lungekneeling_to_forwardbend",
+  "soundTwosided": true
+ },
+ {
+  "name": "lunge_to_lungearmforward",
+  "fromPose": "Lunge",
+  "toPose": "Lunge Arm Forward",
+  "breath": "inhale",
+  "soundName": "lungekneeling_to_lungekneelingarmforward",
+  "soundTwosided": true
+ },
+ {
+  "name": "lunge_to_warriorI",
+  "fromPose": "Lunge",
+  "toPose": "Warrior I",
+  "breath": "inhale",
+  "soundName": "lunge_to_warriorI",
+  "soundTwosided": false
+ },
+ {
+  "name": "lunge_to_splitsstanding",
+  "fromPose": "Lunge",
+  "toPose": "Splits Standing",
+  "breath": "inhale"
+ },
+ {
+  "name": "lunge_to_pyramid",
+  "fromPose": "Lunge",
+  "toPose": "Pyramid",
+  "breath": "exhale"
+ },
+ {
+  "name": "lunge_to_lungecrescent",
+  "fromPose": "Lunge",
+  "toPose": "Lunge Crescent",
+  "breath": "inhale"
+ },
+ {
+  "name": "lunge_to_downwarddoglegup",
+  "fromPose": "Lunge",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "inhale"
+ },
+ {
+  "name": "lunge_to_warriorIIreverse",
+  "fromPose": "Lunge",
+  "toPose": "Warrior II Reverse",
+  "breath": "inhale"
+ },
+ {
+  "name": "lunge_to_lungekneeling",
+  "fromPose": "Lunge",
+  "toPose": "Lunge Kneeling",
+  "breath": "none"
+ },
+ {
+  "name": "lungearmforward_to_lungearmup",
+  "fromPose": "Lunge Arm Forward",
+  "toPose": "Lunge Arm Up",
+  "breath": "exhale",
+  "soundName": "lungekneelingarmforward_to_lungekneelingarmup",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungearmforward_to_lunge",
+  "fromPose": "Lunge Arm Forward",
+  "toPose": "Lunge",
+  "breath": "none",
+  "soundName": "lungekneelingarmup_to_lungekneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungearmup_to_lunge",
+  "fromPose": "Lunge Arm Up",
+  "toPose": "Lunge",
+  "breath": "none",
+  "soundName": "lungekneelingarmup_to_lungekneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungebind_to_chairtwistbind",
+  "fromPose": "Lunge Bind",
+  "toPose": "Chair Twist Bind",
+  "breath": "none",
+  "soundName": "lungebind_to_chairtwistbind",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungebind_to_lungehandsonmat",
+  "fromPose": "Lunge Bind",
+  "toPose": "Lunge Hands On Mat",
+  "breath": "none",
+  "soundName": "lungebind_to_lungehandsonmat",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungebind_to_warriorIIforward",
+  "fromPose": "Lunge Bind",
+  "toPose": "Warrior II Forward",
+  "breath": "none",
+  "soundName": "chairtwistbind_to_chairtwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungecrescent_to_lunge",
+  "fromPose": "Lunge Crescent",
+  "toPose": "Lunge",
+  "breath": "exhale"
+ },
+ {
+  "name": "lungecrescent_to_lungekneeling",
+  "fromPose": "Lunge Crescent",
+  "toPose": "Lunge Kneeling",
+  "breath": "exhale"
+ },
+ {
+  "name": "lungecrescent_to_pyramid",
+  "fromPose": "Lunge Crescent",
+  "toPose": "Pyramid",
+  "breath": "exhale"
+ },
+ {
+  "name": "lungehandsonmat_to_downwarddoglegup",
+  "fromPose": "Lunge Hands On Mat",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "exhale",
+  "soundName": "lungehandsonmat_to_downwarddoglegup",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungehandsonmat_to_lungehandsonmatback",
+  "fromPose": "Lunge Hands On Mat",
+  "toPose": "Lunge Hands On Mat Back",
+  "breath": "exhale",
+  "soundName": "lungehandsonmat_to_lungehandsonmatback",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungehandsonmat_to_lungehandsonmatflying",
+  "fromPose": "Lunge Hands On Mat",
+  "toPose": "Lunge Hands On Mat Flying",
+  "breath": "inhale",
+  "soundName": "lungehandsonmat_to_lungehandsonmatflying",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungehandsonmatback_to_lungehandsonmat",
+  "fromPose": "Lunge Hands On Mat Back",
+  "toPose": "Lunge Hands On Mat",
+  "breath": "inhale",
+  "soundName": "lungehandsonmatback_to_lungehandsonmat",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungehandsonmatflying_to_downwarddoglegup",
+  "fromPose": "Lunge Hands On Mat Flying",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "none",
+  "soundName": "lungehandsonmat_to_downwarddoglegup",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungehandsonmatflying_to_fourlimbedstaff",
+  "fromPose": "Lunge Hands On Mat Flying",
+  "toPose": "Four Limbed Staff",
+  "breath": "none"
+ },
+ {
+  "name": "lungekneeling_to_lungekneelingarmforward",
+  "fromPose": "Lunge Kneeling",
+  "toPose": "Lunge Kneeling Arm Forward",
+  "breath": "inhale",
+  "soundName": "lungekneeling_to_lungekneelingarmforward",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungekneeling_to_forwardbend",
+  "fromPose": "Lunge Kneeling",
+  "toPose": "Forward Bend",
+  "breath": "none",
+  "soundName": "lungekneeling_to_forwardbend",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungekneeling_to_warriorIkneeling",
+  "fromPose": "Lunge Kneeling",
+  "toPose": "Warrior I Kneeling",
+  "breath": "inhale",
+  "soundName": "lungekneeling_to_warriorIkneeling",
+  "soundTwosided": false
+ },
+ {
+  "name": "lungekneeling_to_splitsstanding",
+  "fromPose": "Lunge Kneeling",
+  "toPose": "Splits Standing",
+  "breath": "inhale"
+ },
+ {
+  "name": "lungekneeling_to_lunge",
+  "fromPose": "Lunge Kneeling",
+  "toPose": "Lunge",
+  "breath": "none"
+ },
+ {
+  "name": "lungekneelingarmforward_to_lungekneelingarmup",
+  "fromPose": "Lunge Kneeling Arm Forward",
+  "toPose": "Lunge Kneeling Arm Up",
+  "breath": "exhale",
+  "soundName": "lungekneelingarmforward_to_lungekneelingarmup",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungekneelingarmforward_to_lungekneeling",
+  "fromPose": "Lunge Kneeling Arm Forward",
+  "toPose": "Lunge Kneeling",
+  "breath": "none",
+  "soundName": "lungekneelingarmup_to_lungekneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "lungekneelingarmup_to_lungekneeling",
+  "fromPose": "Lunge Kneeling Arm Up",
+  "toPose": "Lunge Kneeling",
+  "breath": "none",
+  "soundName": "lungekneelingarmup_to_lungekneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "marichiI_to_marichiIII",
+  "fromPose": "Marichi I",
+  "toPose": "Marichi III",
+  "breath": "none",
+  "soundName": "marichiI_to_marichiIII",
+  "soundTwosided": true
+ },
+ {
+  "name": "marichiI_to_staff",
+  "fromPose": "Marichi I",
+  "toPose": "Staff",
+  "breath": "none"
+ },
+ {
+  "name": "marichiIII_to_boxneutral",
+  "fromPose": "Marichi III",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "marichiIII_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "marichiIII_to_staff",
+  "fromPose": "Marichi III",
+  "toPose": "Staff",
+  "breath": "none"
+ },
+ {
+  "name": "mountain_to_tree",
+  "fromPose": "Mountain",
+  "toPose": "Tree",
+  "breath": "none",
+  "soundName": "mountain_to_tree",
+  "soundTwosided": true
+ },
+ {
+  "name": "mountain_to_mountainarmsup",
+  "fromPose": "Mountain",
+  "toPose": "Mountain Arms Up",
+  "breath": "inhale",
+  "soundName": "mountain_to_mountainarmsup",
+  "soundTwosided": false
+ },
+ {
+  "name": "mountain_to_standingheadtokneepreparation",
+  "fromPose": "Mountain",
+  "toPose": "Standing Head To Knee Preparation",
+  "breath": "none"
+ },
+ {
+  "name": "mountain_to_lordofthedance",
+  "fromPose": "Mountain",
+  "toPose": "Lord Of The Dance",
+  "breath": "none"
+ },
+ {
+  "name": "mountain_to_eagle",
+  "fromPose": "Mountain",
+  "toPose": "Eagle",
+  "breath": "none"
+ },
+ {
+  "name": "mountain_to_chair",
+  "fromPose": "Mountain",
+  "toPose": "Chair",
+  "breath": "inhale"
+ },
+ {
+  "name": "mountainarmsup_to_mountain",
+  "fromPose": "Mountain Arms Up",
+  "toPose": "Mountain",
+  "breath": "exhale",
+  "soundName": "mountainarmsup_to_mountain",
+  "soundTwosided": false
+ },
+ {
+  "name": "mountainarmsup_to_forwardbend",
+  "fromPose": "Mountain Arms Up",
+  "toPose": "Forward Bend",
+  "breath": "exhale"
+ },
+ {
+  "name": "mountainarmsup_to_forwardbenddeep",
+  "fromPose": "Mountain Arms Up",
+  "toPose": "Forward Bend Deep",
+  "breath": "exhale",
+  "soundName": "mountainarmsup_to_forwardbenddeep",
+  "soundTwosided": false
+ },
+ {
+  "name": "pigeon_to_camel",
+  "fromPose": "Pigeon",
+  "toPose": "Camel",
+  "breath": "none"
+ },
+ {
+  "name": "pigeonfull_to_kneepile",
+  "fromPose": "Pigeon Full",
+  "toPose": "Knee Pile",
+  "breath": "none",
+  "soundName": "pigeonfull_to_kneepile",
+  "soundTwosided": false
+ },
+ {
+  "name": "pigeonhalf_to_downwarddoglegup",
+  "fromPose": "Pigeon Half",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "inhale",
+  "soundName": "planklegup_to_downwarddoglegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "pigeonhalf_to_pigeonfull",
+  "fromPose": "Pigeon Half",
+  "toPose": "Pigeon Full",
+  "breath": "none",
+  "soundName": "pigeonhalf_to_pigeonfull",
+  "soundTwosided": false
+ },
+ {
+  "name": "pigeonhalf_to_splitsfront",
+  "fromPose": "Pigeon Half",
+  "toPose": "Splits Front",
+  "breath": "none",
+  "soundName": "pigeonhalf_to_splitsfront",
+  "soundTwosided": true
+ },
+ {
+  "name": "pigeonhalf_to_kneepile",
+  "fromPose": "Pigeon Half",
+  "toPose": "Knee Pile",
+  "breath": "none",
+  "soundName": "splitsfront_to_kneepile",
+  "soundTwosided": true
+ },
+ {
+  "name": "plank_to_child",
+  "fromPose": "Plank",
+  "toPose": "Child",
+  "breath": "none"
+ },
+ {
+  "name": "plank_to_fourlimbedstaff",
+  "fromPose": "Plank",
+  "toPose": "Four Limbed Staff",
+  "breath": "exhale",
+  "soundName": "plank_to_fourlimbedstaff",
+  "soundTwosided": false
+ },
+ {
+  "name": "plank_to_boxneutral",
+  "fromPose": "Plank",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "downwarddog_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "plank_to_plankside",
+  "fromPose": "Plank",
+  "toPose": "Plank Side",
+  "breath": "none"
+ },
+ {
+  "name": "plank_to_plankkneelingside",
+  "fromPose": "Plank",
+  "toPose": "Plank Kneeling Side",
+  "breath": "none"
+ },
+ {
+  "name": "plank_to_downwarddog",
+  "fromPose": "Plank",
+  "toPose": "Downward Dog",
+  "breath": "none"
+ },
+ {
+  "name": "plank_to_corpsefrong",
+  "fromPose": "Plank",
+  "toPose": "Corpse Front",
+  "breath": "none"
+ },
+ {
+  "name": "plankdolphin_to_plankdolphinside",
+  "fromPose": "Plank Dolphin",
+  "toPose": "Plank Dolphin Side",
+  "breath": "none"
+ },
+ {
+  "name": "plankdolphinside_to_plankdolphin",
+  "fromPose": "Plank Dolphin Side",
+  "toPose": "Plank Dolphin",
+  "breath": "none"
+ },
+ {
+  "name": "plankkneeling_to_fourlimbedstaff",
+  "fromPose": "Plank Kneeling",
+  "toPose": "Four Limbed Staff",
+  "breath": "exhale",
+  "soundName": "plank_to_fourlimbedstaff",
+  "soundTwosided": false
+ },
+ {
+  "name": "plankkneeling_to_plankkneelingside",
+  "fromPose": "Plank Kneeling",
+  "toPose": "Plank Kneeling Side",
+  "breath": "none"
+ },
+ {
+  "name": "plankkneelingside_to_plankkneeling",
+  "fromPose": "Plank Kneeling Side",
+  "toPose": "Plank Kneeling",
+  "breath": "none"
+ },
+ {
+  "name": "plankkneelingside_to_plankside",
+  "fromPose": "Plank Kneeling Side",
+  "toPose": "Plank Side",
+  "breath": "none"
+ },
+ {
+  "name": "planklegup_to_downwarddoglegup",
+  "fromPose": "Plank Leg Up",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "exhale",
+  "soundName": "planklegup_to_downwarddoglegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "planklegup_to_downwarddogkneetoforehead",
+  "fromPose": "Plank Leg Up",
+  "toPose": "Downward Dog Knee To Forehead",
+  "breath": "exhale",
+  "soundName": "planklegup_to_downwarddogkneetoforehead",
+  "soundTwosided": false
+ },
+ {
+  "name": "planklegupkneeling_to_downwarddoglegup",
+  "fromPose": "Plank Leg Up Kneeling",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "exhale",
+  "soundName": "planklegup_to_downwarddoglegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "planklegupkneeling_to_downwarddoglegupkneeling",
+  "fromPose": "Plank Leg Up Kneeling",
+  "toPose": "Downward Dog Leg Up Kneeling",
+  "breath": "exhale",
+  "soundName": "planklegupkneeling_to_downwarddoglegupkneeling",
+  "soundTwosided": false
+ },
+ {
+  "name": "planklegupkneeling_to_downwarddogkneetoforeheadkneeling",
+  "fromPose": "Plank Leg Up Kneeling",
+  "toPose": "Downward Dog Knee To Forehead Kneeling",
+  "breath": "exhale",
+  "soundName": "planklegup_to_downwarddogkneetoforehead",
+  "soundTwosided": false
+ },
+ {
+  "name": "plankside_to_plank",
+  "fromPose": "Plank Side",
+  "toPose": "Plank",
+  "breath": "none"
+ },
+ {
+  "name": "plankupward_to_staff",
+  "fromPose": "Plank Upward",
+  "toPose": "Staff",
+  "breath": "none"
+ },
+ {
+  "name": "plow_to_corpse",
+  "fromPose": "Plow",
+  "toPose": "Corpse",
+  "breath": "none",
+  "soundName": "deafman_to_corpse",
+  "soundTwosided": false
+ },
+ {
+  "name": "plow_to_deafman",
+  "fromPose": "Plow",
+  "toPose": "Deaf Man",
+  "breath": "none",
+  "soundName": "plow_to_deafman",
+  "soundTwosided": false
+ },
+ {
+  "name": "puppyextened_to_boxneutral",
+  "fromPose": "Puppy Extended",
+  "toPose": "Box Neutral",
+  "breath": "none"
+ },
+ {
+  "name": "pyramid_to_lunge",
+  "fromPose": "Pyramid",
+  "toPose": "Lunge",
+  "breath": "inhale"
+ },
+ {
+  "name": "pyramid_to_lungecrescent",
+  "fromPose": "Pyramid",
+  "toPose": "Lunge Crescent",
+  "breath": "inhale"
+ },
+ {
+  "name": "scale_to_firefly",
+  "fromPose": "Scale",
+  "toPose": "Firefly",
+  "breath": "none",
+  "soundName": "scale_to_firefly",
+  "soundTwosided": false
+ },
+ {
+  "name": "scale_to_splitswide",
+  "fromPose": "Scale",
+  "toPose": "Splits Wide",
+  "breath": "none"
+ },
+ {
+  "name": "scorpion_to_ featheredpeacock",
+  "fromPose": "Scorpion",
+  "toPose": "Feathered Peacock",
+  "breath": "none"
+ },
+ {
+  "name": "seatedforwardbend_to_corpse",
+  "fromPose": "Seated Forward Bend",
+  "toPose": "Corpse",
+  "breath": "none",
+  "soundName": "seatedforwardbend_to_corpse",
+  "soundTwosided": false
+ },
+ {
+  "name": "seatedforwardbendpreparation_to_seatedforwardbend",
+  "fromPose": "Seated Forward Bend Preparation",
+  "toPose": "Seated Forward Bend",
+  "breath": "none",
+  "soundName": "seatedforwardbendpreparation_to_seatedforwardbend",
+  "soundTwosided": false
+ },
+ {
+  "name": "seatedonheelshandsonmatopenedknees_to_crow",
+  "fromPose": "Seated On Heels Hands On Mat Opened Knees",
+  "toPose": "Crow",
+  "breath": "inhale",
+  "soundName": "seatedonheelshandsonmatopenedknees_to_crow",
+  "soundTwosided": false
+ },
+ {
+  "name": "seatedonheelshandsonmatopenedknees_to_plank",
+  "fromPose": "Seated On Heels Hands On Mat Opened Knees",
+  "toPose": "Plank",
+  "breath": "none"
+ },
+ {
+  "name": "seatedonheelsprayer_to_seatedonheelsprayerclosedeyes",
+  "fromPose": "Seated On Heels Prayer",
+  "toPose": "Seated On Heels Prayer Closed Eyes",
+  "breath": "none",
+  "soundName": "seatedonheelsprayer_to_seatedonheelsprayerclosedeyes",
+  "soundTwosided": false
+ },
+ {
+  "name": "seatedonheelsprayer_to_seatedonheelsprayeropenedknees",
+  "fromPose": "Seated On Heels Prayer",
+  "toPose": "Seated On Heels Prayer Opened Knees",
+  "breath": "inhale",
+  "soundName": "seatedonheelsprayer_to_seatedonheelsprayeropenedknees",
+  "soundTwosided": false
+ },
+ {
+  "name": "seatedonheelsprayerclosedeyes_to_seatedonheelsprayer",
+  "fromPose": "Seated On Heels Prayer Closed Eyes",
+  "toPose": "Seated On Heels Prayer",
+  "breath": "none",
+  "soundName": "seatedonheelsprayerclosedeyes_to_seatedonheelsprayer",
+  "soundTwosided": false
+ },
+ {
+  "name": "seatedonheelsprayeropenedknees_to_seatedonheelshandsonmatopenedknees",
+  "fromPose": "Seated On Heels Prayer Opened Knees",
+  "toPose": "Seated On Heels Hands On Mat Opened Knees",
+  "breath": "exhale",
+  "soundName": "seatedonheelsprayeropenedknees_to_seatedonheelshandsonmatopenedknees",
+  "soundTwosided": false
+ },
+ {
+  "name": "shoulderstandsupported_to_plow",
+  "fromPose": "Shoulderstand Supported",
+  "toPose": "Plow",
+  "breath": "none",
+  "soundName": "shoulderstandsupported_to_plow",
+  "soundTwosided": false
+ },
+ {
+  "name": "shoulderstandsupported_to_shoulderstandunsupported",
+  "fromPose": "Shoulderstand Supported",
+  "toPose": "Shoulderstand Unsupported",
+  "breath": "none"
+ },
+ {
+  "name": "shoulderstandunsupported_to_plow",
+  "fromPose": "Shoulderstand Unsupported",
+  "toPose": "Plow",
+  "breath": "none",
+  "soundName": "shoulderstandsupported_to_plow",
+  "soundTwosided": false
+ },
+ {
+  "name": "sphinx_to_corpsefront",
+  "fromPose": "Sphinx",
+  "toPose": "Corpse Front",
+  "breath": "none"
+ },
+ {
+  "name": "splitsfront_to_downwarddoglegup",
+  "fromPose": "Splits Front",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "inhale",
+  "soundName": "planklegup_to_downwarddoglegup",
+  "soundTwosided": false
+ },
+ {
+  "name": "splitsfront_to_kneepile",
+  "fromPose": "Splits Front",
+  "toPose": "Knee Pile",
+  "breath": "none",
+  "soundName": "splitsfront_to_kneepile",
+  "soundTwosided": true
+ },
+ {
+  "name": "splitsstanding_to_forwardbend",
+  "fromPose": "Splits Standing",
+  "toPose": "Forward Bend",
+  "breath": "exhale",
+  "soundName": "splitsstanding_to_forwardbend",
+  "soundTwosided": true
+ },
+ {
+  "name": "splitsstanding_to_halfmoon",
+  "fromPose": "Splits Standing",
+  "toPose": "Half Moon",
+  "breath": "none"
+ },
+ {
+  "name": "splitsstanding_to_halfmoonrevolved",
+  "fromPose": "Splits Standing",
+  "toPose": "Half Moon Revolved",
+  "breath": "none"
+ },
+ {
+  "name": "splitswide_to_boxneutral",
+  "fromPose": "Splits Wide",
+  "toPose": "Box Neutral",
+  "breath": "none",
+  "soundName": "splitswide_to_boxneutral",
+  "soundTwosided": false
+ },
+ {
+  "name": "splitswide_to_forwardbend",
+  "fromPose": "Splits Wide",
+  "toPose": "Forward Bend",
+  "breath": "none",
+  "soundName": "splitswide_to_forwardbend",
+  "soundTwosided": false
+ },
+ {
+  "name": "splitswide_to_headstandtripodpreparation",
+  "fromPose": "Splits Wide",
+  "toPose": "Headstand Tripod Preparation",
+  "breath": "none",
+  "soundName": "splitswide_to_headstandtripodpreparation",
+  "soundTwosided": false
+ },
+ {
+  "name": "splitswide_to_tortoise",
+  "fromPose": "Splits Wide",
+  "toPose": "Tortoise",
+  "breath": "none",
+  "soundName": "splitswide_to_tortoise",
+  "soundTwosided": false
+ },
+ {
+  "name": "staff_to_marichI",
+  "fromPose": "Staff",
+  "toPose": "Marichi I",
+  "breath": "none"
+ },
+ {
+  "name": "staff_to_marichIII",
+  "fromPose": "Staff",
+  "toPose": "Marichi III",
+  "breath": "none"
+ },
+ {
+  "name": "standingheadtoknee_to_mountain",
+  "fromPose": "Standing Head To Knee",
+  "toPose": "Mountain",
+  "breath": "none"
+ },
+ {
+  "name": "standingheadtokneepreparation_to_standingheadtoknee",
+  "fromPose": "Standing Head To Knee Preparation",
+  "toPose": "Standing Head To Knee",
+  "breath": "none"
+ },
+ {
+  "name": "standingheadtokneepreparation_to_mountain",
+  "fromPose": "Standing Head To Knee Preparation",
+  "toPose": "Mountain",
+  "breath": "none",
+  "soundName": "tree_to_mountain",
+  "soundTwosided": true
+ },
+ {
+  "name": "tortoise_to_scale",
+  "fromPose": "Tortoise",
+  "toPose": "Scale",
+  "breath": "none",
+  "soundName": "tortoise_to_scale",
+  "soundTwosided": false
+ },
+ {
+  "name": "tortoise_to_splitswide",
+  "fromPose": "Tortoise",
+  "toPose": "Splits Wide",
+  "breath": "none"
+ },
+ {
+  "name": "tortoise_to_tortoisebind",
+  "fromPose": "Tortoise",
+  "toPose": "Tortoise Bind",
+  "breath": "none",
+  "soundName": "tortoise_to_tortoisebind",
+  "soundTwosided": false
+ },
+ {
+  "name": "tortoisebind_to_scale",
+  "fromPose": "Tortoise Bind",
+  "toPose": "Scale",
+  "breath": "none",
+  "soundName": "tortoise_to_scale",
+  "soundTwosided": false
+ },
+ {
+  "name": "turtle_to_corpse",
+  "fromPose": "Turtle",
+  "toPose": "Corpse",
+  "breath": "none",
+  "soundName": "turtle_to_corpse",
+  "soundTwosided": false
+ },
+ {
+  "name": "tree_to_mountain",
+  "fromPose": "Tree",
+  "toPose": "Mountain",
+  "breath": "none",
+  "soundName": "tree_to_mountain",
+  "soundTwosided": true
+ },
+ {
+  "name": "tree_to_pigeonflying",
+  "fromPose": "Tree",
+  "toPose": "Pigeon Flying",
+  "breath": "none"
+ },
+ {
+  "name": "triangle_to_triangleforward",
+  "fromPose": "Triangle",
+  "toPose": "Triangle Forward",
+  "breath": "exhale",
+  "soundName": "triangle_to_triangleforward",
+  "soundTwosided": false
+ },
+ {
+  "name": "triangle_to_warriorII",
+  "fromPose": "Triangle",
+  "toPose": "Warrior II",
+  "breath": "none",
+  "soundName": "triangle_to_warriorII",
+  "soundTwosided": false
+ },
+ {
+  "name": "triangle_to_trianglerevolved",
+  "fromPose": "Triangle",
+  "toPose": "Triangle Revolved",
+  "breath": "exhale"
+ },
+ {
+  "name": "triangleforward_to_triangle",
+  "fromPose": "Triangle Forward",
+  "toPose": "Triangle",
+  "breath": "inhale",
+  "soundName": "triangleforward_to_triangle",
+  "soundTwosided": true
+ },
+ {
+  "name": "triangleforward_to_halfmoon",
+  "fromPose": "Triangle Forward",
+  "toPose": "Half Moon",
+  "breath": "none"
+ },
+ {
+  "name": "trianglerevolved_to_triangle",
+  "fromPose": "Triangle Revolved",
+  "toPose": "Triangle",
+  "breath": "inhale"
+ },
+ {
+  "name": "trianglerevolved_to_halfmoonrevolved",
+  "fromPose": "Triangle Revolved",
+  "toPose": "Half Moon Revolved",
+  "breath": "none"
+ },
+ {
+  "name": "upwarddog_to_child",
+  "fromPose": "Upward Dog",
+  "toPose": "Child",
+  "breath": "exhale"
+ },
+ {
+  "name": "upwarddog_to_downwarddog",
+  "fromPose": "Upward Dog",
+  "toPose": "Downward Dog",
+  "breath": "exhale",
+  "soundName": "upwarddog_to_downwarddog",
+  "soundTwosided": false
+ },
+ {
+  "name": "upwarddog_to_downwarddog-pushup",
+  "fromPose": "Upward Dog",
+  "toPose": "Downward Dog",
+  "breath": "exhale",
+  "soundName": "upwarddog_to_downwarddog-pushup",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorI_to_warriorIhandsonhips",
+  "fromPose": "Warrior I",
+  "toPose": "Warrior I Hands On Hips",
+  "breath": "none",
+  "soundName": "warriorI_to_warriorIhandsonhips",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorI_to_warriorII",
+  "fromPose": "Warrior I",
+  "toPose": "Warrior II",
+  "breath": "exhale",
+  "soundName": "warriorI_to_warriorII",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorI_to_warriorprayer",
+  "fromPose": "Warrior I",
+  "toPose": "Warrior Prayer",
+  "breath": "none",
+  "soundName": "mountainarmsup_to_mountain",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorI_to_fourlimbedstaff",
+  "fromPose": "Warrior I",
+  "toPose": "Four Limbed Staff",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorI_to_warriorIforward",
+  "fromPose": "Warrior I",
+  "toPose": "Warrior I Forward",
+  "breath": "exhale",
+  "soundName": "warriorIhandssteepled_to_warriorIhandssteepledforward",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorI_to_warriorIII",
+  "fromPose": "Warrior I",
+  "toPose": "Warrior III",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorIhandsonhips_to_warriorI",
+  "fromPose": "Warrior I Hands On Hips",
+  "toPose": "Warrior I",
+  "breath": "none"
+ },
+ {
+  "name": "warriorIhandsonhips_to_warriorII",
+  "fromPose": "Warrior I Hands On Hips",
+  "toPose": "Warrior II",
+  "breath": "exhale",
+  "soundName": "warriorI_to_warriorII",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIhandsonhips_to_warriorIhandsonhipsforward",
+  "fromPose": "Warrior I Hands On Hips",
+  "toPose": "Warrior I Hands On Hips Forward",
+  "breath": "exhale",
+  "soundName": "warriorIhandssteepled_to_warriorIhandssteepledforward",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIhandsonhipsforward_to_warriorIhandsonhips",
+  "fromPose": "Warrior I Hands On Hips Forward",
+  "toPose": "Warrior I Hands On Hips",
+  "breath": "inhale",
+  "soundName": "warriorIhandssteepledforward_to_warriorIhandssteepled",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIforward_to_warriorI",
+  "fromPose": "Warrior I Forward",
+  "toPose": "Warrior I",
+  "breath": "inhale",
+  "soundName": "warriorIhandssteepledforward_to_warriorIhandssteepled",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIforward_to_warriorIII",
+  "fromPose": "Warrior I Forward",
+  "toPose": "Warrior III",
+  "breath": "none"
+ },
+ {
+  "name": "warriorIkneeling_to_forwardbend",
+  "fromPose": "Warrior I Kneeling",
+  "toPose": "Forward Bend",
+  "breath": "exhale",
+  "soundName": "warriorIkneeling_to_forwardbend",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIkneeling_to_fourlimbedstaff",
+  "fromPose": "Warrior I Kneeling",
+  "toPose": "Four Limbed Staff",
+  "breath": "exhale",
+  "soundName": "warriorIkneeling_to_fourlimbedstaff",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorII_to_fourlimbedstaff",
+  "fromPose": "Warrior II",
+  "toPose": "Four Limbed Staff",
+  "breath": "exhale",
+  "soundName": "warriorII_to_fourlimbedstaff",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorII_to_lunge",
+  "fromPose": "Warrior II",
+  "toPose": "Lunge",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorII_to_lungekneeling",
+  "fromPose": "Warrior II",
+  "toPose": "Lunge Kneeling",
+  "breath": "exhale",
+  "soundName": "warriorII_to_lungekneeling",
+  "soundTwosided": true
+ },
+ {
+  "name": "warriorII_to_plank",
+  "fromPose": "Warrior II",
+  "toPose": "Plank",
+  "breath": "exhale",
+  "soundName": "warriorII_to_plank",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorII_to_plankkneeling",
+  "fromPose": "Warrior II",
+  "toPose": "Plank Kneeling",
+  "breath": "exhale",
+  "soundName": "warriorII_to_plankkneeling",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorII_to_triangle",
+  "fromPose": "Warrior II",
+  "toPose": "Triangle",
+  "breath": "none",
+  "soundName": "warriorII_to_triangle",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorII_to_warriorI",
+  "fromPose": "Warrior II",
+  "toPose": "Warrior I",
+  "breath": "inhale"
+ },
+ {
+  "name": "warriorII_to_warriorIIforward",
+  "fromPose": "Warrior II",
+  "toPose": "Warrior II Forward",
+  "breath": "exhale",
+  "soundName": "warriorIhandssteepled_to_warriorIhandssteepledforward",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorII_to_warriorIIreverse",
+  "fromPose": "Warrior II",
+  "toPose": "Warrior II Reverse",
+  "breath": "inhale",
+  "soundName": "warriorII_to_warriorIIreverse",
+  "soundTwosided": true
+ },
+ {
+  "name": "warriorII_to_warriorprayer",
+  "fromPose": "Warrior II",
+  "toPose": "Warrior Prayer",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorII_to_halfmoon",
+  "fromPose": "Warrior II",
+  "toPose": "Half Moon",
+  "breath": "none"
+ },
+ {
+  "name": "warriorIIforward_to_lungebind",
+  "fromPose": "Warrior II Forward",
+  "toPose": "Lunge Bind",
+  "breath": "none",
+  "soundName": "chairtwistextended_to_chairtwistbind",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIIforward_to_warriorII",
+  "fromPose": "Warrior II Forward",
+  "toPose": "Warrior II",
+  "breath": "inhale",
+  "soundName": "triangleforward_to_triangle",
+  "soundTwosided": true
+ },
+ {
+  "name": "warriorIIforward_to_warriorIIreverse",
+  "fromPose": "Warrior II Forward",
+  "toPose": "Warrior II Reverse",
+  "breath": "inhale",
+  "soundName": "warriorII_to_warriorIIreverse",
+  "soundTwosided": true
+ },
+ {
+  "name": "warriorIIforward_to_warriorIIforwardarmforward",
+  "fromPose": "Warrior II Forward",
+  "toPose": "Warrior II Forward Arm Forward",
+  "breath": "none",
+  "soundName": "warriorIIforward_to_warriorIIforwardarmforward",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIIforward_to_halfmoon",
+  "fromPose": "Warrior II Forward",
+  "toPose": "Half Moon",
+  "breath": "none"
+ },
+ {
+  "name": "warriorIIforwardarmforward_to_lungebind",
+  "fromPose": "Warrior II Forward Arm Forward",
+  "toPose": "Lunge Bind",
+  "breath": "none",
+  "soundName": "chairtwistextended_to_chairtwistbind",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIIforwardarmforward_to_lungehandsonmat",
+  "fromPose": "Warrior II Forward Arm Forward",
+  "toPose": "Lunge Hands On Mat",
+  "breath": "none",
+  "soundName": "lungebind_to_lungehandsonmat",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIIforwardarmforward_to_warriorIIreverse",
+  "fromPose": "Warrior II Forward Arm Forward",
+  "toPose": "Warrior II Reverse",
+  "breath": "inhale",
+  "soundName": "warriorII_to_warriorIIreverse",
+  "soundTwosided": true
+ },
+ {
+  "name": "warriorIIreverse_to_warriorII",
+  "fromPose": "Warrior II Reverse",
+  "toPose": "Warrior II",
+  "breath": "none",
+  "soundName": "warriorIIreverse_to_warriorII",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIIreverse_to_warriorIIforward",
+  "fromPose": "Warrior II Reverse",
+  "toPose": "Warrior II Forward",
+  "breath": "exhale",
+  "soundName": "warriorIIreverse_to_warriorIIforward",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorIIreverse_to_warriorIIforwardarmforward",
+  "fromPose": "Warrior II Reverse",
+  "toPose": "Warrior II Forward Arm Forward",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorIIreverse_to_lunge",
+  "fromPose": "Warrior II Reverse",
+  "toPose": "Lunge",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorIIreverse_to_lungekneeling",
+  "fromPose": "Warrior II Reverse",
+  "toPose": "Lunge Kneeling",
+  "breath": "exhale"
+ },
+ {
+  "name": "warriorIII_to_warriorI",
+  "fromPose": "Warrior III",
+  "toPose": "Warrior I",
+  "breath": "inhale"
+ },
+ {
+  "name": "warriorIII_to_halfmoon",
+  "fromPose": "Warrior III",
+  "toPose": "Half Moon",
+  "breath": "inhale"
+ },
+ {
+  "name": "warriorIII_to_lungecrescent",
+  "fromPose": "Warrior III",
+  "toPose": "Lunge Crescent",
+  "breath": "inhale"
+ },
+ {
+  "name": "warriorprayer_to_warriortwist",
+  "fromPose": "Warrior Prayer",
+  "toPose": "Warrior Twist",
+  "breath": "none",
+  "soundName": "warriorprayer_to_warriortwist",
+  "soundTwosided": true
+ },
+ {
+  "name": "warriorprayer_to_warriorII",
+  "fromPose": "Warrior Prayer",
+  "toPose": "Warrior II",
+  "breath": "exhale",
+  "soundName": "warriorI_to_warriorII",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriorprayer_to_warriorI",
+  "fromPose": "Warrior Prayer",
+  "toPose": "Warrior I",
+  "breath": "none"
+ },
+ {
+  "name": "warriortwist_to_warriortwistextended",
+  "fromPose": "Warrior Twist",
+  "toPose": "Warrior Twist Extended",
+  "breath": "none",
+  "soundName": "warriortwist_to_warriortwistextended",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriortwist_to_warriorprayer",
+  "fromPose": "Warrior Twist",
+  "toPose": "Warrior Prayer",
+  "breath": "none",
+  "soundName": "chairtwist_to_chairprayer",
+  "soundTwosided": false
+ },
+ {
+  "name": "warriortwistextended_to_warriortwist",
+  "fromPose": "Warrior Twist Extended",
+  "toPose": "Warrior Twist",
+  "breath": "none",
+  "soundName": "warriortwistextended_to_warriortwist",
+  "soundTwosided": false
+ },
+ {
+  "name": "wheel_to_corpse",
+  "fromPose": "Wheel",
+  "toPose": "Corpse",
+  "breath": "none",
+  "soundName": "wheel_to_corpse",
+  "soundTwosided": false
+ },
+ {
+  "name": "wheel_to_wheellegup",
+  "fromPose": "Wheel",
+  "toPose": "Wheel Leg Up",
+  "breath": "none",
+  "soundName": "wheel_to_wheellegup",
+  "soundTwosided": true
+ },
+ {
+  "name": "wheellegup_to_wheel",
+  "fromPose": "Wheel Leg Up",
+  "toPose": "Wheel",
+  "breath": "none",
+  "soundName": "wheellegup_to_wheel",
+  "soundTwosided": true
+ },
+ {
+  "name": "wheelflip_to_downwarddoglegup",
+  "fromPose": "Wheel Flip",
+  "toPose": "Downward Dog Leg Up",
+  "breath": "none",
+  "soundName": "wheelflip_to_downwarddoglegup",
+  "soundTwosided": true
+ },
+ {
+  "name": "wheelflip_to_wheelfliplegup",
+  "fromPose": "Wheel Flip",
+  "toPose": "Wheel Flip Leg Up",
+  "breath": "none",
+  "soundName": "wheel_to_wheellegup",
+  "soundTwosided": true
+ },
+ {
+  "name": "wheelfliplegup_to_wheelflip",
+  "fromPose": "Wheel Flip Leg Up",
+  "toPose": "Wheel Flip",
+  "breath": "none",
+  "soundName": "wheellegup_to_wheel",
+  "soundTwosided": true
+ },
+ {
+  "name": "windremoving_to_corpse",
+  "fromPose": "Wind Removing",
+  "toPose": "Corpse",
+  "breath": "none"
+ }
+]

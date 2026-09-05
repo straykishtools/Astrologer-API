@@ -1,0 +1,2564 @@
+{
+ "file": "desert",
+ "head": {
+  "name": "Desert",
+  "description": "A Desert practice has the specific focus to unwind the mind, unravel the body, and more importantly to open the heart.  The path to freedom in the Desert practice is through flexibility and detoxification.  As the body opens and the flexibility improves, blocked pranic energy ignites the detoxification and the healing processes.\n\n\"In the Desert you have the space to unwind, unravel, spill out on the Desert floor and heal.\"",
+  "style": "yin",
+  "durations": [
+   30,
+   45,
+   60
+  ],
+  "difficulties": [
+   0,
+   1,
+   2
+  ],
+  "pose": {
+   "name": "Triangle Forward",
+   "side": "left"
+  }
+ },
+ "body": {
+  "preferredBackgroundName": "Home",
+  "steps": [
+   {
+    "type": "tempo",
+    "duration": 4.0
+   },
+   {
+    "type": "music",
+    "kind": "builtin",
+    "id": "0"
+   },
+   {
+    "type": "move",
+    "name": "childwidestart_to_childwidestart"
+   },
+   {
+    "type": "hold",
+    "count": 1,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "childwidestart_to_childwide"
+   },
+   {
+    "type": "hold",
+    "count": 8,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "childwide_to_childwidesidelean"
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "soften",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "childwidesidelean_to_childwide"
+   },
+   {
+    "type": "switchside"
+   },
+   {
+    "type": "move",
+    "name": "childwide_to_childwidesidelean"
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "soften",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "childwidesidelean_to_childwide"
+   },
+   {
+    "type": "switchside"
+   },
+   {
+    "type": "loop",
+    "count": [
+     2,
+     4,
+     4
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "childwide_to_childwidesidelean"
+     },
+     {
+      "type": "move",
+      "name": "childwidesidelean_to_childwide"
+     }
+    ]
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "soften",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "childwide_to_boxneutral"
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "boxneutral_to_dog"
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "dog_to_cat"
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     1,
+     2
+    ],
+    "switchside": false,
+    "steps": [
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "cat_to_dog"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "dog_to_cat"
+     }
+    ]
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "cat_to_boxneutral"
+   },
+   {
+    "type": "move",
+    "name": "boxneutral_to_downwarddog"
+   },
+   {
+    "type": "hold",
+    "count": 4,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "downwarddog_to_downwarddogontoes"
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "loop",
+    "count": [
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddogontoes_to_downwarddoghamstring"
+     },
+     {
+      "type": "hold",
+      "count": 3,
+      "phrase": "soften",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "downwarddoghamstring_to_downwarddogontoes"
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     2,
+     4
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddogontoes_to_downwarddoghamstring"
+     },
+     {
+      "type": "move",
+      "name": "downwarddoghamstring_to_downwarddogontoes"
+     }
+    ]
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "downwarddogontoes_to_downwarddog"
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "switchside"
+   },
+   {
+    "type": "difficulty",
+    "levels": {
+     "intermediate": [
+      {
+       "type": "hold",
+       "count": 1,
+       "phrase": "none",
+       "audibleCount": false
+      },
+      {
+       "type": "loop",
+       "count": [
+        2
+       ],
+       "switchside": true,
+       "steps": [
+        {
+         "type": "move",
+         "name": "downwarddog_to_downwarddoghandtoankle"
+        },
+        {
+         "type": "hold",
+         "count": 4,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "downwarddoghandtoankle_to_downwarddog"
+        }
+       ]
+      },
+      {
+       "type": "hold",
+       "count": 1,
+       "phrase": "none",
+       "audibleCount": false
+      }
+     ],
+     "beginner": [
+      {
+       "type": "move",
+       "name": "downwarddog_to_boxneutral"
+      },
+      {
+       "type": "loop",
+       "count": [
+        2
+       ],
+       "switchside": true,
+       "steps": [
+        {
+         "type": "move",
+         "name": "boxneutral_to_boxhandtoankle"
+        },
+        {
+         "type": "hold",
+         "count": 4,
+         "phrase": "soften",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "boxhandtoankle_to_boxneutral"
+        }
+       ]
+      },
+      {
+       "type": "move",
+       "name": "boxneutral_to_downwarddog"
+      },
+      {
+       "type": "hold",
+       "count": 1,
+       "phrase": "none",
+       "audibleCount": false
+      }
+     ]
+    }
+   },
+   {
+    "type": "music",
+    "kind": "builtin",
+    "id": "1"
+   },
+   {
+    "type": "loop",
+    "count": [
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     4,
+     4
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     0,
+     4
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_forwardbend-step"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_chair"
+        },
+        {
+         "type": "move",
+         "name": "chair_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_chair"
+        },
+        {
+         "type": "move",
+         "name": "chair_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_fourlimbedstaff-step"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     0,
+     4
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_forwardbend-step"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_chair"
+        },
+        {
+         "type": "move",
+         "name": "chair_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_chair"
+        },
+        {
+         "type": "move",
+         "name": "chair_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_fourlimbedstaff-step"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     1,
+     1
+    ],
+    "switchside": false,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_forwardbend-float"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_forwardbenddeep"
+     },
+     {
+      "type": "move",
+      "name": "forwardbenddeep_to_chair"
+     },
+     {
+      "type": "hold",
+      "count": 1,
+      "phrase": "hold",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "chair_to_chairprayer"
+     },
+     {
+      "type": "hold",
+      "count": 1,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "switchside"
+     },
+     {
+      "type": "loop",
+      "count": [
+       2
+      ],
+      "switchside": true,
+      "steps": [
+       {
+        "type": "move",
+        "name": "chairprayer_to_chairtwist"
+       },
+       {
+        "type": "hold",
+        "count": 1,
+        "phrase": "none",
+        "audibleCount": false
+       },
+       {
+        "type": "move",
+        "name": "chairtwist_to_chairtwistextended"
+       },
+       {
+        "type": "hold",
+        "count": 4,
+        "phrase": "hold",
+        "audibleCount": false
+       },
+       {
+        "type": "move",
+        "name": "chairtwistextended_to_chairtwist"
+       },
+       {
+        "type": "move",
+        "name": "chairtwist_to_chairprayer"
+       },
+       {
+        "type": "hold",
+        "count": 1,
+        "phrase": "none",
+        "audibleCount": false
+       }
+      ]
+     },
+     {
+      "type": "move",
+      "name": "chairprayer_to_chair"
+     },
+     {
+      "type": "move",
+      "name": "chair_to_forwardbenddeep"
+     },
+     {
+      "type": "loop",
+      "count": [
+       0,
+       1,
+       0
+      ],
+      "switchside": false,
+      "steps": [
+       {
+        "type": "move",
+        "name": "forwardbenddeep_to_forwardbendhalfway"
+       },
+       {
+        "type": "difficulty",
+        "levels": {
+         "expert": [
+          {
+           "type": "move",
+           "name": "forwardbendhalfway_to_fourlimbedstaff-float"
+          }
+         ],
+         "beginner": [
+          {
+           "type": "move",
+           "name": "forwardbendhalfway_to_fourlimbedstaff-step"
+          }
+         ]
+        }
+       },
+       {
+        "type": "move",
+        "name": "fourlimbedstaff_to_upwarddog"
+       }
+      ]
+     },
+     {
+      "type": "loop",
+      "count": [
+       0,
+       0,
+       1
+      ],
+      "switchside": false,
+      "steps": [
+       {
+        "type": "tempo",
+        "duration": 3.5
+       },
+       {
+        "type": "move",
+        "name": "forwardbenddeep_to_forwardbendhalfway"
+       },
+       {
+        "type": "difficulty",
+        "levels": {
+         "expert": [
+          {
+           "type": "pose",
+           "name": "Plank"
+          }
+         ],
+         "beginner": [
+          {
+           "type": "pose",
+           "name": "Plank Kneeling"
+          }
+         ]
+        }
+       },
+       {
+        "type": "pose",
+        "name": "Four Limbed Staff"
+       },
+       {
+        "type": "pose",
+        "name": "Upward Dog"
+       }
+      ]
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "upwarddog_to_downwarddog-pushup"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "upwarddog_to_downwarddog"
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "type": "tempo",
+    "duration": 3.5
+   },
+   {
+    "type": "move",
+    "name": "downwarddog_to_boxneutral"
+   },
+   {
+    "type": "move",
+    "name": "boxneutral_to_childwide"
+   },
+   {
+    "type": "hold",
+    "count": 5,
+    "phrase": "rest",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "childwide_to_boxneutral"
+   },
+   {
+    "type": "move",
+    "name": "boxneutral_to_downwarddog"
+   },
+   {
+    "type": "loop",
+    "count": [
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddoglegup"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "downwarddoglegup_to_downwarddoglegupstackhips"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "downwarddoglegupstackhips_to_wheelflip"
+        },
+        {
+         "type": "hold",
+         "count": 3,
+         "phrase": "hold",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "wheelflip_to_wheelfliplegup"
+        },
+        {
+         "type": "hold",
+         "count": 3,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "wheelfliplegup_to_wheelflip"
+        },
+        {
+         "type": "move",
+         "name": "wheelflip_to_downwarddoglegup"
+        },
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ],
+       "intermediate": [
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "downwarddoglegup_to_downwarddoglegupstackhips"
+        },
+        {
+         "type": "hold",
+         "count": 4,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "downwarddoglegupstackhips_to_downwarddoglegup"
+        },
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ],
+       "beginner": [
+        {
+         "type": "hold",
+         "count": 4,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "downwarddoglegup_to_downwarddog"
+     },
+     {
+      "type": "move",
+      "name": "downwarddog_to_boxneutral"
+     },
+     {
+      "type": "move",
+      "name": "boxneutral_to_child"
+     },
+     {
+      "type": "loop",
+      "count": [
+       3
+      ],
+      "switchside": false,
+      "steps": [
+       {
+        "type": "move",
+        "name": "child_to_upwarddog"
+       },
+       {
+        "type": "move",
+        "name": "upwarddog_to_child"
+       }
+      ]
+     },
+     {
+      "type": "loop",
+      "count": [
+       6
+      ],
+      "switchside": false,
+      "steps": [
+       {
+        "type": "move",
+        "name": "child_to_upwarddog"
+       },
+       {
+        "type": "move",
+        "name": "upwarddog_to_child"
+       }
+      ]
+     },
+     {
+      "type": "move",
+      "name": "child_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     },
+     {
+      "type": "switchside"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "intermediate": [
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "loop",
+         "count": [
+          2
+         ],
+         "switchside": true,
+         "steps": [
+          {
+           "type": "move",
+           "name": "downwarddog_to_downwarddoghandtoankle"
+          },
+          {
+           "type": "hold",
+           "count": 4,
+           "phrase": "none",
+           "audibleCount": false
+          },
+          {
+           "type": "move",
+           "name": "downwarddoghandtoankle_to_downwarddog"
+          }
+         ]
+        },
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "downwarddog_to_boxneutral"
+        },
+        {
+         "type": "loop",
+         "count": [
+          2
+         ],
+         "switchside": true,
+         "steps": [
+          {
+           "type": "move",
+           "name": "boxneutral_to_boxhandtoankle"
+          },
+          {
+           "type": "hold",
+           "count": 4,
+           "phrase": "soften",
+           "audibleCount": false
+          },
+          {
+           "type": "move",
+           "name": "boxhandtoankle_to_boxneutral"
+          }
+         ]
+        },
+        {
+         "type": "move",
+         "name": "boxneutral_to_downwarddog"
+        },
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "type": "switchside"
+   },
+   {
+    "type": "loop",
+    "count": [
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddoglegup"
+     },
+     {
+      "type": "move",
+      "name": "downwarddoglegup_to_lunge"
+     },
+     {
+      "type": "move",
+      "name": "lunge_to_warriorI"
+     },
+     {
+      "type": "hold",
+      "count": 3,
+      "phrase": "hold",
+      "audibleCount": false
+     },
+     {
+      "type": "loop",
+      "count": [
+       1,
+       0,
+       0
+      ],
+      "switchside": false,
+      "steps": [
+       {
+        "type": "move",
+        "name": "warriorI_to_warriorII"
+       },
+       {
+        "type": "hold",
+        "count": 3,
+        "phrase": "hold",
+        "audibleCount": false
+       }
+      ]
+     },
+     {
+      "type": "loop",
+      "count": [
+       0,
+       1,
+       1
+      ],
+      "switchside": false,
+      "steps": [
+       {
+        "type": "move",
+        "name": "warriorI_to_warriorprayer"
+       },
+       {
+        "type": "move",
+        "name": "warriorprayer_to_warriortwist"
+       },
+       {
+        "type": "difficulty",
+        "levels": {
+         "intermediate": [
+          {
+           "type": "hold",
+           "count": 1,
+           "phrase": "none",
+           "audibleCount": false
+          },
+          {
+           "type": "move",
+           "name": "warriortwist_to_warriortwistextended"
+          },
+          {
+           "type": "hold",
+           "count": 3,
+           "phrase": "hold",
+           "audibleCount": false
+          },
+          {
+           "type": "move",
+           "name": "warriortwistextended_to_warriortwist"
+          }
+         ],
+         "beginner": [
+          {
+           "type": "hold",
+           "count": 3,
+           "phrase": "hold",
+           "audibleCount": false
+          }
+         ]
+        }
+       },
+       {
+        "type": "move",
+        "name": "warriortwist_to_warriorprayer"
+       },
+       {
+        "type": "move",
+        "name": "warriorprayer_to_warriorII"
+       },
+       {
+        "type": "move",
+        "name": "warriorII_to_triangle"
+       },
+       {
+        "type": "move",
+        "name": "triangle_to_triangleforward"
+       },
+       {
+        "type": "hold",
+        "count": 3,
+        "phrase": "hold",
+        "audibleCount": false
+       },
+       {
+        "type": "move",
+        "name": "triangleforward_to_triangle"
+       },
+       {
+        "type": "move",
+        "name": "triangle_to_warriorII"
+       }
+      ]
+     },
+     {
+      "type": "move",
+      "name": "warriorII_to_warriorIIforward"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "warriorIIforward_to_lungebind"
+        },
+        {
+         "type": "move",
+         "name": "lungebind_to_chairtwistbind"
+        },
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "chairtwistbind_to_chairtwistbindup"
+        },
+        {
+         "type": "hold",
+         "count": 3,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "chairtwistbindup_to_chairtwistbind"
+        },
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "chairtwistbind_to_lungebind"
+        },
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "lungebind_to_warriorIIforward"
+        }
+       ],
+       "intermediate": [
+        {
+         "type": "move",
+         "name": "warriorIIforward_to_lungebind"
+        },
+        {
+         "type": "hold",
+         "count": 3,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "lungebind_to_warriorIIforward"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "hold",
+         "count": 3,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "warriorIIforward_to_warriorII"
+     },
+     {
+      "type": "move",
+      "name": "warriorII_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "soften",
+    "audibleCount": false
+   },
+   {
+    "type": "difficulty",
+    "levels": {
+     "expert": [
+      {
+       "type": "hold",
+       "count": 0,
+       "phrase": "none",
+       "audibleCount": false
+      }
+     ],
+     "beginner": [
+      {
+       "type": "move",
+       "name": "downwarddog_to_boxneutral"
+      },
+      {
+       "type": "move",
+       "name": "boxneutral_to_childwide"
+      },
+      {
+       "type": "hold",
+       "count": 5,
+       "phrase": "rest",
+       "audibleCount": false
+      },
+      {
+       "type": "move",
+       "name": "childwide_to_boxneutral"
+      },
+      {
+       "type": "move",
+       "name": "boxneutral_to_downwarddog"
+      }
+     ]
+    }
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     0,
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     0,
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     0,
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "downwarddogbentknees_to_forwardbend-float"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "downwarddogbentknees_to_forwardbend-step"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_chair"
+        },
+        {
+         "type": "move",
+         "name": "chair_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_chair"
+        },
+        {
+         "type": "move",
+         "name": "chair_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_fourlimbedstaff-float"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_fourlimbedstaff-step"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "upwarddog_to_downwarddog-pushup"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "upwarddog_to_downwarddog"
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     0,
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "downwarddogbentknees_to_forwardbend-float"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "downwarddogbentknees_to_forwardbend-step"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_chair"
+        },
+        {
+         "type": "move",
+         "name": "chair_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_chair"
+        },
+        {
+         "type": "move",
+         "name": "chair_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_fourlimbedstaff-float"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_fourlimbedstaff-step"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "upwarddog_to_downwarddog-pushup"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "upwarddog_to_downwarddog"
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     1,
+     1
+    ],
+    "switchside": false,
+    "steps": [
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "pose",
+         "name": "Plank"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "pose",
+         "name": "Plank Kneeling"
+        }
+       ]
+      }
+     },
+     {
+      "type": "pose",
+      "name": "Four Limbed Staff"
+     },
+     {
+      "type": "pose",
+      "name": "Upward Dog"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "intermediate": [
+        {
+         "type": "move",
+         "name": "upwarddog_to_downwarddog-pushup"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "upwarddog_to_downwarddog"
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     1,
+     1
+    ],
+    "switchside": false,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_forwardbend-step"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "mountainarmsup_to_mountain"
+     },
+     {
+      "type": "loop",
+      "count": [
+       2
+      ],
+      "switchside": true,
+      "steps": [
+       {
+        "type": "move",
+        "name": "mountain_to_tree"
+       },
+       {
+        "type": "hold",
+        "count": 6,
+        "phrase": "hold",
+        "audibleCount": false
+       },
+       {
+        "type": "move",
+        "name": "tree_to_mountain"
+       },
+       {
+        "type": "hold",
+        "count": 1,
+        "phrase": "none",
+        "audibleCount": false
+       }
+      ]
+     },
+     {
+      "type": "move",
+      "name": "mountain_to_mountainarmsup"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_fourlimbedstaff-step"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "move",
+    "name": "downwarddog_to_boxneutral"
+   },
+   {
+    "type": "music",
+    "kind": "builtin",
+    "id": "2"
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     2,
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "boxneutral_to_pigeonhalf"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "hold",
+         "count": 5,
+         "phrase": "rest",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "pigeonhalf_to_pigeonfull"
+        },
+        {
+         "type": "hold",
+         "count": 5,
+         "phrase": "soften",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "pigeonfull_to_kneepile"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "hold",
+         "count": 5,
+         "phrase": "rest",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "pigeonhalf_to_kneepile"
+        }
+       ]
+      }
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "intermediate": [
+        {
+         "type": "hold",
+         "count": 1,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "kneepile_to_kneepilebind"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "hold",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "kneepilebind_to_kneepile"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "hold",
+         "count": 5,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "kneepile_to_boxneutral"
+     }
+    ]
+   },
+   {
+    "type": "move",
+    "name": "boxneutral_to_seatedforwardbendpreparation"
+   },
+   {
+    "type": "hold",
+    "count": 1,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "seatedforwardbendpreparation_to_seatedforwardbend"
+   },
+   {
+    "type": "hold",
+    "count": 5,
+    "phrase": "soften",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "seatedforwardbend_to_corpse"
+   },
+   {
+    "type": "hold",
+    "count": 1,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "difficulty",
+    "levels": {
+     "expert": [
+      {
+       "type": "pose",
+       "name": "Wheel"
+      }
+     ],
+     "intermediate": [
+      {
+       "type": "pose",
+       "name": "Bridge"
+      },
+      {
+       "type": "pose",
+       "name": "Wheel"
+      }
+     ],
+     "beginner": [
+      {
+       "type": "pose",
+       "name": "Bridge"
+      }
+     ]
+    }
+   },
+   {
+    "type": "pose",
+    "name": "Corpse"
+   },
+   {
+    "type": "move",
+    "name": "corpse_to_turtle"
+   },
+   {
+    "type": "hold",
+    "count": 3,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "pose",
+    "name": "Corpse"
+   },
+   {
+    "type": "difficulty",
+    "levels": {
+     "expert": [
+      {
+       "type": "pose",
+       "name": "Corpse Double Leg Raise"
+      },
+      {
+       "type": "pose",
+       "name": "Shoulderstand Supported"
+      },
+      {
+       "type": "pose",
+       "name": "Plow"
+      },
+      {
+       "type": "pose",
+       "name": "Deaf Man"
+      },
+      {
+       "type": "pose",
+       "name": "Corpse"
+      }
+     ],
+     "intermediate": [
+      {
+       "type": "pose",
+       "name": "Corpse Double Leg Raise"
+      },
+      {
+       "type": "pose",
+       "name": "Shoulderstand Supported"
+      },
+      {
+       "type": "pose",
+       "name": "Plow"
+      },
+      {
+       "type": "pose",
+       "name": "Corpse"
+      }
+     ],
+     "beginner": [
+      {
+       "type": "pose",
+       "name": "Corpse Double Leg Raise"
+      },
+      {
+       "type": "pose",
+       "name": "Corpse"
+      }
+     ]
+    }
+   },
+   {
+    "type": "music",
+    "kind": "builtin",
+    "id": "3"
+   },
+   {
+    "type": "move",
+    "name": "corpse_to_savasana"
+   },
+   {
+    "type": "hold",
+    "count": 5,
+    "phrase": "none",
+    "audibleCount": false
+   }
+  ]
+ }
+}

@@ -214,6 +214,10 @@ def test_dashboard(client, auth):
     assert dash["profile"]["name"] == "DB Tester"
     assert dash["charts"]["total"] >= 1
     assert dash["yoga"]["total_sessions"] >= 1
+    assert dash["yoga"]["recent"], "dashboard should include recent yoga sessions"
+    first = dash["yoga"]["recent"][0]
+    assert first["category"] in ("asanas", "breathing", "meditation")
+    assert "practice_date" in first and "duration_seconds" in first
     assert dash["tarot"]["total_draws"] >= 1
     streak_types = {s["streak_type"] for s in dash["streaks"]}
     assert {"yoga", "tarot"}.issubset(streak_types)

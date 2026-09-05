@@ -1,0 +1,774 @@
+{
+ "file": "sun_salutation_a",
+ "head": {
+  "name": "Sun Salutation A",
+  "description": "The Gaia Flow Yoga variation of Surya Namaskara Ka, Sun Salutation A, is a series of postures, performed in a graceful and reciprocal flow of movement and breath, which build strength, increase flexibility and support a sense of well-being.  This slow-paced series encourages an inward meditative practice of healing and expansion on many levels.",
+  "style": "power",
+  "durations": [
+   2,
+   4,
+   6,
+   8,
+   10,
+   20,
+   30,
+   108
+  ],
+  "difficulties": [
+   0,
+   1,
+   2
+  ],
+  "pose": {
+   "name": "Mountain Arms Up",
+   "side": "left"
+  }
+ },
+ "body": {
+  "preferredBackgroundName": "Home",
+  "steps": [
+   {
+    "type": "tempo",
+    "duration": 4.0
+   },
+   {
+    "type": "music",
+    "kind": "builtin",
+    "id": "0"
+   },
+   {
+    "type": "move",
+    "name": "downwarddogstart_to_downwarddogstart"
+   },
+   {
+    "type": "hold",
+    "count": 1,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "move",
+    "name": "downwarddogstart_to_downwarddog"
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "none",
+    "audibleCount": false
+   },
+   {
+    "type": "loop",
+    "count": [
+     2
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        },
+        {
+         "type": "hold",
+         "count": 2,
+         "phrase": "none",
+         "audibleCount": false
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     },
+     {
+      "type": "hold",
+      "count": 2,
+      "phrase": "none",
+      "audibleCount": false
+     }
+    ]
+   },
+   {
+    "type": "music",
+    "kind": "builtin",
+    "id": "1"
+   },
+   {
+    "type": "tempo",
+    "duration": 6.0
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "tempo",
+    "duration": 5.0
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "tempo",
+    "duration": 4.0
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     0,
+     2,
+     4,
+     6,
+     6,
+     6,
+     6
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "loop",
+    "count": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     10,
+     20,
+     98
+    ],
+    "switchside": true,
+    "steps": [
+     {
+      "type": "move",
+      "name": "downwarddog_to_downwarddogbentknees"
+     },
+     {
+      "type": "move",
+      "name": "downwarddogbentknees_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_forwardbend"
+     },
+     {
+      "type": "move",
+      "name": "forwardbend_to_forwardbendhalfway"
+     },
+     {
+      "type": "difficulty",
+      "levels": {
+       "expert": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbenddeep"
+        },
+        {
+         "type": "move",
+         "name": "forwardbenddeep_to_forwardbendhalfway"
+        }
+       ],
+       "beginner": [
+        {
+         "type": "move",
+         "name": "forwardbendhalfway_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_mountain"
+        },
+        {
+         "type": "move",
+         "name": "mountain_to_mountainarmsup"
+        },
+        {
+         "type": "move",
+         "name": "mountainarmsup_to_forwardbend"
+        },
+        {
+         "type": "move",
+         "name": "forwardbend_to_forwardbendhalfway"
+        }
+       ]
+      }
+     },
+     {
+      "type": "move",
+      "name": "forwardbendhalfway_to_lungekneeling"
+     },
+     {
+      "type": "move",
+      "name": "lungekneeling_to_warriorIkneeling"
+     },
+     {
+      "type": "move",
+      "name": "warriorIkneeling_to_fourlimbedstaff"
+     },
+     {
+      "type": "move",
+      "name": "fourlimbedstaff_to_upwarddog"
+     },
+     {
+      "type": "move",
+      "name": "upwarddog_to_downwarddog"
+     }
+    ]
+   },
+   {
+    "type": "hold",
+    "count": 2,
+    "phrase": "rest",
+    "audibleCount": false
+   }
+  ]
+ }
+}

@@ -16,6 +16,8 @@ from app.models import (
     PlanResponse,
     PlanUpdate,
     AdminCreateUser,
+    ProfileUpdate,
+    AdminUserEdit,
     create_user,
     create_user_admin,
     ChangePassword,
@@ -144,6 +146,54 @@ def get_me(user=Depends(get_current_user)):
         plan=user["plan"],
         is_admin=bool(user.get("is_admin")),
         created_at=user["created_at"],
+    )
+
+
+@router.put("/profile", response_model=UserResponse)
+def update_profile(data: ProfileUpdate, user=Depends(get_current_user)):
+    """به‌روزرسانی پروفایل کاربر جاری (نام نمایشی / ایمیل)"""
+    from app.models import get_db
+
+    new_email = (data.email or "").strip().lower()
+    new_name = (data.display_name or "").strip()
+    if not new_email and not new_name:
+        raise HTTPException(status_code=400, detail="حداقل یک فیلد برای ویرایش لازم است")
+
+    conn = get_db()
+    try:
+        if new_email:
+            if "@" not in new_email or "." not in new_email:
+                raise HTTPException(status_code=400, detail="ایمیل نامعتبر است")
+            conflict = conn.execute(
+                "SELECT id FROM users WHERE email = ? AND id != ?",
+                (new_email, user["id"]),
+            ).fetchone()
+            if conflict:
+                raise HTTPException(status_code=409, detail="این ایمیل قبلاً ثبت شده")
+
+        updates, values = [], []
+        if new_email:
+            updates.append("email = ?")
+            values.append(new_email)
+        if new_name:
+            updates.append("display_name = ?")
+            values.append(new_name)
+        if updates:
+            values.append(user["id"])
+            conn.execute(f"UPDATE users SET {', '.join(updates)} WHERE id = ?", values)
+            conn.commit()
+
+        u = conn.execute("SELECT * FROM users WHERE id = ?", (user["id"],)).fetchone()
+    finally:
+        conn.close()
+
+    return UserResponse(
+        id=u["id"],
+        email=u["email"],
+        display_name=u["display_name"],
+        plan=u["plan"],
+        is_admin=bool(u["is_admin"]),
+        created_at=u["created_at"],
     )
 
 
@@ -812,6 +862,125 @@ def admin_reset_user_usage(user_id: int, admin=Depends(get_admin_user)):
     if cursor.rowcount == 0:
         raise HTTPException(status_code=404, detail="کاربر یافت نشد")
     return {"status": "reset", "user_id": user_id}
+
+
+@router.put("/admin/users/{user_id}", response_model=UserResponse)
+def admin_edit_user(user_id: int, data: AdminUserEdit, admin=Depends(get_admin_user)):
+    """ویرایش کاربر توسط ادمین — پلن، فلگ ادمین، نام نمایشی
+
+    - **plan**: نام پلن معتبر (404 اگر وجود نداشته باشد)
+    - **is_admin**: ارتقا/تنزل دسترسی ادمین
+    - **display_name**: نام نمایشی جدید
+
+    ادمین نمی‌تواند فلگ ادمین خودش را تغییر دهد.
+    """
+    from app.models import get_db
+
+    conn = get_db()
+    try:
+        user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user:
+            raise HTTPException(status_code=404, detail="کاربر یافت نشد")
+
+        if data.is_admin is not None and user["id"] == admin["id"]:
+            raise HTTPException(status_code=400, detail="نمی‌توانید وضعیت ادمین خودتان را تغییر دهید")
+
+        if data.plan:
+            plan = conn.execute("SELECT id FROM plans WHERE name = ?", (data.plan,)).fetchone()
+            if not plan:
+                raise HTTPException(status_code=404, detail=f"پلن '{data.plan}' یافت نشد")
+
+        updates, values = [], []
+        if data.plan:
+            updates.append("plan = ?")
+            values.append(data.plan)
+        if data.is_admin is not None:
+            updates.append("is_admin = ?")
+            values.append(1 if data.is_admin else 0)
+        if data.display_name is not None:
+            updates.append("display_name = ?")
+            values.append(data.display_name.strip())
+        if updates:
+            values.append(user_id)
+            conn.execute(f"UPDATE users SET {', '.join(updates)} WHERE id = ?", values)
+            conn.commit()
+
+        u = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    finally:
+        conn.close()
+
+    return UserResponse(
+        id=u["id"],
+        email=u["email"],
+        display_name=u["display_name"],
+        plan=u["plan"],
+        is_admin=bool(u["is_admin"]),
+        created_at=u["created_at"],
+    )
+
+
+@router.delete("/admin/users/{user_id}")
+def admin_delete_user(user_id: int, admin=Depends(get_admin_user)):
+    """حذف کاربر توسط ادمین — ادمین نمی‌تواند خودش را حذف کند"""
+    from app.models import get_db
+
+    conn = get_db()
+    try:
+        user = conn.execute("SELECT id FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user:
+            raise HTTPException(status_code=404, detail="کاربر یافت نشد")
+        if user["id"] == admin["id"]:
+            raise HTTPException(status_code=400, detail="نمی‌توانید خودتان را حذف کنید")
+        conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        conn.commit()
+    finally:
+        conn.close()
+    return {"status": "deleted"}
+
+
+@router.post("/admin/users/{user_id}/reset-usage")
+def admin_reset_user_usage(user_id: int, admin=Depends(get_admin_user)):
+    """صفر کردن مصرف روزانه چارت یک کاربر — فقط ادمین"""
+    from app.models import get_db
+
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            "UPDATE users SET daily_charts_used = 0 WHERE id = ?",
+            (user_id,),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    if cursor.rowcount == 0:
+        raise HTTPException(status_code=404, detail="کاربر یافت نشد")
+    return {"daily_charts_used": 0}
+
+
+# ============================================================
+# روت‌های ادمین: آمار کلی مصرف
+# ============================================================
+
+@router.get("/admin/stats")
+def admin_stats(admin=Depends(get_admin_user)):
+    """آمار کلی کاربران — فقط ادمین"""
+    from app.models import get_db
+
+    conn = get_db()
+    try:
+        total_users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        total_admins = conn.execute("SELECT COUNT(*) FROM users WHERE is_admin = 1").fetchone()[0]
+        plan_rows = conn.execute(
+            "SELECT plan AS plan_name, COUNT(*) AS count FROM users GROUP BY plan ORDER BY count DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+
+    return {
+        "total_users": total_users,
+        "total_admins": total_admins,
+        "per_plan": [{"plan": r["plan_name"], "count": r["count"]} for r in plan_rows],
+    }
 
 
 # ============================================================

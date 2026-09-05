@@ -206,11 +206,77 @@ function renderDashboard(containerId) {
                 '<div class="dd-tarot-msg">' + tarot.message + '</div>' +
             '</div>' +
             (yogaHtml ? '<div class="dd-card">' + yogaHtml + '</div>' : '') +
+            (isLoggedIn() ? '<div class="dd-card dd-yoga-stats" id="ddYogaStats"><div class="dd-card-title">🧘 سوابق یوگای من</div><div class="dd-yoga-loading">در حال بارگذاری…</div></div>' : '') +
             eventHtml +
         '</div>';
 
     // اعمال تم عنصر
     if (zodiac && zodiac.element) applyElementTheme(zodiac.element);
+
+    // سوابق یوگا از دیتابیس (فقط کاربران واردشده)
+    loadYogaStats();
+}
+
+function isLoggedIn() {
+    try { return !!localStorage.getItem('cosmic_token'); } catch (e) { return false; }
+}
+
+function faDigits(n) {
+    var d = '۰۱۲۳۴۵۶۷۸۹';
+    return String(n == null ? '' : n).replace(/\d/g, function (x) { return d[+x]; });
+}
+
+// ─── سوابق یوگا (از /api/v5/user/dashboard) ───
+var _yogaStatsCache = { at: 0, html: '' };
+function loadYogaStats() {
+    var host = document.getElementById('ddYogaStats');
+    if (!host) return;
+    if (!isLoggedIn()) { host.remove(); return; }
+    var now = Date.now();
+    if (_yogaStatsCache.html && now - _yogaStatsCache.at < 60000) {
+        host.innerHTML = _yogaStatsCache.html;
+        return;
+    }
+    var token = '';
+    try { token = localStorage.getItem('cosmic_token'); } catch (e) {}
+    fetch('/api/v5/user/dashboard', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (dash) {
+            if (!dash || !dash.yoga) { host.remove(); return; }
+            var y = dash.yoga;
+            var recent = y.recent || [];
+            var catFa = { asanas: 'آسانا', breathing: 'تنفس', meditation: 'مدیتیشن' };
+            function faDate(iso) {
+                if (!iso) return '—';
+                var p = String(iso).split('T')[0].split('-');
+                if (p.length !== 3) return iso;
+                return faDigits(p[2]) + '/' + faDigits(p[1]) + '/' + faDigits(p[0]);
+            }
+            var rows = recent.slice(0, 5).map(function (s) {
+                var label = s.pose_name || s.notes || catFa[s.category] || 'تمرین یوگا';
+                var mins = faDigits(Math.max(1, Math.round((s.duration_seconds || 0) / 60)));
+                return '<div class="dd-yoga-row">' +
+                    '<span class="dd-yoga-row-icon">' + (s.completed ? '✅' : '⏹') + '</span>' +
+                    '<div class="dd-yoga-row-main">' +
+                        '<div class="dd-yoga-row-name">' + label + '</div>' +
+                        '<div class="dd-yoga-row-meta">' + (catFa[s.category] || s.category) + ' · ' + faDate(s.practice_date) + '</div>' +
+                    '</div>' +
+                    '<span class="dd-yoga-row-min">' + mins + ' دقیقه</span>' +
+                '</div>';
+            }).join('');
+            var html =
+                '<div class="dd-yoga-stats-grid">' +
+                    '<div class="dd-yoga-stat"><b>' + faDigits(y.total_minutes || 0) + '</b><span>دقیقه تمرین</span></div>' +
+                    '<div class="dd-yoga-stat"><b>' + faDigits(y.streak || 0) + '</b><span>روز متوالی 🔥</span></div>' +
+                    '<div class="dd-yoga-stat"><b>' + faDigits(y.total_sessions || 0) + '</b><span>جلسه</span></div>' +
+                    '<div class="dd-yoga-stat"><b>' + faDigits(y.longest_streak || 0) + '</b><span>رکورد استریک</span></div>' +
+                '</div>' +
+                '<div class="dd-yoga-recent-title">تمرین‌های اخیر</div>' +
+                (rows ? rows : '<div class="dd-yoga-empty">هنوز جلسه‌ای ثبت نشده — از بخش یوگا شروع کنید 🧘</div>');
+            host.innerHTML = html;
+            _yogaStatsCache = { at: now, html: html };
+        })
+        .catch(function () { host.remove(); });
 }
 
 // ─── اعمال تم بر اساس عنصر ───

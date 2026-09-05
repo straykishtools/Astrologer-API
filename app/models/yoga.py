@@ -3,8 +3,10 @@ Yoga: practice sessions and streak tracking.
 """
 import uuid
 from datetime import date, datetime
+from typing import Optional
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Date,
     DateTime,
@@ -71,6 +73,63 @@ class YogaFavorite(Base):
 
     def __repr__(self) -> str:
         return f"<YogaFavorite user_id={self.user_id} pose_id={self.pose_id} name={self.pose_name!r}>"
+
+
+class YogaInstructor(Base):
+    """A yoga instructor (seeded demo data, manageable by admins)."""
+
+    __tablename__ = "yoga_instructors"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    specialty: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    level: Mapped[str] = mapped_column(String(30), nullable=False, default="intermediate")
+    bio: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    practices = relationship("YogaPracticeCatalog", back_populates="instructor")
+
+    def __repr__(self) -> str:
+        return f"<YogaInstructor id={self.id} name={self.name!r}>"
+
+
+class YogaPracticeCatalog(Base):
+    """Ready-made yoga practice (desert, ocean, ...) stored in the database.
+
+    ``sequence`` holds the full body (steps, loops, difficulty branches) as JSON
+    — the same shape the static ``static/yoga-data/*.json`` files use — and
+    ``subscription_tier`` gates access per plan (free/gold/diamond).
+    """
+
+    __tablename__ = "yoga_practices"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(80), unique=True, index=True, nullable=False)
+    name_fa: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    description_fa: Mapped[str | None] = mapped_column(Text, nullable=True)
+    style: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    difficulty: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    durations: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    difficulties: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    pose_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    instructor_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        Uuid, ForeignKey("yoga_instructors.id", ondelete="SET NULL"), nullable=True
+    )
+    head: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    sequence: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    subscription_tier: Mapped[str] = mapped_column(String(20), nullable=False, default="free")
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # منشأ تمرین: seed (داده‌ی پیش‌فرض) | manual (ساخته‌شده دستی) | xml (آپلود فایل)
+    source: Mapped[str] = mapped_column(String(20), nullable=False, default="manual")
+    source_file: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    instructor = relationship("YogaInstructor", back_populates="practices")
+
+    def __repr__(self) -> str:
+        return f"<YogaPracticeCatalog id={self.id} name={self.name!r} tier={self.subscription_tier}>"
 
 
 class DailyStreak(Base):

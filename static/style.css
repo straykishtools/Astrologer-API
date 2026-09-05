@@ -4573,3 +4573,100 @@ html, body {
     .yp-setting-options { justify-content: flex-start; }
 }
 }
+
+/* ─── سوابق یوگای من (داشبورد روزانه) ─── */
+.dd-yoga-stats { grid-column: 1 / -1; }
+.dd-yoga-loading { color: #aab2cd; font-size: 13px; }
+.dd-yoga-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.dd-yoga-stat {
+    background: rgba(221,192,112,0.07);
+    border: 1px solid rgba(221,192,112,0.12);
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+}
+.dd-yoga-stat b { display: block; font-size: 1.3rem; color: #ddc070; font-weight: 800; }
+.dd-yoga-stat span { display: block; font-size: 0.72rem; color: #aab2cd; margin-top: 2px; }
+.dd-yoga-recent-title { font-size: 0.85rem; color: #ddc070; margin: 8px 0 6px; }
+.dd-yoga-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.dd-yoga-row:last-child { border-bottom: none; }
+.dd-yoga-row-icon { font-size: 1rem; }
+.dd-yoga-row-main { flex: 1; min-width: 0; }
+.dd-yoga-row-name { color: #e8edf5; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dd-yoga-row-meta { color: #7a86a5; font-size: 0.72rem; margin-top: 2px; }
+.dd-yoga-row-min { color: #c9a227; font-size: 0.8rem; white-space: nowrap; }
+.dd-yoga-empty { color: #7a86a5; font-size: 0.8rem; padding: 6px 0; }
+@media (max-width: 640px) {
+    .dd-yoga-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ─── توصیه تمرین روزانه (بر اساس سطح + سابقه) ─── */
+.yoga-daily-rec { margin-top: 6px; }
+.yoga-rec-card {
+    background: linear-gradient(135deg, rgba(16,26,61,0.7), rgba(24,34,72,0.5));
+    border: 1px solid rgba(221,192,112,0.18);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 8px;
+}
+.yoga-rec-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.yoga-rec-emoji { font-size: 2rem; line-height: 1; }
+.yoga-rec-name { font-size: 17px; font-weight: 700; color: var(--gold-200, #e5c766); margin-bottom: 4px; }
+.yoga-rec-meta { font-size: 12.5px; color: var(--ink-dim, #9aa4c0); line-height: 1.7; }
+.yoga-rec-durs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.yoga-rec-dur {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line, #243050);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12.5px;
+    color: var(--ink-dim, #9aa4c0);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+.yoga-rec-dur:hover { border-color: var(--gold-400, #b8860b); color: #fff; }
+.yoga-rec-dur.active {
+    background: linear-gradient(135deg, #b8860b, #8a6d1f);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 700;
+}
+.yoga-rec-reasons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(0,0,0,0.18);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+}
+.yoga-rec-reason { font-size: 12px; color: #b9c3dd; }
+
+/* ─── دکمه‌ی پیش‌نمایش کارت توصیه‌ی روزانه ─── */
+.yoga-daily-start-wrap { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px; }
+.yoga-daily-start-wrap > .yoga-daily-start-btn { flex: 1 1 260px; }
+.yoga-daily-preview-btn {
+    flex: 1 1 190px; align-self: center;
+    padding: 16px 18px;
+    border: 2px dashed var(--line-strong, #3a4a7a);
+    border-radius: 16px;
+    background: rgba(116, 185, 255, 0.06);
+    color: var(--gold-200, #e5c766);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: center;
+}
+.yoga-daily-preview-btn:hover { background: rgba(116,185,255,0.16); border-color: var(--gold-300); transform: translateY(-1px); }

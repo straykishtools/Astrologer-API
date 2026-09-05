@@ -1,0 +1,923 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<session version="2">
+<head>
+	<name>Mountain</name>
+	<description>Mountain is a power based practice that strengthens the body and the mind by instilling a sense of self-discipline, staying power, and one pointed concentration.  In the Mountain practice we move slowly with less vinyasa flow between postures.  In addition, we hold our poses significantly longer; do more arm balances as well as other strength building postures.&#10;&#10;"Your practice begins when you want to come out of a pose."</description>
+	
+	<pose name="Feathered Peacock" side="left"/>
+	
+	<style>ashtanga</style>
+	
+	<durations>
+		<duration value="30"/>
+		<duration value="45"/>
+		<duration value="60"/>
+	</durations>
+	
+	<difficulties>
+		<difficulty value="0"/>
+		<difficulty value="1"/>
+		<difficulty value="2"/>
+	</difficulties>
+</head>
+
+<body preferredBackgroundName="Home">
+
+	<!-- ************************************************************************************************** -->
+	<!-- Warmup -->
+	<tempo duration="4.0f"/>
+	<music type="builtin" id="0"/>
+	
+	<move name="childwidestart_to_childwidestart"/>
+	<hold count="1" phrase="none" audibleCount="false"/>
+	
+	<!-- Child -->
+	<move name="childwidestart_to_childwide"/>
+	<hold count="8" phrase="none" audibleCount="false"/>
+	
+	<move name="childwide_to_childwidesidelean"/>
+	<hold count="2" phrase="soften" audibleCount="false"/>
+	<move name="childwidesidelean_to_childwide"/>
+	<switchside/>
+	<move name="childwide_to_childwidesidelean"/>
+	<hold count="2" phrase="soften" audibleCount="false"/>
+	<move name="childwidesidelean_to_childwide"/>
+	<switchside/>
+
+	<loop count="2,4,4" switchside="true">
+		<move name="childwide_to_childwidesidelean"/>
+		<move name="childwidesidelean_to_childwide"/>
+	</loop>
+		
+	<hold count="2" phrase="soften" audibleCount="false"/>
+	<move name="childwide_to_boxneutral"/>
+	<hold count="2" phrase="none" audibleCount="false"/>
+
+	<!-- Cat & Dog -->
+	<move name="boxneutral_to_dog"/>
+	<hold count="2" audibleCount="false"/>
+	<move name="dog_to_cat"/>
+	
+	<loop count="0,1,2">
+		<hold count="2" audibleCount="false"/>
+		<move name="cat_to_dog"/>
+		<hold count="2" audibleCount="false"/>
+		<move name="dog_to_cat"/>
+	</loop>
+	
+	<hold count="2" audibleCount="false"/>
+	<move name="cat_to_boxneutral"/>
+	
+	
+	<move name="boxneutral_to_downwarddog"/>
+	<hold count="4" phrase="none" audibleCount="false"/>
+	
+	
+	<!-- Walk the Dog -->
+	<move name="downwarddog_to_downwarddogontoes"/>	
+	<hold count="2" audibleCount="false"/>
+	
+	<loop count="2" switchside="true">
+		<move name="downwarddogontoes_to_downwarddoghamstring"/>	
+		<hold count="3" phrase="soften" audibleCount="false"/>
+		<move name="downwarddoghamstring_to_downwarddogontoes"/>	
+	</loop>
+		
+	<loop count="0,2,4" switchside="true">
+		<move name="downwarddogontoes_to_downwarddoghamstring"/>	
+		<move name="downwarddoghamstring_to_downwarddogontoes"/>	
+	</loop>
+	
+	<hold count="2" audibleCount="false"/>
+			
+	<move name="downwarddogontoes_to_downwarddog"/>
+	<hold count="2" phrase="none" audibleCount="false"/>
+
+	
+	
+	<switchside force="right"/>
+	
+	<!-- Hand To Ankle Stretch -->
+	<difficulty>
+		<intermediate>	
+			<!-- 14 -->
+			<hold count="1" phrase="none" audibleCount="false"/>
+			<loop count="2" switchside="true">
+				<move name="downwarddog_to_downwarddoghandtoankle"/>
+				<hold count="4" audibleCount="false"/>
+				<move name="downwarddoghandtoankle_to_downwarddog"/>
+			</loop>
+			<hold count="1" phrase="none" audibleCount="false"/>
+		</intermediate>
+		<beginner>
+			<!-- 15 -->
+			<move name="downwarddog_to_boxneutral"/>
+			<loop count="2" switchside="true">
+				<move name="boxneutral_to_boxhandtoankle"/>
+				<hold count="4" phrase="soften" audibleCount="false"/>
+				<move name="boxhandtoankle_to_boxneutral"/>
+			</loop>
+			<move name="boxneutral_to_downwarddog"/>
+			<hold count="1" phrase="none" audibleCount="false"/>
+		</beginner>
+	</difficulty>
+		
+
+		
+	<!-- ************************************************************************************************** -->
+	<!-- Flow -->
+	<music type="builtin" id="1"/>
+	
+	
+	<!-- Sun Salutation B -->
+	<loop count="2" switchside="true">
+		<move name="downwarddog_to_downwarddogbentknees"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="downwarddogbentknees_to_forwardbend-step"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="forwardbend_to_forwardbendhalfway"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		
+		<difficulty>
+			<expert>
+				<move name="forwardbendhalfway_to_forwardbenddeep"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="forwardbenddeep_to_chair"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="chair_to_forwardbenddeep"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+			</expert>
+			<beginner>
+				<move name="forwardbendhalfway_to_forwardbend"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="forwardbend_to_chair"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="chair_to_forwardbend"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="forwardbend_to_forwardbendhalfway"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+			</beginner>
+		</difficulty>
+		
+		<move name="forwardbendhalfway_to_fourlimbedstaff-step"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="fourlimbedstaff_to_upwarddog"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="upwarddog_to_downwarddog"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+	</loop>
+		
+		
+	
+	<!-- Sun Salutation B -->
+	<loop count="2,2,2" switchside="true">
+		<move name="downwarddog_to_downwarddogbentknees"/>
+		<move name="downwarddogbentknees_to_forwardbend-step"/>
+		<move name="forwardbend_to_forwardbendhalfway"/>
+		
+		<difficulty>
+			<expert>
+				<move name="forwardbendhalfway_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_chair"/>
+				<move name="chair_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_forwardbendhalfway"/>
+			</expert>
+			<beginner>
+				<move name="forwardbendhalfway_to_forwardbend"/>
+				<move name="forwardbend_to_chair"/>
+				<move name="chair_to_forwardbend"/>
+				<move name="forwardbend_to_forwardbendhalfway"/>
+			</beginner>
+		</difficulty>
+		
+		<move name="forwardbendhalfway_to_fourlimbedstaff-step"/>
+		<move name="fourlimbedstaff_to_upwarddog"/>
+		<move name="upwarddog_to_downwarddog"/>
+	</loop>
+	
+	
+	
+	<!-- Sun Salutation B Advanced -->
+	<loop count="2,4,8" switchside="true">
+		<move name="downwarddog_to_downwarddogbentknees"/>
+		<move name="downwarddogbentknees_to_forwardbend-float"/>
+		<move name="forwardbend_to_forwardbendhalfway"/>
+		
+		<difficulty>
+			<expert>
+				<move name="forwardbendhalfway_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_chair"/>
+				<move name="chair_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_forwardbendhalfway"/>
+			</expert>
+			<beginner>
+				<move name="forwardbendhalfway_to_forwardbend"/>
+				<move name="forwardbend_to_chair"/>
+				<move name="chair_to_forwardbend"/>
+				<move name="forwardbend_to_forwardbendhalfway"/>
+			</beginner>
+		</difficulty>
+		
+		<move name="forwardbendhalfway_to_fourlimbedstaff-float"/>
+		<move name="fourlimbedstaff_to_upwarddog"/>
+		<move name="upwarddog_to_downwarddog-pushup"/>
+	</loop>
+	
+	
+	
+	<switchside force="right"/>
+
+	
+	<tempo duration="3.5f"/>
+	
+
+	<!-- Rest 1 -->
+	<move name="downwarddog_to_boxneutral"/>
+	<move name="boxneutral_to_childwide"/>
+	<hold count="variable" phrase="rest" audibleCount="false"/>
+	<move name="childwide_to_boxneutral"/>
+	<move name="boxneutral_to_downwarddog"/>
+	
+	
+	
+
+	<loop count="2" switchside="true">
+
+		<!-- Wheel -->
+		<move name="downwarddog_to_downwarddoglegup"/>
+		
+		<difficulty>
+			<expert>
+				<!-- 16 -->
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="downwarddoglegup_to_downwarddoglegupstackhips"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="downwarddoglegupstackhips_to_wheelflip"/>
+				<hold count="3" phrase="hold" audibleCount="false"/>
+				
+				<move name="wheelflip_to_wheelfliplegup"/>
+				<hold count="3"/>
+				<move name="wheelfliplegup_to_wheelflip"/>
+
+				<move name="wheelflip_to_downwarddoglegup"/>
+				<hold count="1" phrase="none" audibleCount="false"/>
+			</expert>
+			<intermediate>
+				<!-- 9 -->
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="downwarddoglegup_to_downwarddoglegupstackhips"/>
+				<hold count="4"/>
+				<move name="downwarddoglegupstackhips_to_downwarddoglegup"/>
+				<hold count="1" phrase="none" audibleCount="false"/>
+			</intermediate>
+			<beginner>
+				<!-- 4 -->
+				<hold count="4"/>
+			</beginner>
+		</difficulty>
+
+
+		<!-- Mountain Push-ups -->
+		
+		<difficulty>
+			<expert>
+				<move name="downwarddoglegup_to_planklegup"/>
+				<loop count="3">
+					<move name="planklegup_to_downwarddogkneetoforehead"/>
+					<move name="downwarddogkneetoforehead_to_planklegup-pushup"/>
+				</loop>
+
+				<dynamicstate state="silent"/>
+				<loop count="7">		
+					<move name="planklegup_to_downwarddogkneetoforehead"/>
+					<move name="downwarddogkneetoforehead_to_planklegup-pushup"/>
+				</loop>
+				<dynamicstate state="normal"/>		
+								
+				<move name="planklegup_to_downwarddoglegup"/>
+			</expert>
+			<intermediate>
+				<move name="downwarddoglegup_to_planklegup"/>
+				<loop count="3">
+					<move name="planklegup_to_downwarddogkneetoforehead"/>
+					<move name="downwarddogkneetoforehead_to_planklegup"/>
+				</loop>
+				
+				<dynamicstate state="silent"/>
+				<loop count="7">		
+					<move name="planklegup_to_downwarddogkneetoforehead"/>
+					<move name="downwarddogkneetoforehead_to_planklegup"/>
+				</loop>
+				<dynamicstate state="normal"/>
+				
+				<move name="planklegup_to_downwarddoglegup"/>
+			</intermediate>
+			<beginner>
+				<move name="downwarddoglegup_to_planklegupkneeling"/>
+				<loop count="3">
+					<move name="planklegupkneeling_to_downwarddogkneetoforeheadkneeling"/>
+					<move name="downwarddogkneetoforeheadkneeling_to_planklegupkneeling"/>
+				</loop>		
+						
+				<dynamicstate state="silent"/>
+				<loop count="7">		
+					<move name="planklegupkneeling_to_downwarddogkneetoforeheadkneeling"/>
+					<move name="downwarddogkneetoforeheadkneeling_to_planklegupkneeling"/>
+				</loop>
+				<dynamicstate state="normal"/>
+				
+				<move name="planklegupkneeling_to_downwarddoglegup"/>
+			</beginner>			
+		</difficulty>
+	
+		<move name="downwarddoglegup_to_downwarddog"/>	
+	</loop>
+	
+	
+	
+	<loop count="2" switchside="true">
+	
+	
+		<!-- Warrior -->
+		
+		<move name="downwarddog_to_downwarddoglegup"/>
+
+		<move name="downwarddoglegup_to_lunge"/>
+		<move name="lunge_to_warriorI"/>
+		
+		<!-- Warrior_I pulses -->
+
+		<difficulty>
+			<expert>
+				
+				<loop count="1,3,3">
+					<move name="warriorI_to_warriorIforward"/>
+					<hold count="8"/>
+					<move name="warriorIforward_to_warriorI"/>
+				</loop>
+
+				<move name="warriorI_to_warriorII"/>
+			</expert>
+			<beginner>				
+				<move name="warriorI_to_warriorIhandsonhips"/>
+				
+				<loop count="1,3,3">
+					<move name="warriorIhandsonhips_to_warriorIhandsonhipsforward"/>
+					<hold count="8"/>
+					<move name="warriorIhandsonhipsforward_to_warriorIhandsonhips"/>
+				</loop>
+
+				<move name="warriorIhandsonhips_to_warriorII"/>
+			</beginner>
+		</difficulty>
+		
+		<!-- Warrior_II pulses -->
+		
+		<loop count="1,3,3">
+			<move name="warriorII_to_warriorIIforward"/>
+			<hold count="8"/>
+			<move name="warriorIIforward_to_warriorII"/>
+		</loop>
+
+		
+		<loop count="1,0,0">
+			<!-- Come out of warrior -->
+			<move name="warriorII_to_fourlimbedstaff"/>
+			<move name="fourlimbedstaff_to_upwarddog"/>
+			<move name="upwarddog_to_downwarddog"/>
+		</loop>
+		
+		<loop count="0,1,1">
+					
+			<!-- Side angle pose -->
+			
+			<move name="warriorII_to_warriorIIforward"/>
+			<move name="warriorIIforward_to_warriorIIforwardarmforward"/>
+			<hold count="8"/>
+		
+			<!-- Bird of Paradise -->
+			
+			<difficulty>
+				<expert>
+					<!-- 12 -->
+					<move name="warriorIIforwardarmforward_to_lungebind"/>
+					<move name="lungebind_to_chairtwistbind"/>
+					<hold count="1" phrase="none" audibleCount="false"/>
+					<move name="chairtwistbind_to_chairtwistbindup"/>
+					<hold count="3"/>
+
+					<move name="chairtwistbindup_to_chairtwistbind"/>
+					<hold count="1" phrase="none" audibleCount="false"/>
+					<move name="chairtwistbind_to_lungebind"/>
+					<hold count="1" phrase="none" audibleCount="false"/>
+					<move name="lungebind_to_lungehandsonmat"/>
+				</expert>	
+				<intermediate>
+					<!-- 5 -->
+					<move name="warriorIIforwardarmforward_to_lungebind"/>
+					<hold count="3"/>
+					<move name="lungebind_to_lungehandsonmat"/>
+				</intermediate>
+				<beginner>
+					<move name="warriorIIforwardarmforward_to_lungehandsonmat"/>	
+				</beginner>
+			</difficulty>
+			
+			
+			<!-- Flying Man -->
+		
+			<move name="lungehandsonmat_to_lungehandsonmatback"/>
+			<move name="lungehandsonmatback_to_lungehandsonmat"/>
+
+			<difficulty>
+				<expert>
+					<move name="lungehandsonmat_to_downwarddoglegup"/>
+					<move name="downwarddoglegup_to_lungehandsonmatflying"/>
+					
+					<hold count="3"/>
+					
+					<move name="lungehandsonmatflying_to_downwarddoglegup"/>
+					<move name="downwarddoglegup_to_downwarddog"/>	
+				</expert>
+				<beginner>					
+					<move name="lungehandsonmat_to_lungehandsonmatback"/>
+					<move name="lungehandsonmatback_to_lungehandsonmat"/>
+					
+					<hold count="3"/>
+					
+					<move name="lungehandsonmat_to_downwarddoglegup"/>
+					<move name="downwarddoglegup_to_downwarddog"/>		
+				</beginner>
+			</difficulty>
+		</loop>
+		
+		
+		<switchside force="right"/>
+					
+		<!-- Hand To Ankle Stretch -->
+		
+		<difficulty>
+			<intermediate>	
+				<!-- 14 -->
+				<hold count="1" phrase="none" audibleCount="false"/>
+				<loop count="2" switchside="true">
+					<move name="downwarddog_to_downwarddoghandtoankle"/>
+					<hold count="4" audibleCount="false"/>
+					<move name="downwarddoghandtoankle_to_downwarddog"/>
+				</loop>
+				<hold count="1" phrase="none" audibleCount="false"/>
+			</intermediate>
+			<beginner>
+				<!-- 15 -->
+				<move name="downwarddog_to_boxneutral"/>
+				<loop count="2" switchside="true">
+					<move name="boxneutral_to_boxhandtoankle"/>
+					<hold count="4" phrase="soften" audibleCount="false"/>
+					<move name="boxhandtoankle_to_boxneutral"/>
+				</loop>
+				<move name="boxneutral_to_downwarddog"/>
+				<hold count="1" phrase="none" audibleCount="false"/>
+			</beginner>
+		</difficulty>
+	</loop>
+	
+	
+	<switchside force="right"/>
+		
+	<!-- Rest 2	(for non Experts) -->
+	<difficulty>
+		<expert>
+			<hold count="0" phrase="none" audibleCount="false"/>
+		</expert>
+		<beginner>
+			<move name="downwarddog_to_boxneutral"/>
+			<move name="boxneutral_to_childwide"/>
+			<hold count="variable" phrase="rest" audibleCount="false"/>
+			<move name="childwide_to_boxneutral"/>
+			<move name="boxneutral_to_downwarddog"/>
+		</beginner>
+	</difficulty>
+	
+	
+	<loop count="0,0,1">
+	
+		<!-- Sun Salutation B -->
+		<loop count="2" switchside="true">
+			<move name="downwarddog_to_downwarddogbentknees"/>
+			<move name="downwarddogbentknees_to_forwardbend-step"/>
+			<move name="forwardbend_to_forwardbendhalfway"/>
+			
+			<difficulty>
+				<expert>
+					<move name="forwardbendhalfway_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_chair"/>
+					<move name="chair_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				</expert>
+				<beginner>
+					<move name="forwardbendhalfway_to_forwardbend"/>
+					<move name="forwardbend_to_chair"/>
+					<move name="chair_to_forwardbend"/>
+					<move name="forwardbend_to_forwardbendhalfway"/>
+				</beginner>
+			</difficulty>
+			
+			<move name="forwardbendhalfway_to_fourlimbedstaff-step"/>
+			<move name="fourlimbedstaff_to_upwarddog"/>
+			<move name="upwarddog_to_downwarddog"/>
+		</loop>
+		
+		
+		
+		<!-- Sun Salutation B with float -->
+		<loop count="2" switchside="true">
+			<move name="downwarddog_to_downwarddogbentknees"/>
+			<move name="downwarddogbentknees_to_forwardbend-float"/>
+			<move name="forwardbend_to_forwardbendhalfway"/>
+			
+			<difficulty>
+				<expert>
+					<move name="forwardbendhalfway_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_chair"/>
+					<move name="chair_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				</expert>
+				<beginner>
+					<move name="forwardbendhalfway_to_forwardbend"/>
+					<move name="forwardbend_to_chair"/>
+					<move name="chair_to_forwardbend"/>
+					<move name="forwardbend_to_forwardbendhalfway"/>
+				</beginner>
+			</difficulty>
+			
+			<move name="forwardbendhalfway_to_fourlimbedstaff-float"/>
+			<move name="fourlimbedstaff_to_upwarddog"/>
+			<move name="upwarddog_to_downwarddog-pushup"/>
+		</loop>	
+		
+	
+		<dynamicstate state="silent"/>
+		
+		<loop count="2" switchside="true">
+			<move name="downwarddog_to_downwarddogbentknees"/>
+			<move name="downwarddogbentknees_to_forwardbend-float"/>
+			<move name="forwardbend_to_forwardbendhalfway"/>
+			
+			<difficulty>
+				<expert>
+					<move name="forwardbendhalfway_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_chair"/>
+					<move name="chair_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				</expert>
+				<beginner>
+					<move name="forwardbendhalfway_to_forwardbend"/>
+					<move name="forwardbend_to_chair"/>
+					<move name="chair_to_forwardbend"/>
+					<move name="forwardbend_to_forwardbendhalfway"/>
+				</beginner>
+			</difficulty>
+			
+			<move name="forwardbendhalfway_to_fourlimbedstaff-float"/>
+			<move name="fourlimbedstaff_to_upwarddog"/>
+			<move name="upwarddog_to_downwarddog-pushup"/>
+		</loop>	
+	
+		<dynamicstate state="extrasilent"/>
+		
+		<loop count="2" switchside="true">
+			<move name="downwarddog_to_downwarddogbentknees"/>
+			<move name="downwarddogbentknees_to_forwardbend-float"/>
+			<move name="forwardbend_to_forwardbendhalfway"/>
+			
+			<difficulty>
+				<expert>
+					<move name="forwardbendhalfway_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_chair"/>
+					<move name="chair_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				</expert>
+				<beginner>
+					<move name="forwardbendhalfway_to_forwardbend"/>
+					<move name="forwardbend_to_chair"/>
+					<move name="chair_to_forwardbend"/>
+					<move name="forwardbend_to_forwardbendhalfway"/>
+				</beginner>
+			</difficulty>
+			
+			<move name="forwardbendhalfway_to_fourlimbedstaff-float"/>
+			<move name="fourlimbedstaff_to_upwarddog"/>
+			<move name="upwarddog_to_downwarddog-pushup"/>
+		</loop>	
+			
+		<dynamicstate state="normal"/>
+	</loop>
+	
+	<move name="downwarddog_to_boxneutral"/>
+	
+	
+	<loop count="0,1,1">	
+	
+		<!-- Feathered Peacock Pose -->
+			
+		<move name="boxneutral_to_dolphin"/>	
+
+		<loop count="2">
+			<difficulty>
+				<expert>
+					<move name="dolphin_to_featheredpeacock"/>	
+					<hold count="4"/>
+					<move name="featheredpeacock_to_dolphin"/>	
+				</expert>
+				
+				<beginner>
+					<move name="dolphin_to_dolphinlegup"/>
+					<hold count="4"/>
+					<move name="dolphinlegup_to_dolphin"/>
+				</beginner>
+			</difficulty>
+			
+			<switchside/>
+		</loop>
+
+		<!-- Wide splits -->
+		<move name="dolphin_to_splitswide"/>	
+		<hold count="5" phrase="soften" audibleCount="false"/>
+		
+		
+		
+
+		<!-- Tortoise Pose -->
+		<move name="splitswide_to_tortoise"/>	
+		
+		<difficulty>
+			<expert>
+				<!-- 8 -->
+				<hold count="1" phrase="none" audibleCount="false"/>
+				
+				<!-- Tortoise Bind Pose -->
+				<move name="tortoise_to_tortoisebind"/>	
+				<hold count="3" phrase="hold" audibleCount="false"/>
+							
+				<!-- Scale Pose -->
+				<move name="tortoisebind_to_scale"/>	
+				<hold count="1" phrase="none" audibleCount="false"/>
+				
+				<!-- Firefly Pose -->
+				<move name="scale_to_firefly"/>	
+				<hold count="3"/>
+				
+				<!-- Wide splits (2nd) -->
+				<move name="firefly_to_splitswide"/>	
+			</expert>
+			
+			<beginner>
+				<!-- 8 -->
+				<hold count="3" phrase="none" audibleCount="false"/>
+
+				<!-- Scale Pose -->
+				<move name="tortoise_to_scale"/>	
+				<hold count="3"/>
+				
+				<!-- Wide splits (2nd) -->
+				<move name="scale_to_splitswide"/>	
+			</beginner>
+
+		</difficulty>
+		
+		<hold count="5" phrase="soften" audibleCount="false"/>
+
+		<move name="splitswide_to_boxneutral"/>
+		
+	</loop>		
+ 
+ 
+ 
+	<!-- ************************************************************************************************** -->
+	<!-- Cooldown -->
+	<music type="builtin" id="2"/>
+
+
+ 
+	<loop count="0,0,1">
+		
+		<move name="boxneutral_to_downwarddog"/>
+		
+		
+		<!-- Sun Salutation B Advanced -->
+		<loop count="4" switchside="true">
+			<move name="downwarddog_to_downwarddogbentknees"/>
+			<move name="downwarddogbentknees_to_forwardbend-float"/>
+			<move name="forwardbend_to_forwardbendhalfway"/>
+			
+			<difficulty>
+				<expert>
+					<move name="forwardbendhalfway_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_chair"/>
+					<move name="chair_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				</expert>
+				<beginner>
+					<move name="forwardbendhalfway_to_forwardbend"/>
+					<move name="forwardbend_to_chair"/>
+					<move name="chair_to_forwardbend"/>
+					<move name="forwardbend_to_forwardbendhalfway"/>
+				</beginner>
+			</difficulty>
+			
+			<move name="forwardbendhalfway_to_fourlimbedstaff-float"/>
+			<move name="fourlimbedstaff_to_upwarddog"/>
+			<move name="upwarddog_to_downwarddog-pushup"/>
+		</loop>	
+		
+	
+		<!-- Sun Salutation B Advanced (silent) -->
+		<dynamicstate state="silent"/>
+		
+		<loop count="2" switchside="true">
+			<move name="downwarddog_to_downwarddogbentknees"/>
+			<move name="downwarddogbentknees_to_forwardbend-float"/>
+			<move name="forwardbend_to_forwardbendhalfway"/>
+			
+			<difficulty>
+				<expert>
+					<move name="forwardbendhalfway_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_chair"/>
+					<move name="chair_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				</expert>
+				<beginner>
+					<move name="forwardbendhalfway_to_forwardbend"/>
+					<move name="forwardbend_to_chair"/>
+					<move name="chair_to_forwardbend"/>
+					<move name="forwardbend_to_forwardbendhalfway"/>
+				</beginner>
+			</difficulty>
+			
+			<move name="forwardbendhalfway_to_fourlimbedstaff-float"/>
+			<move name="fourlimbedstaff_to_upwarddog"/>
+			<move name="upwarddog_to_downwarddog-pushup"/>
+		</loop>	
+			
+			
+		<!-- Sun Salutation B Advanced (extra silent) -->
+		<dynamicstate state="extrasilent"/>
+		
+		<loop count="4" switchside="true">
+			<move name="downwarddog_to_downwarddogbentknees"/>
+			<move name="downwarddogbentknees_to_forwardbend-float"/>
+			<move name="forwardbend_to_forwardbendhalfway"/>
+			
+			<difficulty>
+				<expert>
+					<move name="forwardbendhalfway_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_chair"/>
+					<move name="chair_to_forwardbenddeep"/>
+					<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				</expert>
+				<beginner>
+					<move name="forwardbendhalfway_to_forwardbend"/>
+					<move name="forwardbend_to_chair"/>
+					<move name="chair_to_forwardbend"/>
+					<move name="forwardbend_to_forwardbendhalfway"/>
+				</beginner>
+			</difficulty>
+			
+			<move name="forwardbendhalfway_to_fourlimbedstaff-float"/>
+			<move name="fourlimbedstaff_to_upwarddog"/>
+			<move name="upwarddog_to_downwarddog-pushup"/>
+		</loop>	
+					
+		<dynamicstate state="normal"/>
+		
+		<move name="downwarddog_to_boxneutral"/>
+	
+	</loop>
+	
+
+
+
+	
+	
+
+				
+	<loop count="2" switchside="true">
+	
+		<!-- Pigeon -->
+		
+		<move name="boxneutral_to_pigeonhalf"/>
+		
+		<difficulty>
+			<expert>
+				<hold count="2,2,4" phrase="rest" audibleCount="false"/>
+				<move name="pigeonhalf_to_splitsfront"/>
+				<hold count="2,2,4" phrase="rest" audibleCount="false"/>
+				<move name="splitsfront_to_kneepile"/>
+			</expert>
+			<beginner>
+				<hold count="5,5,9" phrase="rest" audibleCount="false"/>
+				<move name="pigeonhalf_to_kneepile"/>
+			</beginner>
+		</difficulty>
+		
+		
+		<!-- Knee Pile -->
+		
+		<difficulty>
+			<intermediate>
+				<hold count="1" phrase="none" audibleCount="false"/>
+				<move name="kneepile_to_kneepilebind"/>
+				<hold count="2" phrase="hold" audibleCount="false"/>
+				<move name="kneepilebind_to_kneepile"/>
+			</intermediate>
+			<beginner>
+				<hold count="5" phrase="none" audibleCount="false"/>
+			</beginner>
+		</difficulty>	
+		
+		
+		<loop count="1,0,0">
+			<!-- Come ouf of knee pile -->
+			<move name="kneepile_to_boxneutral"/>
+		</loop>
+		
+		<loop count="0,1,1">
+			<!-- Marichyasana -->
+
+			<move name="kneepile_to_marichiI"/>
+			<hold count="5" audibleCount="false"/>
+			
+			<move name="marichiI_to_marichiIII"/>
+			<hold count="5" audibleCount="false"/>
+			
+			<move name="marichiIII_to_boxneutral"/>
+		</loop>
+		
+	</loop>
+	
+		
+	<!-- Seated Forward bend -->
+	<move name="boxneutral_to_seatedforwardbendpreparation"/>	
+	<hold count="1" phrase="none" audibleCount="false"/>
+	
+	<move name="seatedforwardbendpreparation_to_seatedforwardbend"/>	
+	<hold count="4,6,8" phrase="soften" audibleCount="false"/>
+	<move name="seatedforwardbend_to_corpse"/>
+	<hold count="1" phrase="none" audibleCount="false"/>
+		
+		
+		
+	<!-- Wheel -->
+	<difficulty>
+		<expert>
+			<pose name="Wheel" count="-60" phrase="hold" audibleCount="true"/>
+		</expert>
+		<intermediate>
+			<pose name="Bridge" count="-30" phrase="hold" audibleCount="true"/>
+			<pose name="Wheel" count="-30" phrase="hold" audibleCount="true"/>
+		</intermediate>
+		<beginner>
+			<pose name="Bridge" count="-60" phrase="hold" audibleCount="true"/>
+		</beginner>
+	</difficulty>
+	<pose name="Corpse"/>
+
+
+	<move name="corpse_to_turtle"/>
+	<hold count="3" phrase="none" audibleCount="false"/>
+	
+	<pose name="Corpse"/>
+	
+	<difficulty>
+		<expert>
+			<pose name="Corpse Double Leg Raise" count="5"/>
+			<pose name="Shoulderstand Supported" count="5" phrase="hold" audibleCount="false"/>
+			<pose name="Plow" count="5"/>
+			<pose name="Deaf Man" count="5"/>
+			<pose name="Corpse" count="3"/>
+		</expert>
+		<intermediate>
+			<pose name="Corpse Double Leg Raise" count="6"/>
+			<pose name="Shoulderstand Supported" count="6" phrase="hold" audibleCount="false"/>
+			<pose name="Plow" count="6"/>
+			<pose name="Corpse" count="3"/>
+		</intermediate>
+		<beginner>
+			<pose name="Corpse Double Leg Raise" count="7"/>
+			<pose name="Corpse"/>
+		</beginner>
+	</difficulty>
+	
+	
+	<!-- ************************************************************************************************** -->
+	<!-- Savasana -->
+	<music type="builtin" id="3"/>
+	
+	<move name="corpse_to_savasana"/>
+	<hold count="50,67,84" phrase="none" audibleCount="false"/>
+		
+</body>
+</session>

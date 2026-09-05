@@ -247,6 +247,40 @@ async function loadDashboardCharts() {
                         '<div style="font-size:1.3rem;font-weight:800;color:#fff;margin-top:4px;">' + cd.value + '</div>' +
                         '<div style="color:#888;font-size:0.78rem;margin-top:2px;">' + cd.label + '</div></div>';
                 }).join('') + '</div>';
+
+            // 🧘 جلسات یوگای اخیر — از سوابق واقعی دیتابیس
+            var recent = y.recent || [];
+            var catFa = { asanas: 'آسانا', breathing: 'تنفس', meditation: 'مدیتیشن' };
+            var d = new Date();
+            var todayISO = d.toISOString().split('T')[0];
+            function faDate(iso) {
+                if (!iso) return '—';
+                if (iso === todayISO) return 'امروز';
+                var prev = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                if (iso === prev) return 'دیروز';
+                var parts = String(iso).split('T')[0].split('-');
+                if (parts.length === 3) return fa(parts[2]) + '/' + fa(parts[1]) + '/' + fa(parts[0]);
+                return String(iso);
+            }
+            if (recent.length > 0) {
+                var recentRows = recent.map(function (s) {
+                    var label = s.pose_name || s.notes || catFa[s.category] || 'تمرین یوگا';
+                    var mins = fa(Math.max(1, Math.round((s.duration_seconds || 0) / 60)));
+                    var icon = s.completed ? '✅' : '⏹';
+                    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                        '<span>' + icon + '</span>' +
+                        '<div style="flex:1;min-width:0;">' +
+                            '<div style="color:#e8edf5;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(label) + '</div>' +
+                            '<div style="color:#777;font-size:0.75rem;margin-top:2px;">' + escapeHtml(catFa[s.category] || s.category) + ' · ' + faDate(s.practice_date) + '</div>' +
+                        '</div>' +
+                        '<span style="color:#c9a227;font-size:0.85rem;white-space:nowrap;">' + mins + ' دقیقه</span>' +
+                    '</div>';
+                }).join('');
+                statsHtml += '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;margin-bottom:24px;">' +
+                    '<div style="font-weight:700;color:#fff;margin-bottom:6px;">🧘 جلسات یوگای اخیر</div>' +
+                    recentRows +
+                '</div>';
+            }
         }
     } catch (e) { /* stats are best-effort */ }
 

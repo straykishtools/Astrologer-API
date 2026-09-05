@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<session version="2">
+<head>
+	<name>Sun Salutation A</name>
+	<description>The Gaia Flow Yoga variation of Surya Namaskara Ka, Sun Salutation A, is a series of postures, performed in a graceful and reciprocal flow of movement and breath, which build strength, increase flexibility and support a sense of well-being.  This slow-paced series encourages an inward meditative practice of healing and expansion on many levels.</description>
+
+	<pose name="Mountain Arms Up" side="left"/>
+	
+	<style>power</style>
+	
+	<durations type="repetitions">
+		<duration value="2"/>
+		<duration value="4"/>
+		<duration value="6"/>
+		<duration value="8"/>
+		<duration value="10"/>
+		<duration value="20"/>
+		<duration value="30"/>
+		<duration value="108"/>
+	</durations>
+	
+	<difficulties>
+		<difficulty value="0"/>
+		<difficulty value="1"/>
+		<difficulty value="2"/>
+	</difficulties>
+</head>
+
+<body preferredBackgroundName="Home">
+
+	<!-- ************************************************************************************************** -->
+	<!-- Warm Up -->
+	<tempo duration="4.0f"/>
+	<music type="builtin" id="0"/>
+	
+	<move name="downwarddogstart_to_downwarddogstart"/>
+	<hold count="1" phrase="none" audibleCount="false"/>
+
+	<move name="downwarddogstart_to_downwarddog"/>
+	<hold count="2" phrase="none" audibleCount="false"/>
+	
+	<!-- Sun Salutation A -->
+	<loop count="2" switchside="true">
+		<move name="downwarddog_to_downwarddogbentknees"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="downwarddogbentknees_to_lungekneeling"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="warriorIkneeling_to_forwardbend"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="forwardbend_to_forwardbendhalfway"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		
+		<difficulty>
+			<expert>
+				<move name="forwardbendhalfway_to_forwardbenddeep"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="forwardbenddeep_to_mountainarmsup"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="mountainarmsup_to_forwardbenddeep"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="forwardbenddeep_to_forwardbendhalfway"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+			</expert>
+			<beginner>
+				<move name="forwardbendhalfway_to_forwardbend"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="forwardbend_to_mountainarmsup"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="mountainarmsup_to_forwardbend"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+				<move name="forwardbend_to_forwardbendhalfway"/>
+				<hold count="2" phrase="none" audibleCount="false"/>
+			</beginner>
+		</difficulty>
+		
+		<move name="forwardbendhalfway_to_lungekneeling"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="warriorIkneeling_to_fourlimbedstaff"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="fourlimbedstaff_to_upwarddog"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+		<move name="upwarddog_to_downwarddog"/>
+		<hold count="2" phrase="none" audibleCount="false"/>
+	</loop>
+	
+
+	<!-- ************************************************************************************************** -->
+	<!-- Flow -->
+	<music type="builtin" id="1"/>
+	
+	<tempo duration="6.0f"/>
+	
+	<!-- Sun Salutation A -->
+	<loop count="0,1,1,1,1,1,1,1" switchside="true">
+		<move name="downwarddog_to_downwarddogbentknees"/>
+		<move name="downwarddogbentknees_to_lungekneeling"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<move name="warriorIkneeling_to_forwardbend"/>
+		<move name="forwardbend_to_forwardbendhalfway"/>
+		
+		<difficulty>
+			<expert>
+				<move name="forwardbendhalfway_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_forwardbendhalfway"/>
+			</expert>
+			<beginner>
+				<move name="forwardbendhalfway_to_forwardbend"/>
+				<move name="forwardbend_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_forwardbend"/>
+				<move name="forwardbend_to_forwardbendhalfway"/>
+			</beginner>
+		</difficulty>
+		
+		<move name="forwardbendhalfway_to_lungekneeling"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<move name="warriorIkneeling_to_fourlimbedstaff"/>
+		<move name="fourlimbedstaff_to_upwarddog"/>
+		<move name="upwarddog_to_downwarddog"/>
+	</loop>	
+	
+	<tempo duration="5.0f"/>
+	
+	<!-- Sun Salutation A -->
+	<loop count="0,1,1,1,1,1,1,1" switchside="true">
+		<move name="downwarddog_to_downwarddogbentknees"/>
+		<move name="downwarddogbentknees_to_lungekneeling"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<move name="warriorIkneeling_to_forwardbend"/>
+		<move name="forwardbend_to_forwardbendhalfway"/>
+		
+		<difficulty>
+			<expert>
+				<move name="forwardbendhalfway_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_forwardbendhalfway"/>
+			</expert>
+			<beginner>
+				<move name="forwardbendhalfway_to_forwardbend"/>
+				<move name="forwardbend_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_forwardbend"/>
+				<move name="forwardbend_to_forwardbendhalfway"/>
+			</beginner>
+		</difficulty>
+		
+		<move name="forwardbendhalfway_to_lungekneeling"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<move name="warriorIkneeling_to_fourlimbedstaff"/>
+		<move name="fourlimbedstaff_to_upwarddog"/>
+		<move name="upwarddog_to_downwarddog"/>
+	</loop>	
+	
+	
+	<tempo duration="4.0f"/>
+	
+	<!-- Sun Salutation A -->
+	<loop count="0,0,2,4,6,6,6,6" switchside="true">
+		<move name="downwarddog_to_downwarddogbentknees"/>
+		<move name="downwarddogbentknees_to_lungekneeling"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<move name="warriorIkneeling_to_forwardbend"/>
+		<move name="forwardbend_to_forwardbendhalfway"/>
+		
+		<difficulty>
+			<expert>
+				<move name="forwardbendhalfway_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_forwardbendhalfway"/>
+			</expert>
+			<beginner>
+				<move name="forwardbendhalfway_to_forwardbend"/>
+				<move name="forwardbend_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_forwardbend"/>
+				<move name="forwardbend_to_forwardbendhalfway"/>
+			</beginner>
+		</difficulty>
+		
+		<move name="forwardbendhalfway_to_lungekneeling"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<move name="warriorIkneeling_to_fourlimbedstaff"/>
+		<move name="fourlimbedstaff_to_upwarddog"/>
+		<move name="upwarddog_to_downwarddog"/>
+	</loop>
+	
+	
+	<!-- Sun Salutation A (silent) -->
+	<dynamicstate state="silent"/>
+	
+	<loop count="0,0,0,0,0,10,20,98" switchside="true">
+		<move name="downwarddog_to_downwarddogbentknees"/>
+		<move name="downwarddogbentknees_to_lungekneeling"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<move name="warriorIkneeling_to_forwardbend"/>
+		<move name="forwardbend_to_forwardbendhalfway"/>
+		
+		<difficulty>
+			<expert>
+				<move name="forwardbendhalfway_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_forwardbenddeep"/>
+				<move name="forwardbenddeep_to_forwardbendhalfway"/>
+			</expert>
+			<beginner>
+				<move name="forwardbendhalfway_to_forwardbend"/>
+				<move name="forwardbend_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_mountain"/>
+				<move name="mountain_to_mountainarmsup"/>
+				<move name="mountainarmsup_to_forwardbend"/>
+				<move name="forwardbend_to_forwardbendhalfway"/>
+			</beginner>
+		</difficulty>
+		
+		<move name="forwardbendhalfway_to_lungekneeling"/>
+		<move name="lungekneeling_to_warriorIkneeling"/>
+		<move name="warriorIkneeling_to_fourlimbedstaff"/>
+		<move name="fourlimbedstaff_to_upwarddog"/>
+		<move name="upwarddog_to_downwarddog"/>
+	</loop>
+		
+	<hold count="2" phrase="rest" audibleCount="false"/>
+
+</body>
+</session>

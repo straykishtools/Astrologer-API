@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmic Oracle · چارت تولد حرفه‌ای</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================
+       SPACE THEME COSMIC ORACLE
+       - Dark space background with multi-layer galaxy gradients
+       - Twinkling stars animation
+       - Glassmorphism effects on cards and panels
+       - Header blur on scroll
+       - Fully responsive
+       ========================================================== */
+
+    /* ---- CSS Variables ---- */
+    :root {
+      /* Space colors */
+      --clr-space-deep: #02040e;      /* Almost black */
+      --clr-space-dark: #0a0f2c;      /* Deep blue */
+      --clr-space-blue: #1e293b;      /* Slate dark */
+      --clr-space-purple: #4338ca;    /* Indigo */
+      --clr-space-cyan: #06b6d4;      /* Cyan */
+      --clr-space-pink: #ec4899;      /* Pink */
+      --clr-space-white: #f8fafc;     /* Soft white */
+      --clr-space-gray: #94a3b8;      /* Gray */
+
+      /* Glassmorphism */
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+
+      /* Fonts */
+      --font-main: 'Vazirmatn', sans-serif;
+      --font-title: 'Orbitron', sans-serif;
+
+      /* Transitions */
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* ---- Reset & Base ---- */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--clr-space-deep);
+      color: var(--clr-space-white);
+      direction: rtl;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ==========================================================
+       BACKGROUND: Galaxy gradients + twinkling stars
+       ========================================================== */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      display: block;
+    }
+
+    /* Multiple gradient layers for galaxy effect */
+    .galaxy-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        /* Layer 1: Purple nebula */
+        radial-gradient(ellipse at 20% 30%, rgba(67, 56, 202, 0.3) 0%, transparent 50%),
+        /* Layer 2: Blue nebula */
+        radial-gradient(ellipse at 80% 70%, rgba(30, 64, 175, 0.25) 0%, transparent 60%),
+        /* Layer 3: Pinkish haze */
+        radial-gradient(ellipse at 40% 10%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
+        /* Base dark space */
+        linear-gradient(180deg, var(--clr-space-deep) 0%, var(--clr-space-dark) 100%);
+    }
+
+    /* Twinkling stars */
+    .stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--clr-space-white);
+      border-radius: 50%;
+      animation: twinkle var(--duration, 3s) ease-in-out infinite;
+      opacity: 0;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50%      { opacity: 1;   transform: scale(1.5); }
+    }
+
+    /* Larger stars with glow */
+    .star--large {
+      width: 3px;
+      height: 3px;
+      box-shadow: 0 0 6px 2px rgba(6, 182, 212, 0.6);
+    }
+
+    .star--pink {
+      box-shadow: 0 0 6px 2px rgba(236, 72, 153, 0.6);
+    }
+
+    /* ==========================================================
+       HEADER
+       ========================================================== */
+    .main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: transparent;
+      backdrop-filter: blur(0);
+      transition: backdrop-filter 0.4s, background 0.4s, box-shadow 0.4s;
+    }
+
+    .main-header.scrolled {
+      backdrop-filter: blur(12px) saturate(1.5);
+      background: rgba(2, 4, 14, 0.6);
+      box-shadow: 0 1px 20px rgba(6, 182, 212, 0.15);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-icon {
+      font-size: 1.8rem;
+    }
+
+    .logo h1 {
+      font-family: var(--font-title);
+      font-size: 1.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--clr-space-cyan), var(--clr-space-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .sub {
+      font-size: 0.9rem;
+      color: var(--clr-space-gray);
+      margin-top: 0.25rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(5px);
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-action[style*="background:#1e2740"] {
+      background: var(--glass-bg);
+      color: var(--clr-space-white);
+      border: 1px solid var(--glass-border);
+    }
+
+    .btn-action.primary {
+      background: linear-gradient(135deg, var(--clr-space-purple), var(--clr-space-cyan));
+      color: var(--clr-space-white);
+      box-shadow: 0 4px 15px rgba(67, 56, 202, 0.4);
+    }
+
+    .btn-action.primary:hover {
+      box-shadow: 0 6px 25px rgba(6, 182, 212, 0.5);
+    }
+
+    /* ==========================================================
+       FORM CARD & TABS
+       ========================================================== */
+    .form-card {
+      position: relative;
+      z-index: 10;
+      margin-top: 4rem; /* Space for header */
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: var(--glass-shadow);
+      overflow: hidden;
+    }
+
+    /* Tab navigation */
+    .tab-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 10px;
+      background: var(--glass-bg);
+      color: var(--clr-space-gray);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(8px);
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--clr-space-white);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(67, 56, 202, 0.2));
+      color: var(--clr-space-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+    }
+
+    .tab-emoji {
+      font-size: 1.1rem;
+    }
+
+    /* Location bar */
+    .location-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--clr-space-gray);
+      margin-bottom: 1.5rem;
+      padding: 0.8rem 1.2rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+    }
+
+    .location-bar-icon {
+      font-size: 1.1rem;
+    }
+
+    /* Form title */
+    .form-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+    }
+
+    .form-title > * {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-title span {
+      font-size: 0.85rem;
+      color: var(--clr-space-gray);
+    }
+
+    /* Form container (will be populated by JS) */
+    #formContainer {
+      margin-bottom: 1.5rem;
+      min-height: 180px;
+    }
+
+    /* Primary button */
+    .btn-primary {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--clr-space-purple), var(--clr-space-cyan));
+      color: var(--clr-space-white);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      transition: var(--transition);
+      box-shadow: 0 4px 20px rgba(67, 56, 202, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(6, 182, 212, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* Status area */
+    #status {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      text-align: center;
+      min-height: 2rem;
+    }
+
+    #status.success {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    #status.error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* ==========================================================
+       RESULTS AREA
+       ========================================================== */
+    #result {
+      margin-top: 2rem;
+      min-height: 200px;
+      /* Will be filled by JS */
+    }
+
+    /* ==========================================================
+       FOOTER PREMIUM
+       ========================================================== */
+    .footer-premium {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: var(--clr-space-gray);
+      margin-top: 3rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-premium a {
+      color: var(--clr-space-cyan);
+      margin: 0 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .footer-premium a:hover {
+      color: var(--clr-space-white);
+      text-decoration: underline;
+    }
+
+    /* ==========================================================
+       TOAST CONTAINER
+       ========================================================== */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(50%);
+      z-index: 2000;
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .toast {
+      min-width: 280px;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      color: var(--clr-space-white);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      box-shadow: var(--glass-shadow);
+      animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(50%) translateY(20px); opacity: 0; }
+      to   { transform: translateX(50%) translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    .toast.success { border-left: 4px solid #10b981; }
+    .toast.error   { border-left: 4px solid #ef4444; }
+    .toast.info    { border-left: 4px solid var(--clr-space-cyan); }
+
+    /* ==========================================================
+       YOGA OVERLAY (simplified)
+       ========================================================== */
+    .yoga-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1500;
+      background: rgba(2, 4, 14, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .yoga-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--clr-space-cyan) 0%, transparent 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50%      { transform: scale(1.1); opacity: 0.4; }
+    }
+
+    .yoga-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--clr-space-white);
+    }
+
+    .yoga-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .yoga-controls label {
+      font-size: 0.9rem;
+      color: var(--clr-space-gray);
+    }
+
+    #yogaSpeed {
+      width: 80px;
+    }
+
+    .yoga-overlay button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--glass-bg);
+      color: var(--clr-space-white);
+      cursor: pointer;
+    }
+
+    .yoga-overlay button:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* ==========================================================
+       MAP MODAL (simplified)
+       ========================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1500;
+      background: rgba(2, 4, 14, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow: hidden;
+      box-shadow: var(--glass-shadow);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .modal-header h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.3rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--clr-space-gray);
+    }
+
+    .modal-close:hover {
+      color: var(--clr-space-white);
+    }
+
+    /* Map container */
+    #map {
+      width: 100%;
+      height: 300px;
+      margin: 0;
+    }
+
+    .modal-footer {
+      padding: 1.2rem 1.5rem;
+      text-align: right;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    /* ==========================================================
+       RESPONSIVE ADJUSTMENTS
+       ========================================================== */
+    @media (max-width: 768px) {
+      .main-header {
+        padding: 0.8rem;
+      }
+
+      .logo h1 {
+        font-size: 1.2rem;
+      }
+
+      .sub {
+        font-size: 0.8rem;
+      }
+
+      .header-actions {
+        gap: 0.3rem;
+      }
+
+      .btn-action {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+      }
+
+      .form-card {
+        margin-top: 3.5rem;
+        padding: 1.5rem;
+      }
+
+      .tab-nav {
+        gap: 0.3rem;
+      }
+
+      .tab-btn {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.8rem;
+      }
+
+      .form-title {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+      }
+
+      .btn-primary {
+        padding: 0.9rem;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo h1 {
+        font-size: 1rem;
+      }
+
+      .sub {
+        font-size: 0.75rem;
+      }
+
+      .header-actions {
+        flex-wrap: wrap;
+      }
+
+      .btn-action {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.75rem;
+      }
+
+      .form-card {
+        padding: 1rem;
+      }
+
+      .tab-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+      }
+
+      .form-title > * {
+        flex-wrap: wrap;
+      }
+
+      .btn-primary {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+      }
+
+      .modal-box {
+        width: 95%;
+        margin: 0.5rem;
+      }
+
+      #map {
+        height: 200px;
+      }
+    }
+
+    /* ==========================================================
+       CUSTOM SCROLLBAR (WebKit)
+       ========================================================== */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--clr-space-deep);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--clr-space-purple), var(--clr-space-cyan));
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, var(--clr-space-cyan), var(--clr-space-purple));
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ===== Animated Background ===== -->
+  <div class="galaxy-bg"></div>
+  <div class="stars" id="starsLayer"></div>
+
+  <!-- ===== Main Container ===== -->
+  <div class="container">
+    <!-- Header -->
+    <header class="main-header" id="mainHeader">
+      <div class="logo">
+        <span class="logo-icon">🌌</span>
+        <h1>Cosmic Oracle</h1>
+      </div>
+      <div class="sub">رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای</div>
+      <div class="header-actions">
+        <button class="btn-action" onclick="navigate('')" style="background:var(--glass-bg);">🏠 خانه</button>
+        <button class="btn-action" onclick="navigate('dashboard')" style="background:var(--glass-bg);">📊 داشبورد</button>
+        <button class="btn-action primary" id="payBtn">⭐ خرید</button>
+        <button class="btn-action" id="shareBtn">📤 اشتراک</button>
+        <button class="btn-action" id="saveBtn">💾 ذخیره</button>
+        <button class="btn-action" id="printBtn">🖨️ پرینت</button>
+      </div>
+    </header>
+
+    <!-- Form -->
+    <div class="form-card">
+      <!-- Tab Navigation -->
+      <div class="tab-nav" id="tabNav">
+        <button class="tab-btn active" data-tab="birth">
+          <span class="tab-emoji">🔮</span> چارت تولد
+        </button>
+        <button class="tab-btn" data-tab="synastry">
+          <span class="tab-emoji">💕</span> سیناستری
+        </button>
+        <button class="tab-btn" data-tab="composite">
+          <span class="tab-emoji">🔗</span> کامپوزیت
+        </button>
+        <button class="tab-btn" data-tab="transit">
+          <span class="tab-emoji">🌍</span> ترانزیت
+        </button>
+        <button class="tab-btn" data-tab="solar-return">
+          <span class="tab-emoji">☀️</span> بازگشت خورشیدی
+        </button>
+        <button class="tab-btn" data-tab="lunar-return">
+          <span class="tab-emoji">🌙</span> بازگشت ماهانه
+        </button>
+        <button class="tab-btn" data-tab="mizaj">
+          <span class="tab-emoji">🧬</span> مزاج‌شناسی
+        </button>
+        <button class="tab-btn" data-tab="abjad">
+          <span class="tab-emoji">🔢</span> ابجد
+        </button>
+        <button class="tab-btn" data-tab="tarot">
+          <span class="tab-emoji">🔮</span> تاروت
+        </button>
+        <button class="tab-btn" data-tab="numerology">
+          <span class="tab-emoji">🔢</span> عددشناسی
+        </button>
+        <button class="tab-btn" data-tab="biorhythm">
+          <span class="tab-emoji">🔬</span> بیوریتم
+        </button>
+        <button class="tab-btn" data-tab="zodiac">
+          <span class="tab-emoji">🐉</span> سال حیوانی
+        </button>
+        <button class="tab-btn" data-tab="daily-question">
+          <span class="tab-emoji">❓</span> پرسش روزانه
+        </button>
+        <button class="tab-btn" data-tab="hafez">
+          <span class="tab-emoji">🍃</span> فال حافظ
+        </button>
+        <button class="tab-btn" data-tab="nasa">
+          <span class="tab-emoji">🌌</span> ناسا
+        </button>
+      </div>
+
+      <!-- Persistent Location Bar -->
+      <div class="location-bar" id="locationBar">
+        <span class="location-bar-icon">📍</span>
+        <span class="location-bar-text" id="locationBarText">مکان: در حال بارگذاری...</span>
+      </div>
+
+      <div class="form-title" id="formTitle">
+        🪐 اطلاعات تولد
+        <span>دقیق و حرفه‌ای</span>
+      </div>
+
+      <!-- Dynamic Form Container -->
+      <div id="formContainer"></div>
+
+      <button class="btn-primary" id="calcBtn">🔮 دریافت چارت و تحلیل کامل</button>
+      <div id="status"></div>
+    </div>
+
+    <!-- Results -->
+    <div id="result"></div>
+
+    <!-- Footer -->
+    <div class="footer-premium">
+      ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
+      <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
+      <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
+    </div>
+  </div>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== YOGA ENGINE OVERLAY ===== -->
+  <div class="yoga-overlay" id="yogaOverlay">
+    <div class="yoga-circle" id="yogaCircle">
+      <span id="yogaPhase">🌬️</span>
+    </div>
+    <div class="yoga-text" id="yogaText">دم بکش...</div>
+    <div class="yoga-controls">
+      <button id="yogaToggle">⏸️ توقف</button>
+      <label>سرعت: <input type="range" id="yogaSpeed" min="3" max="10" value="4" step="0.5"></label>
+      <button id="yogaClose">✖ بستن</button>
+    </div>
+  </div>
+
+  <!-- ===== MAP MODAL ===== -->
+  <div class="modal-overlay" id="mapModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>📍 انتخاب مکان روی نقشه</h3>
+        <button class="modal-close" id="closeMapModal">✕</button>
+      </div>
+      <div id="map"></div>
+      <div class="modal-footer">
+        <button id="confirmLocationBtn" class="btn-action primary" style="padding:10px 30px; font-size:14px;">✅ انتخاب</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Leaflet JS ===== -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    /* ==========================================================
+       SPACE THEME JS
+       - Starfield generation
+       - Header blur on scroll
+       - Tab navigation
+       - Location simulation
+       - Toast notifications
+       ========================================================== */
+
+    // Starfield
+    (function createStars() {
+      const layer = document.getElementById('starsLayer');
+      const count = 200; // Number of stars
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        // Randomly assign large or pink stars
+        if (Math.random() < 0.12) star.classList.add('star--large');
+        if (Math.random() < 0.08) star.classList.add('star--pink');
+        // Random position
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        // Random duration and delay
+        const dur = 2 + Math.random() * 4; // 2-6s
+        const delay = Math.random() * 5;   // 0-5s
+        star.style.setProperty('--duration', dur + 's');
+        star.style.setProperty('--delay', delay + 's');
+        layer.appendChild(star);
+      }
+    })();
+
+    // Header blur on scroll
+    const header = document.getElementById('mainHeader');
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          header.classList.toggle('scrolled', window.scrollY > 60);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    // Tab navigation
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active from all
+        tabBtns.forEach(b => b.classList.remove('active'));
+        // Add active to clicked
+        btn.classList.add('active');
+        // Here you would load different form content based on data-tab
+        // For demo, we just update the form title
+        const tabName = btn.dataset.tab;
+        const titleMap = {
+          birth: '🪐 اطلاعات تولد',
+          synastry: '💕 اطلاعات زوجین',
+          composite: '🔗 اطلاعات compagny',
+          transit: '🌍 اطلاعات ترانزیت',
+          'solar-return': '☀️ اطلاعات بازگشت خورشیدی',
+          'lunar-return': '🌙 اطلاعات بازگشت ماهانه',
+          mizaj: '🧬 اطلاعات مزاج',
+          abjad: '🔢 اطلاعات ابجد',
+          tarot: '🔮 اطلاعات تاروت',
+          numerology: '🔢 اطلاعات عددشناسی',
+          biorhythm: '🔬 اطلاعات بیوریتم',
+          zodiac: '🐉 اطلاعات سال حیوانی',
+          'daily-question': '❓ پرسش روزانه',
+          hafez: '🍃 فرانص حافظ',
+          nasa: '🌌 اطلاعات ناسا'
+        };
+        const span = document.querySelector('#formTitle span');
+        if (span) {
+          span.textContent = titleMap[tabName] || 'دقیق و حرفه‌ای';
+        }
+        // Simulate loading form content
+        document.getElementById('formContainer').innerHTML = `<p style="text-align:center; color:var(--clr-space-gray);">فرم ${tabName} در حال بارگذاری...</p>`;
+      });
+    });
+
+    // Simulate location detection
+    (function setLocation() {
+      setTimeout(() => {
+        const locText = document.getElementById('locationBarText');
+        if (locText) {
+          locText.textContent = 'مکان: تهران، ایران';
+        }
+      }, 1500);
+    })();
+
+    // Toast notification system
+    function showToast(message, type = 'info', duration = 3000) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      // Remove after animation
+      setTimeout(() => {
+        toast.remove();
+      }, duration + 300);
+    }
+
+    // Example: show a toast on load
+    setTimeout(() => {
+      showToast('به کیهانی اوراکل خوش آمدید!', 'success', 3500);
+    }, 2000);
+
+    // Yoga toggle (simple)
+    const yogaToggle = document.getElementById('yogaToggle');
+    const yogaOverlay = document.getElementById('yogaOverlay');
+    const yogaClose = document.getElementById('yogaClose');
+    let yogaPaused = false;
+    yogaToggle.addEventListener('click', () => {
+      yogaPaused = !yogaPaused;
+      yogaToggle.textContent = yogaPaused ? '▶️ شروع' : '⏸️ توقف';
+      // In a real app, you'd pause the animation
+    });
+    yogaClose.addEventListener('click', () => {
+      yogaOverlay.style.display = 'none';
+    });
+
+    // Map modal
+    const mapModal = document.getElementById('mapModal');
+    const closeMapModal = document.getElementById('closeMapModal');
+    const confirmLocationBtn = document.getElementById('confirmLocationBtn');
+    // Open map when location bar clicked (for demo)
+    document.getElementById('locationBar').addEventListener('click', () => {
+      mapModal.classList.add('active');
+      // Initialize Leaflet map
+      setTimeout(() => {
+        const map = L.map('map').setView([35.6892, 51.3890], 13); // Tehran coordinates
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        L.marker([35.6892, 51.3890]).addTo(map)
+          .bindPopup('Тегеран, ایران')
+          .openPopup();
+      }, 100);
+    });
+    closeMapModal.addEventListener('click', () => {
+      mapModal.classList.remove('active');
+    });
+    confirmLocationBtn.addEventListener('click', () => {
+      mapModal.classList.remove('active');
+      showToast('مکان bestätigt شد!', 'success');
+    });
+
+    // Calc button click simulation
+    document.getElementById('calcBtn').addEventListener('click', () => {
+      const status = document.getElementById('status');
+      status.textContent = 'در حال محاسبه...';
+      status.className = '';
+      // Simulate calculation delay
+      setTimeout(() => {
+        status.textContent = 'تحلیل کامل با موفقیت تولید شد!';
+        status.className = 'success';
+        // Show result (demo)
+        document.getElementById('result').innerHTML = `
+          <div style="background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(16px); border-radius:16px; padding:2rem; margin-top:1rem;">
+            <h3 style="color:var(--clr-space-cyan); margin-bottom:1rem;">🪐 نمودار تولد شما</h3>
+            <p style="color:var(--clr-space-gray); line-height:1.8;">
+              بر اساس اطلاعات وارد شده، mjesto سیارات در زمان تولد شما به شرح زیر است:
+            </p>
+            <div style="margin:1.5rem 0;">
+              <div style="display:flex; justify-content:space-between; margin:0.5rem 0;">
+                <span>شمس:</span> <span style="color:var(--clr-space-white);">asmaان در بری</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin:0.5rem 0;">
+                <span>ماه:</span> <span style="color:var(--clr-space-white);">asmaان در_THIS</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin:0.5rem 0;">
+                <span>عطارد:</span> <span style="color:var(--clr-space-white);">asmaان در douん</span>
+              </div>
+            </div>
+            <p style="color:var(--clr-space-gray); font-size:0.9rem;">
+              Note: This is a demo visualization. Real calculations would use the Vedic engine.
+            </p>
+          </div>
+        `;
+      }, 2000);
+    });
+
+    // Prevent form submission on enter
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>

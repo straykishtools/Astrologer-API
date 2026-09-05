@@ -48,9 +48,56 @@ var FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
 
 var poses = [];
 var poseMap = {};
+var aliasMap = {};
 var imageMap = {};
+var imageKeyByNorm = {};
 var loaded = false;
 var loadPromise = null;
+
+// ─── Name normalization ───
+// Practice scripts reference poses by spaced display names ("Downward Dog"),
+// while the yoga.txt/yoga-images catalogs are keyed by camelCase technical
+// names ("DownwardDog"). A normalized key maps every form onto one pose.
+function keyOf(s) {
+    return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+function addAlias(map, k, pose) {
+    var n = keyOf(k);
+    if (n && !map[n]) map[n] = pose;
+}
+function buildAliases() {
+    aliasMap = {};
+    poses.forEach(function (p) {
+        addAlias(aliasMap, p.name, p);
+        addAlias(aliasMap, p.display_name, p);
+        addAlias(aliasMap, p.name_fa, p);
+        (p.aka || []).forEach(function (a) { addAlias(aliasMap, a, p); });
+        (p.sanskrit_names || []).forEach(function (sn) {
+            addAlias(aliasMap, sn.simplified, p);
+            addAlias(aliasMap, sn.latin, p);
+        });
+    });
+    // States named in practice scripts that have no pose of their own map to
+    // the closest catalog pose that has real artwork.
+    [
+        ['Savasana', 'Corpse'],
+        ['Child Wide Start', 'ChildWide'],
+        ['Downward Dog Start', 'DownwardDog'],
+        ['Seated On Heels Prayer Closed Eyes', 'SeatedOnHeelsPrayer'],
+        ['Wheel Flip', 'Wheel'],
+        ['Wheel Flip Leg Up', 'WheelLegUp']
+    ].forEach(function (pair) {
+        var t = poseMap[pair[1]] || aliasMap[keyOf(pair[1])];
+        if (t) addAlias(aliasMap, pair[0], t);
+    });
+}
+/** Resolve any user-facing pose reference (spaced/camel/Fa/aka/sanskrit). */
+function resolvePose(ref) {
+    if (ref && typeof ref === 'object') return ref;
+    var s = String(ref == null ? '' : ref);
+    if (poseMap[s]) return poseMap[s];
+    return aliasMap[keyOf(s)] || null;
+}
 
 // ─── Loaders ───
 function fetchText(url) {
@@ -78,6 +125,7 @@ function load() {
             poses = JSON.parse(res[0]);
             poseMap = {};
             poses.forEach(function (p) { poseMap[p.name] = p; });
+            buildAliases();
             var img = JSON.parse(res[1]);
             imageMap = {};
             var src = (img && img.poses) || {};
@@ -85,10 +133,13 @@ function load() {
                 var e = src[name];
                 if (!e) return;
                 var o = {};
-                ['card', 'full', 'R', 'L'].forEach(function (k) {
+                // full = original, card = 90px thumb, thumb = 75px thumb;
+                // L/R = side full-size, L75/L90/R75/R90 = side thumbnails
+                ['full', 'card', 'thumb', 'L', 'R', 'L75', 'L90', 'R75', 'R90'].forEach(function (k) {
                     if (e[k]) o[k] = toRelUrl(e[k]);
                 });
                 imageMap[name] = o;
+                imageKeyByNorm[keyOf(name)] = name;
             });
             loaded = true;
             return { poses: poses, poseMap: poseMap, imageMap: imageMap };
@@ -103,7 +154,7 @@ function load() {
 function isReady() { return loaded; }
 function getPoses() { return poses; }
 function getPoseMap() { return poseMap; }
-function get(name) { return poseMap[name] || null; }
+function get(name) { return resolvePose(name) || null; }
 
 // ─── Persist helpers ───
 function faNum(n) {
@@ -178,34 +229,49 @@ function placeholderSvg(pose, size) {
     return 'data:image/svg+xml,' + encodeURIComponent(svg);
 }
 
-function hasImg(name) {
-    return !!(imageMap[name] && (imageMap[name].card || imageMap[name].full));
+function imgEntry(name) {
+    var p = resolvePose(name);
+    if (p) return imageMap[p.name] || null;
+    return imageMap[imageKeyByNorm[keyOf(name)]] || null;
 }
-function imgEntry(name) { return imageMap[name] || null; }
+function hasImg(name) { return !!imgEntry(name); }
 
 /**
  * getImage(poseOrName, opts)
- * opts: { size: 'card'|'full' (default 'full'), side: 'R'|'L'|'N', soft: bool }
- * Resolves against the manifest. When the exact variant is absent it falls
- * back to any real asset for the pose, then to an SVG placeholder. Never
- * returns a URL that does not exist in the manifest.
+ * opts: { size: 'full'|'card'|'thumb' (default 'full'), side: 'R'|'L'|'N', soft: bool }
+ * Sizes map to the manifest tiers: 'full' = original PNG, 'card' = -tn90,
+ * 'thumb' = -tn75. When a side is requested, a side-specific thumbnail is
+ * preferred for card/thumb tiers. Falls back to any real asset for the pose,
+ * then to an SVG placeholder. Never returns a URL that is not in the manifest.
  */
 function getImage(poseOrName, opts) {
     opts = opts || {};
-    var pose = typeof poseOrName === 'string' ? poseMap[poseOrName] : poseOrName;
-    if (!pose) return placeholderSvg(null);
-    var name = pose.name;
+    var pose = resolvePose(poseOrName);
+    var name = null;
+    if (pose) name = pose.name;
+    else if (typeof poseOrName === 'string') name = imageKeyByNorm[keyOf(poseOrName)] || null;
+    if (!name) return placeholderSvg(null);
     var e = imageMap[name];
-    var wantFull = opts.size !== 'card';
+    var wantFull = opts.size !== 'card' && opts.size !== 'thumb';
     var side = opts.side || 'N';
 
     if (e) {
-        // Preferred side file
         if (side === 'R' || side === 'L') {
-            if (e[side]) return e[side];
+            if (wantFull && e[side]) return e[side];
+            if (!wantFull) {
+                var t90 = e[side + '90'], t75 = e[side + '75'];
+                if (opts.size === 'thumb') {
+                    if (t75) return t75;
+                    if (t90) return t90;
+                } else if (t90) {
+                    return t90;
+                }
+            }
         }
+        if (opts.size === 'thumb' && e.thumb) return e.thumb;
         if (wantFull && e.full) return e.full;
         if (e.card) return e.card;
+        if (e.thumb) return e.thumb;
         if (e.full) return e.full;
     }
     if (opts.soft === false) return '';

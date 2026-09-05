@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Astrologer — پنل نجوم و طالع‌بینی</title>
+
+  <!-- Google Fonts: یک فونت انگلیسی برای تیترها + یک فونت فارسی برای متن فارسی -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================================
+       1) RESET پایه و تنظیمات فونت پیش‌فرض
+       ===================================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-1: #0a0420;     /* رنگ پایه: بنفش خیلی تیره */
+      --bg-2: #1a0a3e;     /* لایه میانی گرادیان */
+      --bg-3: #050118;     /* تیره‌ترین لایه */
+      --accent-1: #a855f7;  /* بنفش روشن */
+      --accent-2: #ec4899;  /* صورتی-قرمز */
+      --accent-3: #38bdf8;  /* آبی روشن */
+      --text: #f1f5f9;
+      --text-dim: #cbd5e1;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      /* سه لایه گرادیان برای ایجاد حس کهکشانی/فضایی */
+      background:
+        radial-gradient(ellipse at 20% 10%, rgba(168, 85, 247, 0.25), transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(236, 72, 153, 0.18), transparent 55%),
+        linear-gradient(180deg, #0a0420 0%, #1a0a3e 50%, #050118 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: 'Vazirmatn', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* =====================================================================
+       2) لایه ستاره‌های پس‌زمینه — با ::before روی body
+          نقاط سفید ریز که با keyframes آهسته محو و ظاهر می‌شوند (چشمک‌زن)
+       ===================================================================== */
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 20px 30px, #ffffff, transparent),
+        radial-gradient(1px 1px at 40px 70px, #ffffff, transparent),
+        radial-gradient(1px 1px at 90px 40px, #f0abfc, transparent),
+        radial-gradient(1px 1px at 130px 80px, #ffffff, transparent),
+        radial-gradient(2px 2px at 160px 30px, #ffffff, transparent),
+        radial-gradient(1px 1px at 200px 60px, #fce7f3, transparent),
+        radial-gradient(1px 1px at 240px 110px, #ffffff, transparent),
+        radial-gradient(2px 2px at 280px 40px, #a78bfa, transparent),
+        radial-gradient(1px 1px at 320px 90px, #ffffff, transparent),
+        radial-gradient(1px 1px at 360px 50px, #ffffff, transparent),
+        radial-gradient(1px 1px at 400px 120px, #fbcfe8, transparent);
+      background-size: 420px 200px;
+      background-repeat: repeat;
+      /* انیمیشن چشمک‌زن: ترکیب opacity و transform برای حس زنده بودن */
+      animation: twinkle 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes twinkle {
+      0%   { opacity: 0.35; transform: translateY(0); }
+      50%  { opacity: 0.8;  }
+      100% { opacity: 0.35; transform: translateY(-8px); }
+    }
+
+    /* لایه دوم ستاره‌های ریزتر برای عمق بیشتر */
+    body::after {
+      content: "";
+      position: fixed; inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 50px 90px, #fff, transparent),
+        radial-gradient(1px 1px at 150px 30px, #fff, transparent),
+        radial-gradient(1px 1px at 250px 70px, #f0abfc, transparent),
+        radial-gradient(1px 1px at 350px 20px, #fff, transparent),
+        radial-gradient(1px 1px at 100px 150px, #fff, transparent),
+        radial-gradient(1px 1px at 300px 130px, #fff, transparent);
+      background-size: 400px 180px;
+      background-repeat: repeat;
+      animation: twinkle 4s ease-in-out infinite alternate-reverse;
+      opacity: 0.4;
+    }
+
+    /* همه محتوای صفحه بالای لایه ستاره‌ها قرار بگیرد */
+    header, main, footer, section { position: relative; z-index: 1; }
+
+    /* =====================================================================
+       3) هدر — با شیشه‌ای (Glassmorphism) و Blur که در اسکرول فعال می‌شود
+       ===================================================================== */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 18px 5%;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(15, 6, 40, 0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(168, 85, 247, 0.25);
+      transition: all 0.35s ease;
+    }
+
+    /* وقتی کاربر اسکرول کرد، کلاس scrolled به هدر اضافه می‌شود */
+    header.scrolled {
+      padding: 12px 5%;
+      background: rgba(10, 4, 32, 0.7);
+      box-shadow: 0 4px 30px rgba(168, 85, 247, 0.25);
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Orbitron', sans-serif; font-weight: 800;
+      font-size: 1.3rem;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      border-radius: 50%;
+      display: grid; place-items: center;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.6);
+    }
+
+    nav ul {
+      list-style: none; display: flex; gap: 32px;
+    }
+
+    nav a {
+      color: var(--text-dim);
+      text-decoration: none; font-weight: 500;
+      transition: color 0.25s;
+      position: relative;
+    }
+    nav a::after {
+      content: ""; position: absolute; left: 0; bottom: -6px;
+      width: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      transition: width 0.3s;
+    }
+    nav a:hover { color: var(--text); }
+    nav a:hover::after { width: 100%; }
+
+    .auth-buttons { display: flex; gap: 12px; }
+
+    .btn {
+      padding: 9px 20px;
+      border-radius: 999px;
+      font-weight: 500; cursor: pointer;
+      transition: all 0.25s;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.08); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(168, 85, 247, 0.6); }
+
+    /* =====================================================================
+       4) HERO — بخش اصلی با تیتر بزرگ و دکمه‌های CTA
+       ===================================================================== */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 0 6%;
+      position: relative;
+    }
+
+    .hero-content { max-width: 900px; }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 18px;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      margin-bottom: 24px;
+      color: #d8b4fe;
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 6vw, 4.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #fff 0%, #d8b4fe 50%, var(--accent-2) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-dim);
+      max-width: 600px; margin: 0 auto 36px;
+    }
+
+    .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    .btn-lg { padding: 14px 32px; font-size: 1rem; }
+
+    /* =====================================================================
+       5) داشبورد آمار — کارت‌های شیشه‌ای (Glassmorphism)
+          پس‌زمینه نیمه شفاف + blur + border درخشان + سایه ملایم
+       ===================================================================== */
+    .stats {
+      padding: 80px 5%;
+    }
+
+    .section-title {
+      text-align: center; margin-bottom: 50px;
+    }
+    .section-title h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      margin-bottom: 12px;
+    }
+    .section-title p {
+      color: var(--text-dim);
+    }
+    .section-title h2 .accent {
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 28px 24px;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .glass:hover {
+      transform: translateY(-6px);
+      border-color: rgba(168, 85, 247, 0.5);
+      box-shadow: 0 12px 40px rgba(168, 85, 247, 0.25);
+    }
+
+    .stat-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      border-radius: 14px;
+      display: grid; place-items: center;
+      font-size: 1.5rem; margin-bottom: 16px;
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .stat-label { color: var(--text-dim); font-size: 0.9rem; }
+
+    /* =====================================================================
+       6) بخش SERVICES — همان کارت‌های شیشه‌ای با آیکون، تیتر و توضیح
+       ===================================================================== */
+    .services { padding: 80px 5%; }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px; max-width: 1200px; margin: 0 auto;
+    }
+
+    .service-card { text-align: right; }
+    .service-card .icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 16px;
+      display: grid; place-items: center;
+      font-size: 1.6rem;
+      margin-bottom: 18px;
+    }
+    .service-card h3 {
+      font-size: 1.2rem; margin-bottom: 10px;
+      font-family: 'Vazirmatn', sans-serif; font-weight: 700;
+    }
+    .service-card p { color: var(--text-dim); font-size: 0.95rem; }
+
+    /* =====================================================================
+       7) فوتر
+       ===================================================================== */
+    footer {
+      text-align: center; padding: 50px 5% 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+    .footer-logo {
+      font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 1.3rem;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px; display: inline-block;
+    }
+    footer .heart { color: var(--accent-2); }
+
+    /* =====================================================================
+       8) رسپانسیو — برای موبایل منو و گریدها جمع‌تر می‌شوند
+       ===================================================================== */
+    @media (max-width: 768px) {
+      nav ul { display: none; }
+      header { padding: 14px 5%; }
+      .hero { padding: 0 5%; }
+      .auth-buttons .btn-ghost { display: none; }
+      .stat-value { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===============================================================
+       هدر: لوگو + منو + دکمه‌های ورود/ثبت‌نام
+       با اسکرول، کلاس scrolled به آن اضافه می‌شود
+       =============================================================== -->
+  <header id="header">
+    <div class="logo">
+      <div class="logo-icon">✦</div>
+      <span>ASTROLOGER</span>
+    </div>
+
+    <nav>
+      <ul>
+        <li><a href="#hero">خانه</a></li>
+        <li><a href="#stats">آمار</a></li>
+        <li><a href="#services">سرویس‌ها</a></li>
+        <li><a href="#footer">تماس</a></li>
+      </ul>
+    </nav>
+
+    <div class="auth-buttons">
+      <button class="btn btn-ghost">ورود</button>
+      <button class="btn btn-primary">ثبت‌نام</button>
+    </div>
+  </header>
+
+  <!-- ===============================================================
+       HERO: تیتر بزرگ + توضیح + دکمه‌های فراخوانی به اقدام
+       =============================================================== -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <span class="hero-badge">✦ پلتفرم نجومی هوشمند ✦</span>
+      <h1>ستارگان مسیر شما را<br>روشن می‌کنند</h1>
+      <p>با داده‌های نجومی دقیق و الگوریتم‌های هوش مصنوعی، آینده خود را کشف کنید و تصمیمات بهتری بگیرید.</p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary btn-lg">شروع کنید</button>
+        <button class="btn btn-ghost btn-lg">بیشتر بدانید</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===============================================================
+       داشبورد آمار: ۴ کارت شیشه‌ای با عدد بزرگ و برچسب
+       =============================================================== -->
+  <section class="stats" id="stats">
+    <div class="section-title">
+      <h2>اعتماد <span class="accent">هزاران کاربر</span></h2>
+      <p>آمار واقعی استفاده از پلتفرم ما</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="glass">
+        <div class="stat-icon">🌙</div>
+        <div class="stat-value">12K+</div>
+        <div class="stat-label">کاربر فعال</div>
+      </div>
+      <div class="glass">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-value">98%</div>
+        <div class="stat-label">رضایت مشتریان</div>
+      </div>
+      <div class="glass">
+        <div class="stat-icon">🔮</div>
+        <div class="stat-value">350+</div>
+        <div class="stat-label">سرویس فعال</div>
+      </div>
+      <div class="glass">
+        <div class="stat-icon">✨</div>
+        <div class="stat-value">24/7</div>
+        <div class="stat-label">پشتیبانی آنلاین</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===============================================================
+       SERVICES: ۶ کارت شیشه‌ای با آیکون و توضیح
+       =============================================================== -->
+  <section class="services" id="services">
+    <div class="section-title">
+      <h2><span class="accent">سرویس‌های</span> ما</h2>
+      <p>ابزارهای حرفه‌ای برای شناخت بهتر خودتان</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="glass service-card">
+        <div class="icon">🌌</div>
+        <h3>طالع‌بینی شخصی</h3>
+        <p>تحلیل دقیق ستاره‌ها برای شناخت ویژگی‌های شخصیتی و سرنوشت شما.</p>
+      </div>
+      <div class="glass service-card">
+        <div class="icon">💫</div>
+        <h3>سازگاری عشقی</h3>
+        <p>بررسی میزان سازگاری دو نفر بر اساس موقعیت ستارگان در زمان تولد.</p>
+      </div>
+      <div class="glass service-card">
+        <div class="icon">🌠</div>
+        <h3>پیش‌بینی روزانه</h3>
+        <p>طالع‌بینی روزانه با تحلیل سیارات و موقعیت کواکب برای تصمیم‌گیری بهتر.</p>
+      </div>
+      <div class="glass service-card">
+        <div class="icon">🪐</div>
+        <h3>تحلیل چارت تولد</h3>
+        <p>نمودار کامل وضعیت سیارات و خانه‌های نجومی در لحظه تولد شما.</p>
+      </div>
+      <div class="glass service-card">
+        <div class="icon">✨</div>
+        <h3>فال هفتگی</h3>
+        <p>پیش‌بینی‌های هفتگی برای عشق، کار، سلامتی و خوشبختی شما.</p>
+      </div>
+      <div class="glass service-card">
+        <div class="icon">🛸</div>
+        <h3>مشاوره تخصصی</h3>
+        <p>ارتباط با منجمان حرفه‌ای برای راهنمایی‌های دقیق‌تر و شخصی‌سازی شده.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===============================================================
+       فوتر ساده
+       =============================================================== -->
+  <footer id="footer">
+    <div class="footer-logo">✦ ASTROLOGER</div>
+    <p>ساخته شده با <span class="heart">♥</span> برای ستارگان — ۱۴۰۴</p>
+  </footer>
+
+  <!-- اسکریپت کوچک: هدر موقع اسکرول کلاس scrolled می‌گیرد -->
+  <script>
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      // اگر بیشتر از ۵۰px اسکرول شد، حالت اسکرول‌شده فعال می‌شود
+      header.classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
+
+</body>
+</html>

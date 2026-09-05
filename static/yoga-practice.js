@@ -399,6 +399,34 @@ function preferredSide(pose) {
     return C.sideAvailable(pose.name, pref) ? pref : (C.sideAvailable(pose.name, 'R') ? 'R' : 'L');
 }
 
+/**
+ * Set a pose image with a full cover-up chain:
+ * requested size tier -> next smaller tier -> SVG placeholder.
+ * Re-attaches the error handler so later src swaps stay protected.
+ */
+function setPoseImg(img, pose, size, side) {
+    if (!img || !pose) return;
+    var url = C.getImage(pose, { size: size, side: side });
+    var fb = C.placeholderSvg(pose, 460);
+    img.setAttribute('data-fb', fb);
+    img.onerror = function () {
+        var self = this;
+        var tier = size === 'full' ? 'card' : 'thumb';
+        var altUrl = C.getImage(pose, { size: tier, side: side });
+        if (altUrl && altUrl !== self.src && altUrl !== self.getAttribute('data-fb')) {
+            self.onerror = function () {
+                self.onerror = null;
+                if (self.src !== self.getAttribute('data-fb')) self.src = self.getAttribute('data-fb');
+            };
+            self.src = altUrl;
+            return;
+        }
+        self.onerror = null;
+        if (self.src !== self.getAttribute('data-fb')) self.src = self.getAttribute('data-fb');
+    };
+    img.src = url;
+}
+
 function updatePoseView(rebuildInstr) {
     var pose = currentPose();
     if (!pose) return;
@@ -411,8 +439,7 @@ function updatePoseView(rebuildInstr) {
     if (imgEl) {
         var img = imgEl.querySelector('img');
         if (img) {
-            img.src = C.getImage(pose, { size: 'full', side: side });
-            img.setAttribute('data-fb', C.placeholderSvg(pose, 460));
+            setPoseImg(img, pose, 'full', side);
             img.alt = C.nameEn(pose);
         }
     }
@@ -526,10 +553,7 @@ function bindRunnerEvents() {
         if (pose && C.sideAvailable(pose.name, side)) {
             var imgEl = document.getElementById('ypPoseImage');
             var img = imgEl ? imgEl.querySelector('img') : null;
-            if (img) {
-                img.src = C.getImage(pose, { size: 'full', side: side });
-                img.setAttribute('data-fb', C.placeholderSvg(pose, 460));
-            }
+            setPoseImg(img, pose, 'full', side);
             sw.querySelectorAll('button').forEach(function (b) {
                 b.classList.toggle('active', b.getAttribute('data-yoga-side') === side);
             });

@@ -105,6 +105,22 @@ async def serve_index():
         return FileResponse("index.html")
     return {"status": "ok", "message": "Cosmic Oracle is running"}
 
+
+@app.get("/admin.html")
+async def serve_admin_page():
+    """صفحه‌ی پنل مدیریت — صفحه‌ی مستقل admin-panel.js"""
+    if os.path.exists("static/admin.html"):
+        return FileResponse("static/admin.html")
+    return FileResponse("index.html")
+
+
+@app.get("/account.html")
+async def serve_account_page():
+    """صفحه‌ی تنظیمات حساب — صفحه‌ی مستقل account-page.js"""
+    if os.path.exists("static/account.html"):
+        return FileResponse("static/account.html")
+    return FileResponse("index.html")
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}

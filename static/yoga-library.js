@@ -280,11 +280,16 @@ function imgTag(pose, opts) {
     opts = opts || {};
     var url = C.getImage(pose, opts);
     var fb = C.placeholderSvg(pose, 220);
+    var altUrl = (opts.size === 'full') ? C.getImage(pose, { size: 'card', side: opts.side }) : '';
     var cls = opts.cls ? ' class="' + opts.cls + '"' : '';
     var alt = C.escAttr(C.nameEn(pose));
     var lazy = opts.lazy === false ? '' : ' loading="lazy"';
-    return '<img src="' + C.escAttr(url) + '"' + cls + ' alt="' + alt + '" data-fb="' + C.escAttr(fb) + '"' + lazy +
-        ' onerror="if(this.src!==this.getAttribute(\'data-fb\')){this.onerror=null;this.src=this.getAttribute(\'data-fb\');}">';
+    var altAttr = (altUrl && altUrl !== url) ? ' data-alt="' + C.escAttr(altUrl) + '"' : '';
+    // Error chain: requested size -> smaller tier (data-alt) -> SVG placeholder (data-fb)
+    return '<img src="' + C.escAttr(url) + '"' + cls + ' alt="' + alt + '" data-fb="' + C.escAttr(fb) + '"' + altAttr + lazy +
+        ' onerror="var a=this.getAttribute(\'data-alt\');' +
+        'if(a&&this.src!==a){this.onerror=null;this.src=a;return;}' +
+        'if(this.src!==this.getAttribute(\'data-fb\')){this.onerror=null;this.src=this.getAttribute(\'data-fb\');}">';
 }
 
 // ─── رندر کارت‌ها ───
@@ -554,6 +559,34 @@ function renderDetail(pose) {
 }
 
 // ═══════════ تب تمرین روزانه ═══════════
+var _dailyRecCache = { at: 0, data: null };
+
+function dailyAuthHeaders() {
+    var t = '';
+    try { t = localStorage.getItem('cosmic_token') || ''; } catch (e) {}
+    return t ? { 'Authorization': 'Bearer ' + t } : {};
+}
+
+/** دریافت توصیه از سرور (سطح + سابقه) — با کش ۳ دقیقه‌ای */
+function fetchDailyRecommendation(maxDiff) {
+    var now = Date.now();
+    if (_dailyRecCache.data && now - _dailyRecCache.at < 180000) {
+        return Promise.resolve(_dailyRecCache.data);
+    }
+    var url = '/api/v5/yoga/recommend';
+    if (maxDiff && maxDiff !== 'beginner') url += '?level=' + encodeURIComponent(maxDiff);
+    return fetch(url, { headers: dailyAuthHeaders() })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+            if (data && data.recommended) {
+                _dailyRecCache = { at: now, data: data };
+                return data;
+            }
+            return null;
+        })
+        .catch(function () { return null; });
+}
+
 function renderDailyPanel() {
     var el = document.getElementById('yogaDailyPanel');
     if (!el) return;
@@ -563,15 +596,6 @@ function renderDailyPanel() {
     var maxDiff = 'beginner';
     var tmax = (window.YogaTest && window.YogaTest.maxDifficulty) ? window.YogaTest.maxDifficulty() : null;
     if (tmax) maxDiff = tmax;
-
-    // توصیه روز: یک زنجیره متصل از حرکات
-    var flow = C.buildFlow('auto', 6).filter(function (n) {
-        return C.canAccess(poseMap[n].difficulty) && C.diffOrder(poseMap[n].difficulty) <= C.diffOrder(maxDiff);
-    });
-    while (flow.length < 4) {
-        var extra = C.buildFlow('auto', 1)[0];
-        if (extra && flow.indexOf(extra) < 0) flow.push(extra); else break;
-    }
 
     var html = '<div class="yoga-daily">';
     html += '<div class="yoga-daily-stats">';
@@ -587,37 +611,80 @@ function renderDailyPanel() {
         : '<span class="yoga-daily-pending">⏳ هنوز امروز تمرین نکردید</span>';
     html += '</div>';
 
-    if (flow.length) {
-        html += '<h3>🌟 جریان پیشنهادی امروز <span class="yk-flow-sub">— حرکات به هم متصل، از ساده به چالش‌برانگیز</span></h3>';
-        html += '<div class="yoga-daily-list yk-daily-flow">';
-        flow.forEach(function (name, i) {
-            var p = poseMap[name];
-            var prevPose = i > 0 ? poseMap[flow[i - 1]] : null;
-            html += '<div class="yoga-daily-item" data-yoga-open="' + C.escAttr(name) + '">';
-            html += '<span class="yk-flow-step">' + C.faNum(i + 1) + '</span>';
-            html += imgTag(p, { size: 'card', side: C.sideOf(p.preferred_side), cls: 'yoga-daily-item-img', lazy: true });
-            html += '<div class="yoga-daily-item-info">';
-            html += '<div class="yoga-daily-item-name">' + C.esc(C.nameFa(p)) + '</div>';
-            html += '<div class="yoga-daily-item-sub">' + (C.DIFFICULTY_STARS[p.difficulty] || '') + ' ' + C.subFa(p.subcategory) +
-                (prevPose ? ' · پس از ' + C.esc(C.nameFa(prevPose)) : ' · حرکت آغازین') + '</div>';
-            html += '</div>';
-            html += '<button class="yoga-daily-item-add" data-yoga-add="' + C.escAttr(name) + '" title="افزودن به جلسه تمرین">+</button>';
-            html += '</div>';
-        });
-        html += '</div>';
-    } else {
-        html += '<div class="yoga-empty">امروز حرکتی پیشنهاد نشد</div>';
-    }
-
-    html += '<div class="yoga-daily-start-wrap">';
-    html += '<button class="yoga-daily-start-btn" id="yogaStartPractice" data-yoga-run-flow="' + C.escAttr(JSON.stringify(flow)) + '">';
-    html += '<span class="yoga-daily-start-icon">🧘</span>';
-    html += '<span class="yoga-daily-start-text">شروع تمرین امروز</span>';
-    html += '<span class="yoga-daily-start-sub">' + C.faNum(flow.length) + ' حرکت پیوسته با تایمر و راهنما</span>';
-    html += '</button>';
-    html += '</div>';
+    html += '<div class="yoga-daily-rec" id="yogaDailyRec"><div class="yoga-empty">در حال دریافت توصیه…</div></div>';
     html += '</div>';
     el.innerHTML = html;
+
+    var recBox = document.getElementById('yogaDailyRec');
+    fetchDailyRecommendation(maxDiff).then(function (data) {
+        if (!recBox || !document.body.contains(recBox)) return;
+        if (data && data.recommended) {
+            var p = data.recommended;
+            var durations = (p.durations || [30]).slice(0, 3);
+            var durHtml = durations.map(function (d) {
+                var active = d === data.suggested_duration ? ' active' : '';
+                return '<button class="yoga-rec-dur' + active + '" data-yoga-rec-dur="' + d + '">' + C.faNum(d) + ' دقیقه</button>';
+            }).join('');
+            var reasonsHtml = (data.reasons || []).map(function (r) {
+                return '<div class="yoga-rec-reason">' + C.esc(r) + '</div>';
+            }).join('');
+            recBox.innerHTML =
+                '<div class="yoga-rec-card">' +
+                    '<div class="yoga-rec-head"><span class="yoga-rec-emoji">🧘</span>' +
+                        '<div><div class="yoga-rec-name">' + C.esc(p.displayName || p.name) + '</div>' +
+                        '<div class="yoga-rec-meta">' + C.esc((p.description || '').slice(0, 120)) + (p.description && p.description.length > 120 ? '…' : '') + '</div></div>' +
+                    '</div>' +
+                    '<div class="yoga-rec-durs">' + durHtml + '</div>' +
+                    '<div class="yoga-rec-reasons">' + reasonsHtml + '</div>' +
+                    '<div class="yoga-daily-start-wrap">' +
+                        '<button class="yoga-daily-start-btn" data-yoga-start-rec="' + C.escAttr(p.name) + '" data-yoga-rec-name="' + C.escAttr(p.displayName || p.name) + '">' +
+                            '<span class="yoga-daily-start-icon">🧘</span>' +
+                            '<span class="yoga-daily-start-text">شروع تمرین پیشنهادی</span>' +
+                            '<span class="yoga-daily-start-sub">' + C.faNum(data.suggested_duration || 30) + ' دقیقه · سطح ' + (data.level ? (C.DIFFICULTY_FA[data.level] || data.level) : (C.DIFFICULTY_FA[maxDiff] || maxDiff)) + '</span>' +
+                        '</button>' +
+                        '<button class="yoga-daily-preview-btn" data-yoga-rec-preview="' + C.escAttr(p.name) + '" title="پیش‌نمایش سریع قبل از شروع">👀 پیش‌نمایش</button>' +
+                    '</div>' +
+                '</div>';
+        } else {
+            // fallback: جریان تصادفی متصل (بدون سرور / مهمان)
+            var flow = C.buildFlow('auto', 6).filter(function (n) {
+                return C.canAccess(poseMap[n].difficulty) && C.diffOrder(poseMap[n].difficulty) <= C.diffOrder(maxDiff);
+            });
+            while (flow.length < 4) {
+                var extra = C.buildFlow('auto', 1)[0];
+                if (extra && flow.indexOf(extra) < 0) flow.push(extra); else break;
+            }
+            if (flow.length) {
+                var flowHtml = '<h3>🌟 جریان پیشنهادی امروز <span class="yk-flow-sub">— حرکات به هم متصل، از ساده به چالش‌برانگیز</span></h3>';
+                flowHtml += '<div class="yoga-daily-list yk-daily-flow">';
+                flow.forEach(function (name, i) {
+                    var fp = poseMap[name];
+                    var prevPose = i > 0 ? poseMap[flow[i - 1]] : null;
+                    flowHtml += '<div class="yoga-daily-item" data-yoga-open="' + C.escAttr(name) + '">';
+                    flowHtml += '<span class="yk-flow-step">' + C.faNum(i + 1) + '</span>';
+                    flowHtml += imgTag(fp, { size: 'thumb', side: C.sideOf(fp.preferred_side), cls: 'yoga-daily-item-img', lazy: true });
+                    flowHtml += '<div class="yoga-daily-item-info">';
+                    flowHtml += '<div class="yoga-daily-item-name">' + C.esc(C.nameFa(fp)) + '</div>';
+                    flowHtml += '<div class="yoga-daily-item-sub">' + (C.DIFFICULTY_STARS[fp.difficulty] || '') + ' ' + C.subFa(fp.subcategory) +
+                        (prevPose ? ' · پس از ' + C.esc(C.nameFa(prevPose)) : ' · حرکت آغازین') + '</div>';
+                    flowHtml += '</div>';
+                    flowHtml += '<button class="yoga-daily-item-add" data-yoga-add="' + C.escAttr(name) + '" title="افزودن به جلسه تمرین">+</button>';
+                    flowHtml += '</div>';
+                });
+                flowHtml += '</div>';
+                flowHtml += '<div class="yoga-daily-start-wrap">';
+                flowHtml += '<button class="yoga-daily-start-btn" id="yogaStartPractice" data-yoga-run-flow="' + C.escAttr(JSON.stringify(flow)) + '">';
+                flowHtml += '<span class="yoga-daily-start-icon">🧘</span>';
+                flowHtml += '<span class="yoga-daily-start-text">شروع تمرین امروز</span>';
+                flowHtml += '<span class="yoga-daily-start-sub">' + C.faNum(flow.length) + ' حرکت پیوسته با تایمر و راهنما</span>';
+                flowHtml += '</button>';
+                flowHtml += '</div>';
+                recBox.innerHTML = flowHtml;
+            } else {
+                recBox.innerHTML = '<div class="yoga-empty">امروز حرکتی پیشنهاد نشد</div>';
+            }
+        }
+    });
 }
 
 // ═══════════ تب تنفس و مدیتیشن ═══════════
@@ -657,16 +724,18 @@ function renderTabs() {
         library: { wrap: 'yogaGridWrap', filters: true },
         daily: { wrap: 'yogaDailyPanel' },
         breath: { wrap: 'yogaBreathPanel' },
-        practice: { wrap: 'yogaPracticePanel' }
+        practice: { wrap: 'yogaPlayerPanel' },
+        coach: { wrap: 'yogaCoachPanel' }
     };
     var cfg = map[_activeTab] || map.library;
     var detailShow = !!activeDetailPose;
-    var ids = ['yogaGridWrap', 'yogaDailyPanel', 'yogaBreathPanel', 'yogaPracticePanel', 'yogaDetail'];
+    var ids = ['yogaGridWrap', 'yogaDailyPanel', 'yogaBreathPanel', 'yogaPracticePanel', 'yogaPlayerPanel', 'yogaCoachPanel', 'yogaDetail'];
     ids.forEach(function (id) {
         var el = document.getElementById(id);
         if (!el) return;
         if (detailShow) { el.style.display = id === 'yogaDetail' ? 'block' : 'none'; return; }
-        el.style.display = (id === cfg.wrap) ? '' : 'none';
+        var show = (id === cfg.wrap) || ((cfg.extra || []).indexOf(id) >= 0);
+        el.style.display = show ? '' : 'none';
     });
     var f = document.getElementById('yogaFilters');
     if (f) f.style.display = (cfg.filters && !detailShow) ? '' : 'none';
@@ -676,6 +745,10 @@ function renderTabs() {
     if (_activeTab === 'breath') renderBreathPanel();
     if (_activeTab === 'practice') {
         if (window.YogaPractice) window.YogaPractice.init();
+        if (window.YogaPracticeUI) window.YogaPracticeUI.init();
+    }
+    if (_activeTab === 'coach') {
+        if (window.YogaCoachUI) window.YogaCoachUI.init();
     }
 }
 
@@ -771,6 +844,44 @@ function bindPageEvents() {
             if (names.length) launchPractice(names, root);
             return;
         }
+        // شروع تمرین پیشنهادی روزانه (تمرین کامل از دیتابیس)
+        var startRec = target.closest('[data-yoga-start-rec]');
+        if (startRec) {
+            var recName = startRec.getAttribute('data-yoga-start-rec');
+            if (window.YogaPracticeUI && typeof window.YogaPracticeUI.playByName === 'function') {
+                window.YogaPracticeUI.playByName(recName);
+            } else if (recName) {
+                // fallback: جریان حرکات
+                var f = C.buildFlow('auto', 6);
+                if (f.length) launchPractice(f, null);
+            }
+            return;
+        }
+        // پیش‌نمایش تمرین پیشنهادی روزانه (قبل از شروع)
+        var recPrev = target.closest('[data-yoga-rec-preview]');
+        if (recPrev) {
+            var recPrevName = recPrev.getAttribute('data-yoga-rec-preview');
+            var recItem = (_dailyRecCache && _dailyRecCache.data && _dailyRecCache.data.recommended) || null;
+            if (window.YogaPracticeUI) {
+                if (recItem && recItem.name === recPrevName && typeof window.YogaPracticeUI.previewPractice === 'function') {
+                    window.YogaPracticeUI.previewPractice(recItem);
+                } else if (typeof window.YogaPracticeUI.previewByName === 'function') {
+                    window.YogaPracticeUI.previewByName(recPrevName);
+                }
+            }
+            return;
+        }
+        // انتخاب مدت تمرین پیشنهادی
+        var recDur = target.closest('[data-yoga-rec-dur]');
+        if (recDur) {
+            var d = parseInt(recDur.getAttribute('data-yoga-rec-dur'), 10);
+            if (window.YogaPracticeUI) window.YogaPracticeUI.duration = d;
+            var recHost = document.getElementById('yogaDailyRec');
+            if (recHost) recHost.querySelectorAll('[data-yoga-rec-dur]').forEach(function (b) {
+                b.classList.toggle('active', b === recDur);
+            });
+            return;
+        }
         // اجرای جریان روزانه
         var runFlow = target.closest('[data-yoga-run-flow]');
         if (runFlow) {
@@ -801,7 +912,10 @@ function launchPractice(names, rootName) {
     _activeTab = 'practice';
     activeDetailPose = null;
     document.getElementById('yogaDetail').style.display = 'none';
-    if (window.YogaPractice) {
+    // پلیر واحد: جریان‌های روزانه/کتابخانه هم در پلیر جدید اجرا می‌شوند
+    if (window.YogaPracticeUI && typeof window.YogaPracticeUI.playFlow === 'function') {
+        window.YogaPracticeUI.playFlow(names, rootName);
+    } else if (window.YogaPractice) {
         window.YogaPractice.launch(names);
     }
     renderTabs();

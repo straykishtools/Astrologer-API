@@ -1,0 +1,22 @@
+# Verdent / Docker build context exclusions
+.git
+.github
+.venv
+venv
+env
+.freebuff
+.freetown
+.verdent
+worktrees
+__pycache__
+.pytest_cache
+*.pyc
+*.pyo
+*.log
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+!.env.example
+_smoke.py
