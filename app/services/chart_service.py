@@ -2,7 +2,6 @@
 Chart history service: save, list, get and delete saved chart results.
 """
 import json
-import uuid
 from typing import Optional
 
 from fastapi import HTTPException
@@ -12,10 +11,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import ChartHistory, User
 
 
-def _as_uuid(chart_id: str) -> uuid.UUID:
-    """Coerce a route parameter into a UUID, 404 on malformed ids."""
+def _as_int(chart_id) -> int:
+    """Coerce a route parameter into an integer id, 404 on malformed ids."""
     try:
-        return uuid.UUID(str(chart_id))
+        return int(str(chart_id))
     except (ValueError, AttributeError, TypeError):
         raise HTTPException(status_code=404, detail="چارت یافت نشد")
 
@@ -75,7 +74,7 @@ async def list_charts(
 
 async def get_chart(db: AsyncSession, user: User, chart_id: str) -> ChartHistory:
     result = await db.execute(
-        select(ChartHistory).where(ChartHistory.id == _as_uuid(chart_id), ChartHistory.user_id == user.id)
+        select(ChartHistory).where(ChartHistory.id == _as_int(chart_id), ChartHistory.user_id == user.id)
     )
     chart = result.scalar_one_or_none()
     if chart is None:

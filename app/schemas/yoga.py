@@ -1,7 +1,6 @@
 """Schemas for yoga practice sessions, favorites and stats."""
 from datetime import date, datetime
 from typing import Optional
-from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -25,7 +24,7 @@ class YogaSessionOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: Optional[UUID] = None
+    id: Optional[int] = None
     pose_id: Optional[int] = None
     pose_name: Optional[str] = None
     category: str

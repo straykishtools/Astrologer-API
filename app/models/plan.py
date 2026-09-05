@@ -19,7 +19,7 @@ class Plan(Base):
 
     __tablename__ = "plans"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(30), unique=True, index=True, nullable=False)
     display_name: Mapped[str] = mapped_column(String(60), nullable=False, default="")
     price_monthly: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

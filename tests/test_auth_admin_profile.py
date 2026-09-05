@@ -7,28 +7,18 @@ Tests for the admin panel & account settings endpoints.
 - GET  /api/v5/auth/admin/stats
 - GET  /admin.html, /account.html               (static pages served)
 
-All DB writes go to an isolated temporary SQLite file (not cosmic_oracle.db).
+All DB writes go to the isolated in-memory database configured in conftest.py
+(COSMIC_DB_URL=sqlite+aiosqlite:///:memory:) — never cosmic.db or the legacy
+cosmic_oracle.db.
 """
 
 from __future__ import annotations
 
+import asyncio
 import time
 
 import pytest
 from fastapi.testclient import TestClient
-
-import app.models as models
-
-
-@pytest.fixture(scope="module", autouse=True)
-def isolated_db(tmp_path_factory):
-    """Point the models layer at a temp database for this whole module."""
-    db_file = tmp_path_factory.mktemp("authdb") / "test_auth.db"
-    old_db_path = models.DB_PATH
-    models.DB_PATH = str(db_file)
-    models.init_db()  # creates tables + default plans + default admin
-    yield
-    models.DB_PATH = old_db_path
 
 
 def _register(client: TestClient, email: str | None = None, password: str = "secret123"):
@@ -41,10 +31,21 @@ def _register(client: TestClient, email: str | None = None, password: str = "sec
 
 
 def _admin_headers(client: TestClient) -> dict:
-    # ادمین پیش‌فرض seed شده توسط init_db (موجود در ENDPOINTS.md)
+    # ادمین پیش‌فرض seed شده توسط startup (موجود در ENDPOINTS.md)
     resp = client.post("/api/v5/auth/login", json={"email": "admin@cosmic.ir", "password": "admin123"})
     assert resp.status_code == 200, resp.text
     return {"Authorization": f"Bearer {resp.json()['access_token']}"}
+
+
+async def _set_daily_usage(user_id: int, value: int) -> None:
+    from sqlalchemy import update
+
+    from app.config.database import SessionLocal
+    from app.models import User
+
+    async with SessionLocal() as db:
+        await db.execute(update(User).where(User.id == user_id).values(daily_charts_used=value))
+        await db.commit()
 
 
 # ---------------------------------------------------------------- profile
@@ -137,22 +138,18 @@ def test_admin_cannot_delete_self(client: TestClient):
 
 def test_admin_reset_usage(client: TestClient):
     admin_headers = _admin_headers(client)
-    user, _ = _register(client)
+    user, headers = _register(client)
 
-    # مصرف را دستی روی ۵ می‌گذاریم
-    conn = models.get_db()
-    conn.execute("UPDATE users SET daily_charts_used = 5 WHERE id = ?", (user["id"],))
-    conn.commit()
-    conn.close()
+    # مصرف را دستی روی ۵ می‌گذاریم (مستقیم روی دیتابیس ناهمگام تست)
+    asyncio.run(_set_daily_usage(user["id"], 5))
 
     resp = client.post(f"/api/v5/auth/admin/users/{user['id']}/reset-usage", headers=admin_headers)
     assert resp.status_code == 200
     assert resp.json()["daily_charts_used"] == 0
 
-    conn = models.get_db()
-    row = conn.execute("SELECT daily_charts_used FROM users WHERE id = ?", (user["id"],)).fetchone()
-    conn.close()
-    assert row["daily_charts_used"] == 0
+    # تأیید از طریق endpoint مصرف خود همان کاربر
+    usage = client.get("/api/v5/auth/usage", headers=headers).json()
+    assert usage["used"] == 0
 
 
 def test_admin_stats_shape(client: TestClient):
@@ -178,4 +175,4 @@ def test_admin_and_account_pages_served(client: TestClient):
     for path in ("/admin.html", "/account.html"):
         resp = client.get(path)
         assert resp.status_code == 200, path
-        assert "text/html" in resp.headers["content-type"], path
+        assert "text/html" in resp.headers["content-type"], path

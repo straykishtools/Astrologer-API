@@ -2462,11 +2462,11 @@
             </a>
             <!-- Always-visible items -->
             <div class="popup-divider"></div>
-            <a class="popup-item" onclick="closeUserPopup(); showPage('home');">
+            <a class="popup-item" onclick="closeUserPopup(); if (window.navigateToNav) window.navigateToNav('home'); else showPage('home');">
                 <span class="popup-item-icon">🏠</span>
                 <span class="popup-item-text">صفحه اصلی</span>
             </a>
-            <a class="popup-item" onclick="closeUserPopup(); showPage('dashboard');">
+            <a class="popup-item" onclick="closeUserPopup(); if (window.navigateToNav) window.navigateToNav('dashboard'); else showPage('dashboard');">
                 <span class="popup-item-icon">📊</span>
                 <span class="popup-item-text">داشبورد روزانه</span>
             </a>
@@ -3143,7 +3143,7 @@
     <script src="static/persian-provinces.js"></script>
     <script src="static/date-wheel-picker.js?v=15"></script>
     <script src="static/city-selector.js?v=9"></script>
-    <script src="static/spa-router.js?v=3"></script>
+    <script src="static/spa-router.js?v=7"></script>
     <script src="static/script.js?v=13"></script>
     <script src="static/yoga-data-loader.js?v=1"></script>
     <script src="static/yoga-core.js?v=2"></script>
@@ -3475,27 +3475,17 @@
         document.querySelectorAll('.sidebar [data-nav]').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 var target = btn.getAttribute('data-nav');
+                closeSidebar();
+                // Let the hash router drive rendering so URLs stay shareable.
+                if (window.navigateToNav) { window.navigateToNav(target); return; }
+                // Fallback if the router isn't loaded yet.
                 if (target === 'home') showPage('home');
                 else if (target === 'landing') showPage('landing');
-                else if (target === 'dashboard') { showPage('dashboard'); closeSidebar(); }
-                else if (target === 'yoga') {
-                    showPage('yoga');
-                    closeSidebar();
-                    if (window.YogaLibrary) window.YogaLibrary.init();
-                }
-                else if (target === 'breath') {
-                    showPage('breath');
-                    closeSidebar();
-                    if (window.BreathModule) window.BreathModule.init();
-                }
-                else if (target === 'qol') {
-                    showPage('qol');
-                    closeSidebar();
-                }
-                else if (target === 'admin') {
-                    showPage('admin');
-                    closeSidebar();
-                }
+                else if (target === 'dashboard') showPage('dashboard');
+                else if (target === 'yoga') { showPage('yoga'); if (window.YogaLibrary) window.YogaLibrary.init(); }
+                else if (target === 'breath') { showPage('breath'); if (window.BreathModule) window.BreathModule.init(); }
+                else if (target === 'qol') showPage('qol');
+                else if (target === 'admin') showPage('admin');
                 else window.openService(target);
             });
         });
@@ -3693,7 +3683,7 @@
         window.addEventListener('load', function () {
             setTimeout(function () {
                 loadScript('static/liquid-orb.js?v=2');
-                loadScript('static/auth-panel.js?v=3');
+                loadScript('static/auth-panel.js?v=4');
             }, 1500);
         });
 

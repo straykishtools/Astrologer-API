@@ -1,10 +1,9 @@
 """
 Chart history: every chart calculation a user saves.
 """
-import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, Uuid, func, Index
+from sqlalchemy import JSON, DateTime, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -18,9 +17,9 @@ class ChartHistory(Base):
         Index("ix_chart_history_user_created", "user_id", "created_at"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     chart_type: Mapped[str] = mapped_column(
         String(30),
@@ -41,3 +40,30 @@ class ChartHistory(Base):
 
     def __repr__(self) -> str:
         return f"<ChartHistory id={self.id} user_id={self.user_id} chart_type={self.chart_type!r}>"
+
+
+class SavedChart(Base):
+    """A chart saved through the legacy ``/api/v5/auth/charts/*`` endpoints.
+
+    Mirrors the legacy ``saved_charts`` table (cosmic_oracle.db) exactly —
+    ``input_data``/``result_data`` are the raw JSON strings the legacy API
+    returns, so the response format stays byte-identical after the migration.
+    """
+
+    __tablename__ = "saved_charts"
+    __table_args__ = (
+        Index("ix_saved_charts_user_created", "user_id", "created_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    chart_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    title: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    input_data: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    result_data: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self) -> str:
+        return f"<SavedChart id={self.id} user_id={self.user_id} chart_type={self.chart_type!r}>"

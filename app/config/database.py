@@ -1,11 +1,11 @@
 """
 Async SQLAlchemy database configuration (SQLite via aiosqlite).
 
-The Cosmic Oracle user database lives in its own file (`cosmic.db`) and is
-managed through SQLAlchemy 2.x async sessions + Alembic migrations. It is
-deliberately separate from the legacy synchronous SQLite layer
-(`app/models.py` -> `cosmic_oracle.db`) that powers the original auth/plans
-routes, so the existing API surface keeps working unchanged.
+The Cosmic Oracle database lives in its own file (`cosmic.db`) and is
+managed through SQLAlchemy 2.x async sessions + Alembic migrations. This is the
+single store: the legacy synchronous layer (cosmic_oracle.db) was fully
+migrated onto it (rows imported by the Alembic migration with ids preserved;
+SHA256 passwords still verify and upgrade to bcrypt on login).
 """
 import os
 from pathlib import Path
@@ -66,6 +66,106 @@ async def create_all():
         await conn.run_sync(Base.metadata.create_all)
 
 
+# Default plan catalog — same values the Alembic seed migration (and the
+# legacy cosmic_oracle.db) inserts, so a fresh DB created via ``create_all``
+# (no migrations) still has rows the premium gating reads.
+DEFAULT_PLANS = [
+    {
+        "name": "free",
+        "display_name": "رایگان",
+        "price_monthly": 0,
+        "price_yearly": 0,
+        "daily_chart_limit": 10,
+        "can_save_charts": False,
+        "can_access_premium": False,
+        "premium_paths": "composite,solar-return,lunar-return",
+        "features": "چارت تولد، سیناستری پایه، تاروت، فال حافظ، ناسا",
+        "is_active": True,
+        "sort_order": 0,
+    },
+    {
+        "name": "gold",
+        "display_name": "طلایی",
+        "price_monthly": 99000,
+        "price_yearly": 990000,
+        "daily_chart_limit": 200,
+        "can_save_charts": True,
+        "can_access_premium": True,
+        "premium_paths": "",
+        "features": "همه ابزار رایگان + کامپوزیت، ترانزیت کامل، ذخیره چارت",
+        "is_active": True,
+        "sort_order": 1,
+    },
+    {
+        "name": "diamond",
+        "display_name": "الماسی",
+        "price_monthly": 299000,
+        "price_yearly": 2990000,
+        "daily_chart_limit": 9999,
+        "can_save_charts": True,
+        "can_access_premium": True,
+        "premium_paths": "",
+        "features": "همه طلایی + خروجی PDF و دسترسی API",
+        "is_active": True,
+        "sort_order": 2,
+    },
+]
+
+
+async def seed_default_plans():
+    """Insert the free/gold/diamond rows when the plans table is empty."""
+    from sqlalchemy import select
+
+    from app.models import Plan
+
+    async with SessionLocal() as db:
+        existing = (await db.execute(select(Plan.id).limit(1))).scalar_one_or_none()
+        if existing is not None:
+            return
+        db.add_all(Plan(**row) for row in DEFAULT_PLANS)
+        await db.commit()
+
+
+async def seed_default_admin():
+    """Create the default admin account when no admin exists yet.
+
+    Same account the legacy layer seeded on cosmic_oracle.db (admin@cosmic.ir /
+    admin123, plan ``pro``, is_admin True) so existing tooling keeps working.
+    """
+    from sqlalchemy import select
+
+    from app.models import User
+    from app.services.auth_service import hash_password
+
+    async with SessionLocal() as db:
+        existing = (
+            await db.execute(select(User.id).where(User.email == "admin@cosmic.ir").limit(1))
+        ).scalar_one_or_none()
+        if existing is not None:
+            # Legacy row migrated? Ensure the admin flag is set (defense in depth).
+            user = (await db.execute(select(User).where(User.email == "admin@cosmic.ir"))).scalar_one()
+            if not user.is_admin:
+                user.is_admin = True
+                await db.commit()
+            return
+        db.add(
+            User(
+                email="admin@cosmic.ir",
+                password_hash=hash_password("admin123"),
+                display_name="مدیر سیستم",
+                plan="pro",
+                is_admin=True,
+            )
+        )
+        await db.commit()
+
+
 async def init_db():
-    """Idempotent startup initializer (alias of create_all + PRAGMA setup)."""
+    """Idempotent startup initializer (create tables + seed plans + seed admin)."""
     await create_all()
+    try:
+        await seed_default_plans()
+        await seed_default_admin()
+    except Exception:
+        # Never block boot on seeding (e.g. locked DB during concurrent start).
+        pass

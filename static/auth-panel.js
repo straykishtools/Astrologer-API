@@ -525,6 +525,7 @@ window.doLogout = function() {
     if (window.showToast) showToast('👋 خارج شدید', 'info');
 };
 
+window.openPricingModal = openPricingModal;
 window.openPricingPage = function() {
     var m = document.getElementById('accountModal');
     if (m) m.remove();

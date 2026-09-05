@@ -579,3 +579,65 @@ def test_practice_with_instructor_link(client, admin_headers):
         "steps": [{"type": "pose", "name": "Corpse"}],
     })
     assert r.status_code == 404
+
+# ─── Plan-table driven premium gating (configurable via the plans table) ───
+
+def test_premium_gating_reads_plans_table(client, admin_headers, user_headers):
+    """Gold-tier practices unlock/lock based on the plans table's can_access_premium."""
+    import asyncio
+    from sqlalchemy import select
+
+    from app.config.database import SessionLocal
+    from app.models import Plan, User
+
+    r = client.post("/api/v5/yoga/practices", headers=admin_headers, json={
+        "name": "tier_cfg_test",
+        "subscription_tier": "gold",
+        "steps": [{"type": "pose", "name": "Corpse"}, {"type": "hold", "count": 5, "phrase": "none"}],
+    })
+    assert r.status_code == 201, r.text
+
+    async def set_plan(name, *, can_access_premium=None):
+        async with SessionLocal() as db:
+            plan = (await db.execute(select(Plan).where(Plan.name == name))).scalar_one()
+            if can_access_premium is not None:
+                plan.can_access_premium = can_access_premium
+            await db.commit()
+
+    async def set_user_plan(plan):
+        async with SessionLocal() as db:
+            u = (await db.execute(select(User).where(User.email == "yoga-user@cosmic.ir"))).scalar_one()
+            u.plan = plan
+            await db.commit()
+
+    # Reset shared module state (other tests may have left the user on gold).
+    asyncio.run(set_user_plan("free"))
+    asyncio.run(set_plan("gold", can_access_premium=True))
+
+    try:
+        # free user -> locked for gold practice
+        locked = {p["name"]: p["locked"] for p in client.get(
+            "/api/v5/yoga/practices", headers=user_headers).json()["items"]}
+        assert locked["tier_cfg_test"] is True
+
+        # upgrade to gold (plans row exists with can_access_premium=True) -> unlocked
+        asyncio.run(set_user_plan("gold"))
+        locked = {p["name"]: p["locked"] for p in client.get(
+            "/api/v5/yoga/practices", headers=user_headers).json()["items"]}
+        assert locked["tier_cfg_test"] is False
+
+        # admin disables premium access for gold -> locked again
+        asyncio.run(set_plan("gold", can_access_premium=False))
+        locked = {p["name"]: p["locked"] for p in client.get(
+            "/api/v5/yoga/practices", headers=user_headers).json()["items"]}
+        assert locked["tier_cfg_test"] is True
+
+        # re-enable -> unlocked
+        asyncio.run(set_plan("gold", can_access_premium=True))
+        locked = {p["name"]: p["locked"] for p in client.get(
+            "/api/v5/yoga/practices", headers=user_headers).json()["items"]}
+        assert locked["tier_cfg_test"] is False
+    finally:
+        asyncio.run(set_user_plan("free"))
+        asyncio.run(set_plan("gold", can_access_premium=True))
+        client.delete("/api/v5/yoga/practices/tier_cfg_test", headers=admin_headers)

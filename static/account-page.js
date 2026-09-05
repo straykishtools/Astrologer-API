@@ -55,12 +55,44 @@
         if (message) document.getElementById('guardError').textContent = message;
     }
 
+    // ─── تأیید ایمیل ───
+    function renderVerifyBanner() {
+        var box = document.getElementById('verifyBanner');
+        var u = getUser();
+        if (u.email_verified) {
+            box.className = 'verify-banner ok';
+            box.textContent = '✓ ایمیل شما تأیید شده است';
+        } else {
+            box.className = 'verify-banner warn';
+            box.innerHTML = '⚠️ ایمیل شما هنوز تأیید نشده است' +
+                ' <button type="button" class="btn-link" onclick="resendVerification()">ارسال لینک تأیید</button>';
+        }
+    }
+
+    window.resendVerification = async function () {
+        var u = getUser();
+        if (!u.email) { showToast('ایمیل در دسترس نیست', ''); return; }
+        try {
+            await api('POST', '/resend-verification', { email: u.email });
+            showToast('📧 لینک تأیید ارسال شد — صندوق ایمیل را بررسی کنید', 'success');
+        } catch (e) {
+            if (e.message !== 'unauthorized') showToast('⚠️ ' + e.message, '');
+        }
+    };
+
+    // توکن تأیید/بازیابی از لینک ایمیل (#/verify-email?token=... یا ?token=...)
+    function urlToken() {
+        var m = /[?&#]token=([^&#]+)/.exec(location.href);
+        return m ? decodeURIComponent(m[1]) : '';
+    }
+
     function showPage() {
         var u = getUser();
         document.getElementById('guardScreen').style.display = 'none';
         document.getElementById('pageScreen').classList.remove('hidden');
         document.getElementById('profName').value = u.display_name || '';
         document.getElementById('profEmail').value = u.email || '';
+        renderVerifyBanner();
         loadPlan();
     }
 
@@ -92,6 +124,7 @@
             var updated = await api('PUT', '/profile', { display_name: display_name, email: email });
             saveSession(null, updated);
             showToast('✅ پروفایل ذخیره شد', 'success');
+            renderVerifyBanner();  // ایمیل جدید → وضعیت تأیید به‌روز می‌شود
         } catch (e) {
             if (e.message !== 'unauthorized') errEl.textContent = e.message;
         }
@@ -144,6 +177,34 @@
 
     // ─── راه‌اندازی ───
     (function boot() {
+        var token = urlToken();
+        if (token) {
+            // رسیدن از لینک تأیید ایمیل — اول توکن را اعتبارسنجی کن
+            api('POST', '/verify-email', { token: token }).then(function () {
+                showToast('✅ ایمیل شما تأیید شد', 'success');
+                // Refresh the stored user best-effort (skipped for guests),
+                // then land on the dashboard — same as the main app flow.
+                if (getToken()) {
+                    api('GET', '/me').then(function (me) { saveSession(null, me); })
+                                      .catch(function () { });
+                }
+                setTimeout(function () {
+                    location.href = '/#/dashboard';
+                }, 1200);
+            }).catch(function (e) {
+                if (e.message !== 'unauthorized') {
+                    showToast('⚠️ ' + (e.message || 'لینک تأیید نامعتبر یا منقضی شده است'), '');
+                }
+                // ادامه به حالت عادی
+                if (getToken()) {
+                    api('GET', '/me').then(function (me) { saveSession(null, me); showPage(); })
+                                      .catch(function () { });
+                } else {
+                    showGuard('');
+                }
+            });
+            return;
+        }
         if (getToken()) {
             // اطلاعات ممکن است قدیمی باشد — با /me تازه کن
             api('GET', '/me').then(function (me) { saveSession(null, me); showPage(); })
@@ -155,3 +216,4 @@
             if (e.key === 'Enter') guardLogin();
         });
     })();
+})();

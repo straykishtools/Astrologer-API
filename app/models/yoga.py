@@ -32,9 +32,9 @@ class YogaPractice(Base):
         Index("ix_yoga_practice_user_date", "user_id", "practice_date"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     pose_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     pose_name: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -61,9 +61,9 @@ class YogaFavorite(Base):
         UniqueConstraint("user_id", "pose_id", name="uq_favorite_user_pose"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     pose_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     pose_name: Mapped[str] = mapped_column(Text, nullable=False)
@@ -140,9 +140,9 @@ class DailyStreak(Base):
         UniqueConstraint("user_id", "streak_type", name="uq_streak_user_type"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     streak_type: Mapped[str] = mapped_column(
         String(30), nullable=False, default="yoga"  # 'yoga', 'tarot', 'daily-question', 'login'

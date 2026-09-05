@@ -29,8 +29,25 @@ function getHashRoute() {
 }
 
 function navigate(route) {
-    window.location.hash = '#/' + route;
-}function showLanding() {
+    var target = '#/' + route;
+    if (window.location.hash === target) {
+        // Same route clicked again — re-render in place.
+        handleRoute();
+    } else {
+        window.location.hash = target;
+    }
+}
+
+// Map a sidebar data-nav target to a hash route and navigate there.
+window.navigateToNav = function (target) {
+    var direct = ['home', 'landing', 'dashboard', 'yoga', 'breath', 'qol', 'admin'];
+    var route = (direct.indexOf(target) !== -1) ? target : ('app/' + target);
+    navigate(route);
+};
+
+function showLanding() {
+    // The current index.html owns page visibility through its native shell.
+    if (window.showPage) { showPage('home'); return; }
     var container = document.querySelector('.container');
     if (!container) return;
     var toolsPage = document.getElementById('pageTools');
@@ -169,6 +186,8 @@ function initLandingOrb() {
 }
 
 function showApp() {
+    // Delegate to the native shell's tools page.
+    if (window.showPage) { showPage('tools'); return; }
     var landing = document.getElementById('landingPage');
     if (landing) landing.style.display = 'none';
     var toolsPage = document.getElementById('pageTools');
@@ -178,6 +197,8 @@ function showApp() {
 }
 
 function showDashboard() {
+    // Delegate to the native shell's dashboard page.
+    if (window.showPage) { showPage('dashboard'); return; }
     var container = document.querySelector('.container');
     if (!container) return;
     var landing = document.getElementById('landingPage');
@@ -372,7 +393,14 @@ window.deleteSavedChart = async function(chartId) {
 };
 
 // ─── Email verification / password reset pages ───
+var authActionState = null; // { kind, token } — guards against double-fire of the route
+
 function openAuthActionPage(kind, token) {
+    // Remove any previously opened action modal so the route never stacks two overlays.
+    var existing = document.getElementById('authActionModal');
+    if (existing) existing.remove();
+    authActionState = { kind: kind, token: token };
+
     var modal = document.createElement('div');
     modal.className = 'modal-overlay';
     modal.id = 'authActionModal';
@@ -394,16 +422,46 @@ function openAuthActionPage(kind, token) {
             body: JSON.stringify({ token: token })
         }).then(function (r) { return r.json(); }).then(function (data) {
             var body = document.getElementById('authActionBody');
+            if (!body) return;
             if (data && data.email_verified) {
-                body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">✅</div><p style="color:#2ecc71;font-weight:700;">ایمیل شما تأیید شد!</p><button onclick="document.getElementById(\'authActionModal\').remove()" style="margin-top:15px;background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;">ادامه</button>';
+                body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">✅</div><p style="color:#2ecc71;font-weight:700;">ایمیل شما تأیید شد!</p>';
+                if (window.showToast) showToast('✅ ایمیل شما تأیید شد', 'success');
+                // Keep the stored user in sync so the UI reflects the verified state.
+                try {
+                    var u = JSON.parse(localStorage.getItem('cosmic_user') || '{}');
+                    u.email_verified = true;
+                    localStorage.setItem('cosmic_user', JSON.stringify(u));
+                } catch (e) {}
+                var tok = localStorage.getItem('cosmic_token');
+                if (tok) {
+                    fetch('/api/v5/auth/me', { headers: { 'Authorization': 'Bearer ' + tok } })
+                        .then(function (r) { return r.json(); })
+                        .then(function (me) {
+                            if (me && me.user) localStorage.setItem('cosmic_user', JSON.stringify(me.user));
+                        }).catch(function () {});
+                }
+                // Land the user on their dashboard.
+                setTimeout(function () {
+                    var m = document.getElementById('authActionModal');
+                    if (m) m.remove();
+                    navigate('dashboard');
+                }, 900);
             } else {
-                body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">' + ((data && (data.detail || data.message)) || 'توکن نامعتبر یا منقضی شده') + '</p>';
+                body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">' + ((data && (data.detail || data.message)) || 'توکن نامعتبر یا منقضی شده') + '</p>' +
+                    '<button onclick="document.getElementById(\'authActionModal\').remove()" style="margin-top:15px;background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;">بستن</button>';
             }
         }).catch(function () {
             var body = document.getElementById('authActionBody');
-            body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">خطا در ارتباط با سرور</p>';
+            if (!body) return;
+            body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">خطا در ارتباط با سرور</p>' +
+                '<button onclick="document.getElementById(\'authActionModal\').remove()" style="margin-top:15px;background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;">بستن</button>';
         });
     } else if (kind === 'reset-password') {
+        // Signed-in users land on the dashboard after a reset; signed-out users
+        // are asked to log in again with their new password.
+        var submitFn = localStorage.getItem('cosmic_token')
+            ? 'window.submitPasswordResetAndGo(\'' + token + '\')'
+            : 'window.submitPasswordReset(\'' + token + '\')';
         modal.innerHTML = `
             <div class="modal-box" style="max-width:400px;">
                 <div class="modal-header"><h3>🔑 تعیین رمز عبور جدید</h3></div>
@@ -411,7 +469,7 @@ function openAuthActionPage(kind, token) {
                     <label style="display:block;margin-bottom:5px;font-size:0.85rem;color:#b0c4e0;">رمز عبور جدید (حداقل ۶ کاراکتر)</label>
                     <input type="password" id="resetNewPassword" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;box-sizing:border-box;" placeholder="••••••">
                     <div id="authActionError" style="color:#e74c3c;margin-top:10px;text-align:center;font-size:0.85rem;"></div>
-                    <button onclick="window.submitPasswordReset('${token}')" style="width:100%;margin-top:15px;padding:12px;border-radius:8px;border:none;background:linear-gradient(135deg,#6c8cff,#9c79ff);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">ذخیره رمز جدید</button>
+                    <button onclick="${submitFn}" style="width:100%;margin-top:15px;padding:12px;border-radius:8px;border:none;background:linear-gradient(135deg,#6c8cff,#9c79ff);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">ذخیره رمز جدید</button>
                 </div>
             </div>`;
         document.body.appendChild(modal);
@@ -440,13 +498,61 @@ window.submitPasswordReset = async function (token) {
     } catch (e) { errEl.textContent = 'خطا در ارتباط با سرور'; }
 };
 
+// Handle a password-reset link clicked while already signed in: after the reset,
+// land the user on their dashboard instead of forcing a re-login flow.
+window.submitPasswordResetAndGo = async function (token) {
+    var password = document.getElementById('resetNewPassword').value;
+    var errEl = document.getElementById('authActionError');
+    if (!password || password.length < 6) { errEl.textContent = 'رمز باید حداقل ۶ کاراکتر باشد'; return; }
+    try {
+        var resp = await fetch('/api/v5/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token, new_password: password })
+        });
+        var data = await resp.json();
+        if (resp.ok) {
+            var modal = document.getElementById('authActionModal');
+            if (modal) modal.remove();
+            if (window.showToast) showToast('✅ رمز عبور با موفقیت تغییر کرد', 'success');
+            navigate('dashboard');
+        } else {
+            errEl.textContent = data.detail || data.message || 'خطا';
+        }
+    } catch (e) { errEl.textContent = 'خطا در ارتباط با سرور'; }
+};
+
 function handleAuthActionRoute(raw) {
     // raw like "verify-email?token=abc123"
     var m = raw.match(/^(verify-email|reset-password)\?token=([^&]+)/);
     if (!m) return false;
-    openAuthActionPage(m[1], decodeURIComponent(m[2]));
+    var kind = m[1], token = decodeURIComponent(m[2]);
+    // handleRoute can fire twice for the same hash (DOMContentLoaded + hashchange);
+    // don't re-open the modal or re-send the token for an identical action.
+    if (authActionState && authActionState.kind === kind && authActionState.token === token &&
+        document.getElementById('authActionModal')) {
+        showApp();
+        return true;
+    }
+    openAuthActionPage(kind, token);
     showApp();
     return true;
+}
+
+// auth-panel.js is lazy-loaded after page load; retry until it's available
+// so a cold-loaded #/pricing link still opens the pricing modal.
+function openPricingWhenReady() {
+    if (window.openPricingModal) { window.openPricingModal(); return; }
+    var tries = 0;
+    var timer = setInterval(function () {
+        tries++;
+        if (window.openPricingModal) {
+            clearInterval(timer);
+            window.openPricingModal();
+        } else if (tries > 30) {
+            clearInterval(timer);
+        }
+    }, 500);
 }
 
 // ─── Router ───
@@ -456,23 +562,29 @@ function handleRoute() {
 
     if (handleAuthActionRoute(route)) return;
 
-    if (route === '' || route === '/') {
+    if (route === '' || route === '/' || route === 'home') {
         showLanding();
+    } else if (route === 'landing') {
+        if (window.showPage) { showPage('landing'); } else { showLanding(); }
     } else if (route === 'app') {
-        showApp();
-        // If sub-route, switch to that tab
-        if (r.sub) {
-            var btn = document.querySelector('.tab-btn[data-tab="' + r.sub + '"]');
-            if (btn) btn.click();
+        if (r.sub && window.openService) {
+            // #/app/<tool> → open the tool through the native lazy-loader.
+            openService(r.sub);
+        } else {
+            showApp();
         }
     } else if (route === 'dashboard') {
         showDashboard();
     } else if (route === 'pricing') {
         showApp();
-        if (window.openPricingModal) window.openPricingModal();
+        openPricingWhenReady();
     } else if (route === 'admin') {
-        showApp();
-        if (window.openAdminPanel) window.openAdminPanel();
+        if (window.showPage) { showPage('admin'); }
+        else { showApp(); if (window.openAdminPanel) window.openAdminPanel(); }
+    } else if (route === 'yoga' || route === 'breath') {
+        if (window.openService) { openService(route); } else { showApp(); }
+    } else if (route === 'qol') {
+        if (window.showPage) { showPage('qol'); } else { showApp(); }
     } else {
         showLanding();
     }

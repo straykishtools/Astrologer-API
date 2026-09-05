@@ -1,7 +1,6 @@
 """Schemas for saving and reading chart history."""
 from datetime import datetime
 from typing import Any, Optional
-from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -34,7 +33,7 @@ class ChartOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: Optional[UUID] = None
+    id: Optional[int] = None
     chart_type: str
     chart_data: Optional[Any] = None
     score: Optional[int] = None

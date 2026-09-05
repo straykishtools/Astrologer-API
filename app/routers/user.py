@@ -82,7 +82,7 @@ async def dashboard(
     charts = await user_service.get_chart_summary(db, user)
     yoga = await user_service.get_yoga_summary(db, user)
     tarot = await user_service.get_tarot_summary(db, user)
-    legacy = await user_service.get_legacy_saved_charts(user)
+    legacy = await user_service.get_legacy_saved_charts(db, user)
     return DashboardResponse(
         user=UserOut.model_validate(user),
         profile=ProfileOut.model_validate(profile) if profile else None,

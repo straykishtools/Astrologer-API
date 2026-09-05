@@ -79,6 +79,13 @@
     .kv .k { color: var(--ink-dim); }
     .mono { font-family: Consolas, monospace; direction: ltr; unicode-bidi: embed; }
 
+    /* ─── تأیید ایمیل ─── */
+    .verify-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; }
+    .verify-banner.ok { background: rgba(85,239,196,.1); border: 1px solid rgba(85,239,196,.3); color: var(--green); }
+    .verify-banner.warn { background: rgba(255,118,117,.08); border: 1px solid rgba(255,118,117,.35); color: var(--gold-2); }
+    .verify-banner .btn-link { border: none; background: transparent; color: var(--gold); cursor: pointer; font-weight: 700; font-size: 13px; text-decoration: underline; white-space: nowrap; }
+    .verify-banner .btn-link:hover { color: var(--gold-2); }
+
     /* ─── توست ─── */
     #toast {
         position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
@@ -121,6 +128,7 @@
                 <label>ایمیل</label>
                 <input type="email" id="profEmail" dir="ltr" placeholder="you@example.com">
             </div>
+            <div id="verifyBanner" class="verify-banner hidden"></div>
             <div class="form-err" id="profError"></div>
             <button class="btn-outline" onclick="saveProfile()">💾 ذخیره پروفایل</button>
         </div>
@@ -152,6 +160,6 @@
 
     <div id="toast"></div>
 
-    <script src="static/account-page.js?v=1"></script>
+    <script src="static/account-page.js?v=4"></script>
 </body>
 </html>

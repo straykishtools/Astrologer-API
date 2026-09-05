@@ -1,7 +1,6 @@
 """Schemas for user profile, settings and dashboard."""
 from datetime import date, datetime
 from typing import Any, Optional
-from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -43,7 +42,7 @@ class ProfileOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: Optional[UUID] = None
+    id: Optional[int] = None
     name: Optional[str] = None
     birth_year: Optional[int] = None
     birth_month: Optional[int] = None
@@ -78,7 +77,7 @@ class UserOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: Optional[UUID] = None
+    id: Optional[int] = None
     email: str
     display_name: str
     plan: str = "free"

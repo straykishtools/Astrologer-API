@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config.database import get_db
+from app.models import Plan as PlanRow
 from app.models.yoga import YogaInstructor, YogaPracticeCatalog
 from app.schemas.yoga import FavoriteCreate, YogaSessionCreate, YogaSessionOut, YogaStatsOut
 from app.services import yoga_service, yoga_session_parser, yoga_steps_validator
@@ -19,8 +20,29 @@ from app.services.auth_service import get_current_user
 
 router = APIRouter(prefix="/api/v5/yoga", tags=["Yoga"])
 
-PREMIUM_PLANS = {"gold", "diamond", "pro", "enterprise"}
 VALID_TIERS = ("free", "gold", "diamond")
+# Legacy admin accounts carry these plan names; no DB row exists for them, but
+# they historically unlock premium content — keep them premium.
+_LEGACY_PREMIUM_PLANS = {"pro", "enterprise"}
+
+
+async def _user_is_premium(user, db: AsyncSession) -> bool:
+    """Whether the user's plan unlocks premium (gold/diamond) yoga content.
+
+    Reads the configurable ``plans`` table (``can_access_premium``), falling
+    back to the legacy premium plan names that predate the database.
+    """
+    if user is None:
+        return False
+    name = (user.plan or "free").strip().lower()
+    if name in _LEGACY_PREMIUM_PLANS:
+        return True
+    row = (
+        await db.execute(
+            select(PlanRow).where(PlanRow.name == name, PlanRow.is_active.is_(True))
+        )
+    ).scalar_one_or_none()
+    return bool(row and row.can_access_premium)
 
 
 def _get_admin_user(user=Depends(get_current_user)):
@@ -121,13 +143,14 @@ async def practices(
         )
     ).scalars().all()
 
+    is_premium = await _user_is_premium(user, db)
     items = []
     seen = set()
     for row in rows:
         seen.add(row.name)
         item = _practice_item(row)
         if item["tier"] != "free":
-            item["locked"] = user is None or (user.plan or "free") not in PREMIUM_PLANS
+            item["locked"] = user is None or not is_premium
         items.append(item)
 
     # مکمل: تمرین‌های static که در دیتابیس نیستند (حالت ارتقا‌نیافته)
@@ -731,7 +754,7 @@ async def recommend_practice(
     if not catalog:
         raise HTTPException(status_code=404, detail="تمرینی برای توصیه پیدا نشد")
 
-    is_premium = bool(user and (user.plan or "free") in PREMIUM_PLANS)
+    is_premium = await _user_is_premium(user, db)
 
     def _as_item(p) -> dict:
         return getattr(p, "_item", None) or _practice_item(p)

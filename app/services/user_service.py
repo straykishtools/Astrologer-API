@@ -8,7 +8,7 @@ from datetime import date, timedelta
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import ChartHistory, DailyStreak, TarotHistory, User, UserProfile, UserSettings, YogaPractice
+from app.models import ChartHistory, DailyStreak, SavedChart, TarotHistory, User, UserProfile, UserSettings, YogaPractice
 from app.schemas.user import SettingsUpdate
 
 
@@ -187,20 +187,18 @@ async def get_tarot_summary(db: AsyncSession, user: User) -> dict:
     return {"total_draws": total, "recent": recent}
 
 
-async def get_legacy_saved_charts(user: User) -> list[dict]:
+async def get_legacy_saved_charts(db: AsyncSession, user: User) -> list[dict]:
     """Charts saved through the legacy /api/v5/auth/charts/save endpoint.
 
-    Runs in a worker thread so the blocking sqlite3 call never stalls the
-    async event loop. Returns [] when the legacy store has no matching row.
+    These rows live in the ``saved_charts`` table of the same database (ORM
+    ``SavedChart`` model) — the same shape the legacy endpoint returns.
     """
-    import asyncio
+    from app.services.auth_service import saved_chart_dict
 
-    from app.models import get_user_charts  # legacy sync layer
-
-    legacy_id = getattr(user, "_legacy_user_id", None)
-    if not legacy_id:
-        return []
-    try:
-        return await asyncio.to_thread(get_user_charts, int(legacy_id))
-    except Exception:
-        return []
+    result = await db.execute(
+        select(SavedChart)
+        .where(SavedChart.user_id == user.id)
+        .order_by(SavedChart.created_at.desc())
+        .limit(50)
+    )
+    return [saved_chart_dict(c) for c in result.scalars()]

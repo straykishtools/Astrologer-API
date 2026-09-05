@@ -61,8 +61,14 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 @pytest.fixture(scope="session")
 def client() -> TestClient:
-    """Client FastAPI riutilizzabile per i test di integrazione sugli endpoint."""
-    return TestClient(app)
+    """Client FastAPI riutilizzabile per i test di integrazione sugli endpoint.
+
+    Used as a context manager so the startup lifespan runs: it creates the
+    async ORM tables on the in-memory engine and seeds default plans + the
+    default admin — everything the auth/user/yoga/tarot endpoints rely on.
+    """
+    with TestClient(app) as c:
+        yield c
 
 
 @pytest.fixture(scope="session")

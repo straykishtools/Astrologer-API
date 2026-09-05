@@ -1,7 +1,6 @@
 """Schemas for saving and reading tarot history."""
 from datetime import datetime
 from typing import Optional
-from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -22,7 +21,7 @@ class TarotHistoryOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: Optional[UUID] = None
+    id: Optional[int] = None
     spread_type: str
     card_ids: Optional[list] = None
     reversed: Optional[list] = None

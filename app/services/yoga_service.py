@@ -81,7 +81,9 @@ async def bump_streak(db: AsyncSession, user: User, streak_type: str, activity_d
 
 async def get_stats(db: AsyncSession, user: User) -> dict:
     result = await db.execute(
-        select(YogaPractice).where(YogaPractice.user_id == user.id)
+        select(YogaPractice)
+        .where(YogaPractice.user_id == user.id)
+        .order_by(YogaPractice.practice_date.desc(), YogaPractice.created_at.desc())
     )
     sessions = list(result.scalars())
 
@@ -106,6 +108,7 @@ async def get_stats(db: AsyncSession, user: User) -> dict:
         cursor -= timedelta(days=1)
 
     streak_row = await get_streak_row(db, user, "yoga")
+    # sessions[0] is the most recent thanks to the ordering above.
     last = sessions[0] if sessions else None
     return {
         "total_sessions": len(sessions),
