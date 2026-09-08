@@ -17,6 +17,7 @@ import hashlib
 import logging
 import os
 import sqlite3
+import threading
 import time
 
 logger = logging.getLogger(__name__)
@@ -352,22 +353,37 @@ def _check_guest_limit(ip):
 # brute-force است، نه محدودکردن ترافیک عادی: فقط «شکست‌ها» شمرده می‌شوند و هر
 # ورود موفق شمارنده‌ی همان IP را پاک می‌کند. کاربران پشت NAT یکسان فقط وقتی
 # آسیب می‌بینند که واقعاً رمز اشتباه بزنند.
+#
+# ماندگاری: وضعیت در جدول login_throttle در همان cosmic.db ذخیره می‌شود تا قفل‌ها
+# از ری‌استارت سرور (و بین پروسه‌های IPv4/IPv6) جان سالم به‌برند و ادمین بتواند
+# قفل‌های فعال را ببیند (GET /auth/admin/lockouts). دسترسی از طریق sqlite3
+# سینکرون است — هم‌راستا با بقیه‌ی این middleware که خارج از چرخه‌ی درخواست
+# FastAPI اجرا می‌شود. ENV_TYPE=test هرگز جدول را نمی‌خواند/نمی‌نویسد (ایزولاسیون
+# تست) و fail-open است: اگر جدول هنوز وجود ندارد، قفل اعمال نمی‌شود.
 LOGIN_FAILURE_LIMIT = 10  # شکست متوالی قبل از قفل موقت
 LOGIN_LOCKOUT_SECONDS = 300  # 5 دقیقه قفل پس از عبور از حد
 
-_login_failures = {}  # {ip: {"count": int, "locked_until": float}}
-_login_cleanup_time = 0.0
+_throttle_lock = threading.Lock()
 
 
-def _login_cleanup_if_due():
-    global _login_cleanup_time
-    now = time.time()
-    if now - _login_cleanup_time < 600:
-        return
-    _login_cleanup_time = now
-    expired = [ip for ip, v in _login_failures.items() if v.get("locked_until", 0) <= now and not v.get("count")]
-    for ip in expired:
-        del _login_failures[ip]
+def _throttle_connect():
+    conn = sqlite3.connect(str(DEFAULT_DB_PATH), timeout=5)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _throttle_table_ready(conn) -> bool:
+    """True اگر جدول login_throttle وجود داشته باشد (create_all/migration هنوز نرسیده؟)"""
+    row = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='login_throttle'"
+    ).fetchone()
+    return row is not None
+
+
+def _get_throttle_row(conn, ip: str):
+    return conn.execute(
+        "SELECT failure_count, locked_until FROM login_throttle WHERE ip = ?", (ip,)
+    ).fetchone()
 
 
 def login_attempt_allowed(ip: str) -> bool:
@@ -379,29 +395,106 @@ def login_attempt_allowed(ip: str) -> bool:
     """
     if os.getenv("ENV_TYPE") == "test":
         return True
-    _login_cleanup_if_due()
-    entry = _login_failures.get(ip)
-    if not entry:
+    try:
+        with _throttle_lock:
+            conn = _throttle_connect()
+            try:
+                if not _throttle_table_ready(conn):
+                    return True  # fail-open تا migration/create_all اجرا شود
+                row = _get_throttle_row(conn, ip)
+                if not row:
+                    return True
+                return time.time() >= float(row["locked_until"] or 0)
+            finally:
+                conn.close()
+    except Exception as exc:
+        logger.warning("login-throttle check failed (fail-open): %s", exc)
         return True
-    return time.time() >= entry.get("locked_until", 0)
 
 
 def record_login_failure(ip: str) -> None:
-    """یک شکست ثبت کن؛ اگر از حد عبور کرد، IP را موقتاً قفل کن."""
-    global _login_cleanup_time
-    _login_cleanup_if_due()
-    now = time.time()
-    entry = _login_failures.setdefault(ip, {"count": 0, "locked_until": 0})
-    entry["count"] += 1
-    if entry["count"] >= LOGIN_FAILURE_LIMIT:
-        entry["locked_until"] = now + LOGIN_LOCKOUT_SECONDS
-        entry["count"] = 0  # پس از پایان قفل، شمارنده از صفر شروع می‌شود
-        logger.warning("login throttled for IP %s (too many failed attempts)", ip)
+    """یک شکست ثبت کن؛ اگر از حد عبور کرد، IP را موقتاً قفل کن. وضعیت در cosmic.db می‌ماند."""
+    if os.getenv("ENV_TYPE") == "test":
+        return  # ایزولاسیون تست — هیچ حالت قفلی خوانده یا نوشته نمی‌شود
+    try:
+        with _throttle_lock:
+            conn = _throttle_connect()
+            try:
+                if not _throttle_table_ready(conn):
+                    return
+                now = time.time()
+                row = _get_throttle_row(conn, ip)
+                count = (row["failure_count"] if row else 0) + 1
+                locked_until = float(row["locked_until"] or 0) if row else 0.0
+                if count >= LOGIN_FAILURE_LIMIT:
+                    locked_until = now + LOGIN_LOCKOUT_SECONDS
+                    count = 0  # پس از پایان قفل، شمارنده از صفر شروع می‌شود
+                    logger.warning("login throttled for IP %s (too many failed attempts)", ip)
+                conn.execute(
+                    """INSERT INTO login_throttle (ip, failure_count, locked_until, updated_at)
+                       VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+                       ON CONFLICT(ip) DO UPDATE SET
+                         failure_count = excluded.failure_count,
+                         locked_until = excluded.locked_until,
+                         updated_at = CURRENT_TIMESTAMP""",
+                    (ip, count, locked_until),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as exc:
+        logger.warning("login-throttle record failed (fail-open): %s", exc)
 
 
 def clear_login_failures(ip: str) -> None:
-    """ورود/بازیابی موفق — شمارنده‌ی IP را پاک کن."""
-    _login_failures.pop(ip, None)
+    """ورود/بازیابی موفق — ردیف IP را از جدول حذف کن."""
+    if os.getenv("ENV_TYPE") == "test":
+        return
+    try:
+        with _throttle_lock:
+            conn = _throttle_connect()
+            try:
+                if not _throttle_table_ready(conn):
+                    return
+                conn.execute("DELETE FROM login_throttle WHERE ip = ?", (ip,))
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as exc:
+        logger.warning("login-throttle clear failed (fail-open): %s", exc)
+
+
+def list_active_lockouts() -> list[dict]:
+    """قفل‌های فعال (برای GET /auth/admin/lockouts) — قدیمی‌ترین انقضا اول."""
+    try:
+        with _throttle_lock:
+            conn = _throttle_connect()
+            try:
+                if not _throttle_table_ready(conn):
+                    return []
+                now = time.time()
+                rows = conn.execute(
+                    """SELECT ip, failure_count, locked_until, updated_at
+                       FROM login_throttle
+                       WHERE locked_until > ?
+                       ORDER BY locked_until ASC""",
+                    (now,),
+                ).fetchall()
+                return [
+                    {
+                        "ip": r["ip"],
+                        "locked_until": float(r["locked_until"]),
+                        "seconds_remaining": max(0, int(float(r["locked_until"]) - now)),
+                        "failure_count": int(r["failure_count"] or 0),
+                        "updated_at": r["updated_at"],
+                    }
+                    for r in rows
+                ]
+            finally:
+                conn.close()
+    except Exception as exc:
+        logger.warning("login-throttle list failed: %s", exc)
+        return []
 
 
 def _decrement_guest(ip):

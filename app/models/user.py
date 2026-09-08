@@ -127,6 +127,27 @@ class GuestSession(Base):
         return f"<GuestSession id={self.id} hash={self.fingerprint_hash[:10]}…>"
 
 
+class LoginThrottle(Base):
+    """Per-IP failed login/reset attempts — brute-force lockouts that survive restarts.
+
+    Written synchronously by the rate-limit middleware (outside the FastAPI
+    request cycle) and read by the admin lockouts endpoint. ``locked_until`` is
+    a POSIX timestamp (float); 0 means "counting failures, not yet locked".
+    """
+
+    __tablename__ = "login_throttle"
+
+    ip: Mapped[str] = mapped_column(String(64), primary_key=True)
+    failure_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    locked_until: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    def __repr__(self) -> str:
+        return f"<LoginThrottle ip={self.ip!r} failures={self.failure_count}>"
+
+
 class UserSettings(Base):
     """App preferences (theme, language, reminders, default chart type)."""
 

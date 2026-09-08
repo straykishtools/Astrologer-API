@@ -193,16 +193,70 @@ function ensureVerifyBanner() {
 window.updateVerifyBannerNow = updateVerifyBanner;
 
 function updateVerifyBanner() {
-    var bar = ensureVerifyBanner();
-    if (!bar) return;
     var u = getUser();
-    if (isLoggedIn() && u.email && u.email_verified === false) {
-        bar.innerHTML = '⚠️ ایمیل شما هنوز تأیید نشده است'
-            + ' <a href="javascript:void(0)" onclick="resendVerificationFromBanner()"'
-            + ' style="color:#f39c12;font-weight:700;text-decoration:none;">ارسال دوباره‌ی لینک تأیید</a>';
-        bar.style.display = 'flex';
+    var show = isLoggedIn() && u.email && u.email_verified === false;
+    var bar = ensureVerifyBanner();
+    if (bar) {
+        if (show) {
+            bar.innerHTML = '⚠️ ایمیل شما هنوز تأیید نشده است'
+                + ' <a href="javascript:void(0)" onclick="resendVerificationFromBanner()"'
+                + ' style="color:#f39c12;font-weight:700;text-decoration:none;">ارسال دوباره‌ی لینک تأیید</a>';
+            bar.style.display = 'flex';
+        } else {
+            bar.style.display = 'none';
+        }
+    }
+    updateVerifyDashCard(show, u);
+}
+
+// ─── کارت پایدار تأیید ایمیل داخل داشبورد ───
+// نوار زرد فقط بالای صفحه است و در اسکرول/جابه‌جایی صفحه گم می‌شود؛ این کارت
+// همیشه بالای داشبورد کاربر می‌ماند تا حلقه‌ی تأیید از دست نرود. همان منبع
+// داده (updateVerifyBanner) هر دو سطح را مدیریت می‌کند.
+
+function _escapeHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function ensureVerifyDashCard() {
+    var host = document.getElementById('pageDashboard');
+    if (!host) return null;
+    var wrap = host.querySelector('.dashboard-page') || host;
+    var card = document.getElementById('verifyEmailDashCard');
+    if (!card) {
+        card = document.createElement('div');
+        card.id = 'verifyEmailDashCard';
+        card.style.cssText = 'display:none;padding:16px 20px;border-radius:14px;margin:14px auto;max-width:900px;'
+            + 'background:rgba(243,156,18,0.10);border:1px solid rgba(243,156,18,0.35);'
+            + 'box-shadow:0 4px 18px rgba(0,0,0,0.15);';
+        wrap.insertBefore(card, wrap.firstChild);
+    }
+    return card;
+}
+
+function updateVerifyDashCard(show, u) {
+    var card = ensureVerifyDashCard();
+    if (!card) return;
+    if (show) {
+        card.innerHTML = '<div style="display:flex;align-items:flex-start;gap:12px;">'
+            + '<div style="font-size:1.6rem;line-height:1;">📧</div>'
+            + '<div style="flex:1;">'
+            + '<div style="font-weight:700;color:#f5c66b;margin-bottom:6px;">ایمیل شما تأیید نشده است</div>'
+            + '<div style="font-size:0.88rem;color:#ccc;line-height:1.7;">'
+            + 'ایمیل <b dir="ltr">' + _escapeHtml(u.email) + '</b> هنوز تأیید نشده. با تأیید ایمیل، '
+            + 'بازیابی رمز عبور و اطلاع‌رسانی‌های حساب شما فعال می‌ماند.'
+            + '</div>'
+            + '<button onclick="resendVerificationFromBanner()" '
+            + 'style="margin-top:10px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;'
+            + 'font-family:inherit;font-size:0.88rem;font-weight:700;color:#1a1a1a;'
+            + 'background:linear-gradient(135deg,#f5c66b,#f39c12);">'
+            + 'ارسال دوباره‌ی لینک تأیید</button>'
+            + '</div></div>';
+        card.style.display = 'block';
     } else {
-        bar.style.display = 'none';
+        card.style.display = 'none';
     }
 }
 
@@ -484,6 +538,13 @@ window.doLogin = async function() {
         // Claim any guest session usage
         claimGuestSession();
         if (window.showToast) showToast('✅ ورود موفقیت‌آمیز بود', 'success');
+        // تلنگر ملایم برای کاربر تأییدنشده — نوار زرد تأیید اکنون بالای صفحه است؛
+        // با تأخیر کوتاه نشان داده می‌شود تا پیام موفقیت ورود قاب خوانا بماند.
+        if (data.user && data.user.email_verified === false) {
+            setTimeout(function() {
+                if (window.showToast) showToast('⚠️ ایمیل شما تأیید نشده — برای ارسال دوباره‌ی لینک، نوار زرد بالای صفحه را ببینید', 'info');
+            }, 800);
+        }
     } catch(e) {
         errEl.textContent = e.message;
     }
@@ -506,6 +567,10 @@ window.doRegister = async function() {
         // Claim any guest session usage
         claimGuestSession();
         if (window.showToast) showToast('✅ ثبت‌نام موفقیت‌آمیز بود', 'success');
+        // تلنگر تأیید ایمیل بلافاصله پس از ثبت‌نام (کاربر تازه‌ساخت همیشه تأییدنشده است)
+        setTimeout(function() {
+            if (window.showToast) showToast('📧 لینک تأیید به ایمیل شما ارسال شد — نوار زرد بالای صفحه را ببینید', 'info');
+        }, 800);
     } catch(e) {
         errEl.textContent = e.message;
     }

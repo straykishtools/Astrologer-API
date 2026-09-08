@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import sqlite3
 import sys
 import time
 from pathlib import Path
@@ -63,12 +64,55 @@ def _call(mw, rec, path, headers=None, client=None) -> None:
 
 # ─── ENV manipulation ───
 
+# ─── Throttle-store helpers (login_throttle table in a per-test DB) ───
+
+def _throttle_ddl():
+    return """CREATE TABLE IF NOT EXISTS login_throttle (
+        ip TEXT PRIMARY KEY,
+        failure_count INTEGER NOT NULL DEFAULT 0,
+        locked_until REAL NOT NULL DEFAULT 0,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )"""
+
+
+def _throttle_rows(db_file):
+    conn = sqlite3.connect(str(db_file))
+    conn.row_factory = sqlite3.Row
+    try:
+        return [dict(r) for r in conn.execute("SELECT * FROM login_throttle").fetchall()]
+    finally:
+        conn.close()
+
+
+def _throttle_exec(db_file, sql, params=()):
+    conn = sqlite3.connect(str(db_file))
+    try:
+        conn.execute(sql, params)
+        conn.commit()
+    finally:
+        conn.close()
+
+
 @pytest.fixture(autouse=True)
-def _production_env(monkeypatch):
-    """Default these tests to a production-like env; the exemption tests opt out."""
+def _production_env(monkeypatch, tmp_path):
+    """Default these tests to a production-like env; the exemption tests opt out.
+
+    Also redirects the throttle store to a per-test temp SQLite database (with the
+    login_throttle table pre-created, mirroring what init_db()/Alembic do in
+    production) so tests can never read or clobber the developer's real cosmic.db.
+    """
     monkeypatch.setenv("ENV_TYPE", "production")
     monkeypatch.setattr(rlm, "_guest_usage", {}, raising=True)
     monkeypatch.setattr(rlm, "_guest_cleanup_time", 0, raising=True)
+    db_file = tmp_path / "throttle-test.db"
+    conn = sqlite3.connect(str(db_file))
+    try:
+        conn.execute(_throttle_ddl())
+        conn.commit()
+    finally:
+        conn.close()
+    monkeypatch.setattr(rlm, "DEFAULT_DB_PATH", db_file, raising=True)
+    yield
 
 
 # ─── Premium gating ───
@@ -165,7 +209,6 @@ def test_non_chart_paths_pass_through_in_production():
 
 def test_login_throttle_allows_under_limit():
     os.environ["ENV_TYPE"] = "production"
-    rlm._login_failures.clear()
     ip = "9.9.9.9"
     for _ in range(rlm.LOGIN_FAILURE_LIMIT - 1):
         rlm.record_login_failure(ip)
@@ -175,28 +218,26 @@ def test_login_throttle_allows_under_limit():
 
 def test_login_throttle_locks_after_limit_then_unlocks():
     os.environ["ENV_TYPE"] = "production"
-    rlm._login_failures.clear()
     ip = "8.8.8.8"
     for _ in range(rlm.LOGIN_FAILURE_LIMIT):
         rlm.record_login_failure(ip)
     assert rlm.login_attempt_allowed(ip) is False, "IP must be locked at the limit"
 
-    # After the lockout window the IP is allowed again (fresh counter).
-    entry = rlm._login_failures[ip]
-    entry["locked_until"] = time.time() - 1
+    # After the lockout window the IP is allowed again.
+    _throttle_exec(rlm.DEFAULT_DB_PATH, "UPDATE login_throttle SET locked_until = ? WHERE ip = ?", (time.time() - 1, ip))
     assert rlm.login_attempt_allowed(ip) is True
     os.environ["ENV_TYPE"] = "test"
 
 
 def test_login_throttle_success_clears_failures():
     os.environ["ENV_TYPE"] = "production"
-    rlm._login_failures.clear()
     ip = "7.7.7.7"
     for _ in range(rlm.LOGIN_FAILURE_LIMIT - 1):
         rlm.record_login_failure(ip)
+    assert len(_throttle_rows(rlm.DEFAULT_DB_PATH)) == 1
     rlm.clear_login_failures(ip)
     assert rlm.login_attempt_allowed(ip) is True
-    assert ip not in rlm._login_failures
+    assert _throttle_rows(rlm.DEFAULT_DB_PATH) == [], "successful login must delete the row"
     os.environ["ENV_TYPE"] = "test"
 
 
@@ -208,12 +249,65 @@ def test_login_throttle_exempt_in_test_env():
     assert rlm.login_attempt_allowed(ip) is True, "test env must bypass the lockout"
 
 
+def test_login_throttle_state_lives_in_db_not_memory():
+    """The lockout is a DB row — it survives process death by construction."""
+    os.environ["ENV_TYPE"] = "production"
+    ip = "192.0.2.50"
+    for _ in range(rlm.LOGIN_FAILURE_LIMIT):
+        rlm.record_login_failure(ip)
+    assert rlm.login_attempt_allowed(ip) is False
+    rows = _throttle_rows(rlm.DEFAULT_DB_PATH)
+    assert len(rows) == 1 and rows[0]["ip"] == ip
+    assert rows[0]["locked_until"] > time.time(), "lockout deadline must be in the future"
+    # Any other process reading the same DB sees the lockout too.
+    assert rlm.login_attempt_allowed(ip) is False
+    assert rlm.login_attempt_allowed("192.0.2.51") is True
+    os.environ["ENV_TYPE"] = "test"
+
+
+def test_login_throttle_row_shape_and_clear_persists():
+    """After N failures: failure_count=N, locked_until=0; clear() removes the row."""
+    os.environ["ENV_TYPE"] = "production"
+    ip = "192.0.2.60"
+    for _ in range(rlm.LOGIN_FAILURE_LIMIT - 1):
+        rlm.record_login_failure(ip)
+    rows = _throttle_rows(rlm.DEFAULT_DB_PATH)
+    assert rows[0]["failure_count"] == rlm.LOGIN_FAILURE_LIMIT - 1
+    assert rows[0]["locked_until"] == 0
+
+    rlm.clear_login_failures(ip)
+    assert _throttle_rows(rlm.DEFAULT_DB_PATH) == []
+    os.environ["ENV_TYPE"] = "test"
+
+
+def test_login_throttle_missing_table_fails_open():
+    """Before migrations/create_all run, the missing table must not break logins."""
+    os.environ["ENV_TYPE"] = "production"
+    ip = "192.0.2.65"
+    # Drop the table the fixture created — fresh-DB-before-boot scenario.
+    _throttle_exec(rlm.DEFAULT_DB_PATH, "DROP TABLE login_throttle")
+    assert rlm.login_attempt_allowed(ip) is True, "missing table must fail open"
+    rlm.record_login_failure(ip)  # must not raise
+    rlm.clear_login_failures(ip)
+    assert rlm.login_attempt_allowed(ip) is True
+    os.environ["ENV_TYPE"] = "test"
+
+
+def test_login_throttle_never_touches_db_in_test_env(tmp_path, monkeypatch):
+    """ENV_TYPE=test must neither read nor write the store (test isolation)."""
+    os.environ["ENV_TYPE"] = "test"
+    fresh = tmp_path / "never-created.db"
+    monkeypatch.setattr(rlm, "DEFAULT_DB_PATH", fresh, raising=True)
+    for _ in range(rlm.LOGIN_FAILURE_LIMIT * 2):
+        rlm.record_login_failure("192.0.2.80")
+    assert not fresh.exists(), "test env must not create the store"
+
+
 def test_login_endpoint_returns_429_when_locked(client, monkeypatch):
     """End-to-end: a locked IP gets 429 from /auth/login before auth is even tried."""
     from app.middleware import rate_limit_middleware as rlm_mod
 
     monkeypatch.setenv("ENV_TYPE", "production")
-    rlm_mod._login_failures.clear()
     ip = "203.0.113.77"
     for _ in range(rlm_mod.LOGIN_FAILURE_LIMIT):
         rlm_mod.record_login_failure(ip)
@@ -226,12 +320,45 @@ def test_login_endpoint_returns_429_when_locked(client, monkeypatch):
     # A different IP is unaffected.
     resp = client.post("/api/v5/auth/login", json={"email": "x@cosmic.ir", "password": "wrongpw"}, headers={"X-Forwarded-For": "198.51.100.9"})
     assert resp.status_code == 401, resp.text
-    rlm_mod._login_failures.clear()
+    rlm_mod.clear_login_failures(ip)
+    monkeypatch.setenv("ENV_TYPE", "test")
+
+
+def test_admin_lockouts_endpoint_lists_locked_ips(client, monkeypatch):
+    """GET /auth/admin/lockouts: admin-only; lists locked IPs with expiry info."""
+    monkeypatch.setenv("ENV_TYPE", "production")
+
+    # Non-admin is rejected.
+    email = f"lockout-viewer-{int(time.time() * 1000)}@test.com"
+    reg = client.post("/api/v5/auth/register", json={"email": email, "password": "secret123"})
+    user_headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+    assert client.get("/api/v5/auth/admin/lockouts", headers=user_headers).status_code == 403
+
+    # Lock an IP (DB row in the per-test store), then read it as admin.
+    ip = "203.0.113.90"
+    for _ in range(rlm.LOGIN_FAILURE_LIMIT):
+        rlm.record_login_failure(ip)
+
+    # Admin login itself goes through the throttle — a different IP (testclient's
+    # forwarded header absent → client host), so it is not locked.
+    admin = client.post("/api/v5/auth/login", json={"email": "admin@cosmic.ir", "password": "admin123"})
+    assert admin.status_code == 200, admin.text
+    admin_headers = {"Authorization": f"Bearer {admin.json()['access_token']}"}
+
+    resp = client.get("/api/v5/auth/admin/lockouts", headers=admin_headers)
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["count"] >= 1
+    entry = next(l for l in body["lockouts"] if l["ip"] == ip)
+    assert entry["seconds_remaining"] > 0
+    assert entry["locked_until"] > time.time()
+    assert "updated_at" in entry
+    rlm.clear_login_failures(ip)
     monkeypatch.setenv("ENV_TYPE", "test")
 
 # ─── Static cache-buster middleware ───
 
-def test_static_cache_buster_pins_no_cache_on_js():
+def test_static_cache_buster_pins_no_cache_on_scripts_styles_and_images():
     from app.middleware.static_cache_buster_middleware import StaticCacheBusterMiddleware
 
     statuses = []
@@ -251,7 +378,14 @@ def test_static_cache_buster_pins_no_cache_on_js():
             headers_seen.append(msg["headers"])
 
     mw = StaticCacheBusterMiddleware(inner_app)
-    for path in ("/static/auth-panel.js", "/static/style.css"):
+    for path in (
+        "/static/auth-panel.js",
+        "/static/style.css",
+        "/static/images/yoga/SeatedForwardBendHalfLotus_R-tn75.png",
+        "/static/images/yoga/pose.webp",
+        "/static/images/deck/back.svg",
+        "/favicon.ico",
+    ):
         statuses.clear(); headers_seen.clear()
         scope = {"type": "http", "path": path, "headers": []}
         asyncio.run(mw(scope, receive, send))
@@ -260,6 +394,32 @@ def test_static_cache_buster_pins_no_cache_on_js():
         assert b"cache-control" in [k.lower() for k in flat], f"no cache-control for {path}"
         cc = [v for msg in headers_seen for k, v in msg if k.lower() == b"cache-control"]
         assert cc == [b"no-cache"], f"wrong cache-control for {path}: {cc}"
+
+
+def test_static_cache_buster_leaves_non_busted_extensions_alone():
+    """Videos/fonts/streaming media keep their own caching story — untouched."""
+    from app.middleware.static_cache_buster_middleware import StaticCacheBusterMiddleware
+
+    headers_seen = []
+
+    async def inner_app(scope, receive, send):
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        await send({"type": "http.response.body", "body": b""})
+
+    async def receive():
+        return {"type": "http.request", "body": b""}
+
+    async def send(msg):
+        if msg["type"] == "http.response.start":
+            headers_seen.append(msg["headers"])
+
+    mw = StaticCacheBusterMiddleware(inner_app)
+    for path in ("/static/video/intro.mp4", "/static/fonts/vazir.woff2", "/api/v5/auth/me"):
+        headers_seen.clear()
+        scope = {"type": "http", "path": path, "headers": []}
+        asyncio.run(mw(scope, receive, send))
+        flat = [k for msg in headers_seen for k, _ in msg]
+        assert b"cache-control" not in [k.lower() for k in flat], f"must not touch {path}"
 
 
 def test_static_cache_buster_leaves_non_static_untouched():

@@ -7,7 +7,8 @@
 خراب را اجرا می‌کند مگر اینکه دستی ?v=N در HTML بالا برود — همان ریشه‌ی
 باگ ماندگار auth-panel.
 
-راه‌حل (بدون تغییر HTML): هر پاسخ /static/*.js و *.css با
+راه‌حل (بدون تغییر HTML): هر پاسخ /static/* برای اسکریپت‌ها، استایل‌ها و
+تصاویر (png/jpg/jpeg/gif/webp/avif/svg/ico) با
 `Cache-Control: no-cache` برمی‌گردد. یعنی مرورگر همیشه قبل از استفاده
 revalidate می‌کند: فایل تغییر نکرده → 304 سبک با Last-Modified/ETag؛
 فایل تغییر کرده → بایت‌های تازه. نتیجه: فیکس‌ها بلافاصله می‌رسند و هیچ
@@ -52,8 +53,17 @@ def bust_static_url(rel_path: str) -> str:
     return f"{rel_path}?v={_version_for(rel_path)}"
 
 
+# پسوندهایی که نباید heuristically کش شوند: اسکریپت‌ها، استایل‌ها و تصاویر
+# (تصاویر هم بازتولید می‌شوند — مثلاً تامبنیل‌های یوگا — و نسخه‌ی کهنه‌ی کش‌شده
+# گمراه‌کننده است؛ revalidate ارزان است: فایل تغییری نکرده → 304 بدون بدنه).
+_BUSTED_SUFFIXES = (
+    ".js", ".css",
+    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".svg", ".ico",
+)
+
+
 class StaticCacheBusterMiddleware:
-    """Pins Cache-Control: no-cache on /static/*.js and *.css responses."""
+    """Pins Cache-Control: no-cache on static script, style and image responses."""
 
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
@@ -64,7 +74,9 @@ class StaticCacheBusterMiddleware:
             return
 
         path = scope.get("path", "")
-        if path.startswith("/static/") and (path.endswith(".js") or path.endswith(".css")):
+        # /favicon.ico در ریشه سرو می‌شود (نه زیر /static/) و به‌طرز افسانه‌ای
+        # در کش می‌مانَد — آن هم revalidate شود.
+        if (path.startswith("/static/") or path == "/favicon.ico") and path.lower().endswith(_BUSTED_SUFFIXES):
             async def send_with_cache_headers(message):
                 if message["type"] == "http.response.start":
                     headers = list(message.get("headers", []))

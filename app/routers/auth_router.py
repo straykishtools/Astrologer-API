@@ -574,6 +574,20 @@ async def get_my_plan(user=Depends(get_current_user), db: AsyncSession = Depends
 # روت‌های ادمین: مدیریت پلن‌ها (CRUD)
 # ============================================================
 
+@router.get("/admin/lockouts")
+async def admin_list_lockouts(admin=Depends(get_admin_user)):
+    """قفل‌های فعال brute-force — IPهای قفل‌شده و زمان انقضای آن‌ها (فقط ادمین).
+
+    کوره‌ی brute-force را از «بی‌صدا» به «قابل مشاهده» می‌کند: هر ردیف شامل IP،
+    انقضای قفل (epoch + ثانیه باقی‌مانده)، شمارنده‌ی شکست پس از آخرین قفل و
+    زمان آخرین به‌روزرسانی است. قدیمی‌ترین انقضا اول.
+    """
+    from app.middleware.rate_limit_middleware import list_active_lockouts
+
+    lockouts = list_active_lockouts()
+    return {"lockouts": lockouts, "count": len(lockouts)}
+
+
 @router.get("/admin/plans")
 async def admin_list_all_plans(admin=Depends(get_admin_user), db: AsyncSession = Depends(get_db)):
     """لیست همه پلن‌ها (فعال و غیرفعال) — فقط ادمین"""
