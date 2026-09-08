@@ -1273,7 +1273,7 @@ Email is delivered via SMTP when `SMTP_HOST` is set; otherwise the message
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| GET | `/api/v5/auth/dev/emails` | Recently emitted verification/reset emails (in-memory ring buffer, newest first) — 404 when `ENV_TYPE=production` |
+| GET | `/api/v5/auth/dev/emails` | Recently emitted verification/reset emails (in-memory ring buffer, newest first) — 404 unless `ENV_TYPE` is `dev` or `test` (unset behaves like production) |
 
 ### Yoga catalog & practice engine (XML data system)
 

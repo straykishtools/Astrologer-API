@@ -160,3 +160,151 @@ def test_non_chart_paths_pass_through_in_production():
         _call(mw, rec, path)
     assert rec.passed == 4
     assert rec.statuses == [200, 200, 200, 200]
+
+# ─── Login / reset throttling (per-IP failed attempts) ───
+
+def test_login_throttle_allows_under_limit():
+    os.environ["ENV_TYPE"] = "production"
+    rlm._login_failures.clear()
+    ip = "9.9.9.9"
+    for _ in range(rlm.LOGIN_FAILURE_LIMIT - 1):
+        rlm.record_login_failure(ip)
+    assert rlm.login_attempt_allowed(ip) is True
+    os.environ["ENV_TYPE"] = "test"
+
+
+def test_login_throttle_locks_after_limit_then_unlocks():
+    os.environ["ENV_TYPE"] = "production"
+    rlm._login_failures.clear()
+    ip = "8.8.8.8"
+    for _ in range(rlm.LOGIN_FAILURE_LIMIT):
+        rlm.record_login_failure(ip)
+    assert rlm.login_attempt_allowed(ip) is False, "IP must be locked at the limit"
+
+    # After the lockout window the IP is allowed again (fresh counter).
+    entry = rlm._login_failures[ip]
+    entry["locked_until"] = time.time() - 1
+    assert rlm.login_attempt_allowed(ip) is True
+    os.environ["ENV_TYPE"] = "test"
+
+
+def test_login_throttle_success_clears_failures():
+    os.environ["ENV_TYPE"] = "production"
+    rlm._login_failures.clear()
+    ip = "7.7.7.7"
+    for _ in range(rlm.LOGIN_FAILURE_LIMIT - 1):
+        rlm.record_login_failure(ip)
+    rlm.clear_login_failures(ip)
+    assert rlm.login_attempt_allowed(ip) is True
+    assert ip not in rlm._login_failures
+    os.environ["ENV_TYPE"] = "test"
+
+
+def test_login_throttle_exempt_in_test_env():
+    os.environ["ENV_TYPE"] = "test"
+    ip = "6.6.6.6"
+    for _ in range(rlm.LOGIN_FAILURE_LIMIT * 3):
+        rlm.record_login_failure(ip)
+    assert rlm.login_attempt_allowed(ip) is True, "test env must bypass the lockout"
+
+
+def test_login_endpoint_returns_429_when_locked(client, monkeypatch):
+    """End-to-end: a locked IP gets 429 from /auth/login before auth is even tried."""
+    from app.middleware import rate_limit_middleware as rlm_mod
+
+    monkeypatch.setenv("ENV_TYPE", "production")
+    rlm_mod._login_failures.clear()
+    ip = "203.0.113.77"
+    for _ in range(rlm_mod.LOGIN_FAILURE_LIMIT):
+        rlm_mod.record_login_failure(ip)
+
+    # Simulate requests from that IP via the forwarded header the middleware reads.
+    headers = {"X-Forwarded-For": ip}
+    resp = client.post("/api/v5/auth/login", json={"email": "x@cosmic.ir", "password": "wrongpw"}, headers=headers)
+    assert resp.status_code == 429, resp.text
+
+    # A different IP is unaffected.
+    resp = client.post("/api/v5/auth/login", json={"email": "x@cosmic.ir", "password": "wrongpw"}, headers={"X-Forwarded-For": "198.51.100.9"})
+    assert resp.status_code == 401, resp.text
+    rlm_mod._login_failures.clear()
+    monkeypatch.setenv("ENV_TYPE", "test")
+
+# ─── Static cache-buster middleware ───
+
+def test_static_cache_buster_pins_no_cache_on_js():
+    from app.middleware.static_cache_buster_middleware import StaticCacheBusterMiddleware
+
+    statuses = []
+    headers_seen = []
+
+    async def inner_app(scope, receive, send):
+        await send({"type": "http.response.start", "status": 200,
+                    "headers": [(b"content-type", b"application/javascript")]})
+        await send({"type": "http.response.body", "body": b"console.log(1)"})
+
+    async def receive():
+        return {"type": "http.request", "body": b""}
+
+    async def send(msg):
+        if msg["type"] == "http.response.start":
+            statuses.append(msg["status"])
+            headers_seen.append(msg["headers"])
+
+    mw = StaticCacheBusterMiddleware(inner_app)
+    for path in ("/static/auth-panel.js", "/static/style.css"):
+        statuses.clear(); headers_seen.clear()
+        scope = {"type": "http", "path": path, "headers": []}
+        asyncio.run(mw(scope, receive, send))
+        assert statuses == [200]
+        flat = [k for msg in headers_seen for k, _ in msg]
+        assert b"cache-control" in [k.lower() for k in flat], f"no cache-control for {path}"
+        cc = [v for msg in headers_seen for k, v in msg if k.lower() == b"cache-control"]
+        assert cc == [b"no-cache"], f"wrong cache-control for {path}: {cc}"
+
+
+def test_static_cache_buster_leaves_non_static_untouched():
+    from app.middleware.static_cache_buster_middleware import StaticCacheBusterMiddleware
+
+    headers_seen = []
+
+    async def inner_app(scope, receive, send):
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        await send({"type": "http.response.body", "body": b""})
+
+    async def receive():
+        return {"type": "http.request", "body": b""}
+
+    async def send(msg):
+        if msg["type"] == "http.response.start":
+            headers_seen.append(msg["headers"])
+
+    mw = StaticCacheBusterMiddleware(inner_app)
+    scope = {"type": "http", "path": "/api/v5/auth/me", "headers": []}
+    asyncio.run(mw(scope, receive, send))
+    flat = [k for msg in headers_seen for k, _ in msg]
+    assert b"cache-control" not in [k.lower() for k in flat], "must not touch API responses"
+
+
+def test_bust_static_url_changes_when_file_changes(tmp_path, monkeypatch):
+    """The mtime-hash helper must produce a new version when the file changes."""
+    import importlib
+
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "static").mkdir()
+    f = tmp_path / "static" / "demo.js"
+    f.write_text("a=1")
+
+    import app.middleware.static_cache_buster_middleware as mod
+    monkeypatch.setattr(mod, "_version", {})
+    v1 = mod.bust_static_url("demo.js")
+    assert v1.startswith("demo.js?v=")
+
+    import os as _os, time as _time
+    st_old = _os.stat(f)
+    _time.sleep(0.01)
+    f.write_text("a=2")
+    st_new = _os.stat(f)
+    assert (st_old.st_mtime_ns, st_old.st_size) != (st_new.st_mtime_ns, st_new.st_size), "test setup needs distinct mtime"
+
+    v2 = mod.bust_static_url("demo.js")
+    assert v2 != v1, "version must change when file content changes"

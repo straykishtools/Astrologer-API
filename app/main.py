@@ -10,7 +10,7 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -27,6 +27,7 @@ from .routers import (
 from .config.settings import settings
 from .middleware.secret_key_checker_middleware import SecretKeyCheckerMiddleware
 from .middleware.rate_limit_middleware import RateLimitMiddleware
+from .middleware.static_cache_buster_middleware import StaticCacheBusterMiddleware
 from .utils.validation_helpers import format_extra_field_error
 
 # ============================================
@@ -120,6 +121,47 @@ async def serve_account_page():
     if os.path.exists("static/account.html"):
         return FileResponse("static/account.html")
     return FileResponse("index.html")
+
+
+@app.get("/yoga.html")
+async def serve_yoga_studio():
+    """محیط تمرین یوگا — صفحه‌ی تمام‌صفحه با تایم‌لاین و پخش جلسه"""
+    if os.path.exists("yoga.html"):
+        return FileResponse("yoga.html")
+    raise HTTPException(status_code=404, detail="yoga.html not found")
+
+
+@app.get("/yoga-classic.html")
+async def serve_yoga_classic():
+    """بازسازی وفادار Pocket Yoga — مستقیم از static/yoga-data/resources/"""
+    if os.path.exists("yoga-classic.html"):
+        return FileResponse("yoga-classic.html")
+    raise HTTPException(status_code=404, detail="yoga-classic.html not found")
+
+
+@app.get("/yoga-cue/{key}")
+async def serve_yoga_cue(key: str):
+    """فایل‌های صوتی تمرین — بدون پسوند و با MIME عمومی (application/octet-stream
+    + X-Content-Type-Options) تا نرم‌افزارهای دانلود (مثل IDM) لینک را شناسایی
+    و رهگیری نکنند. مرورگر با decodeAudioData مبدأ را می‌خواند و پسوند بی‌اهمیت است."""
+    import re as _re
+    m = _re.fullmatch(r"([a-z0-9_]+)", key or "")
+    if not m:
+        raise HTTPException(status_code=404, detail="bad cue key")
+    safe = key + ".ogg"
+    path = os.path.join("static", "yoga-data", "resources", "res", "raw", safe)
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="cue not found")
+    return FileResponse(
+        path,
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": 'inline; filename="cue"',
+            "X-Content-Type-Options": "nosniff",
+            "Cache-Control": "no-store",
+        },
+    )
+
 
 @app.get("/health")
 async def health_check():
@@ -227,6 +269,9 @@ if not settings.debug:
 
 # ─── واسطه‌ی محدودیت روزانه ───
 app.add_middleware(RateLimitMiddleware)
+
+# ─── کش‌باستینگ خودکار استاتیک (پایان باگ‌های پنهان‌شده در کش مرورگر) ───
+app.add_middleware(StaticCacheBusterMiddleware)
 
 # CORS origins: use configured list, fallback to localhost for development
 _cors_origins = settings.allowed_cors_origins or [

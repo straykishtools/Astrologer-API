@@ -1,0 +1,75 @@
+name: CI
+
+# One workflow, two jobs:
+#   backend-tests — full pytest suite with ENV_TYPE=test, gated by an explicit
+#                   assertion of the 429/403 middleware exemption tests so a
+#                   regression that re-enables quota gating fails immediately
+#                   with a clear step name.
+#   yoga-guards   — the browser-JS yoga guards (timing, FA coverage, audio
+#                   scheduling, alias matching, //ref// resolution) driven
+#                   under Node.
+# Consolidates the former ci.yml + yoga-tests.yml; pip is cached between runs.
+
+on:
+  push:
+    paths:
+      - 'app/**'
+      - 'static/**'
+      - 'tests/**'
+      - 'requirements*.txt'
+      - 'package.json'
+      - 'pyproject.toml'
+      - '.github/workflows/ci.yml'
+  pull_request:
+
+env:
+  ENV_TYPE: test
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Python deps
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      # ── 429/403 regression guards ──────────────────────────────────────
+      # Fails before the rest of the suite if the ENV_TYPE=test exemption in
+      # RateLimitMiddleware (or the login throttle) is broken:
+      #   test_premium_path_blocked_for_guest_in_production   → 403 path
+      #   test_guest_quota_allows_five_then_429_in_production → 429 path
+      #   test_premium_path_open_in_test_env                  → exemption
+      #   test_rate_limiter_bypassed_in_test_env              → exemption
+      #   test_login_throttle_* / test_login_endpoint_returns_429_when_locked
+      - name: Assert rate-limit middleware exemption tests
+        run: |
+          python -m pytest tests/test_rate_limit_middleware.py tests/test_db_endpoints.py::test_rate_limiter_bypassed_in_test_env -q
+
+      - name: Run full backend test suite
+        run: python -m pytest tests -q
+
+  yoga-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Python deps
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run yoga JS guard tests
+        run: npm test

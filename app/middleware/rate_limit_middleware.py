@@ -97,7 +97,7 @@ def _db_get_plan_by_name(name):
 
 def _db_atomic_check_and_increment(user_id):
     """اتمیک چک و افزایش مصرف روزانه کاربر (جلوگیری از race condition)."""
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     try:
         conn = _connect()
@@ -106,7 +106,9 @@ def _db_atomic_check_and_increment(user_id):
             if not user:
                 return {"allowed": False, "reason": "کاربر یافت نشد"}
 
-            today = datetime.now().strftime("%Y-%m-%d")
+            # UTC — هم‌راستا با محدودیت مهمان‌ها و endpoint daily-limit (باقی‌ماندن
+            # زمان محلی باعث ریست دیرهنگام/زودهنگام کوتیا در سرورهای غیرUTC می‌شد)
+            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             if user["daily_charts_reset_at"] != today:
                 conn.execute(
                     "UPDATE users SET daily_charts_used = 0, daily_charts_reset_at = ? WHERE id = ?",
@@ -179,12 +181,13 @@ def _db_decrement(user_id):
 
 def _db_guest_check_and_increment(fp_hash, limit=5):
     """اتمیک چک و افزایش مصرف روزانه مهمان بر اساس fingerprint هش‌شده."""
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     try:
         conn = _connect()
         try:
-            today = datetime.now().strftime("%Y-%m-%d")
+            # UTC — هم‌راستا با محدودیت مهمان بر اساس IP (_check_guest_limit)
+            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             guest = conn.execute(
                 "SELECT * FROM guest_sessions WHERE fingerprint_hash = ?",
                 (fp_hash,),
@@ -344,6 +347,63 @@ def _check_guest_limit(ip):
     return count <= GUEST_DAILY_LIMIT, count, GUEST_DAILY_LIMIT
 
 
+# ─── محدودیت تلاش‌های ناموفق ورود/بازیابی رمز (بر اساس IP) ───
+# روی مسیرهای auth اعمال می‌شود (که خودشان از چک کوتیا معافند). هدف جلوگیری از
+# brute-force است، نه محدودکردن ترافیک عادی: فقط «شکست‌ها» شمرده می‌شوند و هر
+# ورود موفق شمارنده‌ی همان IP را پاک می‌کند. کاربران پشت NAT یکسان فقط وقتی
+# آسیب می‌بینند که واقعاً رمز اشتباه بزنند.
+LOGIN_FAILURE_LIMIT = 10  # شکست متوالی قبل از قفل موقت
+LOGIN_LOCKOUT_SECONDS = 300  # 5 دقیقه قفل پس از عبور از حد
+
+_login_failures = {}  # {ip: {"count": int, "locked_until": float}}
+_login_cleanup_time = 0.0
+
+
+def _login_cleanup_if_due():
+    global _login_cleanup_time
+    now = time.time()
+    if now - _login_cleanup_time < 600:
+        return
+    _login_cleanup_time = now
+    expired = [ip for ip, v in _login_failures.items() if v.get("locked_until", 0) <= now and not v.get("count")]
+    for ip in expired:
+        del _login_failures[ip]
+
+
+def login_attempt_allowed(ip: str) -> bool:
+    """False وقتی IP به‌خاطر شکست‌های مکرر در قفل موقت است.
+
+    ENV_TYPE=test معاف است (هم‌راستا با معافیت کوتیای مهمان) تا سوئیت‌های تست
+    در یک پروسه آزادانه رمز اشتباه بزنند؛ تست‌های اختصاصی این قفل، محیط را
+    موقتاً production می‌کنند (الگوی tests/test_rate_limit_middleware.py).
+    """
+    if os.getenv("ENV_TYPE") == "test":
+        return True
+    _login_cleanup_if_due()
+    entry = _login_failures.get(ip)
+    if not entry:
+        return True
+    return time.time() >= entry.get("locked_until", 0)
+
+
+def record_login_failure(ip: str) -> None:
+    """یک شکست ثبت کن؛ اگر از حد عبور کرد، IP را موقتاً قفل کن."""
+    global _login_cleanup_time
+    _login_cleanup_if_due()
+    now = time.time()
+    entry = _login_failures.setdefault(ip, {"count": 0, "locked_until": 0})
+    entry["count"] += 1
+    if entry["count"] >= LOGIN_FAILURE_LIMIT:
+        entry["locked_until"] = now + LOGIN_LOCKOUT_SECONDS
+        entry["count"] = 0  # پس از پایان قفل، شمارنده از صفر شروع می‌شود
+        logger.warning("login throttled for IP %s (too many failed attempts)", ip)
+
+
+def clear_login_failures(ip: str) -> None:
+    """ورود/بازیابی موفق — شمارنده‌ی IP را پاک کن."""
+    _login_failures.pop(ip, None)
+
+
 def _decrement_guest(ip):
     """Rollback guest usage count on failure"""
     from datetime import datetime, timezone
@@ -372,7 +432,7 @@ class RateLimitMiddleware:
         path = scope.get("path", "")
 
         # مسیرهای عمومی → رد شو
-        if path in PUBLIC_PATHS or path.startswith("/static/") or path == "/" or path == "/index.html":
+        if path in PUBLIC_PATHS or path.startswith("/static/") or path == "/" or path.endswith(".html"):
             await self.app(scope, receive, send)
             return
 

@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧘 استودیو یوگا — Cosmic Oracle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/yoga-v3.css?v=7">
+<style>
+/* ================================================================
+   YOGA STUDIO v3 — صوت دقیق مطابق مدل XML اصلی
+   move → فقط صدای move · hold → phrase cue + شمارش فقط اگر audibleCount
+   music marker → تعویض ترک محیطی · pose تازه → instruction + name
+   ================================================================ */
+:root {
+    color-scheme: dark;
+    --st-bg: #0b0e1a;
+    --st-panel: rgba(13, 18, 36, .88);
+    --st-line: rgba(255,255,255,.10);
+    --st-text: #eef3ff;
+    --st-dim: #8fa0c2;
+    --st-gold: #f9d976;
+    --st-gold2: #f39c12;
+    --scene-glow: rgba(79,143,224,.18);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+    font-family: 'Vazirmatn', system-ui, sans-serif;
+    background: var(--st-bg);
+    color: var(--st-text);
+    overflow: hidden;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+button:focus-visible { outline: 2px solid #4f8fe0; outline-offset: 2px; }
+img { -webkit-user-drag: none; user-select: none; }
+
+/* ═══════════════ لابی ═══════════════ */
+#lobby {
+    position: fixed; inset: 0; z-index: 30;
+    overflow-y: auto; padding: 44px 20px 70px;
+    display: flex; flex-direction: column; align-items: center;
+    background:
+        radial-gradient(1100px 480px at 50% -12%, rgba(79,143,224,.2), transparent 62%),
+        radial-gradient(900px 420px at 88% 112%, rgba(243,156,18,.13), transparent 60%),
+        var(--st-bg);
+}
+#lobby.hide { display: none; }
+.lb-head { text-align: center; margin-bottom: 34px; }
+.lb-head .lb-emoji { font-size: 2.8rem; }
+.lb-head h1 {
+    font-size: 1.9rem; font-weight: 900; margin-top: 4px;
+    background: linear-gradient(135deg, var(--st-gold), var(--st-gold2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.lb-head p { color: var(--st-dim); font-size: .9rem; margin-top: 4px; }
+#practiceList {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 16px; width: min(1040px, 100%);
+}
+.pr-card {
+    position: relative; text-align: right; border-radius: 22px;
+    border: 1px solid var(--st-line); background: var(--st-panel);
+    overflow: hidden; transition: transform .22s, border-color .22s, box-shadow .22s;
+    cursor: pointer;
+}
+.pr-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,.28); box-shadow: 0 14px 40px rgba(0,0,0,.45); }
+.pr-card .pr-bg { position: absolute; inset: 0; z-index: 0; opacity: .5; background: var(--pr-grad); }
+.pr-card:hover .pr-bg { opacity: .8; }
+.pr-card > * { position: relative; z-index: 1; }
+.pr-card .pr-top { display: flex; align-items: center; gap: 12px; padding: 20px 20px 0; }
+.pr-card .pr-ico {
+    width: 52px; height: 52px; border-radius: 16px; flex: 0 0 auto;
+    display: grid; place-items: center; font-size: 1.5rem;
+    background: rgba(255,255,255,.10); border: 1px solid var(--st-line);
+}
+.pr-card h3 { font-size: 1.1rem; font-weight: 800; }
+.pr-card .pr-meta { font-size: .72rem; color: var(--st-dim); margin-top: 2px; }
+.pr-card p {
+    padding: 10px 20px 0; font-size: .8rem; line-height: 1.85; color: #c7d2ea; min-height: 60px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pr-card .pr-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 20px 0; }
+.pr-card .pr-start {
+    margin: 16px 20px 18px; width: calc(100% - 40px); padding: 11px;
+    border-radius: 12px; font-weight: 800; font-size: .9rem;
+    background: linear-gradient(135deg, var(--st-gold2), var(--st-gold)); color: #1a1204;
+}
+.pr-card .pr-start:hover { filter: brightness(1.1); }
+.lb-note { margin-top: 26px; color: var(--st-dim); font-size: .8rem; }
+
+/* شیت مدت */
+#durSheet {
+    position: fixed; inset: 0; z-index: 45; display: none;
+    place-items: center; background: rgba(4,7,16,.72); backdrop-filter: blur(6px);
+}
+#durSheet.show { display: grid; }
+.ds-card {
+    width: min(400px, 92vw); background: var(--st-panel);
+    border: 1px solid var(--st-line); border-radius: 22px; padding: 26px 24px;
+    text-align: center; box-shadow: 0 24px 70px rgba(0,0,0,.6);
+}
+.ds-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
+.ds-card .ds-sub { color: var(--st-dim); font-size: .78rem; margin-bottom: 18px; }
+.ds-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.ds-btn {
+    min-width: 86px; padding: 12px 18px; border-radius: 14px; font-weight: 700;
+    background: rgba(255,255,255,.06); border: 1px solid var(--st-line); transition: .18s;
+}
+.ds-btn:hover, .ds-btn.sel { border-color: var(--st-gold); color: var(--st-gold); background: rgba(249,217,118,.08); }
+.ds-cancel { margin-top: 16px; color: var(--st-dim); font-size: .8rem; }
+.ds-cancel:hover { color: var(--st-text); }
+
+/* ═══════════════ محیط تمرین ═══════════════ */
+#studio {
+    position: fixed; inset: 0; z-index: 20;
+    display: none; flex-direction: column;
+    background: linear-gradient(180deg, var(--scene-top, #16213e) 0%, var(--scene-bottom, #0f1730) 100%);
+    transition: background 1.1s ease;
+}
+#studio.show { display: flex; }
+#sceneArt {
+    position: absolute; inset: 0; z-index: 0;
+    background-size: cover; background-position: center bottom;
+    opacity: .9; transition: background .8s ease;
+}
+#sceneArt::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(5,8,18,.55) 0%, rgba(5,8,18,.12) 34%, rgba(5,8,18,.1) 60%, rgba(5,8,18,.72) 100%);
+}
+#sceneArt::before {
+    content: ''; position: absolute; left: 50%; top: 54%;
+    width: min(80vmin, 700px); height: min(80vmin, 700px);
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, var(--scene-glow) 0%, transparent 66%);
+}
+
+/* نوار بالا */
+.st-top {
+    position: relative; z-index: 6;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px 8px;
+}
+.st-top .st-title { font-size: 1rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-top .st-sub { font-size: .72rem; color: #b9c6e4; opacity: .9; white-space: nowrap; }
+.st-top .spacer { flex: 1; }
+.st-btn {
+    min-width: 40px; height: 40px; padding: 0 12px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: .82rem; font-weight: 600;
+    background: rgba(10,14,28,.5); border: 1px solid var(--st-line);
+    backdrop-filter: blur(8px); transition: .18s; color: var(--st-text);
+}
+.st-btn:hover { background: rgba(255,255,255,.14); }
+.st-btn.off { opacity: .45; }
+.st-btn.exit:hover { background: rgba(230,90,90,.22); border-color: rgba(230,90,90,.5); }
+
+/* ── تایم‌لاین شیشه‌ای ── */
+.st-strip {
+    position: relative; z-index: 6;
+    height: 100px; overflow: hidden; user-select: none; margin: 0 10px;
+    background: rgba(8,12,26,.35); border: 1px solid var(--st-line);
+    border-radius: 18px; backdrop-filter: blur(10px);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+.st-strip-inner {
+    position: absolute; top: 0; bottom: 0; left: 0;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 16px;
+    transition: transform .5s cubic-bezier(.3,.8,.3,1);
+    will-change: transform;
+    touch-action: pan-y; /* اجازه‌ی درگ افقی برای مرور */
+}
+.st-strip.dragging .st-strip-inner { transition: none; }
+.tl-card {
+    flex: 0 0 auto; width: 66px; height: 78px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.05); border: 1px solid transparent;
+    opacity: .5; transition: opacity .35s, border-color .35s, transform .35s, background .35s;
+    cursor: pointer; position: relative; overflow: visible;
+}
+.tl-card img { width: 44px; height: 44px; object-fit: contain; }
+.tl-card .tl-dur { font-size: .58rem; color: #cdd9f2; font-variant-numeric: tabular-nums; direction: ltr; }
+.tl-card .tl-idx {
+    position: absolute; top: -6px; right: -2px;
+    min-width: 17px; height: 17px; padding: 0 4px; border-radius: 10px;
+    display: grid; place-items: center; font-size: .6rem;
+    background: rgba(60,75,110,.95); color: #fff; border: 1px solid rgba(255,255,255,.18);
+}
+.tl-card .tl-half { position: absolute; top: -5px; left: 4px; font-size: .6rem; color: var(--st-gold); }
+.tl-card.past { opacity: .22; }
+.tl-card.cur {
+    opacity: 1; transform: scale(1.12);
+    border-color: var(--st-gold); background: rgba(20,26,50,.85);
+    box-shadow: 0 6px 22px rgba(0,0,0,.5);
+}
+.tl-card.cur::after {
+    content: ''; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: var(--st-gold);
+}
+.tl-card:hover { background: rgba(255,255,255,.12); }
+.tl-card.tl-switch .tl-sw {
+    font-size: 1.5rem; color: var(--st-gold); line-height: 44px;
+    text-shadow: 0 0 14px rgba(249,217,118,.5);
+}
+.tl-card.tl-switch { background: rgba(249,217,118,.06); }
+
+/* ── صحنه‌ی حرکت ── */
+.st-stage {
+    position: relative; z-index: 4; flex: 1; min-height: 0;
+    display: grid; place-items: center; padding: 6px 16px;
+}
+#playerHost {
+    width: min(980px, 100%); max-height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+#playerHost .yp-player { background: transparent !important; border: none !important; box-shadow: none !important; width: 100%; padding: 0; }
+#playerHost .yp-player::before { display: none; }
+#playerHost .yp-topbar { display: none; }
+#playerHost .yp-controls,
+#playerHost .yp-progress.yp-seek[data-yp-seek],
+#playerHost .yp-seek-labels,
+#playerHost .yp-elapsed { display: none; }
+#playerHost .yp-main { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 0; }
+#playerHost .yp-stage {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    max-width: none; flex: none; text-align: center;
+}
+#playerHost .yp-img {
+    width: min(50vmin, 360px); height: min(50vmin, 360px);
+    max-height: none;
+    object-fit: contain;
+    border-radius: 26px;
+    background: #fdfdfb;
+    box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 4px 14px rgba(0,0,0,.35);
+    outline: 1px solid rgba(255,255,255,.25);
+}
+#poseImgStack { position: relative; width: min(50vmin, 360px); height: min(50vmin, 360px); }
+#poseImgStack .yp-img { position: absolute; inset: 0; width: 100%; height: 100%; }
+#poseImgStack .yp-img.fade-in { animation: poseFade .45s ease both; }
+@keyframes poseFade {
+    0%   { opacity: 0; transform: scale(.965) translateY(5px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+#playerHost .yp-pose-name { font-size: 1.5rem; font-weight: 900; text-shadow: 0 2px 14px rgba(0,0,0,.65); margin-top: 6px; }
+#playerHost .yp-pose-sanskrit { color: var(--st-dim); font-style: italic; font-size: .82rem; }
+#playerHost .yp-side {
+    display: inline-block; margin-top: 4px; font-size: .72rem;
+    background: rgba(249,217,118,.15); color: var(--st-gold);
+    border: 1px solid rgba(249,217,118,.4);
+    padding: 2px 12px; border-radius: 20px;
+}
+#playerHost .yp-timer-big {
+    margin-top: 4px; font-size: 2rem; font-weight: 900; letter-spacing: 1px;
+    font-variant-numeric: tabular-nums; text-shadow: 0 2px 14px rgba(0,0,0,.65);
+}
+/* زیرنویس فارسی cue */
+#cueCaption {
+    margin-top: 2px; min-height: 1.9em; max-width: min(560px, 92vw);
+    font-size: .92rem; font-weight: 500; color: #dbe6ff;
+    text-shadow: 0 1px 8px rgba(0,0,0,.7);
+    opacity: 0; transition: opacity .3s ease;
+}
+#cueCaption.show { opacity: 1; }
+#playerHost .yp-breath { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 2px; }
+#playerHost .yoga-circle {
+    position: relative; width: 64px; height: 64px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: rgba(8,12,26,.35); backdrop-filter: blur(8px);
+    border: 2px solid rgba(255,255,255,.18);
+    transition: transform 4s ease-in-out, border-color .9s ease, box-shadow 1.2s ease;
+}
+#playerHost .yoga-circle.inhale { transform: scale(1.16); border-color: rgba(249,217,118,.75); box-shadow: 0 0 24px rgba(249,217,118,.28); }
+#playerHost .yoga-circle.exhale { transform: scale(.88); border-color: rgba(143,160,194,.32); box-shadow: none; }
+#playerHost .yp-breath-text {
+    font-size: .8rem; font-weight: 700; color: var(--st-gold);
+}
+#playerHost .yp-count { color: var(--st-dim); font-size: .8rem; }
+#playerHost .yp-phrase { color: var(--st-gold); font-size: .78rem; }
+
+/* نوار پایین */
+.st-bottom {
+    position: relative; z-index: 6;
+    padding: 10px 22px calc(16px + env(safe-area-inset-bottom));
+    background: linear-gradient(0deg, rgba(4,7,16,.75), transparent);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.st-bottom .yp-seek {
+    position: relative; width: min(640px, 92vw); height: 12px;
+    cursor: default;
+    background: rgba(255,255,255,.12); border-radius: 8px; overflow: visible;
+}
+.st-bottom .yp-progress-fill {
+    height: 100%; border-radius: 8px;
+    background: linear-gradient(90deg, var(--st-gold2), var(--st-gold));
+    box-shadow: 0 0 12px rgba(249,217,118,.45);
+}
+.st-bottom .yp-progress-knob {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 15px; height: 15px; border-radius: 50%;
+    background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.5); pointer-events: none;
+}
+.st-bottom .yp-seek-labels {
+    width: min(640px, 92vw); display: flex; justify-content: space-between;
+    font-size: .74rem; color: var(--st-dim); font-variant-numeric: tabular-nums;
+    direction: rtl;
+}
+.st-bottom .yp-controls { display: flex; align-items: center; gap: 16px; margin-top: 2px; }
+.st-bottom .yp-btn {
+    min-width: 46px; height: 46px; padding: 0 16px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .85rem; font-weight: 700;
+    background: rgba(255,255,255,.08); border: 1px solid var(--st-line);
+    color: var(--st-text); transition: .18s;
+}
+.st-bottom .yp-btn:hover { background: rgba(255,255,255,.16); }
+.st-bottom .yp-btn.primary {
+    width: 64px; height: 64px; font-size: 1.5rem; padding: 0;
+    background: linear-gradient(135deg, var(--st-gold2), var(--st-gold));
+    color: #1a1204; border: none; box-shadow: 0 8px 26px rgba(243,156,18,.4);
+}
+.st-bottom .yp-btn.primary:hover { transform: scale(1.06); }
+.st-bottom .yp-elapsed { color: var(--st-dim); font-size: .76rem; }
+
+/* پنل اطلاعات تمرین — سمت راست */
+#infoPanel {
+    position: fixed; z-index: 46; top: 74px; right: 14px; bottom: 150px;
+    width: min(320px, 84vw);
+    background: rgba(13, 18, 36, .94); backdrop-filter: blur(18px);
+    border: 1px solid var(--st-line); border-radius: 20px;
+    display: none; flex-direction: column; overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0,0,0,.5);
+}
+#infoPanel.show { display: flex; animation: slideIn .28s ease; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-16px); } }
+#infoPanel .ip-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px; border-bottom: 1px solid var(--st-line);
+}
+#infoPanel .ip-head h3 { flex: 1; font-size: .98rem; font-weight: 800; }
+#infoPanel .ip-body { flex: 1; overflow-y: auto; padding: 16px; }
+#infoPanel .ip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+#infoPanel p { font-size: .8rem; line-height: 2; color: #c7d2ea; margin: 0; }
+#infoPanel .ip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0; }
+#infoPanel .ip-stat {
+    background: rgba(255,255,255,.05); border: 1px solid var(--st-line);
+    border-radius: 12px; padding: 10px 6px; text-align: center;
+}
+#infoPanel .ip-stat b { display: block; font-size: 1.05rem; color: var(--st-gold); }
+#infoPanel .ip-stat span { font-size: .66rem; color: var(--st-dim); }
+#infoPanel .ip-instructor {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.04); border: 1px solid var(--st-line);
+    border-radius: 14px; padding: 10px 12px; font-size: .8rem;
+}
+#lobby #ipToggle { display: none; }
+#ipToggle { display: inline-flex; }
+
+/* پاپ‌آپ ادامه تمرین */
+#resumePop {
+    position: fixed; z-index: 48;
+    bottom: calc(128px + env(safe-area-inset-bottom)); left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    display: none; align-items: center; gap: 12px;
+    background: rgba(16, 22, 42, .95); backdrop-filter: blur(16px);
+    border: 1px solid rgba(249,217,118,.45);
+    border-radius: 16px; padding: 10px 14px 10px 18px;
+    box-shadow: 0 14px 44px rgba(0,0,0,.55);
+}
+#resumePop.show { display: flex; animation: popIn .28s ease; }
+@keyframes popIn { from { opacity: 0; transform: translateX(-50%) translateY(14px); } }
+#resumePop .rp-txt { font-size: .84rem; }
+#resumePop .rp-txt b { color: var(--st-gold); }
+#resumePop .rp-btn {
+    padding: 8px 18px; border-radius: 11px; font-weight: 800; font-size: .82rem;
+    background: linear-gradient(135deg, var(--st-gold2), var(--st-gold)); color: #1a1204; white-space: nowrap;
+}
+
+#playerHost .yp-done-modal { background: rgba(4,7,16,.75); backdrop-filter: blur(8px); }
+#playerHost .yp-done-card {
+    background: var(--st-panel); border: 1px solid var(--st-line);
+    border-radius: 22px; padding: 26px 30px;
+}
+
+/* موبایل */
+@media (max-width: 640px) {
+    .st-strip { height: 86px; margin: 0 8px; }
+    .tl-card { width: 56px; height: 68px; }
+    .tl-card img { width: 36px; height: 36px; }
+    #poseImgStack { width: min(56vmin, 290px); height: min(56vmin, 290px); }
+    #playerHost .yp-img { width: 100%; height: 100%; }
+    #playerHost .yp-pose-name { font-size: 1.2rem; }
+    #playerHost .yp-timer-big { font-size: 1.6rem; }
+    #playerHost .yoga-circle { width: 56px; height: 56px; }
+    .st-top { padding: 10px 12px 6px; }
+    .st-btn { min-width: 36px; height: 36px; padding: 0 10px; font-size: .76rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="lobby">
+    <div class="lb-head">
+        <div class="lb-emoji">🧘‍♀️</div>
+        <h1>استودیو یوگا</h1>
+        <p>یک تمرین آماده انتخاب کن — با راهنمای صوتی و موسیقی محیطی</p>
+    </div>
+    <div id="practiceList"></div>
+    <div class="lb-note" id="lobbyNote">در حال بارگذاری تمرین‌ها…</div>
+</div>
+
+<div id="durSheet">
+    <div class="ds-card">
+        <h3 id="dsTitle">—</h3>
+        <div class="ds-sub">درجه سختی و مدت جلسه</div>
+        <div class="ds-btns" id="dsLevels" style="margin-bottom:12px"></div>
+        <div class="ds-btns" id="dsBtns"></div>
+        <div><button class="ds-cancel" id="dsCancel">انصراف</button></div>
+    </div>
+</div>
+
+<div id="studio">
+    <div id="sceneArt"></div>
+    <div class="st-top">
+        <div>
+            <div class="st-title" id="stTitle">—</div>
+            <div class="st-sub" id="stSub">—</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="st-btn" id="ipToggle" title="اطلاعات تمرین">ℹ</button>
+        <button class="st-btn" id="stMusic" title="موسیقی محیطی">🎵</button>
+        <button class="st-btn" id="stSound" title="راهنمای صوتی">🔔</button>
+        <button class="st-btn exit" id="stExit">✕ پایان</button>
+    </div>
+
+    <div class="st-strip"><div class="st-strip-inner" id="strip"></div></div>
+
+    <div class="st-stage"><div id="playerHost"></div></div>
+
+    <div class="st-bottom" id="stBottom"></div>
+</div>
+
+<!-- پنل اطلاعات تمرین (سمت راست) -->
+<aside id="infoPanel" aria-label="اطلاعات تمرین">
+    <div class="ip-head">
+        <h3 id="ipTitle">—</h3>
+        <button class="st-btn" id="ipClose" title="بستن">✕</button>
+    </div>
+    <div class="ip-body">
+        <div class="ip-row" id="ipMeta"></div>
+        <p id="ipDesc"></p>
+        <div class="ip-grid">
+            <div class="ip-stat"><b id="ipSteps">—</b><span>گام</span></div>
+            <div class="ip-stat"><b id="ipMin">—</b><span>دقیقه</span></div>
+            <div class="ip-stat"><b id="ipLevel">—</b><span>سطح</span></div>
+        </div>
+        <div class="ip-instructor" id="ipInstructor" hidden>
+            <span>👤</span><span id="ipInstrName"></span>
+            <span class="chip" id="ipInstrSpec"></span>
+        </div>
+    </div>
+</aside>
+
+<div id="resumePop">
+    <span class="rp-txt">⏸ تمرین متوقف شد — <b id="rpStep"></b></span>
+    <button class="rp-btn" id="rpResume">ادامه تمرین</button>
+</div>
+
+<script src="static/audio-manager.js?v=3"></script>
+<script src="static/yoga-core.js?v=2"></script>
+<script src="static/yoga-data-loader.js?v=1"></script>
+<script src="static/yoga-player.js?v=15"></script>
+<script>
+/* ================================================================
+   STUDIO APP v3 — صوت دقیق مطابق مدل XML اصلی تمرین‌ها:
+   • move          → فقط moves_<name>[_l/_r].ogg
+   • pose (تازه)   → pose_instructions_X_ins + pose_names_py_X
+   • hold          → phrase cue (soften/hold/rest) + شمارش نفس فقط با audibleCount=true
+   • music marker  → تعویض ترک محیطی (بخش‌های WarmUp/Flow/CoolDown/Savasana)
+   • hold count="a,b,c" → تعداد متفاوت برای هر سطح · count="-60" → hold زمانی
+   ================================================================ */
+(function () {
+'use strict';
+
+const $ = (id) => document.getElementById(id);
+const FA_D = '۰۱۲۳۴۵۶۷۸۹';
+const faNum = (n) => String(n).replace(/\d/g, (d) => FA_D[+d]);
+const fmtSec = (s) => { s = Math.max(0, Math.round(s)); return faNum(Math.floor(s/60)) + ':' + faNum(String(s%60).padStart(2,'0')); };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LEVEL_KEYS = ['beginner', 'intermediate', 'expert'];
+
+/* ─────────── ترجمه فارسی تمرین‌ها ─────────── */
+const PRACTICE_FA = {
+    ocean: { name: 'اقیانوس', style: 'وینیاسا', desc: 'تمرینی پویا و پرانرژی با موج‌های جریان وینیاسا، نگه‌داشتن‌های قدرتی و حرکات بازکننده — کاملاً هماهنگ با تنفس. «موج خودت را پیدا کن و سوارش شو تا رهایی ذهن و بدن…»' },
+    desert: { name: 'کویر', style: 'هاتا', desc: 'تمرینی آرام با تمرکز بر باز کردن قفسه سینه، افزایش انعطاف‌پذیری و رها کردن تنش‌های بدن و ذهن — مناسب پایان روز و آرام‌سازی عمیق.' },
+    mountain: { name: 'کوه', style: 'پاور', desc: 'تمرینی قدرتی برای تقویت بدن و ذهن با نظم و انضباط — توالی‌های منظم ایستاده و تعادلی برای کسانی که چالش می‌خواهند.' },
+    sun_salutation_a: { name: 'سلام خورشید A', style: 'کلاسیک', desc: 'توالی کلاسیک سلام خورشید (سوریا ناماسکارا) برای گرم کردن بدن و هماهنگی تنفس با حرکت — بهترین شروع برای هر جلسه‌ای.' },
+    sun_salutation_b: { name: 'سلام خورشید B', style: 'کلاسیک', desc: 'نسخه‌ی پویاتر سلام خورشید با حرکات جنگجو — برای قدرت، استقامت و گرمای عمیق در کل بدن.' },
+};
+
+/* ════════════════════════════════════════════════════════════
+   موتور صوتی — WebAudio با کش و preload
+   ════════════════════════════════════════════════════════════ */
+const AUDIO_BASE = 'static/yoga-data/Audio/';
+const AUDIO = { cache: new Map(), known: new Set(), missing: new Set(), dur: {} };
+let _actx = null;
+/* طول واقعی صداها — از durations.json (تولیدشده با ffprobe) */
+fetch(AUDIO_BASE + 'durations.json').then((r) => r.ok ? r.json() : {})
+    .then((d) => { AUDIO.dur = d || {}; }).catch(() => {});
+/* زیرنویس فارسی cueها — از Guide/fa (همان متنی که صدا می‌گوید) */
+const CAPTIONS = {};
+fetch(AUDIO_BASE + 'captions.json').then((r) => r.ok ? r.json() : {})
+    .then((d) => { Object.assign(CAPTIONS, d || {}); }).catch(() => {});
+function captionFor(fileBase) {
+    const t = CAPTIONS[fileBase];
+    return t ? String(t).trim() : '';
+}
+function audioDur(file) { return AUDIO.dur[file] || 0.8; }
+
+/* صف پخش: هر صدا بعد از پایان کامل صدای قبلی — بدون همپوشانی */
+const SfxQueue = {
+    _until: 0,          // زمان WebAudio که صف آزاد می‌شود
+    _chain: Promise.resolve(),
+    reset() { this._until = 0; },
+    play(file) {
+        const c = actx(); if (!c || !Sfx.enabled) return;
+        const startAt = Math.max(c.currentTime + 0.03, this._until);
+        playFile(file, startAt - c.currentTime);
+        this._until = startAt + audioDur(file) + 0.12; /* فاصله‌ی کوچک بین cueها */
+    },
+};
+function actx() {
+    if (!_actx) { try { _actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+    if (_actx && _actx.state === 'suspended') _actx.resume().catch(() => {});
+    return _actx;
+}
+function playFile(file, delay) {
+    const c = actx(); if (!c || Sfx.enabled === false) return;
+    const t = (typeof delay === 'number' && delay > 0.5) ? c.currentTime + delay : c.currentTime + 0.02;
+    if (AUDIO.missing.has(file)) return;
+    const buf = AUDIO.cache.get(file);
+    if (buf) {
+        const src = c.createBufferSource(); src.buffer = buf; src.connect(c.destination); src.start(t);
+        return;
+    }
+    fetch(AUDIO_BASE + file)
+        .then((r) => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+        .then((ab) => c.decodeAudioData(ab))
+        .then((b) => {
+            AUDIO.cache.set(file, b); AUDIO.known.add(file);
+            // اگر تا زمان لود، گام عوض شده و این فایل دیگر مرتبط نیست، پخش نکن (چک ساده: تاخیر نگه‌داشته شده)
+            if (t > c.currentTime - 0.5) {
+                const src = c.createBufferSource(); src.buffer = b; src.connect(c.destination); src.start(Math.max(t, c.currentTime + 0.02));
+            }
+        })
+        .catch(() => { AUDIO.missing.add(file); });
+}
+function preloadFiles(files) {
+    const c = actx(); if (!c) return;
+    const q = files.filter((f) => f && !AUDIO.cache.has(f) && !AUDIO.missing.has(f));
+    let i = 0;
+    const worker = () => {
+        if (i >= q.length) return;
+        const f = q[i++];
+        fetch(AUDIO_BASE + f)
+            .then((r) => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+            .then((ab) => c.decodeAudioData(ab))
+            .then((b) => { AUDIO.cache.set(f, b); AUDIO.known.add(f); })
+            .catch(() => { AUDIO.missing.add(f); })
+            .then(worker, worker);
+    };
+    worker(); worker(); worker(); worker();
+}
+const Sfx = {
+    enabled: localStorage.getItem('yoga_studio_sound') !== 'off',
+    toggle() {
+        this.enabled = !this.enabled;
+        localStorage.setItem('yoga_studio_sound', this.enabled ? 'on' : 'off');
+        return this.enabled;
+    },
+    unlock: () => actx(),
+    /* صدای انتقال — اولویت: فایل سمت‌دار → ساده → نسخه ۲ */
+    move(name, side) {
+        const cands = side === 'L' ? [`${name}_l.ogg`, `${name}.ogg`, `${name}_2.ogg`]
+                    : side === 'R' ? [`${name}_r.ogg`, `${name}.ogg`, `${name}_2.ogg`]
+                    : [`${name}.ogg`, `${name}_2.ogg`, `${name}_l.ogg`];
+        for (const f of cands) {
+            if (!AUDIO.missing.has('moves_' + f)) { SfxQueue.play('moves_' + f); return; }
+        }
+    },
+    instruction(sn) { SfxQueue.play(`pose_instructions_${sn}_ins.ogg`); },
+    poseName(sn, delay) { SfxQueue.play(`pose_names_py_${sn}.ogg`); },
+    phrase(p) {
+        if (p === 'soften') SfxQueue.play('general_soften.ogg');
+        else if (p === 'hold') SfxQueue.play('general_hold.ogg');
+        else if (p === 'rest') SfxQueue.play('general_rest.ogg');
+    },
+    number(n) {
+        if (n >= 1 && n <= 10) SfxQueue.play(`numbers_number_${n}.ogg`);
+        else if (n % 10 === 0 && n <= 100) SfxQueue.play(`numbers_number_${n}.ogg`);
+        else if (n % 2 === 0) SfxQueue.play('general_inhale.ogg');
+        else SfxQueue.play('general_exhale.ogg');
+    },
+    rest() { SfxQueue.play('general_rest.ogg'); },
+    silent() { SfxQueue.play('general_dynamic_state_going_silent.ogg'); },
+};
+function poseSnake(name) {
+    return String(name || '')
+        .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+        .replace(/[\s\-]+/g, '_')
+        .replace(/_+/g, '_')
+        .toLowerCase();
+}
+
+/* ════════════════════════════════════════════════════════════
+   فلتن با حاشه‌نویسی صوتی — منطق مشابه پلیر + ویژگی‌های XML:
+   music marker · phrase/audibleCount · count="a,b,c" · count زمانی · force
+   ════════════════════════════════════════════════════════════ */
+function flattenAudio(steps, level, ctx, out) {
+    (steps || []).forEach(function (s) {
+        switch (s.type) {
+            case 'tempo':
+                ctx.tempo = +s.duration || 4.0;
+                break;
+            case 'music':
+                out.push({ type: 'music', id: s.id, duration: 0 });
+                break;
+            case 'dynamicstate':
+                out.push({ type: 'dyn', state: s.state, duration: 0 });
+                break;
+            case 'move': {
+                const to = (YOGA_DATA.moveTarget(s.name)) || ctx.lastPose || null;
+                out.push({ type: 'move', name: s.name, toPose: to, duration: ctx.tempo, side: ctx.side });
+                if (to) ctx.lastPose = to;
+                break;
+            }
+            case 'pose': {
+                const raw = s.count;
+                let cnt = (raw !== undefined && raw !== null && raw !== '') ? +raw : null;
+                if (cnt !== null && !isNaN(cnt) && cnt < 0) {
+                    /* pose زمانی — count="-60" یعنی ۶۰ ثانیه نگه‌داشتن */
+                    const secs = Math.abs(cnt);
+                    out.push({
+                        type: 'hold', pose: s.name, side: s.side || ctx.side,
+                        count: Math.max(1, Math.round(secs / ctx.tempo)),
+                        phrase: s.phrase || 'none', audibleCount: s.audibleCount === true || s.audibleCount === 'true',
+                        duration: secs, timed: true,
+                    });
+                    ctx.lastPose = s.name;
+                } else if (cnt !== null && !isNaN(cnt) && cnt > 0) {
+                    /* pose با شمارش نفس */
+                    out.push({
+                        type: 'hold', pose: s.name, side: s.side || ctx.side,
+                        count: cnt, phrase: s.phrase || 'none', audibleCount: s.audibleCount === true || s.audibleCount === 'true',
+                        duration: cnt * ctx.tempo,
+                    });
+                    ctx.lastPose = s.name;
+                } else {
+                    out.push({ type: 'pose', name: s.name, side: s.side || ctx.side, duration: ctx.tempo });
+                    ctx.lastPose = s.name;
+                }
+                break;
+            }
+            case 'hold': {
+                let phrase = s.phrase || 'none';
+                let c = s.count;
+                if (typeof c === 'string' && c.indexOf(',') >= 0) {
+                    /* count="4,6,8" — تعداد متفاوت برای هر سطح */
+                    const arr = c.split(',').map(Number).filter((x) => !isNaN(x));
+                    c = arr[Math.min(level, arr.length - 1)] || 5;
+                } else if (c === 'variable') {
+                    c = 8;
+                    if (phrase === 'none') phrase = 'rest';
+                } else {
+                    c = +c || 5;
+                }
+                out.push({
+                    type: 'hold', count: c, phrase, audibleCount: s.audibleCount === true || s.audibleCount === 'true',
+                    duration: c * ctx.tempo, pose: ctx.lastPose, side: ctx.side,
+                });
+                break;
+            }
+            case 'switchside':
+                if (s.force === 'right') ctx.side = 'R';
+                else if (s.force === 'left') ctx.side = 'L';
+                else ctx.side = ctx.side === 'L' ? 'R' : 'L';
+                out.push({ type: 'switchside', side: ctx.side, duration: 0 });
+                break;
+            case 'loop': {
+                const arr = (s.count && s.count.length) ? s.count : [1];
+                let times = arr[Math.min(level, arr.length - 1)] || 1;
+                /* مقیاس مدت جلسه فقط با تعداد تکرار حلقه‌ها (مثل اپ اصلی) —
+                   گام‌ها و تنفس‌ها دست‌نخورده می‌مانند تا صدا و زمان هم‌خوان بمانند */
+                times = Math.max(1, Math.round(times * (ctx.loopScale || 1)));
+                for (let i = 0; i < times; i++) {
+                    flattenAudio(s.steps, level, ctx, out);
+                    if (s.switchside && i < times - 1) {
+                        ctx.side = ctx.side === 'L' ? 'R' : 'L';
+                        out.push({ type: 'switchside', side: ctx.side, duration: 0 });
+                    }
+                }
+                break;
+            }
+            case 'difficulty': {
+                const lvls = s.levels || {};
+                const key = LEVEL_KEYS[level] || 'beginner';
+                const pick = lvls[key] || lvls[Object.keys(lvls)[0]] || [];
+                flattenAudio(pick, level, ctx, out);
+                break;
+            }
+        }
+    });
+    return out;
+}
+/* resolve جایگزین پلیر — همان مقیاس‌بندی + گام‌های حاشه‌نویسی‌شده */
+function audioAwareResolve(player) {
+    const stepsSrc = (player.practice.body && player.practice.body.steps) || [];
+
+    /* پاس ۱: طول خام + یافتن مرز بخش استراحت پایانی (بعد از آخرین music marker =
+       CoolDown/Savasana — این بخش مثل اپ اصلی دست‌نخورده می‌ماند) */
+    let ctx = { tempo: 4.0, side: 'L', lastPose: null, loopScale: 1 };
+    const raw = flattenAudio(stepsSrc, player.level, ctx, []);
+    let est = 0, lastMusicIdx = -1;
+    raw.forEach((s, i) => {
+        est += s.duration || 0;
+        if (s.type === 'music') lastMusicIdx = i;
+    });
+    let cool = 0;
+    raw.forEach((s, i) => { if (i > lastMusicIdx) cool += s.duration || 0; });
+
+    /* پاس ۲: فلوی اصلی با تکرار حلقه‌ها مقیاس می‌شود تا (هدف − استراحت پایانی) شود.
+       استراحت/درازکشیدن پایان جلسه همیشه کامل باقی می‌ماند. */
+    /* طول استراحت پایانی بسته به مدت جلسه (مثل اپ اصلی):
+       ۳۰min→۳ دقیقه · ۴۵min→۴ دقیقه · ۶۰min+→۵ دقیقه — به‌جای طول خامِ ثابتِ ۳ دقیقه‌ای */
+    const targetMin = Math.max(10, player.targetMinutes || 30);
+    const coolTarget = targetMin >= 60 ? 300 : targetMin >= 45 ? 240 : 180;
+    const coolFactor = cool > 0 ? Math.min(2, coolTarget / cool) : 1;
+    const target = targetMin * 60;
+    const mainTarget = Math.max(60, target - cool * coolFactor);
+    const mainRaw = Math.max(1, est - cool);
+    const loopScale = Math.max(0.15, Math.min(4, mainTarget / mainRaw));
+    ctx = { tempo: 4.0, side: 'L', lastPose: null, loopScale };
+    const out = Math.abs(loopScale - 1) > 0.02
+        ? flattenAudio(stepsSrc, player.level, ctx, [])
+        : raw;
+    /* استراحت پایانی به طول هدف (۳/۴/۵ دقیقه) — فقط مدت holdها بعد از آخرین music */
+    if (Math.abs(coolFactor - 1) > 0.02) {
+        let lm = -1;
+        out.forEach((s, i) => { if (s.type === 'music') lm = i; });
+        if (lm >= 0) {
+            out.forEach((s, i) => {
+                if (i > lm && (s.duration || 0) > 0) s.duration = +(s.duration * coolFactor).toFixed(2);
+            });
+        }
+    }
+
+    /* کارت تایم‌لاین = وضعیت فعلی بدن (مثل اپ اصلی):
+       فقط وقتی «وضعیت» عوض شود کارت جدید — ChildWide Start و ChildWide
+       یک وضعیت‌اند (alias) → کارت اول تا ۴۴ ثانیه می‌ماند. hold/switchside
+       کارت عوض نمی‌کنند. */
+    let ui = 0;
+    let lastPoseKey = null;
+    out.forEach((s) => {
+        let key = null;
+        if (s.type === 'move') key = s.toPose || null;
+        else if (s.type === 'pose') key = s.name || null;
+        if (key != null) {
+            const p = (window.YogaCore && YogaCore.get) ? YogaCore.get(key) : null;
+            key = p ? p.name : String(key).toLowerCase();
+        }
+        if (key != null && key !== lastPoseKey) { lastPoseKey = key; s.ui = ui++; }
+        else s.ui = -1;
+    });
+    /* مدت هر کارت = مجموع گام‌های عضو آن (move + holdها تا کارت بعدی) */
+    const cardDur = [];
+    out.forEach((s) => {
+        if (s.ui >= 0) cardDur[s.ui] = (cardDur[s.ui] || 0) + (s.duration || 0);
+        else if (cardDur.length && s.type !== 'music' && s.type !== 'dyn') cardDur[cardDur.length - 1] += (s.duration || 0);
+    });
+    player._cardDurations = cardDur;
+    let total = 0;
+    out.forEach((s) => { total += s.duration || 0; });
+    player.steps = out;
+    player._totalSeconds = total || 1;
+    return out;
+}
+
+/* ─────────── صحنه‌های SVG ─────────── */
+function svgScene(kind) {
+    const scenes = {
+        Ocean: `<rect width="1200" height="700" fill="#0a2c4e"/><circle cx="600" cy="180" r="95" fill="#ffd98a" opacity=".9"/><circle cx="600" cy="180" r="140" fill="#ffd98a" opacity=".18"/><path d="M0 470 Q 150 430 300 470 T 600 470 T 900 470 T 1200 470 V700 H0 Z" fill="#0d3a63"/><path d="M0 510 Q 150 470 300 510 T 600 510 T 900 510 T 1200 510 V700 H0 Z" fill="#115080" opacity=".9"/><path d="M0 550 Q 200 510 400 550 T 800 550 T 1200 550 V700 H0 Z" fill="#1a66a0" opacity=".75"/><path d="M0 600 Q 200 570 400 600 T 800 600 T 1200 600 V700 H0 Z" fill="#2a7fc0" opacity=".5"/>`,
+        Desert: `<rect width="1200" height="700" fill="#3d1f06"/><circle cx="600" cy="190" r="100" fill="#ffb347" opacity=".95"/><circle cx="600" cy="190" r="150" fill="#ff9a3c" opacity=".2"/><path d="M0 480 C 250 400 420 560 650 490 C 830 435 1000 540 1200 470 V700 H0 Z" fill="#7a420e"/><path d="M0 545 C 220 490 480 610 720 545 C 900 500 1050 590 1200 540 V700 H0 Z" fill="#9c5716" opacity=".9"/><path d="M0 610 C 300 560 600 660 900 610 C 1050 585 1150 640 1200 620 V700 H0 Z" fill="#c1712a" opacity=".8"/>`,
+        Mountain: `<rect width="1200" height="700" fill="#141a2e"/><circle cx="600" cy="170" r="88" fill="#e8eefc" opacity=".92"/><circle cx="600" cy="170" r="135" fill="#e8eefc" opacity=".14"/><path d="M0 700 L 260 300 L 430 520 L 610 240 L 810 560 L 990 320 L 1200 700 Z" fill="#232c47"/><path d="M0 700 L 200 420 L 420 640 L 640 380 L 900 660 L 1080 460 L 1200 700 Z" fill="#2d3859" opacity=".95"/><path d="M610 240 L 680 350 L 610 340 L 545 355 Z" fill="#e8eefc" opacity=".8"/><path d="M0 700 L 120 560 L 340 700 Z" fill="#3a4870" opacity=".8"/>`,
+        Studio: `<rect width="1200" height="700" fill="#241d38"/><circle cx="600" cy="200" r="90" fill="#d9c8e8" opacity=".85"/><rect x="150" y="420" width="900" height="14" rx="7" fill="#4a3d66" opacity=".7"/><rect x="240" y="470" width="720" height="10" rx="5" fill="#4a3d66" opacity=".5"/><rect x="330" y="515" width="540" height="8" rx="4" fill="#4a3d66" opacity=".35"/>`,
+        Home: `<rect width="1200" height="700" fill="#131b33"/><circle cx="600" cy="180" r="85" fill="#9db8e8" opacity=".8"/><path d="M0 520 Q 300 460 600 520 T 1200 520 V700 H0 Z" fill="#1a2547"/><path d="M0 590 Q 300 540 600 590 T 1200 590 V700 H0 Z" fill="#233058" opacity=".9"/>`,
+        Temple: `<rect width="1200" height="700" fill="#2b0d0d"/><circle cx="600" cy="180" r="90" fill="#ffb0a0" opacity=".7"/><path d="M300 700 L 340 420 Q 600 340 860 420 L 900 700 Z" fill="#4d1a1a"/><rect x="540" y="480" width="120" height="220" rx="60" fill="#2b0d0d" opacity=".8"/>`,
+        Buddha: `<rect width="1200" height="700" fill="#0e2a1f"/><circle cx="600" cy="180" r="95" fill="#ffe08a" opacity=".85"/><circle cx="600" cy="180" r="150" fill="#ffe08a" opacity=".15"/><path d="M0 560 Q 300 500 600 560 T 1200 560 V700 H0 Z" fill="#123826"/><path d="M0 620 Q 300 570 600 620 T 1200 620 V700 H0 Z" fill="#1a4a32" opacity=".9"/><circle cx="250" cy="500" r="14" fill="#ffe08a" opacity=".4"/><circle cx="960" cy="470" r="10" fill="#ffe08a" opacity=".35"/>`,
+        Dojo: `<rect width="1200" height="700" fill="#22090b"/><circle cx="600" cy="190" r="80" fill="#ff9a7a" opacity=".55"/><rect x="180" y="430" width="840" height="16" rx="8" fill="#5a2020" opacity=".8"/><path d="M0 700 L 0 560 L 250 610 L 500 560 L 750 610 L 1000 560 L 1200 610 L 1200 700 Z" fill="#3a1214" opacity=".9"/>`,
+        Palace: `<rect width="1200" height="700" fill="#2e1c0a"/><circle cx="600" cy="180" r="85" fill="#ffd98a" opacity=".8"/><path d="M200 700 L 240 400 L 380 430 L 420 360 L 560 400 L 600 330 L 640 400 L 780 360 L 820 430 L 960 400 L 1000 700 Z" fill="#5a3a14"/><path d="M560 700 L 565 540 Q 600 510 635 540 L 640 700 Z" fill="#2e1c0a" opacity=".9"/>`,
+        Shiva: `<rect width="1200" height="700" fill="#101e00"/><circle cx="600" cy="180" r="90" fill="#c8f09a" opacity=".6"/><path d="M0 540 Q 300 480 600 540 T 1200 540 V700 H0 Z" fill="#182e00"/><path d="M0 610 Q 300 560 600 610 T 1200 610 V700 H0 Z" fill="#224200" opacity=".9"/><circle cx="300" cy="470" r="9" fill="#c8f09a" opacity=".4"/><circle cx="900" cy="490" r="11" fill="#c8f09a" opacity=".35"/>`,
+        Vishnu: `<rect width="1200" height="700" fill="#241000"/><circle cx="600" cy="180" r="90" fill="#ffb36a" opacity=".8"/><path d="M0 550 Q 300 500 600 550 T 1200 550 V700 H0 Z" fill="#3a2000"/><path d="M0 620 Q 300 575 600 620 T 1200 620 V700 H0 Z" fill="#54300a" opacity=".9"/>`,
+        Office: `<rect width="1200" height="700" fill="#0c2438"/><rect x="220" y="240" width="160" height="200" rx="8" fill="#12354f"/><rect x="420" y="200" width="160" height="240" rx="8" fill="#12354f"/><rect x="620" y="260" width="160" height="180" rx="8" fill="#12354f"/><rect x="820" y="220" width="160" height="220" rx="8" fill="#12354f"/><path d="M0 540 Q 300 500 600 540 T 1200 540 V700 H0 Z" fill="#0e2c44"/>`,
+        'Samādhi': `<rect width="1200" height="700" fill="#050510"/><circle cx="600" cy="200" r="70" fill="#fff" opacity=".9"/><circle cx="600" cy="200" r="110" fill="#fff" opacity=".25"/><circle cx="600" cy="200" r="160" fill="#fff" opacity=".1"/><circle cx="600" cy="200" r="220" fill="#fff" opacity=".05"/><path d="M0 600 Q 300 560 600 600 T 1200 600 V700 H0 Z" fill="#0a0a1e"/>`,
+    };
+    const body = scenes[kind] || scenes.Home;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice">${body}</svg>`;
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+}
+function applyScene(name) {
+    $('sceneArt').style.backgroundImage = svgScene(name);
+    const glows = {
+        Ocean: 'rgba(56,132,255,.2)', Desert: 'rgba(255,170,60,.16)', Mountain: 'rgba(160,150,110,.14)',
+        Studio: 'rgba(182,162,196,.16)', Temple: 'rgba(255,110,110,.1)', Buddha: 'rgba(80,220,160,.12)',
+    };
+    document.documentElement.style.setProperty('--scene-glow', glows[name] || 'rgba(120,140,200,.15)');
+}
+
+/* ─────────── وضعیت ─────────── */
+const PRACTICE_EMOJI = { ocean: '🌊', desert: '🏜️', mountain: '⛰️', sun_salutation_a: '🙏', sun_salutation_b: '☀️' };
+const PRACTICE_GRAD = {
+    ocean: 'linear-gradient(135deg, rgba(13,58,99,.7), rgba(7,35,62,.35))',
+    desert: 'linear-gradient(135deg, rgba(94,50,8,.65), rgba(46,24,3,.35))',
+    mountain: 'linear-gradient(135deg, rgba(61,58,46,.65), rgba(29,28,21,.35))',
+    sun_salutation_a: 'linear-gradient(135deg, rgba(150,110,25,.55), rgba(75,55,10,.35))',
+    sun_salutation_b: 'linear-gradient(135deg, rgba(150,75,12,.6), rgba(70,30,5,.35))',
+};
+const BG_MAP = { ocean: 'Ocean', desert: 'Desert', mountain: 'Mountain', sun_salutation_a: 'Studio', sun_salutation_b: 'Studio' };
+const MUSIC_IDS = { 0: 'bg', 1: 'bg', 2: 'singing-bowl', 3: 'deep-space' };
+
+const S = {
+    practices: [], practice: null, player: null, duration: 30,
+    music: true, paused: false, uiList: [], visited: new Set(),
+};
+function visitedSet() { return S.visited; }
+
+/* ─────────── لابی ─────────── */
+function renderLobby() {
+    const list = $('practiceList');
+    list.innerHTML = '';
+    S.practices.forEach((p) => {
+        const fa = PRACTICE_FA[p.name] || {};
+        const lvls = (p.difficulties || []).map((d) => (['مبتدی', 'متوسط', 'پیشرفته'][d] || '')).filter(Boolean).join(' · ');
+        const card = document.createElement('div');
+        card.className = 'pr-card';
+        card.style.setProperty('--pr-grad', PRACTICE_GRAD[p.name] || 'linear-gradient(135deg, rgba(40,50,80,.65), rgba(20,26,48,.4))');
+        card.innerHTML =
+            '<div class="pr-top">' +
+                '<div class="pr-ico">' + (PRACTICE_EMOJI[p.name] || '🧘') + '</div>' +
+                '<div><h3>' + esc(fa.name || p.displayName || p.name) + '</h3>' +
+                '<div class="pr-meta">' + esc(fa.style || p.style || '') + ' · ' + faNum(p.poseCount || '—') + ' گام</div></div>' +
+            '</div>' +
+            '<p>' + esc(fa.desc || p.description || '') + '</p>' +
+            '<div class="pr-chips">' +
+                (p.instructor_name ? '<span class="chip">👤 ' + esc(p.instructor_name) + '</span>' : '') +
+                ((p.durations || []).slice(0, 3).map((d) => '<span class="chip">' + faNum(d) + ' دقیقه</span>').join('')) +
+            '</div>' +
+            '<button class="pr-start">شروع تمرین</button>';
+        card.onclick = () => openDurSheet(p);
+        list.appendChild(card);
+    });
+    $('lobbyNote').textContent = '🎧 هر تمرین راهنمای صوتی حرکات، شمارش نفس و موسیقی بخش‌بندی‌شده دارد';
+}
+
+function openDurSheet(p) {
+    S.practice = p;
+    /* انتخاب درجه سختی — پیش‌فرض از تست تشخیص */
+    S.level = getUserLevel();
+    const lv = $('dsLevels');
+    lv.innerHTML = '';
+    [['beginner','مبتدی'],['intermediate','متوسط'],['expert','پیشرفته']].forEach(([k, lbl]) => {
+        const b = document.createElement('button');
+        b.className = 'ds-btn' + (k === S.level ? ' sel' : '');
+        b.textContent = lbl;
+        b.onclick = () => { S.level = k; lv.querySelectorAll('.ds-btn').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); };
+        lv.appendChild(b);
+    });
+    const btns = $('dsBtns');
+    btns.innerHTML = '';
+    (p.durations && p.durations.length ? p.durations.slice(0, 6) : [10, 20, 30]).forEach((d) => {
+        const b = document.createElement('button');
+        b.className = 'ds-btn' + (d === S.duration ? ' sel' : '');
+        b.textContent = faNum(d) + ' دقیقه';
+        b.onclick = () => { $('durSheet').classList.remove('show'); startPractice(p, +d); };
+        btns.appendChild(b);
+    });
+    const fa = PRACTICE_FA[p.name] || {};
+    $('dsTitle').textContent = (PRACTICE_EMOJI[p.name] || '🧘') + ' ' + (fa.name || p.displayName || p.name);
+    $('durSheet').classList.add('show');
+}
+$('dsCancel').onclick = () => $('durSheet').classList.remove('show');
+$('durSheet').addEventListener('click', (e) => { if (e.target === $('durSheet')) $('durSheet').classList.remove('show'); });
+
+/* ─────────── شروع جلسه ─────────── */
+function getUserLevel() {
+    try {
+        const t = JSON.parse(localStorage.getItem('yoga_test_results') || 'null');
+        if (t && t.level && LEVEL_KEYS.includes(t.level)) return t.level;
+    } catch (e) {}
+    return 'beginner';
+}
+
+function startPractice(p, duration) {
+    S.duration = duration || (p.durations && p.durations[0]) || 30;
+    YOGA_DATA.getPractice(p.name).then((data) => {
+        S.practice = data;
+        S.paused = false;
+        S.visited = new Set();
+        const bg = BG_MAP[p.name] || (data.body && data.body.preferredBackgroundName) || 'Studio';
+        applyScene(bg);
+        const fa = PRACTICE_FA[p.name] || {};
+        $('stTitle').textContent = '🧘 ' + (fa.name || (data.head && data.head.name) || p.displayName || p.name);
+        const lvlFa = { beginner: 'مبتدی', intermediate: 'متوسط', expert: 'پیشرفته' }[S.level || 'beginner'];
+        $('stSub').textContent = faNum(S.duration) + ' دقیقه · ' + (fa.style || '') + ' · ' + lvlFa + ' ' + (PRACTICE_EMOJI[p.name] || '');
+        $('lobby').classList.add('hide');
+        $('studio').classList.add('show');
+        $('resumePop').classList.remove('show');
+        $('infoPanel').classList.remove('show');
+
+        const host = $('playerHost');
+        host.innerHTML = '';
+        const player = new YogaSessionPlayer(data, {
+            level: S.level || getUserLevel(),
+            duration: S.duration,
+            background: bg,
+            instructorName: p.instructor_name || '',
+            title: fa.name || p.displayName || p.name,
+            container: host,
+            onComplete: onFinish,
+        });
+        S.player = player;
+
+        /* resolve با حاشه‌نویسی صوتی (music/phrase/audibleCount/counts) */
+        player.resolve = function () { return audioAwareResolve(this); };
+
+        /* فید عکس + صدای دقیق هر گام */
+        const origRender = player.render.bind(player);
+        let lastImgSrc = '';
+        let lastStepRef = null;
+        const visited = S.visited;   /* pose هایی که instructionشان پخش شده — بین جلسه‌های یک تمرین مشترک */
+        function crossfade(host, newSrc) {
+            const stack = host.querySelector('#poseImgStack');
+            if (!stack) return;
+            const cur = stack.querySelector('.yp-img:not(.old)');
+            if (!cur) return;
+            const oldImg = cur.cloneNode();
+            oldImg.classList.add('old');
+            oldImg.src = cur.getAttribute('src') || '';
+            stack.appendChild(oldImg);
+            cur.classList.remove('fade-in');
+            void cur.offsetWidth;               /* restart animation */
+            cur.classList.add('fade-in');
+            setTimeout(() => oldImg.remove(), 520);
+        }
+        player.render = function () {
+            const changed = this._current !== lastStepRef;
+            const cur = this._current;
+            lastStepRef = cur;
+            origRender();
+            /* اطمینان: عکس پلیر همیشه داخل stack دولایه باشد */
+            let stack = host.querySelector('#poseImgStack');
+            const rawImg = host.querySelector('.yp-stage > .yp-img');
+            if (!stack && rawImg) {
+                stack = document.createElement('div');
+                stack.id = 'poseImgStack';
+                rawImg.parentNode.insertBefore(stack, rawImg);
+                stack.appendChild(rawImg);
+            }
+            const img = host.querySelector('#poseImgStack .yp-img:not(.old)');
+            if (img) {
+                const src = img.getAttribute('src') || '';
+                if (lastImgSrc && src && src !== lastImgSrc) crossfade(host, src);
+                lastImgSrc = src;
+            }
+            /* زیرنویس cue — بعد از نام حرکت */
+            const stage = host.querySelector('.yp-stage');
+            let cap = document.getElementById('cueCaption');
+            if (stage && !cap) {
+                cap = document.createElement('div');
+                cap.id = 'cueCaption';
+                const timer = stage.querySelector('.yp-timer-big');
+                if (timer) timer.after(cap); else stage.appendChild(cap);
+            }
+            /* پنهان‌سازی کنترل‌های داخلی پلیر */
+            host.querySelectorAll('.yp-controls, .yp-progress.yp-seek[data-yp-seek], .yp-seek-labels, .yp-elapsed, .yp-topbar')
+                .forEach((el) => { el.style.display = 'none'; });
+            /* ── صوت دقیق گام — فقط هنگام پخش واقعی (نه هنگام مرور/توقف) ── */
+            if (changed && cur) { SfxQueue.reset(); if (Sfx.enabled && this._running && !this._paused) stepAudio(cur, visited, this); else clearCaption(); }
+        };
+
+        /* شمارش صوتی نفس‌ها فقط برای audibleCount=true */
+        const origRefresh = player._refreshTick.bind(player);
+        player._refreshTick = function () {
+            origRefresh();
+            const s = this._current;
+            if (!s || s.type !== 'hold' || !s.audibleCount || !Sfx.enabled) return;
+            if (!this._running || this._paused) return; /* هنگام توقف، شمارش صوتی ندارد */
+            if (this._lastCountIdx !== this._breathIdx) {
+                this._lastCountIdx = this._breathIdx;
+                Sfx.number(this._breathIdx + 1);
+            }
+        };
+
+        player.resolve();
+        buildStrip(player.steps);
+        renderBottomBar();
+        player.start();
+        player.pause();             /* آماده‌سازی صحنه بی‌صدا — صداها فقط بعد از پلی */
+        syncStrip(player);          /* فوری روی گام اول بنشیند */
+        showStartHint();
+        syncFromPlayer();
+
+        /* preload صداها برای اجرای دقیق: همه‌ی move های جلسه + اعداد + cue ها */
+        Sfx.unlock();
+        const uniq = new Set();
+        player.steps.forEach((s) => { if (s.type === 'move') uniq.add(s.name); });
+        const files = [];
+        uniq.forEach((n) => { files.push(`moves_${n}.ogg`, `moves_${n}_l.ogg`, `moves_${n}_r.ogg`); });
+        for (let n = 1; n <= 10; n++) files.push(`numbers_number_${n}.ogg`);
+        files.push('general_soften.ogg', 'general_hold.ogg', 'general_rest.ogg', 'general_inhale.ogg', 'general_exhale.ogg', 'general_dynamic_state_going_silent.ogg');
+        preloadFiles(files);
+
+        /* موسیقی محیطی بخش اول */
+        if (S.music && window.AudioManager) { try { AudioManager.play(player._bgTrack()); } catch (e) {} }
+    }).catch((e) => alert('بارگذاری تمرین ناموفق: ' + (e.message || e)));
+}
+
+/* راهنمای شروع — تا وقتی کاربر پلی نزده */
+function showStartHint() {
+    const el = document.getElementById('cueCaption');
+    if (!el) return;
+    el.textContent = 'برای شروع، دکمه‌ی پخش را بزن — راهنمای صوتی با پلی آغاز می‌شود';
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 6000);
+}
+/* نمایش زیرنویس فارسی مربوط به فایل صوتی — دقیق و بدون قاطی شدن */
+let _captionToken = 0;
+function showCaption(fileBase, holdMs) {
+    const el = document.getElementById('cueCaption');
+    if (!el) return;
+    const txt = captionFor(fileBase);
+    if (!txt) return;
+    const token = ++_captionToken;
+    el.textContent = txt;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => {
+        if (token === _captionToken) el.classList.remove('show');
+    }, holdMs || 2800);
+}
+function clearCaption() {
+    _captionToken++;
+    const el = document.getElementById('cueCaption');
+    if (el) el.classList.remove('show');
+}
+/* صدای هر گام — دقیقاً مطابق مدل XML */
+function stepAudio(s, visited, player) {
+    if (s.type === 'music') {
+        clearCaption();
+        const id = MUSIC_IDS[String(s.id)] || 'bg';
+        if (window.AudioManager) {
+            try { AudioManager.play(id === 'bg' ? player._bgTrack() : id); } catch (e) {}
+        }
+        return;
+    }
+    if (s.type === 'dyn') {
+        /* silent/extrasilent/normal — در JSON فعلی حذف شده؛ آماده اگر برگردد */
+        if (window.AudioManager) {
+            try { if (s.state !== 'normal') AudioManager.stop(); else AudioManager.play(player._bgTrack()); } catch (e) {}
+        }
+        return;
+    }
+    if (s.type === 'move') {
+        Sfx.move(s.name, s.side);
+        /* زیرنویس: همان فایلی که Sfx.move انتخاب می‌کند */
+        const f = s.side === 'L' ? `moves_${s.name}_l.ogg` : s.side === 'R' ? `moves_${s.name}_r.ogg` : `moves_${s.name}.ogg`;
+        if (!AUDIO.missing.has(f)) showCaption(f.replace(/\.ogg$/, ''));
+        else if (!AUDIO.missing.has(`moves_${s.name}.ogg`)) showCaption(`moves_${s.name}`);
+        else clearCaption();
+        return;
+    }
+    if (s.type === 'pose') {
+        const poseName = s.name || '';
+        const sn = poseSnake(poseName);
+        if (!visited.has(poseName)) {
+            visited.add(poseName);
+            Sfx.instruction(sn);   /* فقط راهنمای حرکت — بدون تکرار نام */
+            showCaption(`pose_instructions_${sn}_ins`, 4200);
+        }
+        return;
+    }
+    if (s.type === 'hold') {
+        const poseName = s.pose || '';
+        const sn = poseSnake(poseName);
+        player._lastCountIdx = -1;
+        Sfx.phrase(s.phrase);   /* soften/hold/rest — none یعنی سکوت */
+        if (s.phrase && s.phrase !== 'none') {
+            const capMap = { soften: 'general_soften', hold: 'general_hold', rest: 'general_rest' };
+            showCaption(capMap[s.phrase], 2400);
+        } else {
+            clearCaption();
+        }
+        if (poseName && !visited.has(poseName)) {
+            visited.add(poseName);
+            Sfx.instruction(sn);
+            Sfx.poseName(sn);
+        }
+        return;
+    }
+}
+
+/* ─────────── تایم‌لاین ─────────── */
+function poseVis(name, side) {
+    try { return YogaCore.getImage(name, { size: 'card', side: side === 'R' ? 'R' : side === 'L' ? 'L' : 'N' }) || ''; } catch (e) { return ''; }
+}
+function buildStrip(steps) {
+    const strip = $('strip');
+    strip.innerHTML = '';
+    S.uiList = [];
+    const cardDur = (S.player && S.player._cardDurations) || [];
+    steps.forEach((s, i) => {
+        if (s.ui === -1) return; /* music/dyn/hold/switchside — به کارت وضعیت فعلی می‌چسبند */
+        S.uiList.push(i);
+        const name = s.toPose || s.name || '';
+        const card = document.createElement('div');
+        card.className = 'tl-card';
+        card.dataset.i = i;
+        card.dataset.src = poseVis(name, s.side);
+        const dur = cardDur[s.ui] || s.duration || 0;
+        card.innerHTML =
+            '<span class="tl-idx">' + faNum(S.uiList.length) + '</span>' +
+            (s.side === 'R' ? '<span class="tl-half">½</span>' : '') +
+            '<img alt="" src="' + esc(card.dataset.src) + '">' +
+            '<span class="tl-dur">' + (dur ? Math.ceil(dur) + 's' : '') + '</span>';
+        card.onclick = () => {
+            const p = S.player;
+            if (!p || !p._running || i === p._idx - 1) return;
+            p._idx = i;
+            p._advance();
+        };
+        strip.appendChild(card);
+    });
+}
+function syncStrip(p) {
+    const curArr = Math.max(0, p._idx - 1);
+    /* نزدیک‌ترین کارت ui قبل یا مساوی curArr */
+    let curCardIdx = -1;
+    for (const i of S.uiList) { if (i <= curArr) curCardIdx = i; else break; }
+    let curEl = null;
+    document.querySelectorAll('.tl-card').forEach((card) => {
+        const i = +card.dataset.i;
+        const isCur = i === curCardIdx;
+        if (isCur) curEl = card;
+        card.classList.toggle('cur', isCur);
+        card.classList.toggle('past', i < curCardIdx);
+        /* بارگذاری پنجره‌ای عکس‌ها (سبک ماندن DOM برای تمرین‌های ۴۰۰+ گامی) */
+        const dist = Math.abs(i - curCardIdx);
+        const img = card.querySelector('img');
+        if (!img || !card.dataset.src) return;     /* کارت تعویض سمت عکس ندارد */
+        if (dist <= 10) { if (!img.getAttribute('src')) img.src = card.dataset.src; }
+        else if (dist > 14 && img.getAttribute('src')) img.removeAttribute('src');
+    });
+    if (curEl) {
+        const strip = $('strip');
+        const target = curEl.offsetLeft - (strip.parentElement.clientWidth / 2) + (curEl.offsetWidth / 2);
+        strip.style.transform = 'translateX(' + (-target) + 'px)';
+    }
+}
+
+/* ─────────── نوار پایین ─────────── */
+function renderBottomBar() {
+    $('stBottom').innerHTML =
+        '<div class="yp-seek yp-progress" id="stSeek" title="پیشرفت جلسه">' +
+            '<div class="yp-progress-fill"></div>' +
+            '<span class="yp-progress-knob" style="left:0%"></span>' +
+        '</div>' +
+        '<div class="yp-seek-labels">' +
+            '<span class="yp-time-cur">⏱ ۰:۰۰</span>' +
+            '<span class="yp-pct">۰٪</span>' +
+            '<span class="yp-time-total">۰:۰۰</span>' +
+        '</div>' +
+        '<div class="yp-controls">' +
+            '<button class="yp-btn" id="stPrev" title="حرکت قبلی">⏭</button>' +
+            '<button class="yp-btn primary" id="stMain" title="توقف/ادامه">▶</button>' +
+            '<button class="yp-btn" id="stSkip" title="حرکت بعدی">⏮</button>' +
+        '</div>' +
+        '<div class="yp-elapsed"></div>';
+    $('stPrev').onclick = () => S.player && S.player.prev();
+    $('stSkip').onclick = () => S.player && S.player.next();
+    $('stMain').onclick = () => {
+        const p = S.player; if (!p) return;
+        if (p._paused) {
+            const firstPlay = !p._everPlayed;
+            p.resume();
+            p._everPlayed = true;
+            $('resumePop').classList.remove('show');
+            clearTimeout(document.getElementById('cueCaption')?._t);
+            clearCaption();
+            /* اولین پلی: صدای گام فعلی از ابتدا پخش شود */
+            if (firstPlay && p._current && Sfx.enabled) {
+                SfxQueue.reset();
+                stepAudio(p._current, visitedSet(), p);
+            }
+        }
+        else p.pause();
+    };
+}
+function syncBottom(p) {
+    const tPct = p._timePct ? p._timePct() : 0;
+    const fill = document.querySelector('#stSeek .yp-progress-fill');
+    const knob = document.querySelector('#stSeek .yp-progress-knob');
+    if (fill) fill.style.width = tPct + '%';
+    if (knob) knob.style.left = tPct + '%';
+    const pct = document.querySelector('#stBottom .yp-pct');
+    const tCur = document.querySelector('#stBottom .yp-time-cur');
+    const tTot = document.querySelector('#stBottom .yp-time-total');
+    const elap = document.querySelector('#stBottom .yp-elapsed');
+    if (pct) pct.textContent = faNum(tPct) + '٪';
+    if (tCur) tCur.textContent = '⏱ ' + fmtSec((p._elapsedMs || 0) / 1000);
+    if (tTot) tTot.textContent = fmtSec(p._totalSeconds || 0);
+    const curUi = S.uiList.filter((i) => i <= p._idx - 1).length;
+    if (elap) elap.textContent = 'حرکت ' + faNum(Math.min(curUi, S.uiList.length)) + ' از ' + faNum(S.uiList.length);
+    const main = $('stMain');
+    if (main) main.textContent = p._paused ? '▶' : '⏸';
+}
+
+/* ─────────── حلقه sync ─────────── */
+function syncFromPlayer() {
+    if (S._syncTimer) clearInterval(S._syncTimer);
+    S._syncTimer = setInterval(() => {
+        const p = S.player;
+        if (!p) return;
+        syncStrip(p);
+        syncBottom(p);
+        if (p._running && p._paused && !S.paused) {
+            S.paused = true;
+            const s = p._current;
+            let nm = '';
+            if (s) { try { const pp = YogaCore.get(s.pose || s.toPose || s.name || ''); if (pp) nm = YogaCore.nameFa(pp); } catch (e) {} }
+            $('rpStep').textContent = nm || '—';
+            $('resumePop').classList.add('show');
+        } else if (p._running && !p._paused && S.paused) {
+            S.paused = false;
+            $('resumePop').classList.remove('show');
+        }
+    }, 200);
+}
+
+/* ── درگ افقی تایم‌لاین (لمسی و ماوس) — مرور روان روی موبایل ── */
+(function () {
+    const wrap = document.querySelector('.st-strip');
+    const inner = $('strip');
+    let dragging = false, startX = 0, startT = 0, moved = 0;
+    function currentT() {
+        const m = inner.style.transform.match(/translateX\((-?[\d.]+)px\)/);
+        return m ? parseFloat(m[1]) : 0;
+    }
+    function setT(v) { inner.style.transform = 'translateX(' + v + 'px)'; }
+    function down(x) {
+        dragging = true; moved = 0;
+        startX = x; startT = currentT();
+        wrap.classList.add('dragging');
+    }
+    function move(x) {
+        if (!dragging) return;
+        const dx = x - startX;
+        moved = Math.max(moved, Math.abs(dx));
+        setT(startT + dx);
+    }
+    function up() {
+        if (!dragging) return;
+        dragging = false;
+        wrap.classList.remove('dragging');
+        /* snap نرم به کارت نزدیک */
+        if (S.player) syncStrip(S.player);
+    }
+    wrap.addEventListener('touchstart', (e) => down(e.touches[0].clientX), { passive: true });
+    wrap.addEventListener('touchmove', (e) => move(e.touches[0].clientX), { passive: true });
+    wrap.addEventListener('touchend', up);
+    wrap.addEventListener('mousedown', (e) => { down(e.clientX); e.preventDefault(); });
+    window.addEventListener('mousemove', (e) => move(e.clientX));
+    window.addEventListener('mouseup', up);
+    /* اگر درگ > 8px بود، کلیکِ کارت‌ها (پرش) اجرا نشود تا مرور تصادفی نپرد */
+    inner.addEventListener('click', (e) => {
+        if (moved > 8) { e.stopPropagation(); e.preventDefault(); moved = 0; }
+    }, true);
+})();
+
+$('rpResume').onclick = () => {
+    if (S.player) S.player.resume();
+    $('resumePop').classList.remove('show');
+};
+
+/* ─────────── پایان / خروج ─────────── */
+function onFinish(completed, elapsed, done, total) {
+    Sfx.silent();
+    if (window.AudioManager) { try { AudioManager.stop(); } catch (e) {} }
+    const minutes = Math.floor(elapsed / 60);
+    $('playerHost').innerHTML =
+        '<div class="yp-done-modal"><div class="yp-done-card">' +
+            '<div class="yp-done-icon">' + (completed ? '🎉' : '⏹') + '</div>' +
+            '<h3>' + (completed ? 'آفرین! تمرین کامل شد' : 'تمرین متوقف شد') + '</h3>' +
+            '<div class="yp-done-stats">' +
+                '<div class="yp-stat"><b>' + faNum(minutes) + '</b><span>دقیقه</span></div>' +
+                '<div class="yp-stat"><b>' + faNum(done) + ' از ' + faNum(total) + '</b><span>حرکت</span></div>' +
+            '</div>' +
+            '<div class="yp-done-actions">' +
+                '<button class="yp-btn primary" id="againBtn">🔄 تمرین دوباره</button>' +
+                '<button class="yp-btn" id="listBtn">📚 تمرین‌ها</button>' +
+            '</div>' +
+        '</div></div>';
+    $('againBtn').onclick = () => startPractice(S.practice, S.duration);  /* S.level حفظ می‌شود */
+    $('listBtn').onclick = exitToLobby;
+    $('resumePop').classList.remove('show');
+}
+function exitToLobby() {
+    if (S.player) { try { S.player.stop(false); } catch (e) {} S.player = null; }
+    if (window.AudioManager) { try { AudioManager.stop(); } catch (e) {} }
+    $('studio').classList.remove('show');
+    $('resumePop').classList.remove('show');
+    $('lobby').classList.remove('hide');
+    $('playerHost').innerHTML = '';
+}
+/* ── پنل اطلاعات تمرین ── */
+function fillInfoPanel(p) {
+    const fa = PRACTICE_FA[p.name] || {};
+    $('ipTitle').textContent = (PRACTICE_EMOJI[p.name] || '🧘') + ' ' + (fa.name || p.displayName || p.name);
+    const lvls = (p.difficulties || []).map((d) => (['مبتدی', 'متوسط', 'پیشرفته'][d] || '')).filter(Boolean);
+    $('ipMeta').innerHTML =
+        '<span class="chip">' + esc(fa.style || p.style || '—') + '</span>' +
+        lvls.map((l) => '<span class="chip">' + esc(l) + '</span>').join('') +
+        '<span class="chip">' + faNum(S.duration) + ' دقیقه</span>';
+    $('ipDesc').textContent = fa.desc || p.description || '—';
+    $('ipSteps').textContent = faNum(p.poseCount || '—');
+    $('ipMin').textContent = faNum(S.duration);
+    $('ipLevel').textContent = ({beginner: 'مبتدی', intermediate: 'متوسط', expert: 'پیشرفته'}[getUserLevel()] || '—');
+    if (p.instructor_name) {
+        $('ipInstructor').hidden = false;
+        $('ipInstrName').textContent = p.instructor_name;
+        $('ipInstrSpec').textContent = 'مربی';
+    } else {
+        $('ipInstructor').hidden = true;
+    }
+}
+$('ipToggle').onclick = () => {
+    const panel = $('infoPanel');
+    if (panel.classList.contains('show')) panel.classList.remove('show');
+    else {
+        if (S.practice) fillInfoPanel(S.practice);
+        panel.classList.add('show');
+    }
+};
+$('ipClose').onclick = () => $('infoPanel').classList.remove('show');
+
+$('stExit').onclick = () => {
+    const p = S.player;
+    if (p && p._running && (p._elapsedMs || 0) > 30000) {
+        if (!confirm('تمرین نیمه‌کاره رها شود؟')) return;
+    }
+    exitToLobby();
+};
+
+$('stSound').onclick = () => {
+    const on = Sfx.toggle();
+    $('stSound').textContent = on ? '🔔' : '🔕';
+    $('stSound').classList.toggle('off', !on);
+    if (!on && window.AudioManager) { try { AudioManager.stop(); } catch (e) {} }
+};
+$('stSound').textContent = Sfx.enabled ? '🔔' : '🔕';
+$('stMusic').onclick = () => {
+    S.music = !S.music;
+    $('stMusic').classList.toggle('off', !S.music);
+    if (S.music && S.player && window.AudioManager) { try { AudioManager.play(S.player._bgTrack()); } catch (e) {} }
+    else if (window.AudioManager) { try { AudioManager.stop(); } catch (e) {} }
+};
+
+/* ─────────── راه‌اندازی ─────────── */
+Promise.all([
+    window.YogaCore ? YogaCore.load() : Promise.resolve(),
+    fetch('/api/v5/yoga/practices').then((r) => (r.ok ? r.json() : null)).catch(() => null),
+]).then(([_, api]) => {
+    S.practices = (api && api.items && api.items.length ? api.items : null) || window.YOGA_DATA.practices || [];
+    renderLobby();
+    if (!S.practices.length) $('lobbyNote').textContent = '⚠ هیچ تمرینی یافت نشد — سرور را اجرا کنید';
+}).catch(() => {
+    $('lobbyNote').textContent = '⚠ بارگذاری داده‌ها ناموفق بود';
+});
+})();
+</script>
+</body>
+</html>

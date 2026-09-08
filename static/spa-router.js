@@ -82,22 +82,22 @@ function showLanding() {
         <div class="landing-section">
             <h2 class="landing-section-title">⭐ محبوب‌ترین ابزارها</h2>
             <div class="landing-tools-grid">
-                <div class="landing-tool-card lc-1" onclick="navigate('app')" style="--accent:#f39c12"><div class="ltc-emoji">🔮</div><div class="ltc-name">چارت تولد</div><div class="ltc-desc">چارت کامل و تحلیل ودیک</div></div>
-                <div class="landing-tool-card lc-2" onclick="navigate('app')" style="--accent:#e84393"><div class="ltc-emoji">💕</div><div class="ltc-name">سیناستری</div><div class="ltc-desc">سازگاری زوجین</div></div>
-                <div class="landing-tool-card lc-3" onclick="navigate('app')" style="--accent:#a29bfe"><div class="ltc-emoji">🃏</div><div class="ltc-name">تاروت</div><div class="ltc-desc">کشف آینده</div></div>
-                <div class="landing-tool-card lc-4" onclick="navigate('app')" style="--accent:#27ae60"><div class="ltc-emoji">🍃</div><div class="ltc-name">فال حافظ</div><div class="ltc-desc">غزل و تفأل</div></div>
-                <div class="landing-tool-card lc-5" onclick="navigate('app')" style="--accent:#0984e3"><div class="ltc-emoji">🌌</div><div class="ltc-name">ناسا</div><div class="ltc-desc">عکس روز و فضا</div></div>
-                <div class="landing-tool-card lc-6" onclick="navigate('app')" style="--accent:#e17055"><div class="ltc-emoji">🔬</div><div class="ltc-name">بیوریتم</div><div class="ltc-desc">نمودار زیستی</div></div>
-                <div class="landing-tool-card lc-7" onclick="navigate('app')" style="--accent:#00cec9"><div class="ltc-emoji">📚</div><div class="ltc-name">حرکات یوگا</div><div class="ltc-desc">کتابخانه ۱۰۰+ حرکت</div></div>
-                <div class="landing-tool-card lc-8" onclick="navigate('app')" style="--accent:#fdcb6e"><div class="ltc-emoji">🧬</div><div class="ltc-name">مزاج‌شناسی</div><div class="ltc-desc">طبع‌شناسی ایرانی</div></div>
+                <div class="landing-tool-card lc-1" onclick="navigate('app')" style="--accent:#f39c12"><img class="ltc-emoji" src="static/images/ui/birth.svg" alt=""><div class="ltc-name">چارت تولد</div><div class="ltc-desc">چارت کامل و تحلیل ودیک</div></div>
+                <div class="landing-tool-card lc-2" onclick="navigate('app')" style="--accent:#e84393"><img class="ltc-emoji" src="static/images/ui/synastry.svg" alt=""><div class="ltc-name">سیناستری</div><div class="ltc-desc">سازگاری زوجین</div></div>
+                <div class="landing-tool-card lc-3" onclick="navigate('app')" style="--accent:#a29bfe"><img class="ltc-emoji" src="static/images/ui/tarot.svg" alt=""><div class="ltc-name">تاروت</div><div class="ltc-desc">کشف آینده</div></div>
+                <div class="landing-tool-card lc-4" onclick="navigate('app')" style="--accent:#27ae60"><img class="ltc-emoji" src="static/images/ui/hafez.svg" alt=""><div class="ltc-name">فال حافظ</div><div class="ltc-desc">غزل و تفأل</div></div>
+                <div class="landing-tool-card lc-5" onclick="navigate('app')" style="--accent:#0984e3"><img class="ltc-emoji" src="static/images/ui/nasa.svg" alt=""><div class="ltc-name">ناسا</div><div class="ltc-desc">عکس روز و فضا</div></div>
+                <div class="landing-tool-card lc-6" onclick="navigate('app')" style="--accent:#e17055"><img class="ltc-emoji" src="static/images/ui/biorhythm.svg" alt=""><div class="ltc-name">بیوریتم</div><div class="ltc-desc">نمودار زیستی</div></div>
+                <div class="landing-tool-card lc-7" onclick="navigate('app')" style="--accent:#00cec9"><img class="ltc-emoji" src="static/images/ui/yoga.svg" alt=""><div class="ltc-name">حرکات یوگا</div><div class="ltc-desc">کتابخانه ۱۰۰+ حرکت</div></div>
+                <div class="landing-tool-card lc-8" onclick="navigate('app')" style="--accent:#fdcb6e"><img class="ltc-emoji" src="static/images/ui/mizaj.svg" alt=""><div class="ltc-name">مزاج‌شناسی</div><div class="ltc-desc">طبع‌شناسی ایرانی</div></div>
             </div>
         </div>
 
         <div class="landing-section">
             <h2 class="landing-section-title">✨ چرا کیهان‌نگر؟</h2>
             <div class="landing-features-grid">
-                <div class="landing-feature-card lc-1"><div class="lfc-icon">🪐</div><div class="lfc-title">موتور ودیک حرفه‌ای</div><div class="lfc-desc">محاسبات دقیق بر اساس موتور Kerykeion با پشتیبانی از تقویم ودیک</div></div>
-                <div class="landing-feature-card lc-2"><div class="lfc-icon">📊</div><div class="lfc-title">۱۶+ ابزار تخصصی</div><div class="lfc-desc">از چارت تولد تا سیناستری، کامپوزیت، ترانزیت، تاروت و فال حافظ</div></div>
+                <div class="landing-feature-card lc-1"><img class="lfc-icon" src="static/images/ui/saturn.svg" alt=""><div class="lfc-title">موتور ودیک حرفه‌ای</div><div class="lfc-desc">محاسبات دقیق بر اساس موتور Kerykeion با پشتیبانی از تقویم ودیک</div></div>
+                <div class="landing-feature-card lc-2"><img class="lfc-icon" src="static/images/ui/dashboard.svg" alt=""><div class="lfc-title">۱۶+ ابزار تخصصی</div><div class="lfc-desc">از چارت تولد تا سیناستری، کامپوزیت، ترانزیت، تاروت و فال حافظ</div></div>
                 <div class="landing-feature-card lc-3"><div class="lfc-icon">🆓</div><div class="lfc-title">رایگان شروع کنید</div><div class="lfc-desc">چارت تولد کامل، تاروت و فال حافظ کاملاً رایگان</div></div>
                 <div class="landing-feature-card lc-4"><div class="lfc-icon">📈</div><div class="lfc-title">تفسیر هوشمند</div><div class="lfc-desc">تفسیر فارسی کامل با امتیاز و سطوح سازگاری</div></div>
             </div>
@@ -416,44 +416,21 @@ function openAuthActionPage(kind, token) {
                 </div>
             </div>`;
         document.body.appendChild(modal);
-        fetch('/api/v5/auth/verify-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: token })
-        }).then(function (r) { return r.json(); }).then(function (data) {
+        window.verifyEmailToken(token).then(function () {
             var body = document.getElementById('authActionBody');
             if (!body) return;
-            if (data && data.email_verified) {
-                body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">✅</div><p style="color:#2ecc71;font-weight:700;">ایمیل شما تأیید شد!</p>';
-                if (window.showToast) showToast('✅ ایمیل شما تأیید شد', 'success');
-                // Keep the stored user in sync so the UI reflects the verified state.
-                try {
-                    var u = JSON.parse(localStorage.getItem('cosmic_user') || '{}');
-                    u.email_verified = true;
-                    localStorage.setItem('cosmic_user', JSON.stringify(u));
-                } catch (e) {}
-                var tok = localStorage.getItem('cosmic_token');
-                if (tok) {
-                    fetch('/api/v5/auth/me', { headers: { 'Authorization': 'Bearer ' + tok } })
-                        .then(function (r) { return r.json(); })
-                        .then(function (me) {
-                            if (me && me.user) localStorage.setItem('cosmic_user', JSON.stringify(me.user));
-                        }).catch(function () {});
-                }
-                // Land the user on their dashboard.
-                setTimeout(function () {
-                    var m = document.getElementById('authActionModal');
-                    if (m) m.remove();
-                    navigate('dashboard');
-                }, 900);
-            } else {
-                body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">' + ((data && (data.detail || data.message)) || 'توکن نامعتبر یا منقضی شده') + '</p>' +
-                    '<button onclick="document.getElementById(\'authActionModal\').remove()" style="margin-top:15px;background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;">بستن</button>';
-            }
-        }).catch(function () {
+            body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">✅</div><p style="color:#2ecc71;font-weight:700;">ایمیل شما تأیید شد!</p>';
+            if (window.showToast) showToast('✅ ایمیل شما تأیید شد', 'success');
+            // Land the user on their dashboard.
+            setTimeout(function () {
+                var m = document.getElementById('authActionModal');
+                if (m) m.remove();
+                navigate('dashboard');
+            }, 900);
+        }).catch(function (e) {
             var body = document.getElementById('authActionBody');
             if (!body) return;
-            body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">خطا در ارتباط با سرور</p>' +
+            body.innerHTML = '<div style="font-size:2.5rem;margin-bottom:10px;">❌</div><p style="color:#e74c3c;">' + (e.message || 'توکن نامعتبر یا منقضی شده') + '</p>' +
                 '<button onclick="document.getElementById(\'authActionModal\').remove()" style="margin-top:15px;background:#f39c12;color:#0b0e1a;border:none;padding:10px 30px;border-radius:50px;cursor:pointer;font-family:inherit;font-weight:700;">بستن</button>';
         });
     } else if (kind === 'reset-password') {

@@ -180,14 +180,9 @@
         var token = urlToken();
         if (token) {
             // رسیدن از لینک تأیید ایمیل — اول توکن را اعتبارسنجی کن
-            api('POST', '/verify-email', { token: token }).then(function () {
+            // (همان منطق مشترک spa-router: verify + همگام‌سازی کاربر از /me)
+            window.verifyEmailToken(token).then(function () {
                 showToast('✅ ایمیل شما تأیید شد', 'success');
-                // Refresh the stored user best-effort (skipped for guests),
-                // then land on the dashboard — same as the main app flow.
-                if (getToken()) {
-                    api('GET', '/me').then(function (me) { saveSession(null, me); })
-                                      .catch(function () { });
-                }
                 setTimeout(function () {
                     location.href = '/#/dashboard';
                 }, 1200);

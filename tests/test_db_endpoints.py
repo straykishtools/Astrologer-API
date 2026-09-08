@@ -375,3 +375,9 @@ def test_dev_email_inbox_lists_recent_emails(client):
 def test_dev_email_inbox_disabled_in_production(client, monkeypatch):
     monkeypatch.setenv("ENV_TYPE", "production")
     assert client.get("/api/v5/auth/dev/emails").status_code == 404
+
+
+def test_dev_email_inbox_fail_closed_when_env_unset(client, monkeypatch):
+    """ENV_TYPE unset must fail closed too — settings.py loads production config then."""
+    monkeypatch.delenv("ENV_TYPE", raising=False)
+    assert client.get("/api/v5/auth/dev/emails").status_code == 404

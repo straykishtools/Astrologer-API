@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&family=Cinzel:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="static/style.css?v=1">
+    <link rel="icon" type="image/svg+xml" href="static/images/ui/logo.svg">
+    <link rel="stylesheet" href="static/style.css?v=6">
     <link rel="stylesheet" href="static/date-wheel-picker.css">
     <link rel="stylesheet" href="static/yoga-v3.css?v=7">
 
@@ -1343,7 +1344,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 21px;
+            padding: 5px;
+            box-sizing: border-box;
             border-radius: 12px;
             background: linear-gradient(160deg, rgba(221, 192, 112, 0.18), rgba(221, 192, 112, 0.04));
             border: 1px solid var(--line);
@@ -1833,6 +1835,87 @@
             border: 1px solid var(--gold-500); color: var(--gold-200);
         }
 
+        /* ════════════════════════════════════════════
+           DAILY RITUAL — آیین روزانه
+        ════════════════════════════════════════════ */
+        .ritual-wrap { max-width: 860px; margin: 28px auto 0; }
+        .ritual-card {
+            background: linear-gradient(160deg, rgba(37, 53, 107, 0.35), rgba(10, 15, 35, 0.85));
+            border: 1px solid var(--line-strong);
+            border-radius: 22px;
+            padding: 20px 22px;
+            backdrop-filter: blur(10px);
+        }
+        .ritual-head { text-align: center; margin-bottom: 16px; }
+        .ritual-title { font-family: 'Reem Kufi', 'Vazirmatn', sans-serif; font-size: 20px; font-weight: 700; color: var(--gold-200); }
+        .ritual-sub { font-size: 12px; color: var(--ink-dim); margin-top: 4px; }
+        .ritual-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .ritual-step {
+            background: rgba(7, 12, 31, 0.5);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 14px;
+            text-align: center;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+        .ritual-step:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+        .ritual-step-icon { font-size: 28px; }
+        .ritual-step-label { font-size: 11px; color: var(--ink-dim); margin-top: 6px; }
+        .ritual-step-value { font-size: 14px; font-weight: 700; color: var(--gold-200); margin-top: 3px; }
+        .ritual-step-hint { font-size: 10.5px; color: var(--ink-dim); margin-top: 4px; line-height: 1.7; }
+        .ritual-start {
+            display: block; width: 100%; margin-top: 16px;
+            border: none; border-radius: 14px; padding: 13px;
+            font-family: 'Vazirmatn', sans-serif; font-size: 14px; font-weight: 800;
+            cursor: pointer;
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500) 60%, var(--gold-600));
+            color: var(--lapis-950);
+            box-shadow: 0 8px 26px -8px rgba(201, 162, 39, 0.5);
+            transition: transform 0.15s, filter 0.2s;
+        }
+        .ritual-start:hover { filter: brightness(1.07); transform: translateY(-1px); }
+        .ritual-start:active { transform: scale(0.98); }
+        @media (max-width: 640px) { .ritual-steps { grid-template-columns: 1fr; } }
+
+        /* ════════════════════════════════════════════
+           MY DASHBOARD — داشبورد کاربر
+        ════════════════════════════════════════════ */
+        .mydash-wrap { max-width: 860px; margin: 24px auto 0; }
+        .mydash-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .mydash-tab {
+            appearance: none; border: 1px solid var(--line-strong);
+            background: rgba(16, 26, 61, 0.6); color: var(--ink-dim);
+            font-family: 'Vazirmatn', sans-serif; font-size: 12.5px; font-weight: 600;
+            padding: 8px 14px; border-radius: 999px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mydash-tab:hover { color: var(--ink); border-color: var(--gold-400); }
+        .mydash-tab.active {
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500));
+            border-color: transparent; color: var(--lapis-950); font-weight: 800;
+        }
+        .mydash-body {
+            background: rgba(9, 14, 34, 0.6);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 16px 18px;
+            min-height: 120px;
+        }
+        .mdb-chart { width: 100%; height: 160px; }
+        .mdb-row { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12.5px; }
+        .mdb-row:last-child { border-bottom: none; }
+        .mdb-row-main { flex: 1; min-width: 0; }
+        .mdb-row-name { color: var(--ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mdb-row-meta { color: var(--ink-dim); font-size: 10.5px; margin-top: 2px; }
+        .mdb-empty { text-align: center; color: var(--ink-dim); padding: 26px 10px; font-size: 12.5px; }
+        .mdb-cta {
+            margin-top: 12px; display: inline-block;
+            background: rgba(221, 192, 112, 0.12); border: 1px solid var(--line-strong);
+            color: var(--gold-200); font-family: inherit; font-size: 12px; font-weight: 700;
+            padding: 8px 18px; border-radius: 10px; cursor: pointer;
+        }
+        .mdb-cta:hover { background: rgba(221, 192, 112, 0.2); }
+
         /* ============================================================
            مودال نقشه — نمایش با کلاس .active (طبق script.js)
         ============================================================ */
@@ -1938,9 +2021,9 @@
             body.cosmic.sidebar-open .sidebar { transform: translateX(0); }
             .cosmic-main { margin-right: 0; }
             .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
-            /* Hide zodiac text, keep emoji + bio dots */
+            /* Hide zodiac text, keep emoji + bio chips */
             .zodiac-text, .zodiac-date { display: none !important; }
-            .zodiac-bio { border-right: none; padding-right: 0; }
+            .zodiac-bio, #zodiacBio:not(:empty) { border-right: none; padding-right: 0; margin-right: 0; }
             .topbar-player { display: none !important; }
         }
 
@@ -1955,8 +2038,11 @@
             .hero-stat + .hero-stat { border-right: none; }
             .topbar { padding: 8px 12px; gap: 6px; }
             .topbar-visualizer { height: 24px; width: 80px; }
-            .topbar-player { padding: 3px 6px; gap: 4px; }
+            .topbar-player { padding: 3px 6px 3px 4px; gap: 2px; }
             .topbar-player .apw-track { max-width: 80px; font-size: 10px; }
+            .topbar-player .apw-volume { width: 40px; }
+            .topbar-player .apw-play { width: 24px; height: 24px; }
+            .topbar-player .apw-btn:not(.apw-play) { width: 22px; height: 22px; }
             .cosmic .header-actions { gap: 4px; }
             .cosmic .btn-action { padding: 6px 8px; font-size: 11px; }
             .cosmic .form-card { padding: 18px 14px 22px; }
@@ -1968,7 +2054,7 @@
             /* Hide cosmic status on small screens */
             .cosmic-status-dropdown { display: none !important; }
             .zodiac-date { display: none !important; }
-            .zodiac-bio { border-right: none; padding-right: 0; margin-right: 0; }
+            .zodiac-bio, #zodiacBio:not(:empty) { border-right: none; padding-right: 0; margin-right: 0; }
             .topbar-visualizer { width: 60px; }
             .topbar-player { display: none !important; }
         }
@@ -1977,7 +2063,7 @@
             .topbar { padding: 6px 10px; gap: 4px; }
             .topbar-visualizer { width: 48px; height: 20px; }
             .tb-icon-only { padding: 6px 7px !important; font-size: 14px; }
-            .zodiac-bio { display: none !important; }
+            .zodiac-bio, #zodiacBio:not(:empty) { display: none !important; }
             .zodiac-display { padding-right: 0; border-right: none; margin-right: 0; }
             .header-actions { gap: 3px !important; }
         }
@@ -2142,22 +2228,150 @@
         .topbar-visualizer:hover { opacity: 1; }
         .topbar-visualizer.glowing { filter: drop-shadow(0 0 6px rgba(221,192,112,0.5)); }
 
-        /* ─── Topbar Player Strip ─── */
+        /* ─── Topbar Player — minimal capsule ─── */
         .topbar-player {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(22, 34, 77, 0.4); border: 1px solid rgba(221,192,112,0.12);
-            border-radius: 10px; padding: 4px 8px;
+            display: flex; align-items: center; gap: 3px;
+            background: linear-gradient(180deg, rgba(30, 44, 92, 0.45), rgba(16, 26, 61, 0.55));
+            border: 1px solid rgba(221,192,112,0.14);
+            border-radius: 999px; padding: 4px 8px 4px 5px;
             font-family: 'Vazirmatn', sans-serif;
             flex-shrink: 0;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 10px rgba(0,0,0,0.25);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            min-width: 0;
         }
-        .topbar-player .apw-btn {
-            font-size: 13px; padding: 2px 4px;
+        .topbar-player:hover {
+            border-color: rgba(221,192,112,0.4);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 4px 18px rgba(0,0,0,0.35), 0 0 14px rgba(201,162,39,0.12);
         }
+        .topbar-player:empty { display: none !important; } /* hide slot before widget injects */
+
+        /* Circular play button */
+        .topbar-player .apw-play {
+            font-size: 0;
+            width: 28px; height: 28px; padding: 0; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(180deg, var(--gold-300), var(--gold-500) 60%, var(--gold-600));
+            box-shadow: 0 4px 14px -3px rgba(201,162,39,0.6);
+            transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .topbar-player .apw-play:hover {
+            transform: scale(1.08);
+            filter: brightness(1.08);
+            box-shadow: 0 6px 18px -3px rgba(201,162,39,0.75);
+        }
+        .topbar-player .apw-play:active { transform: scale(0.95); }
+        .topbar-player .apw-play svg {
+            width: 13px; height: 13px;
+            fill: #1a2340;
+            display: block;
+        }
+        .topbar-player .apw-play .apw-ic-play { margin-right: 1.5px; } /* optical centering */
+
+        /* Ghost SVG buttons (mute) */
+        .topbar-player .apw-btn:not(.apw-play) {
+            font-size: 0;
+            width: 26px; height: 26px; padding: 0; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s ease, transform 0.15s ease, color 0.2s ease;
+        }
+        .topbar-player .apw-btn:not(.apw-play):hover {
+            background: rgba(221,192,112,0.12);
+            transform: scale(1.06);
+        }
+        .topbar-player .apw-btn:not(.apw-play):active { transform: scale(0.94); }
+        .topbar-player .apw-btn svg {
+            width: 14px; height: 14px;
+            fill: currentColor;
+            color: var(--ink-dim);
+            display: block;
+            transition: color 0.2s ease;
+        }
+        .topbar-player .apw-btn:hover svg { color: var(--gold-200); }
+        .topbar-player .apw-btn.is-active svg { color: var(--gold-300); }
+
+        /* Track info — click opens playlist */
+        .topbar-player .apw-info {
+            min-width: 0; max-width: 130px;
+            display: flex; align-items: center; gap: 6px;
+            padding: 4px 6px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .topbar-player .apw-info:hover { background: rgba(221,192,112,0.08); }
         .topbar-player .apw-track {
-            font-size: 11px; max-width: 120px; overflow: hidden;
+            font-size: 11px; font-weight: 600; color: var(--gold-200);
+            overflow: hidden;
             text-overflow: ellipsis; white-space: nowrap;
         }
-        .topbar-player .apw-volume { width: 50px; height: 3px; }
+
+        /* Mini equalizer (playing indicator) */
+        .topbar-player .apw-eq {
+            display: none;
+            align-items: flex-end; gap: 2px;
+            height: 12px; flex-shrink: 0;
+        }
+        .topbar-player .apw-eq span {
+            width: 2.5px; border-radius: 1.5px;
+            background: var(--gold-300);
+            animation: apwEq 0.9s ease-in-out infinite;
+        }
+        .topbar-player .apw-eq span:nth-child(1) { height: 5px; animation-delay: 0s; }
+        .topbar-player .apw-eq span:nth-child(2) { height: 10px; animation-delay: 0.25s; }
+        .topbar-player .apw-eq span:nth-child(3) { height: 7px; animation-delay: 0.5s; }
+        .topbar-player.apw-playing .apw-eq { display: flex; }
+        @keyframes apwEq {
+            0%, 100% { transform: scaleY(0.45); }
+            50% { transform: scaleY(1); }
+        }
+
+        /* Volume slider with gradient fill */
+        .topbar-player .apw-volume {
+            width: 56px; height: 3px;
+            margin: 0 3px;
+            border-radius: 2px;
+            background:
+                linear-gradient(90deg, var(--gold-400) var(--vol, 50%), rgba(255,255,255,0.12) var(--vol, 50%));
+            -webkit-appearance: none; appearance: none;
+            outline: none; cursor: pointer;
+            flex-shrink: 0;
+        }
+        .topbar-player .apw-volume::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--gold-200);
+            box-shadow: 0 0 6px rgba(201,162,39,0.55);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+        .topbar-player .apw-volume:hover::-webkit-slider-thumb { transform: scale(1.2); }
+        .topbar-player .apw-volume::-moz-range-thumb {
+            width: 10px; height: 10px; border: none; border-radius: 50%;
+            background: var(--gold-200);
+            box-shadow: 0 0 6px rgba(201,162,39,0.55);
+            cursor: pointer;
+        }
+        .topbar-player .apw-volume::-moz-range-track {
+            height: 3px; border-radius: 2px;
+            background: rgba(255,255,255,0.12);
+        }
+        .topbar-player .apw-volume::-moz-range-progress {
+            height: 3px; border-radius: 2px;
+            background: var(--gold-400);
+        }
+
+        /* Playlist dropdown (glass, opens from widget) */
+        #audioPlayerWidget { position: relative; }
+        .topbar-player .apw-playlist {
+            top: calc(100% + 10px);
+            right: auto; left: 0;
+            margin-bottom: 0;
+        }
         .audio-player-widget { display: none; }
 
 
@@ -2294,7 +2508,7 @@
     <!-- ===== سایدبار ===== -->
     <aside class="sidebar" id="sidebar" aria-label="ناوبری اصلی">
         <div class="sidebar-brand">
-            <span class="logo-icon">🌌</span>
+            <img class="logo-icon" src="static/images/ui/logo.svg" alt="">
             <div>
                 <div class="brand-name">Cosmic Oracle</div>
                 <div class="brand-sub">رصدخانه‌ی کیهانی</div>
@@ -2309,106 +2523,106 @@
             <!-- 🏠 داشبورد -->
             <div class="sb-section" data-section="dashboard">
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
-                    <span class="sb-section-icon">🏠</span>
+                    <img class="sb-section-icon" src="static/images/ui/home.svg" alt="">
                     <span class="sb-section-title">داشبورد</span>
                     <span class="sb-badge">۲</span>
                     <span class="sb-chevron">‹</span>
                 </button>
                 <div class="sb-section-items">
-                    <button class="nav-item" data-nav="home"><span class="nav-emoji">🏠</span> صفحه اصلی</button>
-                    <button class="nav-item" data-nav="dashboard"><span class="nav-emoji">📊</span> داشبورد کاربری</button>
+                    <button class="nav-item" data-nav="home"><img class="nav-emoji" src="static/images/ui/home.svg" alt=""> صفحه اصلی</button>
+                    <button class="nav-item" data-nav="dashboard"><img class="nav-emoji" src="static/images/ui/dashboard.svg" alt=""> داشبورد کاربری</button>
                 </div>
             </div>
 
             <!-- ⭐ ابزارهای کیهانی -->
             <div class="sb-section" data-section="cosmic">
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
-                    <span class="sb-section-icon">⭐</span>
+                    <img class="sb-section-icon" src="static/images/ui/star.svg" alt="">
                     <span class="sb-section-title">ابزارهای کیهانی</span>
                     <span class="sb-badge">۶</span>
                     <span class="sb-chevron">‹</span>
                 </button>
                 <div class="sb-section-items">
-                    <button class="nav-item" data-nav="birth"><span class="nav-emoji">🔮</span> چارت تولد</button>
-                    <button class="nav-item" data-nav="synastry"><span class="nav-emoji">💕</span> سیناستری</button>
-                    <button class="nav-item" data-nav="composite"><span class="nav-emoji">🔗</span> کامپوزیت</button>
-                    <button class="nav-item" data-nav="transit"><span class="nav-emoji">🌍</span> ترانزیت</button>
-                    <button class="nav-item" data-nav="solar-return"><span class="nav-emoji">☀️</span> بازگشت خورشیدی</button>
-                    <button class="nav-item" data-nav="lunar-return"><span class="nav-emoji">🌙</span> بازگشت ماهانه</button>
+                    <button class="nav-item" data-nav="birth"><img class="nav-emoji" src="static/images/ui/birth.svg" alt=""> چارت تولد</button>
+                    <button class="nav-item" data-nav="synastry"><img class="nav-emoji" src="static/images/ui/synastry.svg" alt=""> سیناستری</button>
+                    <button class="nav-item" data-nav="composite"><img class="nav-emoji" src="static/images/ui/composite.svg" alt=""> کامپوزیت</button>
+                    <button class="nav-item" data-nav="transit"><img class="nav-emoji" src="static/images/ui/transit.svg" alt=""> ترانزیت</button>
+                    <button class="nav-item" data-nav="solar-return"><img class="nav-emoji" src="static/images/ui/solar-return.svg" alt=""> بازگشت خورشیدی</button>
+                    <button class="nav-item" data-nav="lunar-return"><img class="nav-emoji" src="static/images/ui/lunar-return.svg" alt=""> بازگشت ماهانه</button>
                 </div>
             </div>
 
             <!-- 🧬 حکمت ایرانی -->
             <div class="sb-section" data-section="wisdom">
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
-                    <span class="sb-section-icon">🧬</span>
+                    <img class="sb-section-icon" src="static/images/ui/wisdom.svg" alt="">
                     <span class="sb-section-title">حکمت ایرانی</span>
                     <span class="sb-badge">۳</span>
                     <span class="sb-chevron">‹</span>
                 </button>
                 <div class="sb-section-items">
-                    <button class="nav-item" data-nav="mizaj"><span class="nav-emoji">🧬</span> مزاج‌شناسی</button>
-                    <button class="nav-item" data-nav="abjad"><span class="nav-emoji">🔢</span> ابجد</button>
-                    <button class="nav-item" data-nav="hafez"><span class="nav-emoji">🍃</span> فال حافظ</button>
+                    <button class="nav-item" data-nav="mizaj"><img class="nav-emoji" src="static/images/ui/mizaj.svg" alt=""> مزاج‌شناسی</button>
+                    <button class="nav-item" data-nav="abjad"><img class="nav-emoji" src="static/images/ui/abjad.svg" alt=""> ابجد</button>
+                    <button class="nav-item" data-nav="hafez"><img class="nav-emoji" src="static/images/ui/hafez.svg" alt=""> فال حافظ</button>
                 </div>
             </div>
 
             <!-- 🃏 شخصیت و پیش‌بینی -->
             <div class="sb-section" data-section="prediction">
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
-                    <span class="sb-section-icon">🃏</span>
+                    <img class="sb-section-icon" src="static/images/ui/prediction.svg" alt="">
                     <span class="sb-section-title">شخصیت و پیش‌بینی</span>
                     <span class="sb-badge">۶</span>
                     <span class="sb-chevron">‹</span>
                 </button>
                 <div class="sb-section-items">
-                    <button class="nav-item" data-nav="tarot"><span class="nav-emoji">🃏</span> تاروت</button>
-                    <button class="nav-item" data-nav="numerology"><span class="nav-emoji">🔢</span> عددشناسی</button>
-                    <button class="nav-item" data-nav="biorhythm"><span class="nav-emoji">🔬</span> بیوریتم</button>
-                    <button class="nav-item" data-nav="zodiac"><span class="nav-emoji">🐉</span> سال حیوانی</button>
-                    <button class="nav-item" data-nav="daily-question"><span class="nav-emoji">❓</span> پرسش روزانه</button>
-                    <button class="nav-item" data-nav="qol"><span class="nav-emoji">📋</span> کیفیت زندگی</button>
+                    <button class="nav-item" data-nav="tarot"><img class="nav-emoji" src="static/images/ui/tarot.svg" alt=""> تاروت</button>
+                    <button class="nav-item" data-nav="numerology"><img class="nav-emoji" src="static/images/ui/numerology.svg" alt=""> عددشناسی</button>
+                    <button class="nav-item" data-nav="biorhythm"><img class="nav-emoji" src="static/images/ui/biorhythm.svg" alt=""> بیوریتم</button>
+                    <button class="nav-item" data-nav="zodiac"><img class="nav-emoji" src="static/images/ui/zodiac.svg" alt=""> سال حیوانی</button>
+                    <button class="nav-item" data-nav="daily-question"><img class="nav-emoji" src="static/images/ui/daily-question.svg" alt=""> پرسش روزانه</button>
+                    <button class="nav-item" data-nav="qol"><img class="nav-emoji" src="static/images/ui/qol.svg" alt=""> کیفیت زندگی</button>
                 </div>
             </div>
 
             <!-- 🌌 جهان -->
             <div class="sb-section" data-section="universe">
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
-                    <span class="sb-section-icon">🌌</span>
+                    <img class="sb-section-icon" src="static/images/ui/universe.svg" alt="">
                     <span class="sb-section-title">جهان</span>
                     <span class="sb-badge">۲</span>
                     <span class="sb-chevron">‹</span>
                 </button>
                 <div class="sb-section-items">
-                    <button class="nav-item" data-nav="nasa"><span class="nav-emoji">🌌</span> ناسا</button>
-                    <button class="nav-item" data-nav="moon-phase"><span class="nav-emoji">🌙</span> فاز ماه</button>
+                    <button class="nav-item" data-nav="nasa"><img class="nav-emoji" src="static/images/ui/nasa.svg" alt=""> ناسا</button>
+                    <button class="nav-item" data-nav="moon-phase"><img class="nav-emoji" src="static/images/ui/moon-phase.svg" alt=""> فاز ماه</button>
                 </div>
             </div>
 
             <!-- 🧘 بدن و ذهن -->
             <div class="sb-section" data-section="body">
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
-                    <span class="sb-section-icon">🧘</span>
+                    <img class="sb-section-icon" src="static/images/ui/body.svg" alt="">
                     <span class="sb-section-title">بدن و ذهن</span>
                     <span class="sb-badge">۲</span>
                     <span class="sb-chevron">‹</span>
                 </button>
                 <div class="sb-section-items">
-                    <button class="nav-item" data-nav="yoga"><span class="nav-emoji">🧘</span> کتابخانه یوگا</button>
-                    <button class="nav-item" data-nav="breath"><span class="nav-emoji">🌬️</span> تنفس و مدیتیشن</button>
+                    <button class="nav-item" data-nav="yoga"><img class="nav-emoji" src="static/images/ui/yoga.svg" alt=""> کتابخانه یوگا</button>
+                    <button class="nav-item" data-nav="breath"><img class="nav-emoji" src="static/images/ui/breath.svg" alt=""> تنفس و مدیتیشن</button>
                 </div>
             </div>
 
             <!-- ⚙️ مدیریت (فقط برای ادمین) -->
             <div class="sb-section" data-section="admin" id="sbAdminSection" style="display:none;">
                 <button class="sb-section-header" onclick="toggleSbSection(this)">
-                    <span class="sb-section-icon">⚙️</span>
+                    <img class="sb-section-icon" src="static/images/ui/admin.svg" alt="">
                     <span class="sb-section-title">مدیریت</span>
                     <span class="sb-badge">۳</span>
                     <span class="sb-chevron">‹</span>
                 </button>
                 <div class="sb-section-items">
-                    <button class="nav-item" data-nav="admin"><span class="nav-emoji">👤</span> مدیریت کاربران</button>
+                    <button class="nav-item" data-nav="admin"><img class="nav-emoji" src="static/images/ui/admin.svg" alt=""> مدیریت کاربران</button>
                 </div>
             </div>
         </nav>
@@ -2463,11 +2677,11 @@
             <!-- Always-visible items -->
             <div class="popup-divider"></div>
             <a class="popup-item" onclick="closeUserPopup(); if (window.navigateToNav) window.navigateToNav('home'); else showPage('home');">
-                <span class="popup-item-icon">🏠</span>
+                <img class="popup-item-icon" src="static/images/ui/home.svg" alt="">
                 <span class="popup-item-text">صفحه اصلی</span>
             </a>
             <a class="popup-item" onclick="closeUserPopup(); if (window.navigateToNav) window.navigateToNav('dashboard'); else showPage('dashboard');">
-                <span class="popup-item-icon">📊</span>
+                <img class="popup-item-icon" src="static/images/ui/dashboard.svg" alt="">
                 <span class="popup-item-text">داشبورد روزانه</span>
             </a>
             <div class="popup-divider"></div>
@@ -2494,13 +2708,16 @@
                     <button class="btn-action primary tb-icon-only" id="yogaEngineToggle" title="یوگا">🧘</button>
                     <div class="yoga-summary-panel" id="yogaSummaryPanel"></div>
                 </div>
-                <div class="zodiac-display" id="zodiacDisplay">
-                    <div class="zodiac-trigger" id="zodiacTrigger">
-                        <span class="zodiac-emoji" id="zodiacEmoji">🐉</span>
-                        <span class="zodiac-text" id="zodiacText">ثبت نشده</span>
-                        <span class="zodiac-date" id="zodiacDate"></span>
-                        <span class="zodiac-bio" id="zodiacBio"></span>
+                <div class="zodiac-dropdown" id="zodiacDropdown">
+                    <div class="zodiac-display" id="zodiacDisplay">
+                        <div class="zodiac-trigger" id="zodiacTrigger">
+                            <span class="zodiac-emoji" id="zodiacEmoji">🐉</span>
+                            <span class="zodiac-text" id="zodiacText">ثبت نشده</span>
+                            <span class="zodiac-date" id="zodiacDate"></span>
+                            <span class="zodiac-bio" id="zodiacBio"></span>
+                        </div>
                     </div>
+                    <div class="zodiac-panel" id="zodiacPanel" role="menu" aria-label="اطلاعات زایچة چینی"></div>
                 </div>
                 <div class="cosmic-status-dropdown" id="cosmicStatusDropdown">
                     <button class="btn-action tb-icon-only" id="cosmicStatusBtn" title="وضعیت نجومی">🌌</button>
@@ -2573,6 +2790,85 @@
             </div>
         </div>
 
+        <script>
+        /* ============================================================
+           TOPBAR DROPDOWN COORDINATOR
+           فقط یک پنل باز در نوار بالا — ثبت تاخیری تا ماژول‌ها لود شوند
+        ============================================================ */
+        (function () {
+            'use strict';
+            var PANELS = [
+                { btn: 'yogaEngineToggle', panel: 'yogaSummaryPanel' },
+                { btn: 'zodiacTrigger',    panel: 'zodiacPanel' },
+                { btn: 'cosmicStatusBtn',  panel: 'cosmicStatusPanel' },
+                { btn: 'payBtn',           panel: 'profilePanel' },
+                { btn: 'actionsMenuBtn',   panel: 'actionsMenu' },
+                { btn: 'apwInfo',          panel: 'apwPlaylist' }
+            ];
+            function isOpen(el) {
+                if (!el) return false;
+                // apwPlaylist با style.display کنترل می‌شود؛ بقیه با کلاس open
+                if (el.id === 'apwPlaylist') return el.style.display !== 'none';
+                return el.classList.contains('open');
+            }
+            function setOpen(el, on) {
+                if (!el) return;
+                el.classList.toggle('open', on);
+                if (el.id === 'apwPlaylist') el.style.display = on ? '' : 'none';
+            }
+            function closeAll(exceptPanel) {
+                PANELS.forEach(function (p) {
+                    var el = document.getElementById(p.panel);
+                    if (el && el !== exceptPanel) setOpen(el, false);
+                });
+            }
+            function wire() {
+                var found = false;
+                PANELS.forEach(function (p) {
+                    var btn = document.getElementById(p.btn);
+                    var panel = document.getElementById(p.panel);
+                    if (!btn || !panel || btn.dataset.ddWired) return;
+                    btn.dataset.ddWired = '1';
+                    found = true;
+                    btn.addEventListener('click', function (e) {
+                        // بلافاصله بعد از باز شدن؛ تریگرهای دیگر همه را می‌بندند
+                        var willOpen = !isOpen(panel);
+                        closeAll(panel);
+                        setOpen(panel, willOpen);
+                        e.stopPropagation();
+                    });
+                });
+                // خارج از پنل‌ها = بستن همه
+                if (!document.body.dataset.ddOutsideWired) {
+                    document.body.dataset.ddOutsideWired = '1';
+                    document.addEventListener('click', function (e) {
+                        var insideAnyPanel = PANELS.some(function (p) {
+                            var panel = document.getElementById(p.panel);
+                            var btn = document.getElementById(p.btn);
+                            return (panel && panel.contains(e.target)) || (btn && btn.contains(e.target));
+                        });
+                        if (!insideAnyPanel) closeAll(null);
+                    });
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') closeAll(null);
+                    });
+                }
+                return found;
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', wire);
+            } else {
+                wire();
+            }
+            // ماژول‌هایlazy (auth-panel / audio-manager) دیر متنظیم می‌شوند
+            var tries = 0;
+            var iv = setInterval(function () {
+                tries++;
+                if (wire() || tries > 40) clearInterval(iv);
+            }, 500);
+        })();
+        </script>
+
         <!-- ======================= صفحه اصلی ======================= -->
         <section class="page" id="pageHome">
             <div class="hero">
@@ -2627,10 +2923,10 @@
                 </p>
 
                 <div class="hero-cta">
-                    <button class="btn-action primary" onclick="openService('birth')">🔮 چارت تولد</button>
-                    <button class="btn-action" onclick="openService('hafez')">🍃 فال حافظ</button>
-                    <button class="btn-action" onclick="openService('tarot')">🃏 تاروت</button>
-                    <button class="btn-action" onclick="openService('nasa')">🌌 ناسا</button>
+                    <button class="btn-action primary" onclick="openService('birth')"><img class="hero-cta-icon" src="static/images/ui/birth.svg" alt=""> چارت تولد</button>
+                    <button class="btn-action" onclick="openService('hafez')"><img class="hero-cta-icon" src="static/images/ui/hafez.svg" alt=""> فال حافظ</button>
+                    <button class="btn-action" onclick="openService('tarot')"><img class="hero-cta-icon" src="static/images/ui/tarot.svg" alt=""> تاروت</button>
+                    <button class="btn-action" onclick="openService('nasa')"><img class="hero-cta-icon" src="static/images/ui/nasa.svg" alt=""> ناسا</button>
                 </div>
 
                 <div class="hero-stats">
@@ -2649,112 +2945,112 @@
             <div class="services-grid">
 
                 <div class="service-card" onclick="openService('birth')">
-                    <div class="svc-top"><span class="svc-emoji">🔮</span><span class="svc-name">چارت تولد</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/birth.svg" alt=""><span class="svc-name">چارت تولد</span></div>
                     <div class="svc-desc">چارت کامل نجومی با موقعیت دقیق سیارات، خانه‌ها، جنبه‌ها و تفسیر ودیک. پایه‌ی همه‌ی تحلیل‌ها.</div>
                     <div class="svc-badges"><span class="svc-badge">نجومی</span><span class="svc-badge">ودیک</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('synastry')">
-                    <div class="svc-top"><span class="svc-emoji">💕</span><span class="svc-name">سیناستری</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/synastry.svg" alt=""><span class="svc-name">سیناستری</span></div>
                     <div class="svc-desc">دو چارت را کنار هم بگذارید و سازگاری عاطفی، کاری و دوستانه‌ی خود را با دیگری بسنجید.</div>
                     <div class="svc-badges"><span class="svc-badge">سازگاری</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('composite')">
-                    <div class="svc-top"><span class="svc-emoji">🔗</span><span class="svc-name">کامپوزیت</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/composite.svg" alt=""><span class="svc-name">کامپوزیت</span></div>
                     <div class="svc-desc">چارت ترکیبی دو نفر را محاسبه کنید تا هویتِ خودِ رابطه، قوی‌ترین جنبه و نقطه ضعف آن را ببینید.</div>
                     <div class="svc-badges"><span class="svc-badge">رابطه</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('transit')">
-                    <div class="svc-top"><span class="svc-emoji">🌍</span><span class="svc-name">ترانزیت</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/transit.svg" alt=""><span class="svc-name">ترانزیت</span></div>
                     <div class="svc-desc">تأثیر سیارات در حال حرکت بر چارت تولد شما؛ زمان‌های مناسب برای اقدام را پیدا کنید.</div>
                     <div class="svc-badges"><span class="svc-badge">زمان‌بندی</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('solar-return')">
-                    <div class="svc-top"><span class="svc-emoji">☀️</span><span class="svc-name">بازگشت خورشیدی</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/solar-return.svg" alt=""><span class="svc-name">بازگشت خورشیدی</span></div>
                     <div class="svc-desc">نقشه‌ی سالانه‌ی خود را بگیرید و ببینید سال آینده در کدام حوزه‌ها می‌درخشید.</div>
                     <div class="svc-badges"><span class="svc-badge">سالانه</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('lunar-return')">
-                    <div class="svc-top"><span class="svc-emoji">🌙</span><span class="svc-name">بازگشت ماهانه</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/lunar-return.svg" alt=""><span class="svc-name">بازگشت ماهانه</span></div>
                     <div class="svc-desc">تمرکز عاطفی و موضوعات مهم ماه پیش رو را کشف کنید و بهتر برنامه‌ریزی کنید.</div>
                     <div class="svc-badges"><span class="svc-badge">ماهانه</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('mizaj')">
-                    <div class="svc-top"><span class="svc-emoji">🧬</span><span class="svc-name">مزاج‌شناسی</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/mizaj.svg" alt=""><span class="svc-name">مزاج‌شناسی</span></div>
                     <div class="svc-desc">طبع خود را بر اساس طب سنتی ایرانی شناسایی کنید؛ توصیه‌های غذایی و سبک زندگی متناسب بگیرید.</div>
                     <div class="svc-badges"><span class="svc-badge">طب سنتی</span><span class="svc-badge">آفلاین</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('abjad')">
-                    <div class="svc-top"><span class="svc-emoji">🔢</span><span class="svc-name">ابجد</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/abjad.svg" alt=""><span class="svc-name">ابجد</span></div>
                     <div class="svc-desc">ارزش عددی کلمات و نام‌ها را محاسبه کنید و سازگاری دو نام را بررسی کنید.</div>
                     <div class="svc-badges"><span class="svc-badge">آفلاین</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('tarot')">
-                    <div class="svc-top"><span class="svc-emoji">🃏</span><span class="svc-name">تاروت</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/tarot.svg" alt=""><span class="svc-name">تاروت</span></div>
                     <div class="svc-desc">کارت روزانه، کشیدن کارت و پخش سه‌کارته؛ پیام‌های راهنما برای تصمیم‌های زندگی.</div>
                     <div class="svc-badges"><span class="svc-badge">کارت روزانه</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('numerology')">
-                    <div class="svc-top"><span class="svc-emoji">🔢</span><span class="svc-name">عددشناسی</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/numerology.svg" alt=""><span class="svc-name">عددشناسی</span></div>
                     <div class="svc-desc">اعداد مسیر زندگی، سال شخصی، عدد بیان و درونی؛ نقشه‌ی عددی شخصیت شما.</div>
                     <div class="svc-badges"><span class="svc-badge">شخصیت</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('biorhythm')">
-                    <div class="svc-top"><span class="svc-emoji">🔬</span><span class="svc-name">بیوریتم</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/biorhythm.svg" alt=""><span class="svc-name">بیوریتم</span></div>
                     <div class="svc-desc">چرخه‌های ۲۳، ۲۸ و ۳۳ روزه‌ی فیزیکی، عاطفی و ذهنی را روزبه‌روز ببینید.</div>
                     <div class="svc-badges"><span class="svc-badge">سلامت</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('zodiac')">
-                    <div class="svc-top"><span class="svc-emoji">🐉</span><span class="svc-name">سال حیوانی</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/zodiac.svg" alt=""><span class="svc-name">سال حیوانی</span></div>
                     <div class="svc-desc">حیوان و عنصر سال تولدتان را پیدا کنید؛ شخصیت و سازگاری‌های چینی را بشناسید.</div>
                     <div class="svc-badges"><span class="svc-badge">چینی</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('daily-question')">
-                    <div class="svc-top"><span class="svc-emoji">❓</span><span class="svc-name">پرسش روزانه</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/daily-question.svg" alt=""><span class="svc-name">پرسش روزانه</span></div>
                     <div class="svc-desc">سوال بپرسید و پاسخ ترکیبی از بیوریتم، سال حیوانی و تاروت بگیرید.</div>
                     <div class="svc-badges"><span class="svc-badge">ترکیبی</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('hafez')">
-                    <div class="svc-top"><span class="svc-emoji">🍃</span><span class="svc-name">فال حافظ</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/hafez.svg" alt=""><span class="svc-name">فال حافظ</span></div>
                     <div class="svc-desc">غزل تصادفی دیوان حافظ با تفسیر؛ کاملاً آفلاین و بدون نیاز به اینترنت.</div>
                     <div class="svc-badges"><span class="svc-badge">آفلاین</span><span class="svc-badge">ادبی</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('nasa')">
-                    <div class="svc-top"><span class="svc-emoji">🌌</span><span class="svc-name">ناسا</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/nasa.svg" alt=""><span class="svc-name">ناسا</span></div>
                     <div class="svc-desc">تصویر نجومی روز، آب‌وهوای فضا، سیارک‌ها و اطلاعات مریخ را از آرشیو ناسا ببینید.</div>
                     <div class="svc-badges"><span class="svc-badge">برخط</span></div>
                     <span class="svc-open">باز کردن ←</span>
                 </div>
 
                 <div class="service-card" onclick="openService('moon-phase')">
-                    <div class="svc-top"><span class="svc-emoji">🌙</span><span class="svc-name">فاز ماه</span></div>
+                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/moon-phase.svg" alt=""><span class="svc-name">فاز ماه</span></div>
                     <div class="svc-desc">فاز کنونی ماه، درصد روشنایی، سن ماه و ۲۸ منزل قمری را برای هر تاریخ و مکان ببینید؛ همراه با برج قمر و رویدادهای پیش‌رو.</div>
                     <div class="svc-badges"><span class="svc-badge">قمری</span><span class="svc-badge">برخط</span></div>
                     <span class="svc-open">باز کردن ←</span>
@@ -2906,6 +3202,28 @@
                     <div class="dash-date" id="dashDate"></div>
                 </div>
                 <div id="dailyDashboard" class="daily-dashboard"></div>
+
+                <!-- ═══ آیین روزانه — بیوریتم + یوگا + آسمان زنده ═══ -->
+                <div class="ritual-wrap" id="dailyRitual">
+                    <div class="ritual-card">
+                        <div class="ritual-head">
+                            <div class="ritual-title">🌟 آیین امروز</div>
+                            <div class="ritual-sub">ترکیب بیوریتم، حرکت یوگا و آسمانِ زنده — هر روز یک آیین کامل</div>
+                        </div>
+                        <div class="ritual-steps" id="ritualSteps"></div>
+                        <button class="ritual-start" id="ritualStartBtn">🧘 شروع آیین</button>
+                    </div>
+                </div>
+
+                <!-- ═══ داشبورد کاربر — چارت‌ها، جلسات یوگا، روند بیوریتم ═══ -->
+                <div class="mydash-wrap" id="myDashboard">
+                    <div class="mydash-tabs">
+                        <button class="mydash-tab active" data-mtab="bio">📈 روند بیوریتم ۷ روزه</button>
+                        <button class="mydash-tab" data-mtab="yoga">🧘 جلسات یوگا</button>
+                        <button class="mydash-tab" data-mtab="charts">🔮 چارت‌های من</button>
+                    </div>
+                    <div class="mydash-body" id="myDashBody"></div>
+                </div>
             </div>
         </section>
 
@@ -2952,42 +3270,42 @@
                 <h2 class="section-heading">خدمات رصدخانه</h2>
                 <div class="landing-features-grid">
                     <div class="lf-card" data-anim="fadeUp" onclick="openService('birth')">
-                        <span class="lf-emoji">🔮</span>
+                        <img class="lf-emoji" src="static/images/services/birth.svg" alt="">
                         <h3>چارت تولد</h3>
                         <p>چارت کامل نجومی با تحلیل ودیک و جنبه‌های سیاره‌ای</p>
                     </div>
                     <div class="lf-card" data-anim="fadeUp" onclick="openService('synastry')">
-                        <span class="lf-emoji">💕</span>
+                        <img class="lf-emoji" src="static/images/services/synastry.svg" alt="">
                         <h3>سیناستری</h3>
                         <p>سازگاری دو چارت برای روابط عاطفی و کاری</p>
                     </div>
                     <div class="lf-card" data-anim="fadeUp" onclick="openService('tarot')">
-                        <span class="lf-emoji">🃏</span>
+                        <img class="lf-emoji" src="static/images/services/tarot.svg" alt="">
                         <h3>تاروت</h3>
                         <p>کشیدن کارت و دریافت پیام از کیهان</p>
                     </div>
                     <div class="lf-card" data-anim="fadeUp" onclick="openService('yoga')">
-                        <span class="lf-emoji">🧘</span>
+                        <img class="lf-emoji" src="static/images/services/yoga.svg" alt="">
                         <h3>یوگا</h3>
                         <p>کتابخانه جامع ۲۸۱ حرکت با تصویر و توضیح</p>
                     </div>
                     <div class="lf-card" data-anim="fadeUp" onclick="openService('breath')">
-                        <span class="lf-emoji">🌬️</span>
+                        <img class="lf-emoji" src="static/images/services/breath.svg" alt="">
                         <h3>تنفس و مدیتیشن</h3>
                         <p>تکنیک‌های تنفسی و مراقبه هدایت‌شده</p>
                     </div>
                     <div class="lf-card" data-anim="fadeUp" onclick="openService('mizaj')">
-                        <span class="lf-emoji">🧬</span>
+                        <img class="lf-emoji" src="static/images/services/mizaj.svg" alt="">
                         <h3>مزاج‌شناسی</h3>
                         <p>تشخیص طبع و توصیه‌های غذایی</p>
                     </div>
                     <div class="lf-card" data-anim="fadeUp" onclick="openService('nasa')">
-                        <span class="lf-emoji">🌌</span>
+                        <img class="lf-emoji" src="static/images/services/nasa.svg" alt="">
                         <h3>ناسا</h3>
                         <p>تصویر نجومی روز و اطلاعات فضا</p>
                     </div>
                     <div class="lf-card" data-anim="fadeUp" onclick="openService('hafez')">
-                        <span class="lf-emoji">🍃</span>
+                        <img class="lf-emoji" src="static/images/services/hafez.svg" alt="">
                         <h3>فال حافظ</h3>
                         <p>تفسیر غزل حافظ با هوش مصنوعی</p>
                     </div>
@@ -3140,11 +3458,11 @@
     </div>
 
     <!-- ===== اسکریپت‌های ضروری (کوچک) — موتورهای سنگین lazy هستند ===== -->
-    <script src="static/persian-provinces.js"></script>
+    <script src="static/persian-provinces.js?v=1"></script>
     <script src="static/date-wheel-picker.js?v=15"></script>
     <script src="static/city-selector.js?v=9"></script>
-    <script src="static/spa-router.js?v=7"></script>
-    <script src="static/script.js?v=13"></script>
+    <script src="static/spa-router.js?v=8"></script>
+    <script src="static/script.js?v=18"></script>
     <script src="static/yoga-data-loader.js?v=1"></script>
     <script src="static/yoga-core.js?v=2"></script>
     <script src="static/yoga-library.js?v=14"></script>
@@ -3155,12 +3473,14 @@
     <script src="static/breath-module.js?v=1"></script>
     <script src="static/quality-of-life.js?v=1"></script>
     <script src="static/moon-phase.js?v=4"></script>
-    <script src="static/zodiac-display.js?v=1"></script>
-    <script src="static/cosmic-status.js?v=2"></script>
+    <script src="static/zodiac-display.js?v=4"></script>
+    <script src="static/cosmic-status.js?v=3"></script>
     <script src="static/yoga-summary.js?v=1"></script>
     <script src="static/yoga-test.js?v=3"></script>
     <script src="static/daily-dashboard.js?v=2"></script>
-    <script src="static/audio-manager.js?v=1"></script>
+    <script src="static/audio-manager.js?v=3"></script>
+    <script src="static/my-dashboard.js?v=1"></script>
+    <script src="static/daily-reminder.js?v=1"></script>
 
     <script>
     /* ================================================================
@@ -3333,6 +3653,7 @@
             } else if (name === 'dashboard') {
                 if (dashboard) dashboard.hidden = false;
                 if (window.DailyDashboard) window.DailyDashboard.init();
+                if (window.MyDashboard) window.MyDashboard.init();
             } else if (name === 'admin') {
                 if (admin) admin.hidden = false;
                 if (window.AdminPanel) window.AdminPanel.init();
@@ -3683,7 +4004,8 @@
         window.addEventListener('load', function () {
             setTimeout(function () {
                 loadScript('static/liquid-orb.js?v=2');
-                loadScript('static/auth-panel.js?v=4');
+                loadScript('static/email-verification.js?v=2');
+                loadScript('static/auth-panel.js?v=10');
             }, 1500);
         });
 

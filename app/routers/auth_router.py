@@ -11,7 +11,7 @@ import secrets
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,6 +33,12 @@ from app.models import (
     UserResponse,
 )
 from app.schemas.user import UserOut
+from app.middleware.rate_limit_middleware import (
+    LOGIN_FAILURE_LIMIT,
+    clear_login_failures,
+    login_attempt_allowed,
+    record_login_failure,
+)
 from app.services import auth_service
 from app.services.auth_service import get_current_user
 
@@ -86,11 +92,21 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
-    """ورود کاربر"""
+async def login(data: UserLogin, request: Request, db: AsyncSession = Depends(get_db)):
+    """ورود کاربر — تلاش‌های ناموفق مکرر از یک IP موقتاً قفل می‌شود"""
+    from app.middleware.rate_limit_middleware import _get_guest_ip
+
+    ip = _get_guest_ip(request.scope)
+    if not login_attempt_allowed(ip):
+        raise HTTPException(
+            status_code=429,
+            detail=f"تلاش‌های ناموفق بیش از حد ({LOGIN_FAILURE_LIMIT}). چند دقیقه دیگر دوباره تلاش کنید.",
+        )
     user = await auth_service.authenticate_user(db, data.email, data.password)
     if not user:
+        record_login_failure(ip)
         raise HTTPException(status_code=401, detail="ایمیل یا رمز عبور اشتباه است")
+    clear_login_failures(ip)
     await db.commit()
 
     token = auth_service.create_access_token({"user_id": user.id, "email": user.email})
@@ -256,7 +272,13 @@ async def change_user_password(data: ChangePassword, user=Depends(get_current_us
 
 
 @router.post("/forgot-password")
-async def forgot_password(data: dict, db: AsyncSession = Depends(get_db)):
+async def forgot_password(data: dict, request: Request, db: AsyncSession = Depends(get_db)):
+    # جلوگیری از سوءاستفاده برای بمباران ایمیلی — همان قفل موقت ورود
+    from app.middleware.rate_limit_middleware import _get_guest_ip
+
+    ip = _get_guest_ip(request.scope)
+    if not login_attempt_allowed(ip):
+        raise HTTPException(status_code=429, detail="درخواست‌های بیش از حد. چند دقیقه دیگر تلاش کنید.")
     """درخواست بازیابی رمز عبور
 
     همیشه پیام موفقیت برمی‌گرداند (حتی اگر ایمیل وجود نداشته باشد)
@@ -321,7 +343,11 @@ def dev_email_inbox():
     """لیست ایمیل‌های اخیر صادرشده (فقط محیط توسعه/تست)."""
     import os as _os
 
-    if _os.getenv("ENV_TYPE") == "production":
+    # Fail closed: فقط محیط‌های dev/test صریح اجازه خواندن صندوق ایمیل dev را دارند.
+    # ENV_TYPE خالی هم مثل production بارگذاری می‌شود (app/config/settings.py)، پس
+    # نباید این‌جا بازش کنیم — وگرنه یک دیپلوی production که متغیرش را فراموش کرده
+    # توکن‌های تازه‌ی تأیید/بازیابی را لو می‌دهد.
+    if _os.getenv("ENV_TYPE") not in ("dev", "test"):
         raise HTTPException(status_code=404, detail="این مسیر فقط در محیط توسعه فعال است")
     from app.services.email_service import get_inbox
 
@@ -329,7 +355,13 @@ def dev_email_inbox():
 
 
 @router.post("/reset-password")
-async def reset_password(data: dict, db: AsyncSession = Depends(get_db)):
+async def reset_password(data: dict, request: Request, db: AsyncSession = Depends(get_db)):
+    # حدس زدن توکن بازیابی = همان رفتار brute-force ورود؛ با همان قفل موقت
+    from app.middleware.rate_limit_middleware import _get_guest_ip
+
+    ip = _get_guest_ip(request.scope)
+    if not login_attempt_allowed(ip):
+        raise HTTPException(status_code=429, detail="درخواست‌های بیش از حد. چند دقیقه دیگر تلاش کنید.")
     """تعیین رمز عبور جدید با توکن بازیابی (۲۴ ساعت معتبر)"""
     token = (data.get("token") or "").strip()
     new_password = data.get("new_password") or ""
@@ -338,7 +370,12 @@ async def reset_password(data: dict, db: AsyncSession = Depends(get_db)):
     if len(new_password) < 6:
         raise HTTPException(status_code=400, detail="رمز عبور باید حداقل ۶ کاراکتر باشد")
 
-    await auth_service.reset_password_with_token(db, token, new_password)
+    try:
+        await auth_service.reset_password_with_token(db, token, new_password)
+    except HTTPException:
+        record_login_failure(ip)  # توکن نامعتبر = تلاش برای حدس
+        raise
+    clear_login_failures(ip)
     await db.commit()
     return {"status": "ok", "message": "رمز عبور با موفقیت تغییر کرد. اکنون می‌توانید وارد شوید."}
 

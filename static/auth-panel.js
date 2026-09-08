@@ -165,6 +165,58 @@ window.getGuestUsageLabel = function() {
 
 // ─── به‌روزرسانی نمایش هدر ───
 
+// ================================================================
+//  UNVERIFIED-EMAIL BANNER — حلقه‌ی تأیید ایمیل را برای کاربر مرئی می‌کند
+//  نشان فقط وقتی نمایش داده می‌شود که کاربر وارد شده و email_verified او
+//  false باشد. منبع داده: کاربر ذخیره‌شده (که توسط /auth/me تازه می‌شود —
+//  هم در verifyEmailToken و هم بعد از هر ورود). دکمه‌ی آن لینک تأیید را
+//  دوباره می‌فرستد (resend-verification).
+// ================================================================
+
+function ensureVerifyBanner() {
+    var host = document.getElementById('pageHome') || document.body;
+    if (!host) return null;
+    var bar = document.getElementById('verifyEmailBanner');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'verifyEmailBanner';
+        bar.style.cssText = 'display:none;align-items:center;justify-content:center;gap:12px;'
+            + 'padding:10px 16px;border-radius:12px;margin:10px auto;max-width:900px;font-size:0.9rem;'
+            + 'background:rgba(243,156,18,0.12);border:1px solid rgba(243,156,18,0.35);color:#f5c66b;';
+        host.insertBefore(bar, host.firstChild);
+    }
+    return bar;
+}
+
+// Hook for other scripts (email-verification.js) to re-render the banner
+// after the user object changes outside the auth panel's own flows.
+window.updateVerifyBannerNow = updateVerifyBanner;
+
+function updateVerifyBanner() {
+    var bar = ensureVerifyBanner();
+    if (!bar) return;
+    var u = getUser();
+    if (isLoggedIn() && u.email && u.email_verified === false) {
+        bar.innerHTML = '⚠️ ایمیل شما هنوز تأیید نشده است'
+            + ' <a href="javascript:void(0)" onclick="resendVerificationFromBanner()"'
+            + ' style="color:#f39c12;font-weight:700;text-decoration:none;">ارسال دوباره‌ی لینک تأیید</a>';
+        bar.style.display = 'flex';
+    } else {
+        bar.style.display = 'none';
+    }
+}
+
+window.resendVerificationFromBanner = async function () {
+    var u = getUser();
+    if (!u.email) return;
+    try {
+        await apiCall('POST', '/resend-verification', { email: u.email });
+        if (window.showToast) showToast('📧 لینک تأیید ارسال شد — صندوق ایمیل را بررسی کنید', 'success');
+    } catch (e) {
+        if (window.showToast) showToast('⚠️ ' + (e.message || 'خطا در ارسال'), '');
+    }
+};
+
 function updateAuthUI() {
     var payBtn = document.getElementById('payBtn');
     if (!payBtn) return;
@@ -215,6 +267,9 @@ function updateAuthUI() {
             var planName = card.getAttribute('data-plan');
             if (planName === planKey) card.classList.add('tpp-plan-current');
         });
+
+        // Show/hide the unverified-email banner (needs the user object)
+        updateVerifyBanner();
         // Main action button
         if (tppMainAction) {
             if (planKey === 'free') {
@@ -270,6 +325,10 @@ function updateAuthUI() {
         // Show guest quota
         updateGuestUI();
     }
+
+    // The banner is driven by the logged-in branch; hide it for guests.
+    var banner = document.getElementById('verifyEmailBanner');
+    if (banner && !isLoggedIn()) banner.style.display = 'none';
 }
 
 // ================================================================
@@ -1119,19 +1178,24 @@ window.createUser = async function() {
 //  INIT — اجرای هنگام لود صفحه
 // ================================================================
 
-document.addEventListener('DOMContentLoaded', function() {
+// این اسکریپت با تأخیر (loadScript بعد از window.load) بارگذاری می‌شود؛
+// در آن لحظه DOMContentLoaded قبلاً رخ داده، پس listener هیچ‌وقت فایر نمی‌شود.
+// اگر document هنوز در حال لود است صبر کن، وگرنه بلافاصله اجرا کن.
+function _initAuthPanel() {
     updateAuthUI();
+    updateVerifyBanner();
     initGuestSession();
 
-    // Wire payBtn
-    var payBtn = document.getElementById('payBtn');
-    if (payBtn) {
-        payBtn.onclick = function() {
-            if (isLoggedIn()) openAuthModal('account');
-            else openAuthModal('login');
-        };
-    }
-});
+    // payBtn توسط TOPBAR DROPDOWN COORDINATOR (index.html) مدیریت می‌شود —
+    // بازنویسی onclick اینجا حذف شد چون toggle پنل پروفایل را خراب می‌کرد.
+    // ورود/ثبت‌نام از دکمه tppMainAction داخل پنل پروفایل در دسترس است.
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _initAuthPanel);
+} else {
+    _initAuthPanel();
+}
 
 // Expose functions for sidebar wiring (already done above via window.xxx = function)
 
