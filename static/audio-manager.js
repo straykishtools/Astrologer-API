@@ -608,12 +608,59 @@ var BG_DB_KEY = 'cosmic_admin_bg_images';
 function getAudioDb() {
     try { return JSON.parse(localStorage.getItem(AUDIO_DB_KEY) || '[]'); } catch (_) { return []; }
 }
-function saveAudioDb(arr) { localStorage.setItem(AUDIO_DB_KEY, JSON.stringify(arr)); }
+function saveAudioDb(arr) {
+    localStorage.setItem(AUDIO_DB_KEY, JSON.stringify(arr));
+    // منبع حقیقت = سرور؛ localStorage فقط آینه‌ی آفلاین است.
+    var token = localStorage.getItem('cosmic_token');
+    if (token) {
+        fetch('/api/v5/settings/audio', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ items: arr })
+        }).catch(function () {});
+    }
+}
 
 function getBgDb() {
     try { return JSON.parse(localStorage.getItem(BG_DB_KEY) || '[]'); } catch (_) { return []; }
 }
-function saveBgDb(arr) { localStorage.setItem(BG_DB_KEY, JSON.stringify(arr)); }
+function saveBgDb(arr) {
+    localStorage.setItem(BG_DB_KEY, JSON.stringify(arr));
+    var token = localStorage.getItem('cosmic_token');
+    if (token) {
+        fetch('/api/v5/settings/backgrounds', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ items: arr })
+        }).catch(function () {});
+    }
+}
+
+/* hydrate: داده‌ی سرور → localStorage → رندر مجدد */
+function hydrateSettingsFromServer(ns, localKey, rerender) {
+    fetch('/api/v5/settings/' + ns).then(function (r) { return r.ok ? r.json() : null; }).then(function (data) {
+        if (!data) return;
+        var items = data.items || [];
+        if (items.length) {
+            localStorage.setItem(localKey, JSON.stringify(items));
+            if (rerender) rerender();
+        } else {
+            try {
+                var local = JSON.parse(localStorage.getItem(localKey) || 'null');
+                if (local && local.length) {
+                    var token = localStorage.getItem('cosmic_token');
+                    if (token) {
+                        fetch('/api/v5/settings/' + ns, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                            body: JSON.stringify({ items: local })
+                        }).catch(function () {});
+                    }
+                }
+            } catch (_) {}
+        }
+    }).catch(function () {});
+}
 
 // Seed defaults
 function seedAudioDefaults() {
@@ -766,6 +813,35 @@ function adminDeleteBg(id) {
    (با سقف حجم، چون در localStorage ذخیره می‌شود). */
 var BG_DATA_URL_MAX = 500 * 1024; // سقف ۵۰۰KB برای data-URL در localStorage
 
+/* فایل تصویر → data-URL با کوچک‌سازی خودکار (حداکثر 1280px، JPEG q0.82) */
+function processImageFile(file, cb) {
+    if (file.size > BG_DATA_URL_MAX * 8) {
+        if (window.showToast) showToast('فایل خیلی بزرگ است ❌', 'error');
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+        var img = new Image();
+        img.onload = function () {
+            var MAX = 1280;
+            var scale = Math.min(1, MAX / Math.max(img.width, img.height));
+            // PNG کوچک دست‌نخورده بماند (شفافیت حفظ شود)
+            if (scale === 1 && file.type === 'image/png' && file.size <= BG_DATA_URL_MAX) {
+                cb(reader.result);
+                return;
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            cb(canvas.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = function () { if (window.showToast) showToast('فایل تصویر معتبر نیست ❌', 'error'); };
+        img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+}
+
 function adminEditBg(id) {
     seedAudioDefaults(); // اگر تب صدا هنوز رندر نشده، پیش‌فرض‌ها ساخته شوند
     var db = getBgDb();
@@ -784,7 +860,8 @@ function adminEditBg(id) {
         '<div class="admin-form-row"><label>آیکون (اموجی)</label><input type="text" class="admin-input" id="bgIcon" value="' + _esc(p.icon) + '" maxlength="4"></div>' +
         '<div class="admin-form-row"><label>تصویر (URL یا فایل)</label><input type="text" class="admin-input" id="bgImageUrl" dir="ltr" placeholder="https://... یا خالی = گرادیان" value="' + _esc(p.imageUrl || '') + '"><input type="file" id="bgImageFile" accept="image/*" style="margin-top:8px;color:var(--ink-dim);font-size:12px;"></div>' +
         '<div class="admin-form-row"><label>گرادیان (وقتی تصویری انتخاب نشده)</label><input type="text" class="admin-input" id="bgGradient" dir="ltr" value="' + _esc(p.gradient) + '"></div>' +
-        '<div style="text-align:center;margin-top:8px;"><div id="bgPreview" style="width:100%;height:90px;border-radius:8px;border:1px solid var(--line-strong);background:' + (p.imageUrl ? 'url(' + _esc(p.imageUrl) + ') center/cover' : p.gradient) + ';display:flex;align-items:center;justify-content:center;font-size:32px;">' + (p.imageUrl ? '' : _esc(p.icon)) + '</div></div>' +
+        '<div class="admin-form-row"><label>تخصیص به پلن‌ها (خالی = همه)</label><select id="bgPlans" multiple size="4" class="admin-input" style="width:100%;"></select></div>' +
+        '<div style="text-align:center;margin-top:8px;"><div id="bgPreview" style="width:100%;height:90px;border-radius:8px;border:1px dashed var(--line-strong);background:' + (p.imageUrl ? 'url(' + _esc(p.imageUrl) + ') center/cover' : p.gradient) + ';display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;">' + (p.imageUrl ? '' : _esc(p.icon)) + '</div><div style="font-size:10px;color:var(--ink-dim);margin-top:4px;">فایل را روی پیش‌نمایش بکشید و رها کنید یا از دکمه‌ی انتخاب فایل استفاده کنید</div></div>' +
         '</div>' +
         '<div class="admin-modal-footer">' +
         '<button class="admin-btn" id="bgModalCancel">انصراف</button>' +
@@ -794,6 +871,27 @@ function adminEditBg(id) {
 
     document.body.appendChild(overlay);
     setTimeout(function () { overlay.classList.add('visible'); }, 10);
+
+    /* فهرست پلن‌ها برای تخصیص (از سرور/آینه‌ی محلی) */
+    (function fillPlanSelect() {
+        var sel = document.getElementById('bgPlans');
+        if (!sel) return;
+        var assigned = p.assignedPlans || [];
+        var plans = null;
+        try { plans = JSON.parse(localStorage.getItem('cosmic_admin_plans') || 'null'); } catch (_) {}
+        if (!plans || !plans.length) {
+            fetch('/api/v5/settings/plans').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+                if (!d || !d.items || !d.items.length || !document.getElementById('bgPlans')) return;
+                document.getElementById('bgPlans').innerHTML = d.items.map(function (pl) {
+                    return '<option value="' + _esc(pl.name) + '"' + (assigned.indexOf(pl.name) >= 0 ? ' selected' : '') + '>' + _esc(pl.label) + '</option>';
+                }).join('');
+            }).catch(function () {});
+            return;
+        }
+        sel.innerHTML = plans.map(function (pl) {
+            return '<option value="' + _esc(pl.name) + '"' + (assigned.indexOf(pl.name) >= 0 ? ' selected' : '') + '>' + _esc(pl.label) + '</option>';
+        }).join('');
+    })();
 
     function refreshPreview(url, gradient, icon) {
         var prev = document.getElementById('bgPreview');
@@ -810,18 +908,30 @@ function adminEditBg(id) {
     document.getElementById('bgImageFile').addEventListener('change', function () {
         var f = this.files && this.files[0];
         if (!f) return;
-        if (f.size > BG_DATA_URL_MAX) {
-            if (window.showToast) showToast('حجم فایل بیش از حد مجاز است (' + Math.round(BG_DATA_URL_MAX / 1024) + 'KB) ❌', 'error');
-            this.value = '';
-            return;
-        }
-        var reader = new FileReader();
-        reader.onload = function () {
+        processImageFile(f, function (dataUrl) {
             urlInput.value = '';
-            urlInput.dataset.dataUrl = reader.result;
-            refreshPreview(reader.result, '', '');
-        };
-        reader.readAsDataURL(f);
+            urlInput.dataset.dataUrl = dataUrl;
+            refreshPreview(dataUrl, '', '');
+        });
+    });
+
+    /* درگ‌اند‌دراپ روی پیش‌نمایش */
+    var preview = document.getElementById('bgPreview');
+    ['dragenter', 'dragover'].forEach(function (ev) {
+        preview.addEventListener(ev, function (e) { e.preventDefault(); preview.style.borderColor = '#f39c12'; });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+        preview.addEventListener(ev, function (e) { e.preventDefault(); preview.style.borderColor = 'var(--line-strong)'; });
+    });
+    preview.addEventListener('drop', function (e) {
+        var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (!f || f.type.indexOf('image/') !== 0) return;
+        document.getElementById('bgImageFile').value = '';
+        processImageFile(f, function (dataUrl) {
+            urlInput.value = '';
+            urlInput.dataset.dataUrl = dataUrl;
+            refreshPreview(dataUrl, '', '');
+        });
     });
     document.getElementById('bgGradient').addEventListener('input', function () {
         if (!urlInput.value.trim() && !urlInput.dataset.dataUrl) refreshPreview('', this.value, document.getElementById('bgIcon').value);
@@ -835,6 +945,7 @@ function adminEditBg(id) {
     document.getElementById('bgModalSave').addEventListener('click', function () {
         var name = document.getElementById('bgName').value.trim();
         if (!name) { if (window.showToast) showToast('نام الزامی است ❌', 'error'); return; }
+        var assignedPlans = [...document.getElementById('bgPlans').selectedOptions].map(function (o) { return o.value; });
         var finalUrl = urlInput.dataset.dataUrl || urlInput.value.trim();
         var updated = {
             name: name,
@@ -842,6 +953,7 @@ function adminEditBg(id) {
             icon: document.getElementById('bgIcon').value.trim() || '🖼️',
             gradient: document.getElementById('bgGradient').value.trim() || p.gradient,
             imageUrl: finalUrl,
+            assignedPlans: assignedPlans,
             active: item ? item.active : true
         };
         if (isNew) {
@@ -858,6 +970,7 @@ function adminEditBg(id) {
         playSfx('success');
         closeModal();
         render();
+        applyAdminBackgrounds(db.slice()); // بازخورد فوری روی خود صفحه‌ی ادمین
     });
 }
 
@@ -1051,6 +1164,61 @@ function medFormatTime(sec) {
 }
 
 /* ═══════════════════════════════════════
+   APPLY BACKGROUNDS (per-plan, real page background)
+   تصاویری که ادمین به پلن‌ها تخصیص داده به‌عنوان پس‌زمینه‌ی واقعی صفحه اعمال
+   می‌شوند: اولویت با تصویرِ پلن کاربر؛ مهمان → تصاویر بدون تخصیص؛ بعد گرادیان.
+   ═══════════════════════════════════════ */
+
+function applyAdminBackgrounds(bgs) {
+    try {
+        bgs = bgs || getBgDb();
+        var user = {};
+        try { user = JSON.parse(localStorage.getItem('cosmic_user') || '{}'); } catch (_) {}
+        var plan = user.plan || null;
+        var pick = null;
+        var unassigned = [];
+        bgs.forEach(function (b) {
+            if (!b.active) return;
+            if (b.imageUrl) {
+                if (b.assignedPlans && b.assignedPlans.length) {
+                    if (plan && b.assignedPlans.indexOf(plan) >= 0 && !pick) pick = b;
+                } else {
+                    unassigned.push(b);
+                }
+            }
+        });
+        var chosen = pick || (unassigned.length ? unassigned[0] : null);
+        var el = document.getElementById('cosmicBgLayer');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'cosmicBgLayer';
+            el.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;'
+                + 'background-size:cover;background-position:center;transition:opacity .6s;';
+            document.body.appendChild(el);
+        }
+        if (chosen) {
+            el.style.backgroundImage = 'url("' + chosen.imageUrl + '")';
+            el.style.opacity = '0.35'; // ملایم — خوانایی محتوا حفظ شود
+        } else {
+            el.style.backgroundImage = 'none';
+        }
+    } catch (_) { /* هرگز نباید صفحه را بشکند */ }
+}
+
+function initAdminBackgrounds() {
+    // ۱) اعمال فوری از آینه‌ی محلی؛ ۲) تازه‌سازی از سرور و اعمال مجدد
+    applyAdminBackgrounds();
+    hydrateSettingsFromServer('backgrounds', BG_DB_KEY, function () { applyAdminBackgrounds(); });
+    // پس از ورود/خروج، پلن عوض می‌شود → انتخاب تصویر هم باید عوض شود
+    var lastPlan = null;
+    setInterval(function () {
+        var plan = null;
+        try { plan = (JSON.parse(localStorage.getItem('cosmic_user') || '{}').plan) || null; } catch (_) {}
+        if (plan !== lastPlan) { lastPlan = plan; applyAdminBackgrounds(); }
+    }, 2000);
+}
+
+/* ═══════════════════════════════════════
    PUBLIC API
    ═══════════════════════════════════════ */
 
@@ -1079,7 +1247,12 @@ window.AudioManager = {
     getCurrentTrack: function() { return prefs.currentTrack || TRACKS[0].id; },
     isPlaying: function() { return bgmPlaying && !bgmPaused; },
     // Init
-    init: function() { createPlayerWidget(); },
+    init: function() {
+        createPlayerWidget();
+        hydrateSettingsFromServer('audio', AUDIO_DB_KEY);
+        hydrateSettingsFromServer('backgrounds', BG_DB_KEY);
+        initAdminBackgrounds();
+    },
     // Meditation Timer
     medStart: medStart,
     medStop: medStop,
@@ -1095,6 +1268,7 @@ window.AudioManager = {
     adminAdd: adminAdd,
     adminDeleteBg: adminDeleteBg,
     adminEditBg: adminEditBg,
+    applyAdminBackgrounds: applyAdminBackgrounds,
     seedAudioDefaults: seedAudioDefaults
 };
 

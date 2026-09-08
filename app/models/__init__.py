@@ -140,6 +140,7 @@ class ChangePassword(BaseModel):
 from app.models.base import Base  # noqa: E402,F401
 from app.models.chart import ChartHistory, SavedChart  # noqa: E402,F401
 from app.models.plan import Plan  # noqa: E402,F401
+from app.models.setting import AppSetting  # noqa: E402,F401
 from app.models.tarot import TarotHistory  # noqa: E402,F401
 from app.models.user import GuestSession, LoginThrottle, User, UserProfile, UserSettings  # noqa: E402,F401
 from app.models.yoga import (  # noqa: E402,F401
@@ -166,4 +167,5 @@ __all__ = [
     "DailyStreak",
     "TarotHistory",
     "Plan",
+    "AppSetting",
 ]

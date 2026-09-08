@@ -21,7 +21,7 @@ from .routers import (
     mizaj, abjad_router, tarot_router,
     numerology_router, biorhythm_router, chinese_zodiac_router,
     daily_question_router, hafez_router, geo_router,
-    nasa_router, auth_router,
+    nasa_router, auth_router, settings_router,
     user as user_router, yoga as yoga_router
 )
 from .config.settings import settings
@@ -93,6 +93,7 @@ app.include_router(nasa_router.router, tags=["NASA"])
 app.include_router(auth_router.router, tags=["Auth"])
 app.include_router(user_router.router, tags=["User"])
 app.include_router(yoga_router.router, tags=["Yoga"])
+app.include_router(settings_router.router, tags=["Settings"])
 
 # ============================================
 # سرویس فایل‌های استاتیک (فرانت‌اند)

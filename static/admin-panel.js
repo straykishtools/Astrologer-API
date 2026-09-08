@@ -23,7 +23,40 @@
     } catch (_) {}
     return DEFAULT_PLANS.slice();
   }
-  function savePlans(arr) { localStorage.setItem(PLANS_KEY, JSON.stringify(arr)); }
+  function savePlans(arr) {
+    localStorage.setItem(PLANS_KEY, JSON.stringify(arr));
+    syncToServer('plans', arr); // منبع حقیقت = سرور؛ localStorage فقط آینه‌ی آفلاین
+  }
+
+  /* ─── همگام‌سازی با سرور (جدول app_settings در cosmic.db) ───
+     تا قبل از اولین ذخیره‌ی ادمین، سرور خالی است و از localStorage استفاده
+     می‌شود؛ بعد از آن پلن‌های سرور برای همه‌ی کاربران اعمال می‌شوند. */
+  function syncToServer(ns, items) {
+    var token = localStorage.getItem('cosmic_token');
+    if (!token) return;
+    fetch('/api/v5/settings/' + ns, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ items: items })
+    }).catch(function () { /* آفلاین — آینه‌ی محلی باقی می‌ماند */ });
+  }
+
+  function hydrateFromServer(ns, localKey, onLoaded) {
+    fetch('/api/v5/settings/' + ns).then(function (r) { return r.ok ? r.json() : null; }).then(function (data) {
+      if (!data) return;
+      var items = data.items || [];
+      if (items.length) {
+        localStorage.setItem(localKey, JSON.stringify(items));
+        if (onLoaded) onLoaded();
+      } else {
+        // سرور خالی ولی محلی پر است (اولین بار) — محلی را به سرور بفرست
+        try {
+          var local = JSON.parse(localStorage.getItem(localKey) || 'null');
+          if (local && local.length) syncToServer(ns, local);
+        } catch (_) {}
+      }
+    }).catch(function () {});
+  }
 
   /* ─── آیکون پلن برای منوی پروفایل (tpp-plans) ───
      نام شناسه → ایموجی؛ پلن‌های ناشناس از روی ترتیب رنگ می‌گیرند تا همیشه
@@ -437,7 +470,10 @@
 
   /* ─── Public API ─── */
   window.AdminPanel = {
-    init: function () { render(); },
+    init: function () {
+      render();
+      hydrateFromServer('plans', PLANS_KEY, function () { render(); });
+    },
     editUser: function (id) {
       var users = getUsers();
       var u = users.find(function (x) { return x.id === id; });
@@ -476,4 +512,8 @@
     getPlans: getPlans,
     renderTppPlans: renderTppPlans
   };
+
+  // هیدریت پلن‌های سرور برای «همه‌ی» کاربران (نه فقط ادمین) — منوی پروفایل
+  // باید پلن‌های تعریف‌شده‌ی ادمین را نشان دهد حتی قبل از باز شدن پنل ادمین.
+  hydrateFromServer('plans', PLANS_KEY, function () { renderTppPlans(); });
 })();
