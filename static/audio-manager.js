@@ -684,11 +684,17 @@ function renderAdminAudio() {
 
     // Background images
     html += '<h3 style="color:var(--gold-200);margin:24px 0 12px;">🖼️ تصاویر پس‌زمینه</h3>';
+    html += '<div style="margin-bottom:12px;"><button class="admin-btn admin-btn-primary" onclick="AudioManager.adminEditBg(null)">➕ افزودن تصویر جدید</button></div>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">';
     bgDb.forEach(function(bg) {
         html += '<div style="background:rgba(18,22,46,0.85);border:1px solid var(--line-strong);border-radius:12px;padding:12px;text-align:center;position:relative;">';
-        html += '<button class="admin-icon-btn" onclick="AudioManager.adminDeleteBg(' + bg.id + ')" title="حذف" style="position:absolute;top:6px;left:6px;">🗑️</button>';
-        html += '<div style="width:100%;height:80px;border-radius:8px;background:' + bg.gradient + ';margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:32px;">' + bg.icon + '</div>';
+        html += '<button class="admin-icon-btn" onclick="AudioManager.adminEditBg(' + bg.id + ')" title="ویرایش / جایگزینی تصویر" style="position:absolute;top:6px;left:6px;">✏️</button>';
+        html += '<button class="admin-icon-btn" onclick="AudioManager.adminDeleteBg(' + bg.id + ')" title="حذف" style="position:absolute;top:6px;right:6px;">🗑️</button>';
+        if (bg.imageUrl) {
+            html += '<img src="' + _esc(bg.imageUrl) + '" alt="' + _esc(bg.name) + '" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:8px;">';
+        } else {
+            html += '<div style="width:100%;height:80px;border-radius:8px;background:' + bg.gradient + ';margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:32px;">' + bg.icon + '</div>';
+        }
         html += '<div style="color:var(--gold-200);font-size:13px;font-weight:600;">' + _esc(bg.name) + '</div>';
         html += '<div style="color:var(--ink-dim);font-size:11px;">' + (bg.active ? '✅' : '❌') + ' ' + _esc(bg.category) + '</div>';
         html += '</div>';
@@ -752,6 +758,107 @@ function adminDeleteBg(id) {
     saveBgDb(db);
     playSfx('success');
     render();
+}
+
+/* ─── Admin: ویرایش/جایگزینی تصویر پس‌زمینه ───
+   به‌جای فقط حذف، ادمین می‌تواند نام/دسته/آیکون را عوض کند و خودِ تصویر را
+   با یک URL جدید یا فایل محلی جایگزین کند. فایل محلی به data-URL تبدیل می‌شود
+   (با سقف حجم، چون در localStorage ذخیره می‌شود). */
+var BG_DATA_URL_MAX = 500 * 1024; // سقف ۵۰۰KB برای data-URL در localStorage
+
+function adminEditBg(id) {
+    seedAudioDefaults(); // اگر تب صدا هنوز رندر نشده، پیش‌فرض‌ها ساخته شوند
+    var db = getBgDb();
+    var item = (id == null) ? null : db.find(function(b) { return b.id === id; });
+    var isNew = !item;
+    var p = item || { name: '', icon: '🖼️', category: 'custom', gradient: 'linear-gradient(135deg,#121636,#2a1a50)', imageUrl: '', active: true };
+
+    var overlay = document.createElement('div');
+    overlay.className = 'admin-modal-overlay';
+    overlay.innerHTML =
+        '<div class="admin-modal">' +
+        '<div class="admin-modal-header"><h3>' + (isNew ? '➕ تصویر پس‌زمینه جدید' : '✏️ ویرایش تصویر: ' + _esc(p.name)) + '</h3><button class="admin-modal-close" id="bgModalClose">✕</button></div>' +
+        '<div class="admin-modal-body">' +
+        '<div class="admin-form-row"><label>نام</label><input type="text" class="admin-input" id="bgName" value="' + _esc(p.name) + '"></div>' +
+        '<div class="admin-form-row"><label>دسته‌بندی</label><input type="text" class="admin-input" id="bgCategory" value="' + _esc(p.category) + '"></div>' +
+        '<div class="admin-form-row"><label>آیکون (اموجی)</label><input type="text" class="admin-input" id="bgIcon" value="' + _esc(p.icon) + '" maxlength="4"></div>' +
+        '<div class="admin-form-row"><label>تصویر (URL یا فایل)</label><input type="text" class="admin-input" id="bgImageUrl" dir="ltr" placeholder="https://... یا خالی = گرادیان" value="' + _esc(p.imageUrl || '') + '"><input type="file" id="bgImageFile" accept="image/*" style="margin-top:8px;color:var(--ink-dim);font-size:12px;"></div>' +
+        '<div class="admin-form-row"><label>گرادیان (وقتی تصویری انتخاب نشده)</label><input type="text" class="admin-input" id="bgGradient" dir="ltr" value="' + _esc(p.gradient) + '"></div>' +
+        '<div style="text-align:center;margin-top:8px;"><div id="bgPreview" style="width:100%;height:90px;border-radius:8px;border:1px solid var(--line-strong);background:' + (p.imageUrl ? 'url(' + _esc(p.imageUrl) + ') center/cover' : p.gradient) + ';display:flex;align-items:center;justify-content:center;font-size:32px;">' + (p.imageUrl ? '' : _esc(p.icon)) + '</div></div>' +
+        '</div>' +
+        '<div class="admin-modal-footer">' +
+        '<button class="admin-btn" id="bgModalCancel">انصراف</button>' +
+        '<button class="admin-btn admin-btn-primary" id="bgModalSave">💾 ذخیره</button>' +
+        '</div>' +
+        '</div>';
+
+    document.body.appendChild(overlay);
+    setTimeout(function () { overlay.classList.add('visible'); }, 10);
+
+    function refreshPreview(url, gradient, icon) {
+        var prev = document.getElementById('bgPreview');
+        if (!prev) return;
+        prev.style.background = url ? ('url(' + url + ') center/cover') : gradient;
+        prev.textContent = url ? '' : icon;
+    }
+
+    var urlInput = document.getElementById('bgImageUrl');
+    urlInput.addEventListener('input', function () {
+        if (this.value.trim()) document.getElementById('bgImageFile').value = '';
+        refreshPreview(this.value.trim(), document.getElementById('bgGradient').value, document.getElementById('bgIcon').value);
+    });
+    document.getElementById('bgImageFile').addEventListener('change', function () {
+        var f = this.files && this.files[0];
+        if (!f) return;
+        if (f.size > BG_DATA_URL_MAX) {
+            if (window.showToast) showToast('حجم فایل بیش از حد مجاز است (' + Math.round(BG_DATA_URL_MAX / 1024) + 'KB) ❌', 'error');
+            this.value = '';
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function () {
+            urlInput.value = '';
+            urlInput.dataset.dataUrl = reader.result;
+            refreshPreview(reader.result, '', '');
+        };
+        reader.readAsDataURL(f);
+    });
+    document.getElementById('bgGradient').addEventListener('input', function () {
+        if (!urlInput.value.trim() && !urlInput.dataset.dataUrl) refreshPreview('', this.value, document.getElementById('bgIcon').value);
+    });
+
+    function closeModal() { overlay.classList.remove('visible'); setTimeout(function () { overlay.remove(); }, 300); }
+    document.getElementById('bgModalClose').addEventListener('click', closeModal);
+    document.getElementById('bgModalCancel').addEventListener('click', closeModal);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+
+    document.getElementById('bgModalSave').addEventListener('click', function () {
+        var name = document.getElementById('bgName').value.trim();
+        if (!name) { if (window.showToast) showToast('نام الزامی است ❌', 'error'); return; }
+        var finalUrl = urlInput.dataset.dataUrl || urlInput.value.trim();
+        var updated = {
+            name: name,
+            category: document.getElementById('bgCategory').value.trim() || 'custom',
+            icon: document.getElementById('bgIcon').value.trim() || '🖼️',
+            gradient: document.getElementById('bgGradient').value.trim() || p.gradient,
+            imageUrl: finalUrl,
+            active: item ? item.active : true
+        };
+        if (isNew) {
+            var newId = db.length > 0 ? Math.max.apply(null, db.map(function (b) { return b.id; })) + 1 : 1;
+            updated.id = newId;
+            db.push(updated);
+        } else {
+            updated.id = item.id;
+            var idx = db.indexOf(item);
+            db[idx] = updated;
+        }
+        saveBgDb(db);
+        if (window.showToast) showToast(isNew ? 'تصویر اضافه شد ✅' : 'تصویر جایگزین شد ✅', 'success');
+        playSfx('success');
+        closeModal();
+        render();
+    });
 }
 
 function render() {
@@ -987,6 +1094,7 @@ window.AudioManager = {
     adminDelete: adminDelete,
     adminAdd: adminAdd,
     adminDeleteBg: adminDeleteBg,
+    adminEditBg: adminEditBg,
     seedAudioDefaults: seedAudioDefaults
 };
 

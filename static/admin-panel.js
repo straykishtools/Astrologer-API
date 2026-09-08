@@ -25,6 +25,44 @@
   }
   function savePlans(arr) { localStorage.setItem(PLANS_KEY, JSON.stringify(arr)); }
 
+  /* ─── آیکون پلن برای منوی پروفایل (tpp-plans) ───
+     نام شناسه → ایموجی؛ پلن‌های ناشناس از روی ترتیب رنگ می‌گیرند تا همیشه
+     با آنچه ادمین در تب اشتراک‌ها ساخته هم‌خوان باشد. */
+  function tppPlanIcon(planName) {
+    var map = { free: '🆓', basic: '🥉', gold: '⭐', pro: '✨', diamond: '💎', enterprise: '🏢' };
+    if (map[planName]) return map[planName];
+    var plans = getPlans();
+    var idx = plans.findIndex(function (p) { return p.name === planName; });
+    return idx >= 0 ? ['🅰️', '🅱️', '🅲', '🅳', '🅴', '🅵', '🅶', '🅷'][idx % 8] : '✨';
+  }
+
+  /* ─── بازسازی tpp-plans از پلن‌های ادمین ───
+     منوی پروفایل (پلن‌ها) باید دقیقاً همان پلن‌های تب «اشتراک‌ها» را نشان دهد —
+     نام، رنگ، قیمت و محدودیت؛ با نشانه‌گذاری پلن جاری کاربر. */
+  function renderTppPlans() {
+    var host = document.getElementById('tppPlans');
+    if (!host) return;
+    var plans = getPlans();
+    var user = {};
+    try { user = JSON.parse(localStorage.getItem('cosmic_user') || '{}'); } catch (_) {}
+    var currentPlan = user.plan || 'free';
+    var html = '';
+    plans.forEach(function (p) {
+      var isCurrent = p.name === currentPlan;
+      var featured = (p.name === 'gold' || p.name === 'pro') ? ' tpp-plan-featured' : '';
+      html += '<div class="tpp-plan-card' + featured + '" data-plan="' + _esc(p.name) + '" onclick="openPricingModal()"'
+        + (isCurrent ? ' style="outline:2px solid ' + _esc(p.color) + ';"' : '') + '>';
+      if (isCurrent) html += '<div class="tpp-plan-popular">پلن شما</div>';
+      html += '<div class="tpp-plan-icon">' + tppPlanIcon(p.name) + '</div>';
+      html += '<div class="tpp-plan-name">' + _esc(p.label) + '</div>';
+      html += '<div class="tpp-plan-price">' + _esc(p.price) + '</div>';
+      if (p.limit) html += '<div class="tpp-plan-limit">' + _esc(p.limit) + '</div>';
+      html += '<div class="tpp-plan-check"></div>';
+      html += '</div>';
+    });
+    host.innerHTML = html;
+  }
+
   function _esc(s) {
     var d = document.createElement('div');
     d.appendChild(document.createTextNode(s));
@@ -152,6 +190,7 @@
     container.innerHTML = html;
     bindEvents();
     filterUsers('');
+    renderTppPlans(); // پلن‌های منوی پروفایل = پلن‌های تب اشتراک‌ها
   }
 
   function statCard(icon, label, value) {
@@ -227,12 +266,12 @@
         if (!confirm('آیا از حذف این پلن مطمئن هستید؟')) return;
         var plans = getPlans();
         plans.splice(planIndex, 1);
-        savePlans(plans);
-        showToast('پلن حذف شد 🗑️');
-        closeModal();
-        render();
-      });
-    }
+      savePlans(plans);
+      showToast('پلن حذف شد 🗑️');
+      closeModal();
+      render();
+    });
+  }
 
     document.getElementById('planModalSave').addEventListener('click', function () {
       var label = document.getElementById('planLabel').value.trim();
@@ -434,6 +473,7 @@
       showToast('پلن‌ها بازنشانی شدند 🔄');
       render();
     },
-    getPlans: getPlans
+    getPlans: getPlans,
+    renderTppPlans: renderTppPlans
   };
 })();

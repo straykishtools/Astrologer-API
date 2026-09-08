@@ -207,6 +207,9 @@ function updateVerifyBanner() {
         }
     }
     updateVerifyDashCard(show, u);
+    // پلن‌های منوی پروفایل از پلن‌های ادمین (تب اشتراک‌ها) ساخته می‌شوند و
+    // پس از هر تغییر وضعیت ورود/پلن، هم‌گام می‌مانند.
+    if (window.AdminPanel && window.AdminPanel.renderTppPlans) window.AdminPanel.renderTppPlans();
 }
 
 // ─── کارت پایدار تأیید ایمیل داخل داشبورد ───
