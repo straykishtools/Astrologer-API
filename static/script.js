@@ -3720,8 +3720,78 @@ function getNasaForm() {
         {id: 'images', icon: '\u{1f5bc}\ufe0f', label: 'تصاویر'},
         {id: 'space-weather', icon: '\u2600\ufe0f', label: 'آب و هوای فضا'},
         {id: 'asteroids', icon: '\u2604\ufe0f', label: 'سیارک\u200cها'},
-        {id: 'mars', icon: '\u{1f534}'
-        {id: 'curiosity', icon: '\u{1f916}', label: 'Curiosity'},
+        {id: 'planets', icon: 'Y', label: 'Z'}
+    ];
+    tabs.forEach(function(t, i) {
+        var cls = i === 0 ? 'nasa-tab active' : 'nasa-tab';
+        html += '<button class="' + cls + '" data-nasa-tab="' + t.id + '">' + t.icon + ' ' + t.label + '</button>';
+    });
+    html += '</div><div id="nasaContent">';
+    html += '<div id="nasaApod">';
+    html += '<button class="btn-primary" onclick="fetchNasaApod()" style="width:100%;margin-bottom:16px;">\u{1f30c} دریافت تصویر نجومی روز</button>';
+    html += '<div id="nasaApodResult"></div></div>';
+    html += '<div id="nasaImages" style="display:none;">';
+    html += '<div class="form-group"><label>\u{1f50d} کلمه کلیدی</label><input type="text" id="nasaImageQuery" value="galaxy" placeholder="مثلاً: nebula, galaxy, mars"></div>';
+    html += '<button class="btn-primary" onclick="fetchNasaImages()" style="width:100%;margin-bottom:16px;">\u{1f50d} جستجو</button>';
+    html += '<div id="nasaImagesResult"></div></div>';
+    var _nasaToday = new Date().toISOString().split('T')[0];
+    var _nasa7Ago = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];
+    function _gregToShamsi(iso) {
+        try {
+            var d = new Date(iso + 'T00:00:00');
+            if (window.DateWheelPicker && DateWheelPicker.miladiToShamsi) {
+                var j = DateWheelPicker.miladiToShamsi(d.getFullYear(), d.getMonth() + 1, d.getDate());
+                if (j && j.year > 1200) return { year: j.year, month: j.month, day: j.day };
+            }
+            var fmt = new Intl.DateTimeFormat('en-u-ca-persian', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            var parts = {};
+            fmt.formatToParts(d).forEach(function (p) { parts[p.type] = p.value; });
+            return { year: parseInt(parts.year), month: parseInt(parts.month), day: parseInt(parts.day) };
+        } catch (e) {
+            try {
+                if (window.DateWheelPicker && DateWheelPicker.miladiToShamsi) {
+                    var now = new Date();
+                    var j2 = DateWheelPicker.miladiToShamsi(now.getFullYear(), now.getMonth() + 1, now.getDate());
+                    return { year: j2.year, month: j2.month, day: j2.day };
+                }
+            } catch (e2) {}
+            return { year: 1404, month: 6, day: 17 };
+        }
+    }
+    html += '<div id="nasaSpaceWeather" style="display:none;">';
+    html += '<div class="form-grid">';
+    html += '<div class="form-group"><label>\u{1f4c5} از تاریخ (شمسی)</label><div id="nasaWeatherRangePC"></div></div>';
+    html += '</div>';
+    html += '<button class="btn-primary" onclick="fetchNasaSpaceWeather()" style="width:100%;margin-bottom:16px;">☀️ دریافت آب و هوای فضا</button>';
+    html += '<div id="nasaWeatherResult"></div></div>';
+    html += '<div id="nasaAsteroids" style="display:none;">';
+    html += '<div class="form-grid">';
+    html += '<div class="form-group"><label>\u{1f4c5} بازه‌ی تاریخ (شمسی)</label><div id="nasaNeoRangePC"></div></div>';
+    html += '</div>';
+    html += '<button class="btn-primary" onclick="fetchNasaAsteroids()" style="width:100%;margin-bottom:16px;">☄️ دریافت سیارک‌ها</button>';
+    html += '<div id="nasaNeoResult"></div></div>';
+    var _nasaToday2 = new Date().toISOString().split('T')[0];
+    html += '<div id="nasaPlanets" style="display:none;">';
+    html += '<div class="form-group"><label>\u{1f4c5} تاریخ (شمسی)</label><div id="nasaPlanetsSinglePC"></div></div>';
+    html += '<button class="btn-primary" onclick="fetchNasaPlanets()" style="width:100%;margin-bottom:16px;">🌏 دریافت موقعیت سیارات</button>';
+    html += '<div id="nasaPlanetsResult"></div></div>';
+    html += '</div></div>';
+    setTimeout(function() {
+        document.querySelectorAll('.nasa-tab[data-nasa-tab]').forEach(function(btn) {
+            btn.addEventListener('click', function() { switchNasaTab(this.dataset.nasaTab); });
+        });
+        /* تقویم‌های preset‌دار */
+        if (window.PresetCalendar) {
+            PresetCalendar.mount({ mountId: 'nasaWeatherRangePC', mode: 'range', startHiddenId: 'nasaWeatherStartDP_hidden', endHiddenId: 'nasaWeatherEndDP_hidden', defaultFrom: '-7d', defaultTo: '0d' });
+            PresetCalendar.mount({ mountId: 'nasaNeoRangePC', mode: 'range', startHiddenId: 'nasaNeoStartDP_hidden', endHiddenId: 'nasaNeoEndDP_hidden', defaultFrom: '-7d', defaultTo: '0d' });
+            PresetCalendar.mount({ mountId: 'nasaPlanetsSinglePC', mode: 'single', hiddenId: 'nasaPlanetsDateDP_hidden', defaultDuration: '0d' });
+        }
+    }, 0);
+    return html;
+}
+function _deadNasaFragment() { /*
+   deadcode: removed
+        {id: 'mars___REMOVEDB___', icon: 'X', label: 'Curiosity'},
         {id: 'planets', icon: '\ud83c\udf0f', label: 'موقعیت سیارات'}
     ];
     tabs.forEach(function(t, i) {
@@ -3810,19 +3880,33 @@ function getNasaForm() {
     return html;
 }
 
-function switchNasaTab(tab) {
-    // هر ۷ پنل — شامل nasaPlanets (باگِ چسبیدنِ نتیجه اینجا بود!)
-    var panels = ['nasaApod','nasaImages','nasaSpaceWeather','nasaAsteroids','nasaMars','nasaPlanets','nasaCuriosity'];
+function _oldGetaNasaForm_REMOVED() {
+    var html = '';
+    var tabs = [
+        {id: 'apod', icon: 'A', label: 'x'}
+    ];
+    tabs.forEach(function(t, i) {
+        var cls = i === 0 ? 'nasa-tab active' : 'nasa-tab';
+        html += '<button class="' + cls + '" data-nasa-tab="' + t.id + '">' + t.icon + ' ' + t.label + '</button>';
+    });
+    html += '<div id="x"></div>';
+    setTimeout(function() {}, 0);
+    return html;
+}
+
+function _unused_switchNasaTab_OLD(tab) {
+    // هر ۵ پنل — پس از حذفِ تب‌های مریخ و Curiosity
+    var panels = ['nasaApod','nasaImages','nasaSpaceWeather','nasaAsteroids','nasaPlanets'];
     panels.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
     document.querySelectorAll('.nasa-tab').forEach(function(b) { b.classList.remove('active'); });
-    var tabMap = {'apod':'nasaApod','images':'nasaImages','space-weather':'nasaSpaceWeather','asteroids':'nasaAsteroids','mars':'nasaMars','planets':'nasaPlanets','curiosity':'nasaCuriosity'};
+    var tabMap = {'apod':'nasaApod','images':'nasaImages','space-weather':'nasaSpaceWeather','asteroids':'nasaAsteroids','planets':'nasaPlanets'};
     var target = document.getElementById(tabMap[tab]);
     if (target) target.style.display = 'block';
     var btn = document.querySelector('.nasa-tab[data-nasa-tab="' + tab + '"]');
     if (btn) btn.classList.add('active');
     // ─── پاک‌سازی نتایجِ تب‌هایِ دیگر: هیچ نتیجه‌ای از تب قبلی نچسبد ───
     var resultIds = { apod:'nasaApodResult', images:'nasaImagesResult', 'space-weather':'nasaWeatherResult',
-                      asteroids:'nasaNeoResult', mars:'nasaMarsResult', planets:'nasaPlanetsResult', curiosity:'nasaCuriosityResult' };
+                      asteroids:'nasaNeoResult', planets:'nasaPlanetsResult' };
     Object.keys(resultIds).forEach(function (k) {
         if (k !== tab) { var el = document.getElementById(resultIds[k]); if (el) el.innerHTML = ''; }
     });

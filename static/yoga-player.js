@@ -670,7 +670,7 @@ var PracticeUI = {
         var self = this;
         self._detail = false;
         D.whenReady(function () {
-            if ((self.active && self.active._running) || self._pendingLaunch) return;
+            if (window.YogaClassicModal && YogaClassicModal._el) return;  /* استودیو کلاسیک باز است — پنل را خراب نکن */
             self._loadApi().then(function () { self.renderSelector(el); })
                 .catch(function () { self.renderSelector(el); });
         });
@@ -785,10 +785,8 @@ var PracticeUI = {
                     '<div class="yp-set"><span class="yp-set-label">پس‌زمینه</span>' +
                         '<select class="yp-bg-select" data-yp-background>' + bgOpts + '</select>' +
                     '</div>' +
-                    '<button class="yp-start-btn" data-yp-go' + (this.selected ? '' : ' disabled') + '>▶ شروع تمرین</button>' +
                 '</div>' +
-            '</div>' +
-            '<div class="yp-player" id="ypPlayerHost"></div>';
+            '</div>';
         this.bindEvents(el);
     },
 
@@ -797,7 +795,7 @@ var PracticeUI = {
         el.innerHTML = detailPageHTML(p, {
             level: this.level, duration: this.duration,
             background: this.background, backgroundOverridden: this.backgroundOverridden,
-        }) + '<div class="yp-player" id="ypPlayerHost"></div>';
+        });
         this.bindEvents(el);
     },
 
@@ -835,6 +833,7 @@ var PracticeUI = {
                 if (!sp) return;
                 if (sp.locked) { self._promptUpgrade(sp); return; }
                 self.selected = sp;
+                self._detail = false;
                 self.launch(el);
                 return;
             }
@@ -862,18 +861,6 @@ var PracticeUI = {
             if (go) {
                 if (self.selected && self.selected.locked) { self._promptUpgrade(self.selected); return; }
                 self.launch(el);
-                return;
-            }
-            var ctrl = t.closest('[data-yp]');
-            if (ctrl && self.active) {
-                var cmd = ctrl.getAttribute('data-yp');
-                if (cmd === 'pause') self.active.pause();
-                else if (cmd === 'resume') self.active.resume();
-                else if (cmd === 'skip') self.active.next();
-                else if (cmd === 'prev') self.active.prev();
-                else if (cmd === 'end') { self.active.stop(false); self.active = null; }
-                else if (cmd === 'repeat') { var nm = self.active && self.active.practice && (self.active.practice.file || self.active.practice.name); self.active = null; self.selected = nm ? self.selected : self.selected; self.launch(el, self.selected); }
-                else if (cmd === 'back-list') { self.active = null; self.renderSelector(el); }
                 return;
             }
             var back2 = t.closest('[data-yp-back-list]');
@@ -913,12 +900,16 @@ var PracticeUI = {
         });
     },
 
-    /** پیش‌نمایش سریع تمرین — همان پلیر واقعی با گام‌های فشرده، بدون ذخیره در سوابق */
+    /** پیش‌نمایش سریع تمرین — همان پلیر واقعی با گام‌های فشرده، بدون ذخیره در سوابق.
+        اگر p خودش body.steps داشت (جریان دست‌ساز playFlow) بدون fetch استفاده می‌شود. */
     previewPractice: function (p) {
         var self = this;
         if (!p) return;
         var bg = self.backgroundOverridden ? self.background : bgForPractice(p);
-        D.getPractice(p.name).then(function (data) {
+        var ready = (p.body && p.body.steps && p.body.steps.length)
+            ? Promise.resolve(p)
+            : D.getPractice(p.name);
+        ready.then(function (data) {
             var steps = self.previewSteps((data.body && data.body.steps) || []);
             if (!steps.length) { try { window.showToast && showToast('⚠ گام‌های تمرین خالی است', 'error'); } catch (e) {} return; }
             var practice = {
@@ -991,77 +982,17 @@ var PracticeUI = {
         });
     },
 
-    _showDone: function (el, completed, elapsed, done, total) {
-        var host = document.getElementById('ypPlayerHost');
-        if (!host) return;
-        var card = '<div class="yp-done-modal"><div class="yp-done-card">' +
-            '<div class="yp-done-icon">' + (completed ? '🎉' : '⏹') + '</div>' +
-            '<h3>' + (completed ? 'آفرین! تمرین کامل شد' : 'تمرین متوقف شد') + '</h3>' +
-            '<div class="yp-done-stats">' +
-                '<div class="yp-stat"><b>' + faNum(Math.floor(elapsed / 60)) + '</b><span>دقیقه تمرین</span></div>' +
-                '<div class="yp-stat"><b>' + faNum(done) + ' از ' + faNum(total || 0) + '</b><span>حرکت</span></div>' +
-            '</div>' +
-            (completed && authToken() ? '<p class="yp-note">✅ جلسه در سوابق شما ذخیره شد</p>' : '') +
-            (!authToken() ? '<p class="yp-note yp-login-hint">💡 برای ذخیره جلسات و استریک، <a href="#" onclick="window.__ypAuthReturn && window.__ypAuthReturn(); return false;">وارد شوید</a></p>' : '') +
-            '<div class="yp-done-actions">' +
-                '<button class="yp-btn primary" data-yp-back-list>📚 بازگشت به تمرین‌ها</button>' +
-                '<button class="yp-btn" data-yp-back-list2>بستن</button>' +
-            '</div>' +
-        '</div></div>';
-        host.innerHTML = card;
-        var self = this;
-        setTimeout(function () { el.querySelector('#ypPlayerHost') && (el.querySelector('#ypPlayerHost').innerHTML = card); }, 0);
-    },
-
+    /** شروع تمرین — از طریق استودیو کلاسیک (Pocket Yoga) در مودال تمام‌صفحه.
+        پلیر داخلی فقط برای پیش‌نمایش استفاده می‌شود. */
     launch: function (el, forcePractice) {
         var self = this;
         var practice = forcePractice || this.selected;
         if (!practice) return;
-        var name = practice.name;
-        var host = document.getElementById('ypPlayerHost');
-        if (!host) return;
-        host.innerHTML = '<p class="yp-note">در حال بارگذاری تمرین…</p>';
-
-        var instr = practice.instructor_name || '';
-        D.getPractice(name).then(function (data) {
-            // رندر تب می‌تواند host را عوض کند — دوباره بگیر (گره قدیمی جدا شده ممکن است)
-            var liveHost = document.getElementById('ypPlayerHost');
-            if (!liveHost) { self.active = null; return; }
-            if (liveHost !== host) {
-                host = liveHost;
-                host.innerHTML = '<p class="yp-note">در حال بارگذاری تمرین…</p>';
-            }
-            var player = new YogaSessionPlayer(data, {
-                level: self.level,
-                duration: self.duration,
-                background: (self.backgroundOverridden ? self.background : bgForPractice(practice)),
-                instructorName: instr,
-                title: practice.displayName || '',
-                container: host,
-                onComplete: function (completed, elapsed, done, total) {
-                    self.active = null;
-                    var card = '<div class="yp-done-modal"><div class="yp-done-card">' +
-                        '<div class="yp-done-icon">' + (completed ? '🎉' : '⏹') + '</div>' +
-                        '<h3>' + (completed ? 'آفرین! تمرین کامل شد' : 'تمرین متوقف شد') + '</h3>' +
-                        '<div class="yp-done-stats">' +
-                            '<div class="yp-stat"><b>' + faNum(Math.floor(elapsed / 60)) + '</b><span>دقیقه تمرین</span></div>' +
-                            '<div class="yp-stat"><b>' + faNum(done) + ' از ' + faNum(total) + '</b><span>حرکت</span></div>' +
-                            '<div class="yp-stat"><b>' + faNum(total ? Math.min(100, Math.round(elapsed / (self.targetSeconds() || 1) * 100)) : 0) + '٪</b><span>تکمیل</span></div>' +
-                        '</div>' +
-                        (completed && authToken() ? '<p class="yp-note">✅ جلسه در سوابق شما ذخیره شد</p>' : '') +
-            (!authToken() ? '<p class="yp-note yp-login-hint">💡 برای ذخیره جلسات و استریک، <a href="#" onclick="window.__ypAuthReturn && window.__ypAuthReturn(); return false;">وارد شوید</a></p>' : '') +
-                        '<div class="yp-done-actions">' +
-                            '<button class="yp-btn primary" data-yp-back-list>📚 بازگشت به تمرین‌ها</button>' +
-                        '</div>' +
-                    '</div></div>';
-                    host.innerHTML = card;
-                }
-            });
-            self.active = player;
-            player.start();
-        }).catch(function (err) {
-            host.innerHTML = '<p class="yp-note">⚠ بارگذاری تمرین ناموفق بود: ' + esc(err.message || err) + '</p>';
-        });
+        var q = ['practice=' + encodeURIComponent(practice.name),
+                 'dur=' + (this.duration || 30),
+                 'lvl=' + encodeURIComponent(this.level || 'beginner')];
+        this.active = null;
+        YogaClassicModal.open('?' + q.join('&'));
     },
 
     /** پیش‌نمایش تمرین پیشنهادی روزانه — از نام تمرین، از داخل تب روزانه */
@@ -1072,7 +1003,7 @@ var PracticeUI = {
         self.previewPractice(p);
     },
 
-    /** شروع تمرین پیشنهادی روزانه — از نام تمرین، از داخل تب روزانه */
+    /** شروع تمرین پیشنهادی روزانه — از نام تمرین، از داخل تب روزانه (استودیو کلاسیک) */
     playByName: function (name) {
         var self = this;
         var p = (self.apiPractices || D.practices || []).filter(function (x) { return x.name === name; })[0];
@@ -1083,23 +1014,16 @@ var PracticeUI = {
         if (window.YogaLibrary && typeof window.YogaLibrary.switchTab === 'function') {
             window.YogaLibrary.switchTab('practice');
         }
-        var el = document.getElementById(self.panelId);
-        if (!el) return;
-        // مطمئن شو host پلیر وجود دارد (تب تمرین init می‌شود)
-        if (!document.getElementById('ypPlayerHost')) self.renderSelector(el);
-        self.launch(el, p);
+        self.launch(document.getElementById(self.panelId), p);
     },
 
     targetSeconds: function () { return Math.max(1, (this.duration || 30) * 60); },
 
-    /** اجرای جریان حرکات (فلو روزانه/کتابخانه) در پلیر واحد */
+    /** اجرای جریان حرکات (فلو روزانه/کتابخانه) — جریان دلخواهِ از حرکات ساخته‌شده
+        است نه تمرین آماده، پس در پنجره پیش‌نمایش پلیر سبک اجرا می‌شود (بدون ثبت سابقه). */
     playFlow: function (names, rootName) {
         var self = this;
         if (!names || !names.length) return;
-        var el = document.getElementById(this.panelId);
-        if (!el) return;
-        // اگر پنل هنوز رندر نشده، اول انتخاب‌گر را بساز تا #ypPlayerHost وجود داشته باشد
-        if (!document.getElementById('ypPlayerHost')) this.renderSelector(el);
         var steps = [];
         names.forEach(function (n) {
             steps.push({ type: 'move', name: n, duration: 4 });
@@ -1110,6 +1034,7 @@ var PracticeUI = {
         var practice = {
             name: rootName || 'جریان تمرین',
             file: 'flow_' + (rootName || 'custom'),
+            preferred_background: this.background || 'Home',
             head: {
                 name: rootName ? (poseNameFa(rootName) || rootName) : 'جریان تمرین',
                 description: 'جریانی از حرکات پیشنهادی',
@@ -1120,22 +1045,7 @@ var PracticeUI = {
             },
             body: { preferredBackgroundName: this.background || 'Home', steps: steps, generated: true },
         };
-        var host = document.getElementById('ypPlayerHost');
-        if (host) host.innerHTML = '<p class="yp-note">در حال بارگذاری تمرین…</p>';
-        var player = new YogaSessionPlayer(practice, {
-            level: this.level, duration: this.duration || 30, background: this.background,
-            container: host, instructorName: '',
-            title: rootName || '',
-            onComplete: function (completed, elapsed, done, total) {
-                self.active = null;
-                if (host) host.innerHTML = '<div class="yp-done">' +
-                    (completed ? '🎉 تمرین با موفقیت به پایان رسید' : '⏹ تمرین متوقف شد') +
-                    ' <span class="yp-note">(' + fmtSec(elapsed) + ')</span></div>';
-                setTimeout(function () { self.init(); }, 2500);
-            }
-        });
-        this.active = player;
-        player.start();
+        self.previewPractice(practice);
     }
 };
 
@@ -1415,45 +1325,16 @@ var CoachUI = {
     },
 
     runPractice: function (name) {
-        var self = this;
         var item = (this.apiPractices || D.practices || []).filter(function (x) { return x.name === name; })[0] || {};
-        // جلوگیری از رندر مجدد انتخاب‌گر توسط init هنگام سوییچ تب (که host را از بین می‌برد)
-        if (window.YogaPracticeUI) YogaPracticeUI._pendingLaunch = true;
-        var tabBtn = document.querySelector('.yoga-tab[data-tab="practice"]');
-        if (tabBtn && window.YogaLibrary && YogaLibrary.switchTab) YogaLibrary.switchTab('practice');
-        D.getPractice(name).then(function (practice) {
-            // بعد از سوییچ تب، host را دوباره بگیر — اگر تب تمرین هرگز رندر نشده، اول پنل را بساز
-            var host = document.getElementById('ypPlayerHost');
-            if (!host) {
-                var panel = document.getElementById('yogaPlayerPanel');
-                if (panel && PracticeUI && PracticeUI.renderSelector) {
-                    try { PracticeUI.renderSelector(panel); } catch (e) {}
-                    host = document.getElementById('ypPlayerHost');
-                }
-            }
-            if (!host) { if (window.YogaPracticeUI) YogaPracticeUI._pendingLaunch = false; return; }
-            host.innerHTML = '<p class="yp-note">در حال بارگذاری تمرین…</p>';
-            var player = new YogaSessionPlayer(practice, {
-                level: self._level || 'beginner',
-                duration: self._duration || (practice.head.durations && practice.head.durations[0]) || 30,
-                background: self._bgOverridden ? self._bg : bgForPractice({ name: name, preferred_background: practice.body && practice.body.preferredBackgroundName }),
-                title: item.displayName || (practice.head && practice.head.name) || name,
-                container: host,
-                onComplete: function (completed, elapsed, done, total) {
-                    PracticeUI.active = null;
-                    host.innerHTML = '<div class="yp-done">' +
-                        (completed ? '🎉 تمرین با موفقیت به پایان رسید' : '⏹ تمرین متوقف شد') +
-                        (elapsed > 0 ? ' <span class="yp-note">(' + fmtSec(elapsed) + ')</span>' : '') +
-                        '</div>';
-                }
-            });
-            PracticeUI.active = player;
-            player.start();
-            PracticeUI._pendingLaunch = false;
-        }).catch(function (err) {
-            PracticeUI._pendingLaunch = false;
-            alert('بارگذاری تمرین ناموفق بود: ' + (err.message || err));
-        });
+        if (item.locked) {
+            if (window.YogaPracticeUI) YogaPracticeUI._promptUpgrade(item);
+            return;
+        }
+        /* شروع از استودیو کلاسیک — پلیر داخلی فقط برای پیش‌نمایش */
+        var q = ['practice=' + encodeURIComponent(name),
+                 'dur=' + (this._duration || 30),
+                 'lvl=' + encodeURIComponent(this._level || 'beginner')];
+        YogaClassicModal.open('?' + q.join('&'));
     }
 };
 
