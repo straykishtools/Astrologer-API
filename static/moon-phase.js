@@ -97,13 +97,17 @@ function _signFromLongitude(lam) {
 }
 
 function getMoonPhaseForm() {
-    // تاریخِ شمسیِ امروز — با تقویمِ دقیقِ جلالی (DateWheelPicker)
+    // تاریخِ شمسیِ امروز — با تقویمِ دقیقِ جلالی (PresetCalendar)
     var todayShamsi = { year: 1404, month: 6, day: 17 };
     try {
-        if (window.DateWheelPicker && DateWheelPicker.miladiToShamsi) {
+        if (window.PresetCalendar && PresetCalendar.toJalali) {
+            var n = new Date();
+            var j = PresetCalendar.toJalali(n.getFullYear(), n.getMonth() + 1, n.getDate());
+            if (j && j.jy > 1200) todayShamsi = { year: j.jy, month: j.jm, day: j.jd };
+        } else if (window.DateWheelPicker && DateWheelPicker.miladiToShamsi) {
             var now = new Date();
-            var j = DateWheelPicker.miladiToShamsi(now.getFullYear(), now.getMonth() + 1, now.getDate());
-            if (j && j.year > 1200) todayShamsi = { year: j.year, month: j.month, day: j.day };
+            var j2 = DateWheelPicker.miladiToShamsi(now.getFullYear(), now.getMonth() + 1, now.getDate());
+            if (j2 && j2.year > 1200) todayShamsi = { year: j2.year, month: j2.month, day: j2.day };
         } else {
             var fmt = new Intl.DateTimeFormat('en-u-ca-persian', { year: 'numeric', month: 'numeric', day: 'numeric' });
             var parts = {};
@@ -117,7 +121,8 @@ function getMoonPhaseForm() {
     html += '<div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.05);">';
     html += '<div class="form-group" style="margin-bottom:12px;">';
     html += '<label style="color:#b0c4e0;font-size:13px;display:block;margin-bottom:6px;">📅 تاریخ (شمسی)</label>';
-    html += makeDatePickerTrigger('moonPhaseDP', { label: 'تاریخ', calendarType: 'shamsi', digits: 'fa', defaultValue: todayShamsi });
+    html += '<div id="moonPhasePC"></div>';
+    html += '<input type="hidden" id="moonPhaseDP_hidden" value="' + todayShamsi.year + '-' + String(todayShamsi.month).padStart(2,'0') + '-' + String(todayShamsi.day).padStart(2,'0') + '">';
     html += '</div>';
     html += '<div class="form-group" style="margin-bottom:12px;">';
     html += '<label style="color:#b0c4e0;font-size:13px;display:block;margin-bottom:6px;">📍 مکان (اختیاری)</label>';
@@ -129,6 +134,12 @@ function getMoonPhaseForm() {
     html += '</div>';
     html += '<div id="moonPhaseResult"></div>';
     html += '</div>';
+    /* mount تقویمِ preset‌دار بعد از رندرِ DOM */
+    setTimeout(function () {
+        if (window.PresetCalendar) {
+            PresetCalendar.mount({ mountId: 'moonPhasePC', mode: 'single', hiddenId: 'moonPhaseDP_hidden', defaultDuration: '0d' });
+        }
+    }, 0);
     return html;
 }
 

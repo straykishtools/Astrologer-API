@@ -872,6 +872,24 @@
 .yp-preview-host { padding: 16px; overflow-y: auto; flex: 1; }
 .yp-preview-host .yp-player { margin: 0; }
 
+/* موبایل: پیش‌نمایش و پلیر — تارگت لمسی بزرگ‌تر، فشرده‌تر */
+@media (max-width: 560px) {
+    .yp-preview-overlay { padding: 10px; }
+    .yp-preview-shell { width: 100%; max-height: 94vh; border-radius: 14px; }
+    .yp-preview-head { flex-wrap: wrap; padding: 10px 12px; }
+    .yp-preview-note { display: none; }   /* در موبایل جا را می‌گیرد؛ عنوان و ✕ کافی است */
+    .yp-preview-host { padding: 10px; }
+    .yp-main { gap: 12px; margin-bottom: 12px; }
+    .yp-stage { flex: 1 1 100%; max-width: none; }
+    .yp-img { max-height: 250px; }
+    .yp-breath { flex: 0 0 auto; flex-direction: row; width: 100%; justify-content: center; }
+    .yp-breath .yoga-circle { width: 110px; height: 110px; }
+    .yp-breath-text { font-size: 19px; }
+    .yp-timer-big { font-size: 21px; }
+    .yp-pose-name { font-size: 17px; }
+    .yp-btn { padding: 10px 14px; font-size: 13.5px; }
+}
+
 /* ─── نوار پیشروی/جستجو در پلیر ─── */
 .yp-seek { position: relative; height: 12px; cursor: pointer; overflow: visible; margin-bottom: 4px; }
 .yp-seek .yp-progress-fill { position: relative; }

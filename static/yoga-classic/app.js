@@ -1309,6 +1309,7 @@ function classicQuery() {
     practice: q.get('practice'),
     dur: +q.get('dur') || null,
     lvl: q.get('lvl'),
+    bg: q.get('bg'),          /* override محیط (از تب جلسه تمرین اپ اصلی) */
   };
 }
 function reportSessionEnd(completed, seconds) {
@@ -1392,7 +1393,7 @@ function reportSessionEnd(completed, seconds) {
         const di = q.dur ? Math.max(0, durs.indexOf(q.dur)) : Math.min(1, durs.length - 1);
         const minutes = repBased ? Math.max(10, Math.round(durs[di] * 1.1)) : durs[di];
         const lvl = Math.max(0, ['beginner', 'intermediate', 'expert'].indexOf(q.lvl));
-        applyBackground(p.bg || DB.currentBg);
+        applyBackground(q.bg || p.bg || DB.currentBg);
         showScreen('scr-yoga');
         Player.start(p, minutes, lvl, di);
         return;

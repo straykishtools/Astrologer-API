@@ -268,7 +268,7 @@ var TAB_INFO = {
     'zodiac': { title: 'سال حیوانی چینی', text: 'حیوان و عنصر سال تولد خود را پیدا کنید و شخصیت و سازگاری‌های خود را بررسی کنید.' },
     'daily-question': { title: 'پرسش روزانه', text: 'یک سوال بپرسید و پاسخ ترکیبی از بیوریتم، سال حیوانی و تاروت را دریافت کنید.' },
     'hafez': { title: 'فال حافظ', text: 'فال حافظ بگیرید و غزل تصادفی دیوان حافظ را با تفسیر دریافت کنید. کاملاً آفلاین و بدون نیاز به اینترنت.' },
-    'nasa': { title: 'ناسا', text: 'تصویر نجومی روز، تصاویر فضایی، آب و هوای فضا، سیارک‌ها و اطلاعات مریخ را مشاهده کنید.' },
+    'nasa': { title: 'ناسا', text: 'تصویر نجومی روز، تصاویر فضایی، آب و هوای فضا، سیارک‌ها و موقعیت سیارات را مشاهده کنید.' },
     'moon-phase': { title: 'فاز ماه', text: 'فاز ماه و منازل قمری را بر اساس تاریخ انتخابی مشاهده کنید. زمان‌های مناسب برای فعالیت‌های مختلف را بر اساس موقعیت ماه در آسمان پیدا کنید.' }
 };
 
@@ -1431,15 +1431,8 @@ function attachDatePickerTriggers(tab) {
         attachDatePicker('pyBirthDP', opts); // پیکر مجزای سال اختیاری
     }
     if (tab === 'nasa') {
-        // همهٔ date-pickerهای شمسیِ ناسا
-        attachDatePicker('nasaWeatherStartDP', opts);
-        attachDatePicker('nasaWeatherEndDP', opts);
-        attachDatePicker('nasaNeoStartDP', opts);
-        attachDatePicker('nasaNeoEndDP', opts);
-        attachDatePicker('nasaPlanetsDateDP', opts);
-        // فاز ماه
-        attachDatePicker('moonPhaseDate', opts);
-        attachDatePicker('moonPhaseDatePicker', opts);
+        /* تقویم‌های preset‌دارِ ناسا خودشان در getNasaForm می‌شوند؛
+           pickerهای قدیمیِ wheel حذف شدند. */
     }
 }
 
@@ -3720,7 +3713,7 @@ function getNasaForm() {
         {id: 'images', icon: '\u{1f5bc}\ufe0f', label: 'تصاویر'},
         {id: 'space-weather', icon: '\u2600\ufe0f', label: 'آب و هوای فضا'},
         {id: 'asteroids', icon: '\u2604\ufe0f', label: 'سیارک\u200cها'},
-        {id: 'planets', icon: 'Y', label: 'Z'}
+        {id: 'planets', icon: '🌏', label: 'موقعیت سیارات'}
     ];
     tabs.forEach(function(t, i) {
         var cls = i === 0 ? 'nasa-tab active' : 'nasa-tab';
@@ -3770,7 +3763,7 @@ function getNasaForm() {
     html += '</div>';
     html += '<button class="btn-primary" onclick="fetchNasaAsteroids()" style="width:100%;margin-bottom:16px;">☄️ دریافت سیارک‌ها</button>';
     html += '<div id="nasaNeoResult"></div></div>';
-    var _nasaToday2 = new Date().toISOString().split('T')[0];
+    var _nasaToday2 = new Date().toISOString().split('T')[0]; //x2
     html += '<div id="nasaPlanets" style="display:none;">';
     html += '<div class="form-group"><label>\u{1f4c5} تاریخ (شمسی)</label><div id="nasaPlanetsSinglePC"></div></div>';
     html += '<button class="btn-primary" onclick="fetchNasaPlanets()" style="width:100%;margin-bottom:16px;">🌏 دریافت موقعیت سیارات</button>';
@@ -3789,9 +3782,11 @@ function getNasaForm() {
     }, 0);
     return html;
 }
-function _deadNasaFragment() { /*
-   deadcode: removed
-        {id: 'mars___REMOVEDB___', icon: 'X', label: 'Curiosity'},
+/* _deadNasaFragment_REMOVED: old NASA code (mars/curiosity tabs + old form + fetchCuriosityRaw) was deleted here
+function _deadNasaFragment_REMOVED() {
+   deadcode: removed // KEEPMARK-START — DELETE-FROM-HERE
+        {id: 'mars___REMOVEDT2___', icon: 'X', label: 'Curiosity'},
+SPLIT-MARKER-INLINE-CLOSED-NEUTRALIZED
         {id: 'planets', icon: '\ud83c\udf0f', label: 'موقعیت سیارات'}
     ];
     tabs.forEach(function(t, i) {
@@ -3854,20 +3849,11 @@ function _deadNasaFragment() { /*
     html += '<div id="nasaNeoResult"></div></div>';
 
     
-    var _nasaToday2 = new Date().toISOString().split('T')[0];
+    var _nasaToday2 = new Date().toISOString().split('T')[0]; //x2
     html += '<div id="nasaPlanets" style="display:none;">';
     html += '<div class="form-group"><label>\u{1f4c5} تاریخ (شمسی)</label>' + makeDatePickerTrigger('nasaPlanetsDateDP', {label:'تاریخ', calendarType:'shamsi', digits:'fa', defaultValue: _gregToShamsi(_nasaToday2)}) + '</div>';
     html += '<button class="btn-primary" onclick="fetchNasaPlanets()" style="width:100%;margin-bottom:16px;">\ud83c\udf0f دریافت موقعیت سیارات</button>';
     html += '<div id="nasaPlanetsResult"></div></div>';
-
-    html += '<div id="nasaMars" style="display:none;">';
-    html += '<button class="btn-primary" onclick="fetchNasaMarsWeather()" style="width:100%;margin-bottom:16px;">\u{1f534} دریافت آب و هوای مریخ</button>';
-    html += '<div id="nasaMarsResult"></div></div>';
-
-    html += '<div id="nasaCuriosity" style="display:none;">';
-    html += '<p style="color:#8a82a0;font-size:0.85rem;line-height:2;">🤖 <b>مریخ‌نورد کنجکاوی (Curiosity)</b> از ۲۰۱۲ در دهانه‌ی گیل فعال است و روزانه داده‌ی هواشناسیِ REMS می‌فرستد. این تب خروجیِ خامِ REMS را با دیباگ نشان می‌دهد.</p>';
-    html += '<button class="btn-primary" onclick="fetchCuriosityRaw()" style="width:100%;margin-bottom:16px;">\u{1f916} دریافت داده‌ی خام Curiosity</button>';
-    html += '<div id="nasaCuriosityResult"></div></div>';
 
     html += '</div></div>';
 
@@ -3948,7 +3934,26 @@ async function fetchCuriosityRaw() {
         div.innerHTML = '<div class="nasa-error">❌ خطا در ارتباط با سرور</div>';
     }
 }
-window.fetchCuriosityRaw = fetchCuriosityRaw;
+window.fetchCuriosityRaw = fetchCuriosityRaw; // dc-end8
+*/ // KEEPMARK-END3 — DELETE-TO-HERE (block ends; content is commented out and inert)
+
+function switchNasaTab(tab) {
+    // هر ۵ پنل — پس از حذفِ تب‌های مریخ و Curiosity
+    var panels = ['nasaApod','nasaImages','nasaSpaceWeather','nasaAsteroids','nasaPlanets'];
+    panels.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    document.querySelectorAll('.nasa-tab').forEach(function(b) { b.classList.remove('active'); });
+    var tabMap = {'apod':'nasaApod','images':'nasaImages','space-weather':'nasaSpaceWeather','asteroids':'nasaAsteroids','planets':'nasaPlanets'};
+    var target = document.getElementById(tabMap[tab]);
+    if (target) target.style.display = 'block';
+    var btn = document.querySelector('.nasa-tab[data-nasa-tab="' + tab + '"]');
+    if (btn) btn.classList.add('active');
+    // ─── پاک‌سازی نتایجِ تب‌هایِ دیگر: هیچ نتیجه‌ای از تب قبلی نچسبد ───
+    var resultIds = { apod:'nasaApodResult', images:'nasaImagesResult', 'space-weather':'nasaWeatherResult',
+                      asteroids:'nasaNeoResult', planets:'nasaPlanetsResult' };
+    Object.keys(resultIds).forEach(function (k) {
+        if (k !== tab) { var el = document.getElementById(resultIds[k]); if (el) el.innerHTML = ''; }
+    });
+}
 
 async function fetchNasaApod() {
     var div = document.getElementById('nasaApodResult');
@@ -4154,18 +4159,18 @@ function displayNasaAsteroids(data, container) {
     container.innerHTML = html;
 }
 
-async function fetchNasaMarsWeather() {
+async function _removed_fetchNasaMarsWeather() {
     var div = document.getElementById('nasaMarsResult');
     div.innerHTML = '<div class="nasa-loading">\u23f3 در حال دریافت آب و هوای مریخ...</div>';
     try {
         var res = await fetch('/api/v5/nasa/mars-weather');
         var data = await res.json();
-        if (data.status === 'success') { displayNasaMarsWeather(data.data, div); }
+        if (data.status === 'success') { _removed_displayNasaMarsWeather(data.data, div); }
         else { div.innerHTML = '<div class="nasa-error">\u274c ' + (data.detail || 'خطا') + '</div>'; }
     } catch(e) { div.innerHTML = '<div class="nasa-error">\u274c خطا در ارتباط با سرور</div>'; }
 }
 
-function displayNasaMarsWeather(data, container) {
+function _removed_displayNasaMarsWeather(data, container) {
     if (!data.sols || data.sols.length === 0) {
         container.innerHTML = '<div class="nasa-card"><p style="color:#888;text-align:center;">' + (data.note_fa || 'داده‌ای موجود نیست') + '</p></div>';
         return;

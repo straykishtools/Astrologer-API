@@ -86,7 +86,8 @@ var ShamsiCalendar = (function () {
         return cells;
     }
     function isBeyond(state, d) {
-        /* بعد از امروز مجاز نیست (endMonth=today در مرجع) */
+        /* بعد از امروز مجاز نیست (endMonth=today در مرجع) — مگر allowFuture */
+        if (state.allowFuture) return false;
         var today = todayJalali();
         if (state.jy > today.jy) return true;
         if (state.jy === today.jy && state.jm > today.jm) return true;
@@ -170,19 +171,23 @@ var ShamsiCalendar = (function () {
     }
 
     /**
-     * open({ trigger, anchor, defaultJalali:{jy,jm,jd}, minJy, onSave(iso) })
+     * open({ trigger, anchor, defaultJalali:{jy,jm,jd}, minJy, maxJy, allowFuture, onSave(iso) })
      * onSave یک ISO شمسی «YYYY-MM-DD» برمی‌گرداند.
+     * allowFuture: انتخاب تاریخ‌های آینده را مجاز می‌کند (ترانزیت/ناسا/…)
      */
     function open(opts) {
         close();
         var today = todayJalali();
         var minJy = opts.minJy || 1300;
         var def = opts.defaultJalali || { jy: 1370, jm: 1, jd: 1 };
+        var allowFuture = !!opts.allowFuture;
         var state = {
             jy: def.jy, jm: def.jm,
             selected: null,
             minJy: minJy, minJm: 1,
-            maxJy: today.jy, maxJm: today.jm,
+            maxJy: allowFuture ? (opts.maxJy || today.jy + 120) : today.jy,
+            maxJm: allowFuture ? 12 : today.jm,
+            allowFuture: allowFuture,
             onSave: opts.onSave || null,
             anchorBtn: opts.anchor || null,
         };

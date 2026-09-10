@@ -150,12 +150,33 @@ var PresetCalendar = (function () {
             activePreset: -1
         };
 
-        /* پیش‌فرض‌ها */
+        /* پیش‌فرض‌ها — اگر hidden از قبل مقدار داشت (مثلاً امروز از سرور)، همان ملاک است */
+        var existingIso = null;
         if (mode === 'range') {
-            state.start = applyDuration(today, opts.defaultFrom || '-7d');
-            state.end = applyDuration(today, opts.defaultTo || '0d');
+            var sEl = document.getElementById(opts.startHiddenId);
+            var eEl = document.getElementById(opts.endHiddenId);
+            if (sEl && sEl.value && /^\d{4}-\d{2}-\d{2}$/.test(sEl.value) && eEl && eEl.value && /^\d{4}-\d{2}-\d{2}$/.test(eEl.value)) {
+                existingIso = { s: sEl.value, e: eEl.value };
+            }
         } else {
-            state.single = applyDuration(today, opts.defaultDuration || '0d');
+            var hEl = document.getElementById(opts.hiddenId);
+            if (hEl && hEl.value && /^\d{4}-\d{2}-\d{2}$/.test(hEl.value)) existingIso = { h: hEl.value };
+        }
+        var existingJ = null;
+        if (existingIso) {
+            function _p(iso) {
+                var p = iso.split('-');
+                return { jy: parseInt(p[0]), jm: parseInt(p[1]), jd: parseInt(p[2]) };
+            }
+            existingJ = existingIso.s
+                ? { s: _p(existingIso.s), e: _p(existingIso.e) }
+                : { h: _p(existingIso.h) };
+        }
+        if (mode === 'range') {
+            state.start = existingJ && existingJ.s ? existingJ.s : applyDuration(today, opts.defaultFrom || '-7d');
+            state.end = existingJ && existingJ.e ? existingJ.e : applyDuration(today, opts.defaultTo || '0d');
+        } else {
+            state.single = existingJ && existingJ.h ? existingJ.h : applyDuration(today, opts.defaultDuration || '0d');
         }
         var anchor = (mode === 'range') ? state.start : state.single;
         state.view = { jy: anchor.jy, jm: anchor.jm };
