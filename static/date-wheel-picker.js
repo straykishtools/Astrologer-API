@@ -233,6 +233,8 @@
         if (cal === _cal) return;
         document.getElementById('dpTogSh').classList.toggle('active', cal === 'shamsi');
         document.getElementById('dpTogMl').classList.toggle('active', cal === 'miladi');
+        /* convert the selection, then clamp day into the new month length
+           (30 اسفند → 31 مارس fine; 30/31 → فوریه must clamp) */
         if (_cal === 'shamsi' && cal === 'miladi') {
             var g = ShamsiConv.j2g(_sel.year, _sel.month, _sel.day);
             _sel = { year: g.year, month: g.month, day: g.day };
@@ -241,9 +243,15 @@
             _sel = { year: j.year, month: j.month, day: j.day };
         }
         _cal = cal;
-        // Clear min/max year so renderAll uses defaults for the new calendar
-        delete _opts.minYear;
-        delete _opts.maxYear;
+        /* keep caller-supplied min/max when valid for the new calendar;
+           otherwise fall back to per-calendar defaults (no stale bounds) */
+        var defMin = cal === 'shamsi' ? 1300 : 1921;
+        var defMax = cal === 'shamsi' ? 1450 : 2071;
+        if (_opts.minYear != null && (_opts.minYear < defMin - 200 || _opts.minYear > defMax)) delete _opts.minYear;
+        if (_opts.maxYear != null && (_opts.maxYear > defMax + 200 || _opts.maxYear < defMin)) delete _opts.maxYear;
+        var maxD = daysInMonth(_cal, _sel.year, _sel.month);
+        if (_sel.day > maxD) _sel.day = maxD;
+        if (_sel.day < 1) _sel.day = 1;
         renderAll();
     }
 
@@ -343,6 +351,17 @@
                     });
                 }
             }
+            /* CLICK-to-select: tapping/clicking any item selects it —
+               previously only scrolling changed the value ("click does
+               not change, it locks") */
+            cfg.list.addEventListener('click', function (ev) {
+                var it = ev.target.closest('.dp-wheel-item');
+                if (!it) return;
+                _sel[cfg.key] = parseInt(it.dataset.value);
+                renderAll();
+                scrollToList(cfg.list, _sel[cfg.key]);
+                updateDisplay();
+            });
             cfg.list.addEventListener('scroll', onScroll, { passive: true });
             _scrollHandlers.push({ list: cfg.list, fn: onScroll });
         });
@@ -380,9 +399,26 @@
         _onSave = opts.onSave || null;
         _cal = opts.calendarType || 'shamsi';
 
-        if (opts.defaultValue) {
-            _sel = { year: opts.defaultValue.year, month: opts.defaultValue.month, day: opts.defaultValue.day };
+        if (opts.defaultValue && !isNaN(parseInt(opts.defaultValue.year)) &&
+            parseInt(opts.defaultValue.year) > 0 &&
+            !isNaN(parseInt(opts.defaultValue.month)) &&
+            !isNaN(parseInt(opts.defaultValue.day))) {
+            _sel = { year: parseInt(opts.defaultValue.year), month: parseInt(opts.defaultValue.month), day: parseInt(opts.defaultValue.day) };
         } else {
+            /* invalid/missing default → sensible fallback per calendar
+               (NaN/undefined year previously rendered nothing and the
+               wheel visually "stuck" at the first rendered year 1300) */
+            var now = new Date();
+            _sel = _cal === 'shamsi'
+                ? ShamsiConv.g2j(now.getFullYear(), now.getMonth() + 1, now.getDate())
+                : { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
+        }
+        /* clamp into the rendered year range so the wheel always has the
+           selection inside the list */
+        var mnY = _opts.minYear || (_cal === 'shamsi' ? 1300 : 1921);
+        var mxY = _opts.maxYear || (_cal === 'shamsi' ? 1450 : 2071);
+        if (_sel.year < mnY) _sel.year = mnY;
+        if (_sel.year > mxY) _sel.year = mxY;
             var now = new Date();
             _sel = _cal === 'shamsi'
                 ? ShamsiConv.g2j(now.getFullYear(), now.getMonth() + 1, now.getDate())

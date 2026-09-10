@@ -676,6 +676,8 @@
 
 /* ═══════════ Yoga Player (تمرینهای آماده XML) ═══════════ */
 .yp-note { color: var(--gold-300, #b8a05a); font-size: 12px; opacity: .85; }
+.yp-note.yp-login-hint { color: #8fb4ff; opacity: 1; margin: 6px 0 0; }
+.yp-note.yp-login-hint a { color: #a9c6ff; font-weight: 700; text-decoration: underline; }
 
 .yp-selector-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
 .yp-selector-head h3 { margin: 0; font-size: 18px; }
@@ -882,3 +884,51 @@
 }
 .yp-seek-labels { display: flex; justify-content: space-between; font-size: 12px; opacity: .75; direction: ltr; margin-bottom: 14px; }
 .yp-seek-labels .yp-time-cur { color: var(--gold-300, #b8a05a); }
+
+/* ═══════════ YogaClassicModal — fullscreen classic studio ═══════════ */
+#yogaClassicModal{position:fixed;inset:0;z-index:9999;}
+#yogaClassicModal .ycm-backdrop{position:absolute;inset:0;background:rgba(2,6,16,.82);backdrop-filter:blur(6px);}
+#yogaClassicModal .ycm-frame{position:absolute;inset:3vh 3vw;display:flex;flex-direction:column;border-radius:22px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.7);}
+#yogaClassicModal iframe{flex:1;width:100%;border:none;background:#000;}
+#yogaClassicModal .ycm-close{position:absolute;top:10px;left:12px;z-index:3;width:40px;height:40px;border-radius:12px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:16px;cursor:pointer;}
+#yogaClassicModal .ycm-close:hover{background:rgba(220,70,70,.6);}
+.yp-classic-btn{margin-right:auto;padding:8px 18px;border-radius:12px;border:1px solid var(--gold-500,#f9d976);background:rgba(249,217,118,.1);color:#f9d976;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;}
+.yp-classic-btn:hover{background:rgba(249,217,118,.22);}
+
+/* ═══════════ Classic Studio stats strip (yoga page header) ═══════════ */
+.yoga-page-header .pyc-stats{
+  display:inline-flex;align-items:center;gap:6px;margin-right:14px;
+  background:rgba(249,217,118,.08);border:1px solid rgba(249,217,118,.25);
+  border-radius:14px;padding:4px 12px;
+}
+.pyc-stats .pyc-stat{font-size:12px;color:#cbbf8a;white-space:nowrap;}
+.pyc-stats .pyc-stat b{color:#f9d976;font-weight:800;}
+
+/* ═══════════ Yoga Karma Store ═══════════ */
+.pks-wrap{max-width:920px;margin:0 auto;}
+.pks-head{margin-bottom:8px;}
+.pks-head h3{font-size:1.15rem;font-weight:800;margin-bottom:2px;}
+.pks-sub{font-size:12px;color:var(--ink-dim,#8fa0c2);}
+.pks-karma{display:flex;align-items:baseline;gap:10px;margin:10px 0 4px;}
+.pks-karma-num{font-size:2rem;font-weight:900;color:#f9d976;}
+.pks-karma-lbl{font-size:12px;color:var(--ink-dim,#8fa0c2);}
+.pks-hint{font-size:11.5px;color:var(--ink-dim,#8fa0c2);margin-bottom:14px;}
+.pks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;}
+.pks-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden;transition:.2s;}
+.pks-card:hover{border-color:rgba(249,217,118,.4);transform:translateY(-3px);}
+.pks-card.current{border-color:#f9d976;box-shadow:0 0 18px rgba(249,217,118,.18);}
+.pks-thumb-wrap{position:relative;cursor:zoom-in;}
+.pks-thumb{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;}
+.pks-lock{position:absolute;top:6px;left:8px;font-size:14px;background:rgba(0,0,0,.5);border-radius:8px;padding:2px 8px;}
+.pks-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:10px 12px;}
+.pks-name{font-size:13px;font-weight:800;color:var(--ink,#eef3ff);}
+.pks-btn{font-family:inherit;font-size:12px;font-weight:800;padding:6px 14px;border-radius:10px;cursor:pointer;transition:.15s;border:1px solid var(--colorPrimary,#1f70a1);background:transparent;color:var(--colorPrimary,#5caddd);}
+.pks-btn.select:hover{background:var(--colorPrimary,#5caddd);color:#fff;}
+.pks-btn.buy{border-color:#f9d976;color:#f9d976;background:rgba(249,217,118,.08);}
+.pks-btn.buy:hover:not(:disabled){background:rgba(249,217,118,.2);}
+.pks-btn.buy:disabled{opacity:.4;cursor:default;}
+.pks-btn.current{border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.6);cursor:default;}
+.pks-viewer{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(2,6,16,.85);backdrop-filter:blur(8px);}
+.pks-viewer-card{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:90vw;}
+.pks-viewer-card img{max-width:min(86vw,760px);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.pks-viewer-name{font-size:16px;font-weight:800;color:#fff;}

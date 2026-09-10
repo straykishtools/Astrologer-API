@@ -215,8 +215,14 @@
 /* --- Scrollable List --- */
 .dp-wheel-list {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    scroll-snap-type: y mandatory;
+    /* proximity + smooth: mandatory snap fought small mouse-wheel deltas
+       on desktop and snapped the year back — the "stuck at 2000" bug.
+       overscroll-behavior: contain stops page/parent scroll chains. */
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding: 80px 0;

@@ -50,7 +50,7 @@ class TarotEngine:
         slug = _CARD_SLUGS.get(card.get('id'), '')
         if slug:
             return f"/static/tarot/images/{slug}.webp"
-        return "/static/tarot/images/the-fool.webp"  # fallback
+        return "/static/tarot/images/card-back.svg"  # placeholder خنثی (نه تصویر احمق!)
 
     def _enrich_card(self, card: Dict) -> Dict:
         card = dict(card)  # shallow copy
@@ -58,8 +58,8 @@ class TarotEngine:
         return card
     
     def get_all_cards(self) -> List[Dict]:
-        """بازگرداندن تمام ۷۸ کارت (گلاسری)"""
-        return self.cards
+        """بازگرداندن تمام ۷۸ کارت (گلاسری) — با مسیر تصویر"""
+        return [self._enrich_card(c) for c in self.cards]
     
     def get_card_by_name(self, name: str) -> Optional[Dict]:
         """دریافت یک کارت بر اساس نام"""
@@ -78,6 +78,7 @@ class TarotEngine:
                 "card": self._enrich_card(card),
                 "is_reversed": is_reversed,
                 "meaning": card.get('meaning_reversed' if is_reversed else 'meaning_upright', ''),
+                "deep_interp": card.get('deep_interp_reversed' if is_reversed else 'deep_interp_upright', ''),
                 "keywords": card.get('keywords_reversed' if is_reversed else 'keywords_upright', ''),
                 "love": card.get('love_reversed' if is_reversed else 'love_upright', ''),
                 "career": card.get('career_reversed' if is_reversed else 'career_upright', ''),
@@ -86,7 +87,7 @@ class TarotEngine:
                 "yes_no": card.get('yes_no_reversed' if is_reversed else 'yes_no', '')
             })
         return result
-    
+
     def get_daily_card(self) -> Dict:
         """کارت روزانه (بر اساس تاریخ)"""
         seed = datetime.now().strftime("%Y-%m-%d")
@@ -99,6 +100,7 @@ class TarotEngine:
             "is_reversed": is_reversed,
             "date": seed,
             "meaning": card.get('meaning_reversed' if is_reversed else 'meaning_upright', ''),
+            "deep_interp": card.get('deep_interp_reversed' if is_reversed else 'deep_interp_upright', ''),
             "keywords": card.get('keywords_reversed' if is_reversed else 'keywords_upright', []),
             "love": card.get('love_reversed' if is_reversed else 'love_upright', ''),
             "career": card.get('career_reversed' if is_reversed else 'career_upright', ''),
@@ -108,35 +110,39 @@ class TarotEngine:
         }
     
     def three_card_spread(self) -> Dict:
-        """اسپرید ۳ کارتی (گذشته، حال، آینده)"""
+        """اسپرید ۳ کارتی (گذشته، حال، آینده) — با تعبیرِ متناسبِ هر جایگاه"""
         cards = self.draw_cards(3)
+        guides = {
+            "گذشته": "این کارت نشان می‌دهد چه گذشته‌ای هنوز بر وضعیتِ فعلی‌ات اثر گذاشته — درسی که باید از آن برداری یا چیزی که باید رهایش کنی.",
+            "حال": "این کارت آینه‌ی اکنونِ توست: احساس، موقعیت و انرژی‌ای که همین حالا در آن هستی.",
+            "آینده": "این کارت مسیرِ پیشِ رو را نشان می‌دهد — نه سرنوشتی قطعی، بلکه نتیجه‌ی طبیعیِ ادامه‌ی همین مسیر.",
+        }
         return {
             "spread": "Three Card",
             "positions": [
-                {"position": "گذشته", "card": cards[0]},
-                {"position": "حال", "card": cards[1]},
-                {"position": "آینده", "card": cards[2]}
+                {"position": pos, "card": cards[i], "position_guide": guides[pos]}
+                for i, pos in enumerate(("گذشته", "حال", "آینده"))
             ]
         }
-    
+
     def celtic_cross_spread(self) -> Dict:
-        """اسپرید سلتیک کراس (۱۰ کارتی)"""
+        """اسپرید سلتیک کراس (۱۰ کارتی) — با تعبیرِ متناسبِ هر جایگاه"""
         cards = self.draw_cards(10)
-        position_names = [
-            "وضعیت فعلی",
-            "چالش اصلی",
-            "زیربنا (گذشته‌ی دور)",
-            "گذشته‌ی نزدیک",
-            "هدف و آرزو",
-            "ناخودآگاه",
-            "تأثیرات بیرونی",
-            "امیدها و ترس‌ها",
-            "نتیجه‌ی نهایی"
+        positions = [
+            ("وضعیت فعلی", "قلبِ ماجرا: انرژی‌ای که همین حالا حولِ سؤالت می‌چرخد."),
+            ("چالش اصلی", "مانعی که باید رد شود — گاهی بیرونی، گاهی درونِ خودت."),
+            ("زیربنا (گذشته‌ی دور)", "ریشه‌های عمیقِ وضعیت: چیزهایی که از گذشته دور تا امروز رسیده‌اند."),
+            ("گذشته‌ی نزدیک", "رویدادِ تازه‌ای که هنوز لرزشش در موقعیتِ فعلی حس می‌شود."),
+            ("هدف و آرزو", "آنچه در افقِ ذهنِ توست — آگاهانه یا نیمه‌آگاهانه دنبالش می‌روی."),
+            ("ناخودآگاه", "انگیزه‌های پنهانی که خودت هم شاید به‌روشنی نمی‌بینی؛ حرفِ نزده‌ی درون."),
+            ("تأثیرات بیرونی", "آدم‌ها و شرایطی که از بیرون بر اوضاع اثر می‌گذارند — دوست یا ناخواسته."),
+            ("امیدها و ترس‌ها", "آنچه آرزو می‌کنی و آنچه ازش می‌ترسی — گاهی یکی‌اند!"),
+            ("نتیجه‌ی نهایی", "اگر همین مسیر ادامه پیدا کند، این تصویرِ مقصد است. مسیر هنوز در دستِ توست."),
         ]
         return {
             "spread": "Celtic Cross",
             "positions": [
-                {"position": position_names[i], "card": cards[i]} 
-                for i in range(min(len(position_names), len(cards)))
+                {"position": pos, "card": cards[i], "position_guide": guide}
+                for i, (pos, guide) in enumerate(positions[:len(cards)])
             ]
         }

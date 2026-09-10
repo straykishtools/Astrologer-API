@@ -1,0 +1,1777 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<moves>	
+
+	// New moves
+	// ---------
+	
+	
+	// Child Traditional
+	<move name="childtraditional_to_boxneutral" fromPose="Child Traditional" toPose="Box Neutral" breath="none">
+	</move>
+	
+
+	// Bird Of Paradise Revolved
+	<move name="birdofparadiserevolved_to_birdofparadiserevolvedpreparation" fromPose="Bird Of Paradise Revolved" toPose="Bird Of Paradise Revolved Preparation" breath="none">
+	</move>
+
+
+	// Bird Of Paradise Revolved Preparation
+	<move name="birdofparadiserevolvedpreparation_to_birdofparadiserevolved" fromPose="Bird Of Paradise Revolved Preparation" toPose="Bird Of Paradise Revolved" breath="none">
+	</move>
+	<move name="birdofparadiserevolvedpreparation_to_lungetwistextendedbound" fromPose="Bird Of Paradise Revolved Preparation" toPose="Lunge Twist Extended Bound" breath="none">
+	</move>
+	<move name="birdofparadiserevolvedpreparation_to_warriortwistextendedbound" fromPose="Bird Of Paradise Revolved Preparation" toPose="Warrior Twist Extended Bound" breath="none">
+	</move>
+	
+	// Lunge Twist Extended Bound
+	<move name="lungetwistextendedbound_to_birdofparadiserevolvedpreparation" fromPose="Lunge Twist Extended Bound" toPose="Bird Of Paradise Revolved Preparation" breath="none">
+	</move>
+	
+	// Warrior Twist Extended Bound
+	<move name="warriortwistextendedbound_to_birdofparadiserevolvedpreparation" fromPose="Warrior Twist Extended Bound" toPose="Bird Of Paradise Revolved Preparation" breath="none">
+	</move>
+
+
+	// Bridge
+	<move name="bridge_to_brigelegup" fromPose="Bridge" toPose="Bridge Leg Up" breath="none">
+		<soundName twosided="true">wheel_to_wheellegup</soundName>
+	</move>
+	
+	// Bridge Leg Up
+	<move name="bridgelegup_to_bridge" fromPose="Bridge Leg Up" toPose="Bridge" breath="none">
+		<soundName twosided="true">wheellegup_to_wheel</soundName>
+	</move>
+
+
+	// Lunge Hands On Mat Flying
+	<move name="lungehandsonmatflying_to_eightangle" fromPose="Lunge Hands On Mat Flying" toPose="Eight Angle" breath="none">
+	</move>
+
+	// Eight Angle
+	<move name="eightangle_to_lungehandsonmatflying" fromPose="Eight Angle" toPose="Lunge Hands On Mat Flying" breath="none">
+	</move>
+
+
+
+	// Downward Dog Leg Up
+	<move name="downwarddoglegup_to_flyingmanrevolved" fromPose="Downward Dog Leg Up" toPose="Flying Man Revolved" breath="inhale">
+	</move>
+
+	// Flying Man Revolved
+	<move name="flyingmanrevolved_to_downwarddoglegup" fromPose="Flying Man Revolved" toPose="Downward Dog Leg Up" breath="none">
+	</move>
+
+
+	// Half Moon
+	<move name="halfmoon_to_halfmoonbound" fromPose="Half Moon" toPose="Half Moon Bound" breath="none">
+	</move>
+	
+	// Half Moon Bound
+	<move name="halfmoonbound_to_halfmoon" fromPose="Half Moon Bound" toPose="Half Moon" breath="none">
+	</move>
+	
+	
+	// Lotus Half
+	<move name="lotushalf_to_lotusfull" fromPose="Lotus Half" toPose="Lotus Full" breath="none">
+	</move>
+	
+	
+	// Lunge Crescent
+	<move name="lungecrescent_to_lungecrescentforwardbend" fromPose="Lunge Crescent" toPose="Lunge Crescent Forward Bend" breath="exhale">
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward</soundName>
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward_2</soundName>
+	</move>
+	<move name="lungecrescent_to_lungecrescenttwist" fromPose="Lunge Crescent" toPose="Lunge Crescent Twist" breath="none">
+	</move>
+
+	// Lunge Crescent Forward Bend
+	<move name="lungecrescentforwardbend_to_lungecrescent" fromPose="Lunge Crescent Forward Bend" toPose="Lunge Crescent" breath="inhale">
+		<soundName twosided="false">warriorIhandssteepledforward_to_warriorIhandssteepled</soundName>
+	</move>
+
+	// Lunge Crescent Twist
+	<move name="lungecrescenttwist_to_lungecrescenttwistreverse" fromPose="Lunge Crescent Twist" toPose="Lunge Crescent Twist Reverse" breath="none">
+	</move>
+	<move name="lungecrescenttwist_to_lungecrescent" fromPose="Lunge Crescent Twist" toPose="Lunge Crescent" breath="none">
+	</move>
+	<move name="lungecrescenttwist_to_lunge" fromPose="Lunge Crescent Twist" toPose="Lunge" breath="none">
+	</move>
+
+	// Lunge Crescent Twist Reverse
+	<move name="lungecrescenttwistreverse_to_lungecrescenttwist" fromPose="Lunge Crescent Twist Reverse" toPose="Lunge Crescent Twist" breath="none">
+	</move>
+
+
+
+
+
+	// Warrior I Kneeling
+	<move name="warriorIkneeling_to_lungecrescentkneelingforwardbend" fromPose="Warrior I Kneeling" toPose="Lunge Crescent Kneeling Forward Bend" breath="exhale">
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward</soundName>
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward_2</soundName>
+	</move>
+	<move name="warriorIkneeling_to_lungecrescenttwist" fromPose="Warrior I Kneeling" toPose="Lunge Crescent Kneeling Twist" breath="none">
+	</move>
+	
+	// Lunge Crescent Kneeling Forward Bend
+	<move name="lungecrescentkneelingforwardbend_to_warriorIkneeling" fromPose="Lunge Crescent Kneeling Forward Bend" toPose="Warrior I Kneeling" breath="inhale">
+		<soundName twosided="false">warriorIhandssteepledforward_to_warriorIhandssteepled</soundName>
+	</move>
+	
+	// Lunge Crescent Kneeling Twist
+	<move name="lungecrescentkneelingtwist_to_lungecrescentkneelingtwistreverse" fromPose="Lunge Crescent Kneeling Twist" toPose="Lunge Crescent Kneeling Twist Reverse" breath="none">
+	</move>
+	<move name="lungecrescentkneelingtwist_to_warriorIkneeling" fromPose="Lunge Crescent Kneeling Twist" toPose="Warrior I Kneeling" breath="none">
+	</move>
+	<move name="lungecrescentkneelingtwist_to_lungekneeling" fromPose="Lunge Crescent Kneeling Twist" toPose="Lunge Kneeling" breath="none">
+	</move>
+
+	// Lunge Crescent Kneeling Twist Reverse
+	<move name="lungecrescenttwistreverse_to_lungecrescenttwist" fromPose="Lunge Crescent Kneeling Twist Reverse" toPose="Lunge Crescent Kneeling Twist" breath="none">
+	</move>
+
+
+
+	// Downward Dog Leg Up Stack Hips
+	<move name="downwarddoglegupstackhips_to_wildthing" fromPose="Downward Dog Leg Up Stack Hips" toPose="Wild Thing" breath="none">
+	</move>
+
+	// Wild Thing
+	<move name="wildthing_to_downwarddoglegup" fromPose="Wild Thing" toPose="Downward Dog Leg Up" breath="none">
+	</move>
+
+
+	// Plank Side
+	<move name="plankside_to_planksideextended" fromPose="Plank Side" toPose="Plank Side Extended" breath="none">
+	</move>
+
+
+	// Plank Side Extended
+	<move name="planksideextended_to_plankside" fromPose="Plank Side Extended" toPose="Plank Side" breath="none">
+	</move>
+
+
+	// Crow
+	<move name="crow_to_fourlimbedstaff" fromPose="Crow" toPose="Four Limbed Staff" breath="none">
+	</move>
+
+
+	// Current moves
+	// -------------
+	
+	
+	
+	// Standing Knee To Chest
+	<move name="standingkneetochest_to_standinghandtotoe" fromPose="Standing Knee To Chest" toPose="Standing Hand To Toe" breath="none">
+	</move>
+	<move name="standingkneetochest_to_standingheadtokneepreparation" fromPose="Standing Knee To Chest" toPose="Standing Head To Knee Preparation" breath="none">
+	</move>
+	
+	
+	// Pigeon Forward Bend
+	<move name="pigeonforwardbend_to_pigeonhalf" fromPose="Pigeon Forward Bend" toPose="Pigeon Half" breath="none">
+	</move>
+
+	// Pigeon Flying
+	<move name="pigeonflying_to_tree" fromPose="Pigeon Flying" toPose="Tree" breath="none">
+	</move>
+
+	
+	// Standing Head To Knee Preparation
+	<move name="standingheadtokneepreparation_to_standinghandtotoe" fromPose="Standing Head To Knee Preparation" toPose="Standing Hand To Toe" breath="none">
+	</move>	
+	
+	// Standing Hand To Toe
+	<move name="standinghandtotoe_to_standinghandtotoeextended" fromPose="Standing Hand To Toe" toPose="Standing Hand To Toe Extended" breath="none">
+	</move>
+	
+	// Standing Hand To Toe Extended
+	<move name="standinghandtotoeextended_to_mountain" fromPose="Standing Hand To Toe Extended" toPose="Mountain" breath="none">
+	</move>
+	<move name="standinghandtotoeextended_to_standinghandtotoe" fromPose="Standing Hand To Toe Extended" toPose="Standing Hand To Toe" breath="none">
+	</move>
+	
+	
+	// Supine Spinal Twist
+	<move name="supinespinaltwist_to_corpse" fromPose="Supine Spinal Twist" toPose="Corpse" breath="none">
+	</move>
+	
+	// Wind Removing
+	<move name="windremoving_to_supinespinaltwist" fromPose="Wind Removing" toPose="Supine Spinal Twist" breath="none">
+	</move>		
+	
+	
+	
+	// Pigeon Full
+	<move name="pigeonfull_to_pigeonking" fromPose="Pigeon Full" toPose="Pigeon King" breath="none">
+	</move>
+	
+	// Pigeon King
+	<move name="pigeonking_to_kneepile" fromPose="Pigeon King" toPose="Knee Pile" breath="none">
+		<soundName twosided="false">pigeonfull_to_kneepile</soundName>
+	</move>	
+	
+	
+	
+	// Pyramid Kneeling
+	<move name="pyramidkneeling_to_warriorIkneeling" fromPose="Pyramid Kneeling" toPose="Warrior I Kneeling" breath="inhale">
+	</move>			
+	<move name="pyramidkneeling_to_lungekneeling" fromPose="Pyramid Kneeling" toPose="Lunge Kneeling" breath="inhale">
+	</move>			
+	
+	// Warrior I Kneeling
+	<move name="warriorIkneeling_to_pyramidkneeling" fromPose="Warrior I Kneeling" toPose="Pyramid Kneeling" breath="exhale">
+	</move>	
+	<move name="warriorIkneeling_to_lungekneeling" fromPose="Warrior I Kneeling" toPose="Lunge Kneeling" breath="exhale">
+	</move>
+	
+	
+	// Warrior I Kneeling
+	<move name="warriorIkneeling_to_lungekneelingprayer" fromPose="Warrior I Kneeling" toPose="Lunge Kneeling Prayer" breath="none">
+		<soundName twosided="false">mountainarmsup_to_mountain</soundName>
+		<soundName twosided="false">mountainarmsup_to_mountain_2</soundName>
+	</move>		
+	
+		
+	// Lunge Kneeling
+	<move name="lungekneeling_to_pyramidkneeling" fromPose="Lunge Kneeling" toPose="Pyramid Kneeling" breath="exhale">
+	</move>
+	
+	// Lunge Kneeling Prayer
+	<move name="lungekneelingprayer_to_lungekneelingtwist" fromPose="Lunge Kneeling Prayer" toPose="Lunge Kneeling Twist" breath="none">
+		<soundName twosided="true">warriorprayer_to_warriortwist</soundName>
+	</move>
+	<move name="lungekneelingprayer_to_warriorIkneeling" fromPose="Lunge Kneeling Prayer" toPose="Warrior I Kneeling" breath="none">
+	</move>
+	
+	
+	// Lunge Kneeling Twist
+	<move name="lungekneelingtwist_to_lungekneelingtwistextended" fromPose="Lunge Kneeling Twist" toPose="Lunge Kneeling Twist Extended" breath="none">
+		<soundName twosided="false">warriortwist_to_warriortwistextended</soundName>
+	</move>	
+	<move name="lungekneelingtwist_to_lungekneelingprayer" fromPose="Lunge Kneeling Twist" toPose="Lunge Kneeling Prayer" breath="none">
+		<soundName twosided="false">chairtwist_to_chairprayer</soundName>
+	</move>		
+	
+	// Lunge Kneeling Twist Extended
+	<move name="lungekneelingtwistextended_to_lungekneelingtwist" fromPose="Lunge Kneeling Twist Extended" toPose="Lunge Kneeling Twist" breath="none">
+		<soundName twosided="false">warriortwistextended_to_warriortwist</soundName>
+	</move>	
+	<move name="lungekneelingtwistextended_to_lungekneelingtwistextendedbound" fromPose="Lunge Kneeling Twist Extended" toPose="Lunge Kneeling Twist Extended Bound" breath="none">
+		<soundName twosided="false">chairtwistextended_to_chairtwistbind</soundName>
+	</move>
+	
+	// Lunge Kneeling Twist Extended Bound
+	<move name="lungekneelingtwistextendedbound_to_lungekneelingtwistextended" fromPose="Lunge Kneeling Twist Extended Bound" toPose="Lunge Kneeling Twist Extended" breath="none">
+		<soundName twosided="false">chairtwistbind_to_chairtwistextended</soundName>
+	</move>
+	
+	
+	
+	
+	
+	
+	
+	
+	// Lunge Crescent
+	<move name="lungecrescent_to_lungeprayer" fromPose="Lunge Crescent" toPose="Lunge Prayer" breath="none">
+		<soundName twosided="false">mountainarmsup_to_mountain</soundName>
+		<soundName twosided="false">mountainarmsup_to_mountain_2</soundName>
+	</move>	
+	<move name="lungecrescent_to_warriorIII" fromPose="Lunge Crescent" toPose="Warrior III" breath="exhale">
+	</move>
+	
+	// Lunge Prayer
+	<move name="lungeprayer_to_lungetwist" fromPose="Lunge Prayer" toPose="Lunge Twist" breath="none">
+		<soundName twosided="true">warriorprayer_to_warriortwist</soundName>
+	</move>
+	<move name="lungeprayer_to_lungecrescent" fromPose="Lunge Prayer" toPose="Lunge Crescent" breath="none">
+	</move>
+	
+	
+	// Lunge Twist
+	<move name="lungetwist_to_lungetwistextended" fromPose="Lunge Twist" toPose="Lunge Twist Extended" breath="none">
+		<soundName twosided="false">warriortwist_to_warriortwistextended</soundName>
+	</move>	
+	<move name="lungetwist_to_lungeprayer" fromPose="Lunge Twist" toPose="Lunge Prayer" breath="none">
+		<soundName twosided="false">chairtwist_to_chairprayer</soundName>
+	</move>		
+	
+	// Lunge Twist Extended
+	<move name="lungetwistextended_to_lungetwist" fromPose="Lunge Twist Extended" toPose="Lunge Twist" breath="none">
+		<soundName twosided="false">warriortwistextended_to_warriortwist</soundName>
+	</move>	
+	<move name="lungetwistextended_to_lungetwistextendedbound" fromPose="Lunge Twist Extended" toPose="Lunge Twist Extended Bound" breath="none">
+		<soundName twosided="false">chairtwistextended_to_chairtwistbind</soundName>
+	</move>
+	
+	// Lunge Twist Extended Bound
+	<move name="lungetwistextendedbound_to_lungetwistextended" fromPose="Lunge Twist Extended Bound" toPose="Lunge Twist Extended" breath="none">
+		<soundName twosided="false">chairtwistbind_to_chairtwistextended</soundName>
+	</move>
+	
+	
+
+	
+	
+	// Box Neutral
+	<move name="boxneutral_to_catbalance" fromPose="Box Neutral" toPose="Cat Balance" breath="none">
+	</move>	
+	
+	
+	// Cat Balance
+	<move name="catbalance_to_boxneutral" fromPose="Cat Balance" toPose="Box Neutral" breath="none">
+	</move>	
+	<move name="catbalance_to_bowhalf" fromPose="Cat Balance" toPose="Bow Half" breath="none">
+	</move>	
+	
+	// Bow Half
+	<move name="bowhalf_to_boxneutral" fromPose="Bow Half" toPose="Box Neutral" breath="none">
+	</move>	
+	<move name="bowhalf_to_catbalance" fromPose="Bow Half" toPose="Cat Balance" breath="none">
+	</move>	
+	
+	
+	
+	// Seated On Heels Prayer Twist
+	<move name="seatedonheelsprayertwist_to_seatedonheelstwistbound" fromPose="Seated On Heels Prayer Twist" toPose="Seated On Heels Twist Bound" breath="none">
+		<soundName twosided="false">chairtwistextended_to_chairtwistbind</soundName>
+	</move>
+	
+	// Seated On Heels Twist Bound
+	<move name="seatedonheelstwistbound_to_seatedonheelsprayertwist" fromPose="Seated On Heels Twist Bound" toPose="Seated On Heels Prayer Twist" breath="none">
+		<soundName twosided="false">chairtwistbind_to_chairtwistextended</soundName>
+	</move>
+		
+		
+	
+	// Mountain
+	<move name="mountain_to_standingkneetochest" fromPose="Mountain" toPose="Standing Knee To Chest" breath="none">
+	</move>
+		
+	// Pigeon Half
+	<move name="pigeonhalf_to_pigeonforwardbend" fromPose="Pigeon Half" toPose="Pigeon Forward Bend" breath="none">
+	</move>
+
+	
+	
+	
+	// Hero Reclining
+	<move name="herorecliningextended_to_hero" fromPose="Hero Reclining Extended" toPose="Hero" breath="none">
+	</move>	
+	<move name="heroreclining_to_herorecliningextended" fromPose="Hero Reclining" toPose="Hero Reclining Extended" breath="none">
+	</move>	
+	
+	// Seated On Heels Prayer
+	<move name="seatedonheelsprayer_to_seatedonheelsprayertwist" fromPose="Seated On Heels Prayer" toPose="Seated On Heels Prayer Twist" breath="none">
+		<soundName twosided="true">warriorprayer_to_warriortwist</soundName>
+	</move>
+	// Seated On Heels Prayer Twist
+	<move name="seatedonheelsprayertwist_to_sidecrowpreparation" fromPose="Seated On Heels Prayer Twist" toPose="Crow Side Preparation" breath="none">
+	</move>	
+	<move name="seatedonheelsprayertwist_to_seatedonheelsprayer" fromPose="Seated On Heels Prayer Twist" toPose="Seated On Heels Prayer" breath="none">
+		<soundName twosided="false">chairtwist_to_chairprayer</soundName>
+	</move>
+	// Crow Side Preparation
+	<move name="sidecrowpreparation_to_sidecrow" fromPose="Crow Side Preparation" toPose="Crow Side" breath="none">
+	</move>
+	<move name="sidecrowpreparation_to_seatedonheelsprayertwist" fromPose="Crow Side Preparation" toPose="Seated On Heels Prayer Twist" breath="none">
+	</move>
+	// Crow Side
+	<move name="sidecrow_to_sidecrowpreparation" fromPose="Crow Side" toPose="Crow Side Preparation" breath="none">
+	</move>	
+	
+	
+	// Supine Pigeon
+	<move name="supinepigeon_to_corpse" fromPose="Supine Pigeon" toPose="Corpse" breath="none">
+	</move>	
+	
+	
+	// Corpse
+	<move name="corpse_to_supinepigeon" fromPose="Corpse" toPose="Supine Pigeon" breath="none">
+	</move>	
+	
+	<move name="corpse_to_supinehandtotoe" fromPose="Corpse" toPose="Supine Hand To Toe" breath="none">
+	</move>	
+	<move name="corpse_to_supineboundangle" fromPose="Corpse" toPose="Supine Bound Angle" breath="none">
+	</move>	
+	
+	// Supine Hand To Toe
+	<move name="supinehandtotoe_to_supinehandtotoeextended" fromPose="Supine Hand To Toe" toPose="Supine Hand To Toe Extended" breath="none">
+	</move>	
+	<move name="supinehandtotoe_to_corpse" fromPose="Supine Hand To Toe" toPose="Corpse" breath="none">
+	</move>
+	
+	// Supine Hand To Toe Extended
+	<move name="supinehandtotoe_to_corpse" fromPose="Supine Hand To Toe Extended" toPose="Corpse" breath="none">
+	</move>
+	
+	// Supine Bound Angle
+	<move name="supineboundangle_to_corpse" fromPose="Supine Bound Angle" toPose="Corpse" breath="none">
+	</move>
+	
+	
+	// Lord Of The Dance
+	<move name="lordofthedance_to_lordofthedance" fromPose="Lord Of The Dance" toPose="Lord Of The Dance Full" breath="none">
+	</move>	
+	
+	// Lord Of The Dance Full
+	<move name="lordofthedancefull_to_mountain" fromPose="Lord Of The Dance Full" toPose="Mountain" breath="none">
+	</move>	
+	
+	// Warrior Twist Extended
+	<move name="warriortwistextended_to_warriortwistextendedbound" fromPose="Warrior Twist Extended" toPose="Warrior Twist Extended Bound" breath="none">
+		<soundName twosided="false">chairtwistextended_to_chairtwistbind</soundName>
+	</move>
+	
+	// Warrior Twist Extended Bound
+	<move name="warriortwistextendedbound_to_warriortwistextended" fromPose="Warrior Twist Extended Bound" toPose="Warrior Twist Extended" breath="none">
+		<soundName twosided="false">chairtwistbind_to_chairtwistextended</soundName>
+	</move>
+	
+	// Staff
+	<move name="staff_to_table" fromPose="Staff" toPose="Table" breath="none">
+	</move>	
+	
+	// Table
+	<move name="table_to_staff" fromPose="Table" toPose="Staff" breath="none">
+	</move>	
+	<move name="table_to_plankupward" fromPose="Table" toPose="Plank Upward" breath="none">
+	</move>	
+	
+	
+	
+	// Blissful Baby
+	<move name="blissfulbaby_to_corpse" fromPose="Blissful Baby" toPose="Corpse" breath="none">
+	</move>	
+	
+	// Boat Full
+	<move name="boatfull_to_corse" fromPose="Boat Full" toPose="Corpse" breath="none">
+	</move>	
+	
+	// Boat Half
+	<move name="boathalf_to_corse" fromPose="Boat Half" toPose="Corpse" breath="none">
+	</move>	
+	<move name="boathalf_to_boatfull" fromPose="Boat Half" toPose="Boat Full" breath="none">
+	</move>	
+	
+
+	// Bow
+	<move name="bow_to_corpsefront" fromPose="Bow" toPose="Corpse Front" breath="none">
+	</move>	
+	<move name="bow_to_bowpreparation" fromPose="Bow" toPose="Bow Preparation" breath="none">
+	</move>	
+
+	// Bow Preparation
+	<move name="bowpreparation_to_bow" fromPose="Bow Preparation" toPose="Bow" breath="none">
+	</move>	
+	<move name="bowpreparation_to_corpsefront" fromPose="Bow Preparation" toPose="Corpse Front" breath="none">
+	</move>	
+	
+	
+	// Box Hand To Ankle
+	<move name="boxhandtoankle_to_boxneutral" fromPose="Box Hand To Ankle" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">boxhandtoankle_to_boxneutral</soundName>	
+	</move>	
+
+	// Box Neutral
+	<move name="boxneutral_to_boxhandtoankle" fromPose="Box Neutral" toPose="Box Hand To Ankle" breath="none">
+		<soundName twosided="true">boxneutral_to_boxhandtoankle</soundName>
+	</move>		
+	<move name="boxneutral_to_child" fromPose="Box Neutral" toPose="Child" breath="none">
+		<soundName twosided="false">boxneutral_to_child</soundName>
+	</move>	
+	<move name="boxneutral_to_childwide" fromPose="Box Neutral" toPose="Child Wide" breath="none">
+		<soundName twosided="false">boxneutral_to_childwide</soundName>
+	</move>	
+	<move name="boxneutral_to_dog" fromPose="Box Neutral" toPose="Dog" breath="inhale">
+	</move>		
+	<move name="boxneutral_to_dolphin" fromPose="Box Neutral" toPose="Dolphin" breath="none">
+		<soundName twosided="false">boxneutral_to_dolphin</soundName>
+	</move>	
+	<move name="boxneutral_to_downwarddog" fromPose="Box Neutral" toPose="Downward Dog" breath="exhale">
+		<soundName twosided="false">boxneutral_to_downwarddog</soundName>
+	</move>	
+	<move name="boxneutral_to_pigeonhalf" fromPose="Box Neutral" toPose="Pigeon Half" breath="none">
+		<soundName twosided="true">boxneutral_to_pigeonhalf</soundName>
+	</move>		
+	<move name="boxneutral_to_seatedforwardbendpreparation" fromPose="Box Neutral" toPose="Seated Forward Bend Preparation" breath="none">
+		<soundName twosided="false">boxneutral_to_seatedforwardbendpreparation</soundName>
+	</move>		
+	<move name="boxneutral_to_puppyextened" fromPose="Box Neutral" toPose="Puppy Extended" breath="none">
+	</move>		
+	<move name="boxneutral_to_corpsefront" fromPose="Box Neutral" toPose="Corpse Front" breath="none">
+	</move>	
+
+	
+			
+	// Bridge
+	<move name="bridge_to_corpse" fromPose="Bridge" toPose="Corpse" breath="none">
+		<soundName twosided="false">wheel_to_corpse</soundName>
+	</move>	
+	<move name="bridge_to_wheel" fromPose="Bridge" toPose="Wheel" breath="none">
+		<soundName twosided="false">corpse_to_wheel</soundName>
+	</move>	
+	
+
+	// Camel
+	<move name="camel_to_hero" fromPose="Camel" toPose="Hero" breath="none">
+	</move>	
+	<move name="camel_to_pigeon" fromPose="Camel" toPose="Pigeon" breath="none">
+	</move>	
+	
+			
+	// Cat
+	<move name="cat_to_dog" fromPose="Cat" toPose="Dog" breath="inhale">
+	</move>	
+	<move name="cat_to_boxneutral" fromPose="Cat" toPose="Box Neutral" breath="inhale">
+		<soundName twosided="false">cat_to_boxneutral</soundName>
+	</move>	
+	
+	
+	// Chair
+	<move name="chair_to_forwardbend" fromPose="Chair" toPose="Forward Bend" breath="exhale">
+	</move>	
+	<move name="chair_to_forwardbenddeep" fromPose="Chair" toPose="Forward Bend Deep" breath="exhale">
+		<soundName twosided="false">chair_to_forwardbenddeep</soundName>
+	</move>	
+	<move name="chair_to_chairprayer" fromPose="Chair" toPose="Chair Prayer" breath="none">
+		<soundName twosided="false">chair_to_chairprayer</soundName>
+	</move>	
+	<move name="chair_to_mountain" fromPose="Chair" toPose="Mountain" breath="exhale">
+	</move>
+	
+	// Chair Prayer
+	<move name="chairprayer_to_chair" fromPose="Chair Prayer" toPose="Chair" breath="inhale">
+	</move>	
+	<move name="chairprayer_to_chairtwist" fromPose="Chair Prayer" toPose="Chair Twist" breath="none">
+		<soundName twosided="true">chairprayer_to_chairtwist</soundName>
+	</move>	
+		
+	// Chair Twist
+	<move name="chairtwist_to_chairprayer" fromPose="Chair Twist" toPose="Chair Prayer" breath="none">
+		<soundName twosided="false">chairtwist_to_chairprayer</soundName>
+	</move>	
+	<move name="chairtwist_to_chairtwistextended" fromPose="Chair Twist" toPose="Chair Twist Extended" breath="none">
+		<soundName twosided="true">chairtwist_to_chairtwistextended</soundName>
+	</move>	
+			
+	// Chair Twist Extended	
+	<move name="chairtwistextended_to_chairtwist" fromPose="Chair Twist Extended" toPose="Chair Twist" breath="none">
+		<soundName twosided="false">chairtwistextended_to_chairtwist</soundName>
+	</move>	
+	<move name="chairtwistextended_to_chairtwistbind" fromPose="Chair Twist Extended" toPose="Chair Twist Bind" breath="none">
+		<soundName twosided="false">chairtwistextended_to_chairtwistbind</soundName>
+	</move>		
+	
+	// Chair Twist Bind
+	<move name="chairtwistbind_to_chairtwistextended" fromPose="Chair Twist Bind" toPose="Chair Twist Extended" breath="none">
+		<soundName twosided="false">chairtwistbind_to_chairtwistextended</soundName>
+	</move>		
+	<move name="chairtwistbind_to_chairtwistbindup" fromPose="Chair Twist Bind" toPose="Chair Twist Bind Up" breath="none">
+		<soundName twosided="true">chairtwistbind_to_chairtwistbindup</soundName>
+	</move>		
+	<move name="chairtwistbind_to_lungebind" fromPose="Chair Twist Bind" toPose="Lunge Bind" breath="none">
+		<soundName twosided="true">chairtwistbind_to_lungebind</soundName>
+	</move>	
+				
+	
+	// Chair Twist Bind Up	
+	<move name="chairtwistbindup_to_chairtwistbind" fromPose="Chair Twist Bind Up" toPose="Chair Twist Bind" breath="none">
+		<soundName twosided="true">chairtwistbindup_to_chairtwistbind</soundName>
+	</move>		
+	
+	// Child
+	<move name="child_to_upwarddog" fromPose="Child" toPose="Upward Dog" breath="inhale">
+	</move>
+	<move name="child_to_boxneutral" fromPose="Child" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">childwide_to_boxneutral</soundName>
+	</move>			
+
+	// Child Wide
+	<move name="childwide_to_childwidesidelean" fromPose="Child Wide" toPose="Child Wide Side Lean" breath="exhale">
+		<soundName twosided="true">childwide_to_childwidesidelean</soundName>
+		<soundName twosided="true">childwide_to_childwidesidelean_2</soundName>
+	</move>
+	<move name="childwide_to_boxneutral" fromPose="Child Wide" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">childwide_to_boxneutral</soundName>
+	</move>
+				
+	// Child Wide Side Lean
+	<move name="childwidesidelean_to_childwide" fromPose="Child Wide Side Lean" toPose="Child Wide" breath="inhale">
+		<soundName twosided="false">childwidesidelean_to_childwide</soundName>
+	</move>	
+	
+	// Child Wide Start
+	<move name="childwidestart_to_childwidestart" fromPose="Child Wide Start" toPose="Child Wide Start" breath="none">
+	</move>
+	<move name="childwidestart_to_childwide" fromPose="Child Wide Start" toPose="Child Wide" breath="none">
+		<soundName twosided="false">childwidestart_to_childwide</soundName>
+	</move>
+	
+			
+	// Crow
+	<move name="crow_to_crowflying" fromPose="Crow" toPose="Crow Flying" breath="none">
+		<soundName twosided="true">crow_to_crowflying</soundName>
+	</move>	
+	<move name="crow_to_seatedonheelshandsonmatopenedknees" fromPose="Crow" toPose="Seated On Heels Hands On Mat Opened Knees" breath="exhale">
+		<soundName twosided="false">crow_to_seatedonheelshandsonmatopenedknees</soundName>
+	</move>	
+	
+	// Crow Flying
+	<move name="crowflying_to_crow" fromPose="Crow Flying" toPose="Crow" breath="none">
+		<soundName twosided="true">downwarddoglegup_to_downwarddog</soundName>
+	</move>	
+	
+	// Cobra
+	<move name="cobra_to_corpsefront" fromPose="Cobra" toPose="Corpse Front" breath="none">
+	</move>		
+	
+	
+	// Corpse
+	<move name="corpse_to_bridge" fromPose="Corpse" toPose="Bridge" breath="none">
+		<soundName twosided="false">corpse_to_bridge</soundName>
+	</move>
+	<move name="corpse_to_corpsedoublelegraise" fromPose="Corpse" toPose="Corpse Double Leg Raise" breath="none">
+		<soundName twosided="false">corpse_to_corpsedoublelegraise</soundName>
+	</move>
+	<move name="corpse_to_savasana" fromPose="Corpse" toPose="Savasana" breath="none">
+		<soundName twosided="false">corpse_to_savasana</soundName>
+	</move>
+	<move name="corpse_to_turtle" fromPose="Corpse" toPose="Turtle" breath="none">
+		<soundName twosided="false">corpse_to_turtle</soundName>
+	</move>
+	<move name="corpse_to_wheel" fromPose="Corpse" toPose="Wheel" breath="none">
+		<soundName twosided="false">corpse_to_wheel</soundName>
+	</move>
+	<move name="corpse_to_windremoving" fromPose="Corpse" toPose="Wind Removing" breath="none">
+	</move>	
+	<move name="corpse_to_blissfulbaby" fromPose="Corpse" toPose="Blissful Baby" breath="none">
+	</move>	
+	<move name="corpse_to_boathalf" fromPose="Corpse" toPose="Boat Half" breath="none">
+	</move>	
+	<move name="corpse_to_boatfull" fromPose="Corpse" toPose="Boat Full" breath="none">
+	</move>		
+	<move name="corpse_to_fish" fromPose="Corpse" toPose="Fish" breath="none">
+	</move>		
+	
+	
+	// Corpse Double Leg Raise
+	<move name="corpsedoublelegraise_to_corpse" fromPose="Corpse Double Leg Raise" toPose="Corpse" breath="none">
+		<soundName twosided="false">corpsedoublelegraise_to_corpse</soundName>
+	</move>		
+	<move name="corpsedoublelegraise_to_shoulderstandsupported" fromPose="Corpse Double Leg Raise" toPose="Shoulderstand Supported" breath="none">
+		<soundName twosided="false">corpsedoublelegraise_to_shoulderstandsupported</soundName>
+	</move>	
+	
+	
+	// Corpse Front
+	<move name="corpsefront_to_boxneutral" fromPose="Corpse Front" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">childwide_to_boxneutral</soundName>
+	</move>
+	<move name="corpsefront_to_bowpreparation" fromPose="Corpse Front" toPose="Bow Preparation" breath="none">
+	</move>		
+	<move name="corpsefront_to_locust" fromPose="Corpse Front" toPose="Locust" breath="none">
+	</move>		
+	<move name="corpsefront_to_locusthalf" fromPose="Corpse Front" toPose="Locust Half" breath="none">
+	</move>	
+	<move name="corpsefront_to_cobra" fromPose="Corpse Front" toPose="Cobra" breath="none">
+	</move>		
+	<move name="corpsefront_to_plank" fromPose="Corpse Front" toPose="Plank" breath="none">
+	</move>
+	<move name="corpsefront_to_sphinx" fromPose="Corpse Front" toPose="Sphinx" breath="none">
+	</move>
+
+	// Deaf Man
+	<move name="deafman_to_corpse" fromPose="Deaf Man" toPose="Corpse" breath="none">
+		<soundName twosided="false">deafman_to_corpse</soundName>
+		<soundName twosided="false">wheel_to_corpse</soundName>
+	</move>	
+	
+	
+	// Dolphin
+	<move name="dolphin_to_dolphinlegup" fromPose="Dolphin" toPose="Dolphin Leg Up" breath="none">
+		<soundName twosided="true">wheel_to_wheellegup</soundName>
+	</move>	
+	<move name="dolphin_to_featheredpeacock" fromPose="Dolphin" toPose="Feathered Peacock" breath="none">
+		<soundName twosided="true">dolphin_to_featheredpeacock</soundName>
+	</move>	
+	<move name="dolphin_to_splitswide" fromPose="Dolphin" toPose="Splits Wide" breath="none">
+	</move>	
+	
+	// Dolphin Leg Up
+	<move name="dolphinlegup_to_dolphin" fromPose="Dolphin Leg Up" toPose="Dolphin" breath="none">
+		<soundName twosided="true">wheellegup_to_wheel</soundName>
+	</move>	
+	
+	
+	// Dog
+	<move name="dog_to_cat" fromPose="Dog" toPose="Cat" breath="exhale">
+	</move>	
+
+	// Downward Dog
+	<move name="downwarddog_to_boxneutral" fromPose="Downward Dog" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">downwarddog_to_boxneutral</soundName>
+	</move>	
+	<move name="downwarddog_to_downwarddogontoes" fromPose="Downward Dog" toPose="Downward Dog On Toes" breath="inhale">
+		<soundName twosided="false">downwarddog_to_downwarddogontoes</soundName>
+	</move>	
+	<move name="downwarddog_to_downwarddogbentknees" fromPose="Downward Dog" toPose="Downward Dog Bent Knees" breath="inhale">
+		<soundName twosided="false">downwarddog_to_downwarddogbentknees</soundName>
+		<soundName twosided="false">downwarddog_to_downwarddogbentknees_2</soundName>
+	</move>	
+	<move name="downwarddog_to_downwarddoghandtoankle" fromPose="Downward Dog" toPose="Downward Dog Hand To Ankle" breath="none">
+		<soundName twosided="true">downwarddog_to_downwarddoghandtoankle</soundName>
+	</move>	
+	<move name="downwarddog_to_downwarddoglegup" fromPose="Downward Dog" toPose="Downward Dog Leg Up" breath="inhale">
+		<soundName twosided="true">downwarddog_to_downwarddoglegup</soundName>
+		<soundName twosided="true">downwarddog_to_downwarddoglegup_2</soundName>
+	</move>	
+	<move name="downwarddog_to_headstandtripod" fromPose="Downward Dog" toPose="Headstand Tripod" breath="none">
+	</move>	
+	<move name="downwarddog_to_plank" fromPose="Downward Dog" toPose="Plank" breath="none">
+		<soundName twosided="false">downwarddog_to_plank</soundName>
+	</move>	
+	<move name="downwarddog_to_plankkneeling" fromPose="Downward Dog" toPose="Plank Kneeling" breath="none">
+		<soundName twosided="false">downwarddog_to_plankkneeling</soundName>
+	</move>	
+	<move name="downwarddog_to_splitswide" fromPose="Downward Dog" toPose="Splits Wide" breath="none">
+	</move>	
+	<move name="downwarddog_to_warriorI" fromPose="Downward Dog" toPose="Warrior I" breath="inhale">
+	</move>
+	<move name="downwarddog_to_forwardbendhalfway" fromPose="Downward Dog" toPose="Forward Bend Half Way" breath="inhale">
+	</move>
+	
+	
+	// Downward Dog Bent Knees
+	<move name="downwarddogbentknees_to_downwarddog" fromPose="Downward Dog Bent Knees" toPose="Downward Dog" breath="exhale">
+	</move>	
+	<move name="downwarddogbentknees_to_forwardbend-step" fromPose="Downward Dog Bent Knees" toPose="Forward Bend" breath="exhale">
+		<soundName twosided="true">downwarddogbentknees_to_forwardbend-step</soundName>
+		<soundName twosided="false">downwarddogbentknees_to_forwardbend-step_2</soundName>
+	</move>
+	<move name="downwarddogbentknees_to_forwardbend-float" fromPose="Downward Dog Bent Knees" toPose="Forward Bend" breath="exhale">
+		<soundName twosided="false">downwarddogbentknees_to_forwardbend-float</soundName>
+	</move>
+	<move name="downwarddogbentknees_to_lungekneeling" fromPose="Downward Dog Bent Knees" toPose="Lunge Kneeling" breath="exhale">
+		<soundName twosided="true">downwarddogbentknees_to_lungekneeling</soundName>
+		<soundName twosided="false">downwarddogbentknees_to_lungekneeling_2</soundName>
+	</move>
+	<move name="downwarddogbentknees_to_lunge" fromPose="Downward Dog Bent Knees" toPose="Lunge" breath="exhale">
+		<soundName twosided="true">downwarddogbentknees_to_lunge</soundName>
+	</move>
+	<move name="downwarddogbentknees_to_downwarddogkneetoforehead" fromPose="Downward Dog Bent Knees" toPose="Downward Dog Knee To Forehead" breath="exhale">
+	</move>
+	
+	
+	
+	// Downward Dog Hamstring
+	<move name="downwarddoghamstring_to_downwarddogontoes" fromPose="Downward Dog Hamstring" toPose="Downward Dog On Toes" breath="inhale">
+		<soundName twosided="false">downwarddog_to_downwarddogontoes</soundName>
+	</move>	
+	
+	// Downward Dog Hand To Ankle
+	<move name="downwarddoghandtoankle_to_downwarddog" fromPose="Downward Dog Hand To Ankle" toPose="Downward Dog" breath="none">
+		<soundName twosided="false">downwarddoghandtoankle_to_downwarddog</soundName>
+	</move>	
+	
+	// Downward Dog Knee To Forehead
+	<move name="downwarddogkneetoforehead_to_planklegup" fromPose="Downward Dog Knee To Forehead" toPose="Plank Leg Up" breath="inhale">
+		<soundName twosided="false">downwarddogkneetoforehead_to_planklegup</soundName>
+	</move>	
+	<move name="downwarddogkneetoforehead_to_planklegup-pushup" fromPose="Downward Dog Knee To Forehead" toPose="Plank Leg Up" breath="inhale">
+		<soundName twosided="false">downwarddogkneetoforehead_to_planklegup-pushup</soundName>
+	</move>	
+	<move name="downwarddogkneetoforehead_to_downwarddoglegup" fromPose="Downward Dog Knee To Forehead" toPose="Downward Dog Leg Up" breath="inhale">
+	</move>	
+	<move name="downwarddogkneetoforehead_to_lunge" fromPose="Downward Dog Knee To Forehead" toPose="Lunge" breath="none">
+	</move>
+	<move name="downwarddogkneetoforehead_to_lungekneeling" fromPose="Downward Dog Knee To Forehead" toPose="Lunge Kneeling" breath="none">
+	</move>
+
+	
+	
+	// Downward Dog Knee To Forehead Kneeling
+	<move name="downwarddogkneetoforeheadkneeling_to_planklegupkneeling" fromPose="Downward Dog Knee To Forehead Kneeling" toPose="Plank Leg Up Kneeling" breath="inhale">
+		<soundName twosided="false">downwarddogkneetoforehead_to_planklegup</soundName>
+	</move>	
+
+	
+	// Downward Dog Leg Up
+	<move name="downwarddoglegup_to_downwarddog" fromPose="Downward Dog Leg Up" toPose="Downward Dog" breath="none">
+		<soundName twosided="true">downwarddoglegup_to_downwarddog</soundName>
+	</move>	
+	<move name="downwarddoglegup_to_downwarddoglegupstackhips" fromPose="Downward Dog Leg Up" toPose="Downward Dog Leg Up Stack Hips" breath="exhale">
+		<soundName twosided="true">downwarddoglegup_to_downwarddoglegupstackhips</soundName>
+	</move>	
+	<move name="downwarddoglegup_to_lunge" fromPose="Downward Dog Leg Up" toPose="Lunge" breath="exhale">
+		<soundName twosided="true">downwarddoglegup_to_lunge</soundName>
+		<soundName twosided="true">downwarddoglegup_to_lunge_2</soundName>
+	</move>
+	<move name="downwarddoglegup_to_lungekneeling" fromPose="Downward Dog Leg Up" toPose="Lunge Kneeling" breath="exhale">
+	</move>
+	<move name="downwarddoglegup_to_lungehandsonmat" fromPose="Downward Dog Leg Up" toPose="Lunge Hands On Mat" breath="inhale">
+	</move>
+	<move name="downwarddoglegup_to_lungehandsonmatflying" fromPose="Downward Dog Leg Up" toPose="Lunge Hands On Mat Flying" breath="inhale">
+		<soundName twosided="false">downwarddoglegup_to_lungehandsonmatflying</soundName>
+	</move>
+	<move name="downwarddoglegup_to_pigeonhalf" fromPose="Downward Dog Leg Up" toPose="Pigeon Half" breath="exhale">
+		<soundName twosided="true">boxneutral_to_pigeonhalf</soundName>
+	</move>	
+	<move name="downwarddoglegup_to_planklegup" fromPose="Downward Dog Leg Up" toPose="Plank Leg Up" breath="inhale">
+		<soundName twosided="false">downwarddoglegup_to_planklegup</soundName>
+	</move>	
+	<move name="downwarddoglegup_to_planklegup-pushup" fromPose="Downward Dog Leg Up" toPose="Plank Leg Up" breath="inhale">
+		<soundName twosided="false">downwarddogkneetoforehead_to_planklegup-pushup</soundName>
+	</move>		
+	<move name="downwarddoglegup_to_planklegupkneeling" fromPose="Downward Dog Leg Up" toPose="Plank Leg Up Kneeling" breath="inhale">
+		<soundName twosided="true">downwarddoglegup_to_planklegupkneeling</soundName>
+	</move>	
+	<move name="downwarddoglegup_to_splitsfront" fromPose="Downward Dog Leg Up" toPose="Splits Front" breath="exhale">
+	</move>	
+	<move name="downwarddoglegup_to_downwarddogkneetoforehead" fromPose="Downward Dog Leg Up" toPose="Downward Dog Knee To Forehead" breath="exhale">
+	</move>	
+	
+	
+	
+	// Downward Dog Leg Up Kneeling
+	<move name="downwarddoglegupkneeling_to_planklegupkneeling" fromPose="Downward Dog Leg Up Kneeling" toPose="Plank Leg Up Kneeling" breath="inhale">
+		<soundName twosided="false">downwarddoglegup_to_planklegup</soundName>
+	</move>		
+	
+
+	// Downward Dog Leg Up Stack Hips
+	<move name="downwarddoglegupstackhips_to_wheelflip" fromPose="Downward Dog Leg Up Stack Hips" toPose="Wheel Flip" breath="none">
+		<soundName twosided="true">downwarddoglegupstackhips_to_wheelflip</soundName>
+		<soundName twosided="false">downwarddoglegupstackhips_to_wheelflip_2</soundName>
+	</move>	
+	<move name="downwarddoglegupstackhips_to_downwarddoglegup" fromPose="Downward Dog Leg Up Stack Hips" toPose="Downward Dog Leg Up" breath="none">
+		<soundName twosided="false">downwarddoglegupstackhips_to_downwarddoglegup</soundName>
+	</move>	
+	
+	
+	// Downward Dog On Toes
+	<move name="downwarddogontoes_to_downwarddog" fromPose="Downward Dog On Toes" toPose="Downward Dog" breath="exhale">
+		<soundName twosided="false">downwarddogontoes_to_downwarddog</soundName>
+	</move>	
+	<move name="downwarddogontoes_to_downwarddoghamstring" fromPose="Downward Dog On Toes" toPose="Downward Dog Hamstring" breath="exhale">
+		<soundName twosided="true">downwarddogontoes_to_downwarddoghamstring</soundName>
+		<soundName twosided="true">downwarddogontoes_to_downwarddoghamstring_2</soundName>
+	</move>	
+	
+	// Downward Dog Start
+	<move name="downwarddogstart_to_downwarddogstart" fromPose="Downward Dog Start" toPose="Downward Dog Start" breath="none">
+	</move>
+	<move name="downwarddogstart_to_downwarddog" fromPose="Downward Dog Start" toPose="Downward Dog" breath="none">
+		<soundName twosided="false">downwarddogstart_to_downwarddog</soundName>
+	</move>
+	
+	// Eagle
+	<move name="eagle_to_mountain" fromPose="Eagle" toPose="Mountain" breath="none">
+	</move>	
+	
+	
+	// Feathered Peacock
+	<move name="featheredpeacock_to_dolphin" fromPose="Feathered Peacock" toPose="Dolphin" breath="none">
+		<soundName twosided="false">featheredpeacock_to_dolphin</soundName>
+	</move>	
+	<move name="featheredpeacock_to_scorpion" fromPose="Feathered Peacock" toPose="Scorpion" breath="none">
+	</move>	
+
+	
+	// Firefly
+	<move name="firefly_to_splitswide" fromPose="Firefly" toPose="Splits Wide" breath="none">
+	</move>	
+	
+	
+	// Fish
+	<move name="fish_to_corpse" fromPose="Fish" toPose="Corpse" breath="none">
+	</move>		
+
+
+
+	// Forward Bend
+	<move name="forwardbend_to_chair" fromPose="Forward Bend" toPose="Chair" breath="inhale">
+	</move>	
+	<move name="forwardbend_to_lunge" fromPose="Forward Bend" toPose="Lunge" breath="none">
+		<soundName twosided="true">forwardbend_to_lunge</soundName>
+	</move>	
+	<move name="forwardbend_to_lungekneeling" fromPose="Forward Bend" toPose="Lunge Kneeling" breath="none">
+		<soundName twosided="true">forwardbend_to_lungekneeling</soundName>
+		<soundName twosided="true">forwardbend_to_lungekneeling_2</soundName>
+	</move>	
+	<move name="forwardbend_to_forwardbendhalfway" fromPose="Forward Bend" toPose="Forward Bend Half Way" breath="inhale">
+		<soundName twosided="false">forwardbend_to_forwardbendhalfway</soundName>
+	</move>	
+	<move name="forwardbend_to_mountainarmsup" fromPose="Forward Bend" toPose="Mountain Arms Up" breath="inhale">
+		<soundName twosided="false">forwardbend_to_mountainarmsup</soundName>
+		<soundName twosided="false">forwardbend_to_mountainarmsup_2</soundName>
+	</move>
+	<move name="forwardbend_to_splitsstanding" fromPose="Forward Bend" toPose="Splits Standing" breath="inhale">
+	</move>
+
+
+	// Forward Bend Deep
+	<move name="forwardbenddeep_to_chair" fromPose="Forward Bend Deep" toPose="Chair" breath="inhale">
+		<soundName twosided="false">forwardbenddeep_to_chair</soundName>
+	</move>
+	<move name="forwardbenddeep_to_forwardbendhalfway" fromPose="Forward Bend Deep" toPose="Forward Bend Half Way" breath="inhale">
+		<soundName twosided="false">forwardbend_to_forwardbendhalfway</soundName>
+	</move>
+	<move name="forwardbenddeep_to_mountainarmsup" fromPose="Forward Bend Deep" toPose="Mountain Arms Up" breath="inhale">
+		<soundName twosided="false">forwardbend_to_mountainarmsup</soundName>
+		<soundName twosided="false">forwardbend_to_mountainarmsup_2</soundName>
+	</move>
+	
+	
+	// Forward Bend Half Way
+	<move name="forwardbendhalfway_to_forwardbenddeep" fromPose="Forward Bend Half Way" toPose="Forward Bend Deep" breath="exhale">
+		<soundName twosided="false">forwardbendhalfway_to_forwardbenddeep</soundName>
+	</move>		
+	<move name="forwardbendhalfway_to_forwardbend" fromPose="Forward Bend Half Way" toPose="Forward Bend" breath="exhale">
+	</move>
+	<move name="forwardbendhalfway_to_gorilla" fromPose="Forward Bend Half Way" toPose="Gorilla" breath="exhale">
+	</move>
+	<move name="forwardbendhalfway_to_plank" fromPose="Forward Bend Half Way" toPose="Plank" breath="exhale">
+		<soundName twosided="false">downwarddog_to_plank</soundName>
+	</move>		
+	<move name="forwardbendhalfway_to_plankkneeling" fromPose="Forward Bend Half Way" toPose="Plank Kneeling" breath="exhale">
+		<soundName twosided="false">downwarddog_to_plankkneeling</soundName>
+	</move>
+	<move name="forwardbendhalfway_to_fourlimbedstaff-step" fromPose="Forward Bend Half Way" toPose="Four Limbed Staff" breath="exhale">
+		<soundName twosided="true">forwardbendhalfway_to_fourlimbedstaff-step</soundName>
+		<soundName twosided="false">forwardbendhalfway_to_fourlimbedstaff-step_2</soundName>
+		<soundName twosided="false">forwardbendhalfway_to_fourlimbedstaff-step_3</soundName>
+	</move>	
+	<move name="forwardbendhalfway_to_fourlimbedstaff-float" fromPose="Forward Bend Half Way" toPose="Four Limbed Staff" breath="exhale">
+		<soundName twosided="false">forwardbendhalfway_to_fourlimbedstaff-float</soundName>
+		<soundName twosided="false">forwardbendhalfway_to_fourlimbedstaff-float_2</soundName>
+	</move>		
+	<move name="forwardbendhalfway_to_lunge" fromPose="Forward Bend Half Way" toPose="Lunge" breath="exhale">
+		<soundName twosided="true">forwardbend_to_lunge</soundName>
+	</move>	
+	<move name="forwardbendhalfway_to_lungekneeling" fromPose="Forward Bend Half Way" toPose="Lunge Kneeling" breath="exhale">
+		<soundName twosided="true">forwardbend_to_lungekneeling</soundName>
+		<soundName twosided="true">forwardbend_to_lungekneeling_2</soundName>
+	</move>	
+	<move name="forwardbendhalfway_to_seatedonheelsprayer" fromPose="Forward Bend Half Way" toPose="Seated On Heels Prayer" breath="exhale">
+		<soundName twosided="false">forwardbendhalfway_to_seatedonheelsprayer</soundName>
+	</move>	
+	
+
+		
+	// Four Limbed Staff
+	<move name="fourlimbedstaff_to_upwarddog" fromPose="Four Limbed Staff" toPose="Upward Dog" breath="inhale">
+		<soundName twosided="false">fourlimbedstaff_to_upwarddog</soundName>
+	</move>	
+	
+	
+	// Half Moon
+	<move name="halfmoon_to_warriorII" fromPose="Half Moon" toPose="Warrior II" breath="none">
+	</move>	
+    <move name="halfmoon_to_forwardbend" fromPose="Half Moon" toPose="Forward Bend" breath="none">
+	</move>	
+    <move name="halfmoon_to_splitsstanding" fromPose="Half Moon" toPose="Splits Standing" breath="none">
+	</move>
+
+	// Half Moon Revolved
+    <move name="halfmoonrevolved_to_splitsstanding" fromPose="Half Moon Revolved" toPose="Splits Standing" breath="none">
+	</move>
+
+	
+	// Handstand
+	<move name="handstand_to_handstandscorpion" fromPose="Handstand" toPose="Handstand Scorpion" breath="none">
+	</move>	
+	<move name="handstand_to_handstandsplits" fromPose="Handstand" toPose="Handstand Splits" breath="none">
+	</move>	
+	<move name="handstand_to_fourlimbedstaff" fromPose="Handstand" toPose="Four Limbed Staff" breath="none">
+	</move>
+	<move name="handstand_to_lungehandsonmatflying" fromPose="Handstand" toPose="Lunge Hands On Mat Flying" breath="none">
+	</move>
+
+	// Handstand Scorpion
+	<move name="handstandscorpion_to_handstand" fromPose="Handstand Scorpion" toPose="Handstand" breath="none">
+	</move>	
+
+	// Handstand Splits
+	<move name="handstandsplits_to_handstand" fromPose="Handstand Splits" toPose="Handstand" breath="none">
+	</move>	
+
+	
+	// Headstand Supported Preparation
+	<move name="headstandsupportedpreparation_to_headstandsupported" fromPose="Headstand Supported Preparation" toPose="Headstand Supported" breath="none">
+	</move>		
+	
+	
+	
+	// Headstand Tripod
+	<move name="headstandtripod_to_headstandtripodkneesonelbows" fromPose="Headstand Tripod" toPose="Headstand Tripod Knees On Elbows" breath="none">
+		<soundName twosided="false">headstandtripod_to_headstandtripodkneesonelbows</soundName>
+	</move>		
+	<move name="headstandtripod_to_headstandtripodspirallegs" fromPose="Headstand Tripod" toPose="Headstand Tripod Spiral Legs" breath="none">
+		<soundName twosided="false">headstandtripod_to_headstandtripodspirallegs</soundName>
+	</move>	
+	<move name="headstandtripod_to_downwarddog" fromPose="Headstand Tripod" toPose="Downward Dog" breath="none">
+	</move>	
+	
+	// Headstand Tripod Knees On Elbows
+	<move name="headstandtripodkneesonelbows_to_headstandtripod" fromPose="Headstand Tripod Knees On Elbows" toPose="Headstand Tripod" breath="none">
+		<soundName twosided="false">headstandtripodkneesonelbows_to_headstandtripod</soundName>
+	</move>		
+	<move name="headstandtripodkneesonelbows_to_splitswide" fromPose="Headstand Tripod Knees On Elbows" toPose="Splits Wide" breath="none">
+	</move>		
+	
+	// Headstand Tripod Preparation
+	<move name="headstandtripodpreparation_to_headstandtripodkneesonelbows" fromPose="Headstand Tripod Preparation" toPose="Headstand Tripod Knees On Elbows" breath="none">
+		<soundName twosided="false">headstandtripodpreparation_to_headstandtripodkneesonelbows</soundName>
+	</move>		
+	
+	// Headstand Tripod Spiral Legs
+	<move name="headstandtripodspirallegs_to_headstandtripod" fromPose="Headstand Tripod Spiral Legs" toPose="Headstand Tripod" breath="none">
+		<soundName twosided="false">headstandtripodspirallegs_to_headstandtripod</soundName>
+	</move>	
+				
+
+	// Hero
+	<move name="hero_to_heroreclining" fromPose="Hero" toPose="Hero Reclining" breath="none">
+	</move>	
+	<move name="hero_to_camel" fromPose="Hero" toPose="Camel" breath="none">
+	</move>	
+
+				
+	// Hero Reclining
+	<move name="heroreclining_to_hero" fromPose="Hero Reclining" toPose="Hero" breath="none">
+	</move>	
+				
+	// Knee Pile
+	<move name="kneepile_to_boxneutral" fromPose="Knee Pile" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">kneepile_to_boxneutral</soundName>
+	</move>	
+	<move name="kneepile_to_kneepilebind" fromPose="Knee Pile" toPose="Knee Pile Bind" breath="none">
+		<soundName twosided="true">kneepile_to_kneepilebind</soundName>
+	</move>		
+	<move name="kneepile_to_marichiI" fromPose="Knee Pile" toPose="Marichi I" breath="none">
+		<soundName twosided="true">kneepile_to_marichiI</soundName>
+	</move>
+
+	// Knee Pile Bind
+	<move name="kneepilebind_to_kneepile" fromPose="Knee Pile Bind" toPose="Knee Pile" breath="none">
+		<soundName twosided="false">chairtwistbind_to_chairtwistextended</soundName>
+	</move>	
+	
+	
+	// Locust
+	<move name="locust_to_corpsefront" fromPose="Locust" toPose="Corpse Front" breath="none">
+	</move>	
+
+	// Locust Half
+	<move name="locusthalf_to_corpsefront" fromPose="Locust Half" toPose="Corpse Front" breath="none">
+	</move>	
+	
+	
+	// Lord Of The Dance
+	<move name="lordofthedance_to_mountain" fromPose="Lord Of The Dance" toPose="Mountain" breath="none">
+	</move>	
+	
+			
+			
+	// Lunge
+	<move name="lunge_to_forwardbend" fromPose="Lunge" toPose="Forward Bend" breath="none">
+		<soundName twosided="true">lungekneeling_to_forwardbend</soundName>
+	</move>
+	<move name="lunge_to_lungearmforward" fromPose="Lunge" toPose="Lunge Arm Forward" breath="inhale">
+		<soundName twosided="true">lungekneeling_to_lungekneelingarmforward</soundName>
+	</move>
+	<move name="lunge_to_warriorI" fromPose="Lunge" toPose="Warrior I" breath="inhale">
+		<soundName twosided="false">lunge_to_warriorI</soundName>
+	</move>
+	<move name="lunge_to_splitsstanding" fromPose="Lunge" toPose="Splits Standing" breath="inhale">
+	</move>	
+	<move name="lunge_to_pyramid" fromPose="Lunge" toPose="Pyramid" breath="exhale">
+	</move>	
+	<move name="lunge_to_lungecrescent" fromPose="Lunge" toPose="Lunge Crescent" breath="inhale">
+	</move>			
+	<move name="lunge_to_downwarddoglegup" fromPose="Lunge" toPose="Downward Dog Leg Up" breath="inhale">
+	</move>
+	<move name="lunge_to_warriorIIreverse" fromPose="Lunge" toPose="Warrior II Reverse" breath="inhale">
+	</move>
+	<move name="lunge_to_lungekneeling" fromPose="Lunge" toPose="Lunge Kneeling" breath="none">
+	</move>
+	
+	
+	// Lunge Arm Forward
+	<move name="lungearmforward_to_lungearmup" fromPose="Lunge Arm Forward" toPose="Lunge Arm Up" breath="exhale">
+		<soundName twosided="true">lungekneelingarmforward_to_lungekneelingarmup</soundName>
+	</move>
+	<move name="lungearmforward_to_lunge" fromPose="Lunge Arm Forward" toPose="Lunge" breath="none">
+		<soundName twosided="true">lungekneelingarmup_to_lungekneeling</soundName>
+	</move>
+			
+	// Lunge Arm Up
+	<move name="lungearmup_to_lunge" fromPose="Lunge Arm Up" toPose="Lunge" breath="none">
+		<soundName twosided="true">lungekneelingarmup_to_lungekneeling</soundName>
+	</move>
+		
+
+	
+			
+	// Lunge Bind
+	<move name="lungebind_to_chairtwistbind" fromPose="Lunge Bind" toPose="Chair Twist Bind" breath="none">
+		<soundName twosided="false">lungebind_to_chairtwistbind</soundName>
+		<soundName twosided="false">lungebind_to_chairtwistbind_2</soundName>
+	</move>	
+	<move name="lungebind_to_lungehandsonmat" fromPose="Lunge Bind" toPose="Lunge Hands On Mat" breath="none">
+		<soundName twosided="false">lungebind_to_lungehandsonmat</soundName>
+		<soundName twosided="false">lungebind_to_lungehandsonmat_2</soundName>
+	</move>	
+	<move name="lungebind_to_warriorIIforward" fromPose="Lunge Bind" toPose="Warrior II Forward" breath="none">
+		<soundName twosided="false">chairtwistbind_to_chairtwistextended</soundName>
+	</move>	
+	
+	
+	// Lunge Crescent
+	<move name="lungecrescent_to_lunge" fromPose="Lunge Crescent" toPose="Lunge" breath="exhale">
+	</move>			
+	<move name="lungecrescent_to_lungekneeling" fromPose="Lunge Crescent" toPose="Lunge Kneeling" breath="exhale">
+	</move>
+	<move name="lungecrescent_to_pyramid" fromPose="Lunge Crescent" toPose="Pyramid" breath="exhale">
+	</move>			
+
+	
+					
+	// Lunge Hands On Mat
+	<move name="lungehandsonmat_to_downwarddoglegup" fromPose="Lunge Hands On Mat" toPose="Downward Dog Leg Up" breath="exhale">
+		<soundName twosided="true">lungehandsonmat_to_downwarddoglegup</soundName>
+		<soundName twosided="true">lungehandsonmat_to_downwarddoglegup_2</soundName>
+	</move>	
+	<move name="lungehandsonmat_to_lungehandsonmatback" fromPose="Lunge Hands On Mat" toPose="Lunge Hands On Mat Back" breath="exhale">
+		<soundName twosided="false">lungehandsonmat_to_lungehandsonmatback</soundName>
+	</move>
+	<move name="lungehandsonmat_to_lungehandsonmatflying" fromPose="Lunge Hands On Mat" toPose="Lunge Hands On Mat Flying" breath="inhale">
+		<soundName twosided="true">lungehandsonmat_to_lungehandsonmatflying</soundName>
+	</move>
+	
+	// Lunge Hands On Mat Back
+	<move name="lungehandsonmatback_to_lungehandsonmat" fromPose="Lunge Hands On Mat Back" toPose="Lunge Hands On Mat" breath="inhale">
+		<soundName twosided="false">lungehandsonmatback_to_lungehandsonmat</soundName>
+	</move>
+	
+	// Lunge Hands On Mat Flying	
+	<move name="lungehandsonmatflying_to_downwarddoglegup" fromPose="Lunge Hands On Mat Flying" toPose="Downward Dog Leg Up" breath="none">
+		<soundName twosided="true">lungehandsonmat_to_downwarddoglegup</soundName>
+		<soundName twosided="true">lungehandsonmat_to_downwarddoglegup_2</soundName>
+	</move>
+	<move name="lungehandsonmatflying_to_fourlimbedstaff" fromPose="Lunge Hands On Mat Flying" toPose="Four Limbed Staff" breath="none">
+	</move>
+	
+	
+	
+	// Lunge Kneeling
+	<move name="lungekneeling_to_lungekneelingarmforward" fromPose="Lunge Kneeling" toPose="Lunge Kneeling Arm Forward" breath="inhale">
+		<soundName twosided="true">lungekneeling_to_lungekneelingarmforward</soundName>
+	</move>
+	<move name="lungekneeling_to_forwardbend" fromPose="Lunge Kneeling" toPose="Forward Bend" breath="none">
+		<soundName twosided="true">lungekneeling_to_forwardbend</soundName>
+	</move>
+	<move name="lungekneeling_to_warriorIkneeling" fromPose="Lunge Kneeling" toPose="Warrior I Kneeling" breath="inhale">
+		<soundName twosided="false">lungekneeling_to_warriorIkneeling</soundName>
+		<soundName twosided="false">lungekneeling_to_warriorIkneeling_2</soundName>
+	</move>
+	<move name="lungekneeling_to_splitsstanding" fromPose="Lunge Kneeling" toPose="Splits Standing" breath="inhale">
+	</move>	
+	<move name="lungekneeling_to_lunge" fromPose="Lunge Kneeling" toPose="Lunge" breath="none">
+	</move>
+
+
+
+
+	// Lunge Kneeling Arm Forward
+	<move name="lungekneelingarmforward_to_lungekneelingarmup" fromPose="Lunge Kneeling Arm Forward" toPose="Lunge Kneeling Arm Up" breath="exhale">
+		<soundName twosided="true">lungekneelingarmforward_to_lungekneelingarmup</soundName>
+	</move>
+	<move name="lungekneelingarmforward_to_lungekneeling" fromPose="Lunge Kneeling Arm Forward" toPose="Lunge Kneeling" breath="none">
+		<soundName twosided="true">lungekneelingarmup_to_lungekneeling</soundName>
+	</move>
+
+	// Lunge Kneeling Arm Up
+	<move name="lungekneelingarmup_to_lungekneeling" fromPose="Lunge Kneeling Arm Up" toPose="Lunge Kneeling" breath="none">
+		<soundName twosided="true">lungekneelingarmup_to_lungekneeling</soundName>
+	</move>    
+	    
+		
+		
+		
+
+
+
+	
+	// Marichi I
+	<move name="marichiI_to_marichiIII" fromPose="Marichi I" toPose="Marichi III" breath="none">
+		<soundName twosided="true">marichiI_to_marichiIII</soundName>
+	</move>	
+	<move name="marichiI_to_staff" fromPose="Marichi I" toPose="Staff" breath="none">
+	</move>	
+	
+	
+	// Marichi III
+	<move name="marichiIII_to_boxneutral" fromPose="Marichi III" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">marichiIII_to_boxneutral</soundName>
+	</move>	
+	<move name="marichiIII_to_staff" fromPose="Marichi III" toPose="Staff" breath="none">
+	</move>	
+	
+			
+	// Mountain
+	<move name="mountain_to_tree" fromPose="Mountain" toPose="Tree" breath="none">
+		<soundName twosided="true">mountain_to_tree</soundName>
+	</move>
+	<move name="mountain_to_mountainarmsup" fromPose="Mountain" toPose="Mountain Arms Up" breath="inhale">
+		<soundName twosided="false">mountain_to_mountainarmsup</soundName>
+		<soundName twosided="false">mountain_to_mountainarmsup_2</soundName>
+	</move>
+	<move name="mountain_to_standingheadtokneepreparation" fromPose="Mountain" toPose="Standing Head To Knee Preparation" breath="none">
+	</move>
+	<move name="mountain_to_lordofthedance" fromPose="Mountain" toPose="Lord Of The Dance" breath="none">
+	</move>	
+	<move name="mountain_to_eagle" fromPose="Mountain" toPose="Eagle" breath="none">
+	</move>
+	<move name="mountain_to_chair" fromPose="Mountain" toPose="Chair" breath="inhale">
+	</move>
+
+		
+	
+	// Mountain Arms Up
+	<move name="mountainarmsup_to_mountain" fromPose="Mountain Arms Up" toPose="Mountain" breath="exhale">
+		<soundName twosided="false">mountainarmsup_to_mountain</soundName>
+		<soundName twosided="false">mountainarmsup_to_mountain_2</soundName>
+	</move>
+
+	<move name="mountainarmsup_to_forwardbend" fromPose="Mountain Arms Up" toPose="Forward Bend" breath="exhale">
+	</move>
+	<move name="mountainarmsup_to_forwardbenddeep" fromPose="Mountain Arms Up" toPose="Forward Bend Deep" breath="exhale">
+		<soundName twosided="false">mountainarmsup_to_forwardbenddeep</soundName>
+	</move>
+	
+	
+	// Pigeon
+	<move name="pigeon_to_camel" fromPose="Pigeon" toPose="Camel" breath="none">
+	</move>	
+	
+
+	// Pigeon Full
+	<move name="pigeonfull_to_kneepile" fromPose="Pigeon Full" toPose="Knee Pile" breath="none">
+		<soundName twosided="false">pigeonfull_to_kneepile</soundName>
+	</move>	
+	
+	// Pigeon Half
+	<move name="pigeonhalf_to_downwarddoglegup" fromPose="Pigeon Half" toPose="Downward Dog Leg Up" breath="inhale">
+		<soundName twosided="false">planklegup_to_downwarddoglegup</soundName>
+	</move>	
+	<move name="pigeonhalf_to_pigeonfull" fromPose="Pigeon Half" toPose="Pigeon Full" breath="none">
+		<soundName twosided="false">pigeonhalf_to_pigeonfull</soundName>
+	</move>	
+	<move name="pigeonhalf_to_splitsfront" fromPose="Pigeon Half" toPose="Splits Front" breath="none">
+		<soundName twosided="true">pigeonhalf_to_splitsfront</soundName>
+	</move>	
+	<move name="pigeonhalf_to_kneepile" fromPose="Pigeon Half" toPose="Knee Pile" breath="none">
+		<soundName twosided="true">splitsfront_to_kneepile</soundName>
+	</move>	
+
+
+
+    
+	
+	// Plank
+	<move name="plank_to_child" fromPose="Plank" toPose="Child" breath="none">
+	</move>	
+	<move name="plank_to_fourlimbedstaff" fromPose="Plank" toPose="Four Limbed Staff" breath="exhale">
+		<soundName twosided="false">plank_to_fourlimbedstaff</soundName>
+		<soundName twosided="false">plank_to_fourlimbedstaff_2</soundName>	
+	</move>	
+	<move name="plank_to_boxneutral" fromPose="Plank" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">downwarddog_to_boxneutral</soundName>
+	</move>
+	<move name="plank_to_plankside" fromPose="Plank" toPose="Plank Side" breath="none">
+	</move>	
+	<move name="plank_to_plankkneelingside" fromPose="Plank" toPose="Plank Kneeling Side" breath="none">
+	</move>
+	<move name="plank_to_downwarddog" fromPose="Plank" toPose="Downward Dog" breath="none">
+	</move>
+	<move name="plank_to_corpsefrong" fromPose="Plank" toPose="Corpse Front" breath="none">
+	</move>
+	
+
+	// Plank Dolphin
+	<move name="plankdolphin_to_plankdolphinside" fromPose="Plank Dolphin" toPose="Plank Dolphin Side" breath="none">
+	</move>	
+
+	// Plank Dolphin Side
+	<move name="plankdolphinside_to_plankdolphin" fromPose="Plank Dolphin Side" toPose="Plank Dolphin" breath="none">
+	</move>	
+
+	// Plank Kneeling
+	<move name="plankkneeling_to_fourlimbedstaff" fromPose="Plank Kneeling" toPose="Four Limbed Staff" breath="exhale">
+		<soundName twosided="false">plank_to_fourlimbedstaff</soundName>	
+		<soundName twosided="false">plank_to_fourlimbedstaff_2</soundName>	
+	</move>	
+	<move name="plankkneeling_to_plankkneelingside" fromPose="Plank Kneeling" toPose="Plank Kneeling Side" breath="none">
+	</move>	
+	
+	// Plank Kneeling Side
+	<move name="plankkneelingside_to_plankkneeling" fromPose="Plank Kneeling Side" toPose="Plank Kneeling" breath="none">
+	</move>	
+	<move name="plankkneelingside_to_plankside" fromPose="Plank Kneeling Side" toPose="Plank Side" breath="none">
+	</move>	
+	
+
+	// Plank Leg Up
+	<move name="planklegup_to_downwarddoglegup" fromPose="Plank Leg Up" toPose="Downward Dog Leg Up" breath="exhale">
+		<soundName twosided="false">planklegup_to_downwarddoglegup</soundName>
+	</move>	
+	<move name="planklegup_to_downwarddogkneetoforehead" fromPose="Plank Leg Up" toPose="Downward Dog Knee To Forehead" breath="exhale">
+		<soundName twosided="false">planklegup_to_downwarddogkneetoforehead</soundName>
+	</move>	
+	
+	// Plank Leg Up Kneeling
+	<move name="planklegupkneeling_to_downwarddoglegup" fromPose="Plank Leg Up Kneeling" toPose="Downward Dog Leg Up" breath="exhale">
+		<soundName twosided="false">planklegup_to_downwarddoglegup</soundName>
+	</move>			
+	<move name="planklegupkneeling_to_downwarddoglegupkneeling" fromPose="Plank Leg Up Kneeling" toPose="Downward Dog Leg Up Kneeling" breath="exhale">
+		<soundName twosided="false">planklegupkneeling_to_downwarddoglegupkneeling</soundName>
+	</move>		
+	<move name="planklegupkneeling_to_downwarddogkneetoforeheadkneeling" fromPose="Plank Leg Up Kneeling" toPose="Downward Dog Knee To Forehead Kneeling" breath="exhale">
+		<soundName twosided="false">planklegup_to_downwarddogkneetoforehead</soundName>
+	</move>	
+	
+	// Plank Side
+	<move name="plankside_to_plank" fromPose="Plank Side" toPose="Plank" breath="none">
+	</move>	
+	
+	// Plank Upward
+	<move name="plankupward_to_staff" fromPose="Plank Upward" toPose="Staff" breath="none">
+	</move>	
+
+	
+	
+	// Plow
+	<move name="plow_to_corpse" fromPose="Plow" toPose="Corpse" breath="none">
+		<soundName twosided="false">deafman_to_corpse</soundName>
+	</move>	
+	<move name="plow_to_deafman" fromPose="Plow" toPose="Deaf Man" breath="none">
+		<soundName twosided="false">plow_to_deafman</soundName>
+	</move>		
+			
+	// Puppy Extended
+	<move name="puppyextened_to_boxneutral" fromPose="Puppy Extended" toPose="Box Neutral" breath="none">
+	</move>		
+				
+		
+    // Pyramid
+    <move name="pyramid_to_lunge" fromPose="Pyramid" toPose="Lunge" breath="inhale">
+	</move>	
+    <move name="pyramid_to_lungecrescent" fromPose="Pyramid" toPose="Lunge Crescent" breath="inhale">
+	</move>	
+	
+	
+	// Scale
+	<move name="scale_to_firefly" fromPose="Scale" toPose="Firefly" breath="none">
+		<soundName twosided="false">scale_to_firefly</soundName>
+		<soundName twosided="false">scale_to_firefly_2</soundName>
+	</move>	
+	<move name="scale_to_splitswide" fromPose="Scale" toPose="Splits Wide" breath="none">
+	</move>
+	
+
+	// Scorpion
+	<move name="scorpion_to_ featheredpeacock" fromPose="Scorpion" toPose="Feathered Peacock" breath="none">
+	</move>
+
+	
+	
+	// Seated Forward Bend
+	<move name="seatedforwardbend_to_corpse" fromPose="Seated Forward Bend" toPose="Corpse" breath="none">
+		<soundName twosided="false">seatedforwardbend_to_corpse</soundName>
+	</move>	
+	
+	// Seated Forward Bend Preparation
+	<move name="seatedforwardbendpreparation_to_seatedforwardbend" fromPose="Seated Forward Bend Preparation" toPose="Seated Forward Bend" breath="none">
+		<soundName twosided="false">seatedforwardbendpreparation_to_seatedforwardbend</soundName>
+	</move>	
+	
+	
+
+
+	// Seated On Heels Hands On Mat Opened Knees
+	<move name="seatedonheelshandsonmatopenedknees_to_crow" fromPose="Seated On Heels Hands On Mat Opened Knees" toPose="Crow" breath="inhale">
+		<soundName twosided="false">seatedonheelshandsonmatopenedknees_to_crow</soundName>
+	</move>		
+	<move name="seatedonheelshandsonmatopenedknees_to_plank" fromPose="Seated On Heels Hands On Mat Opened Knees" toPose="Plank" breath="none">
+	</move>	
+	
+	// Seated On Heels Prayer
+	<move name="seatedonheelsprayer_to_seatedonheelsprayerclosedeyes" fromPose="Seated On Heels Prayer" toPose="Seated On Heels Prayer Closed Eyes" breath="none">
+		<soundName twosided="false">seatedonheelsprayer_to_seatedonheelsprayerclosedeyes</soundName>
+	</move>	
+	<move name="seatedonheelsprayer_to_seatedonheelsprayeropenedknees" fromPose="Seated On Heels Prayer" toPose="Seated On Heels Prayer Opened Knees" breath="inhale">
+		<soundName twosided="false">seatedonheelsprayer_to_seatedonheelsprayeropenedknees</soundName>
+		<soundName twosided="false">seatedonheelsprayer_to_seatedonheelsprayeropenedknees_2</soundName>
+	</move>	
+
+	
+	// Seated On Heels Prayer Closed Eyes
+	<move name="seatedonheelsprayerclosedeyes_to_seatedonheelsprayer" fromPose="Seated On Heels Prayer Closed Eyes" toPose="Seated On Heels Prayer" breath="none">
+		<soundName twosided="false">seatedonheelsprayerclosedeyes_to_seatedonheelsprayer</soundName>
+	</move>		
+
+	// Seated On Heels Prayer Opened Knees
+	<move name="seatedonheelsprayeropenedknees_to_seatedonheelshandsonmatopenedknees" fromPose="Seated On Heels Prayer Opened Knees" toPose="Seated On Heels Hands On Mat Opened Knees" breath="exhale">
+		<soundName twosided="false">seatedonheelsprayeropenedknees_to_seatedonheelshandsonmatopenedknees</soundName>
+	</move>		
+	
+
+	// Shoulderstand Supported
+	<move name="shoulderstandsupported_to_plow" fromPose="Shoulderstand Supported" toPose="Plow" breath="none">
+		<soundName twosided="false">shoulderstandsupported_to_plow</soundName>
+		<soundName twosided="false">shoulderstandsupported_to_plow_2</soundName>
+	</move>		
+	<move name="shoulderstandsupported_to_shoulderstandunsupported" fromPose="Shoulderstand Supported" toPose="Shoulderstand Unsupported" breath="none">
+	</move>		
+	
+	// Shoulderstand Unsupported
+	<move name="shoulderstandunsupported_to_plow" fromPose="Shoulderstand Unsupported" toPose="Plow" breath="none">
+		<soundName twosided="false">shoulderstandsupported_to_plow</soundName>
+		<soundName twosided="false">shoulderstandsupported_to_plow_2</soundName>
+	</move>		
+	
+	
+	// Sphinx
+	<move name="sphinx_to_corpsefront" fromPose="Sphinx" toPose="Corpse Front" breath="none">
+	</move>
+
+		
+		
+	// Splits Front
+	<move name="splitsfront_to_downwarddoglegup" fromPose="Splits Front" toPose="Downward Dog Leg Up" breath="inhale">
+		<soundName twosided="false">planklegup_to_downwarddoglegup</soundName>
+	</move>	
+	<move name="splitsfront_to_kneepile" fromPose="Splits Front" toPose="Knee Pile" breath="none">
+		<soundName twosided="true">splitsfront_to_kneepile</soundName>
+	</move>	
+	
+	
+	// Splits Standing
+	<move name="splitsstanding_to_forwardbend" fromPose="Splits Standing" toPose="Forward Bend" breath="exhale">
+		<soundName twosided="true">splitsstanding_to_forwardbend</soundName>
+	</move>		
+	<move name="splitsstanding_to_halfmoon" fromPose="Splits Standing" toPose="Half Moon" breath="none">
+	</move>
+	<move name="splitsstanding_to_halfmoonrevolved" fromPose="Splits Standing" toPose="Half Moon Revolved" breath="none">
+	</move>
+    
+	// Splits Wide
+	<move name="splitswide_to_boxneutral" fromPose="Splits Wide" toPose="Box Neutral" breath="none">
+		<soundName twosided="false">splitswide_to_boxneutral</soundName>
+	</move>	
+	
+	<move name="splitswide_to_forwardbend" fromPose="Splits Wide" toPose="Forward Bend" breath="none">
+		<soundName twosided="false">splitswide_to_forwardbend</soundName>
+	</move>					
+
+	<move name="splitswide_to_headstandtripodpreparation" fromPose="Splits Wide" toPose="Headstand Tripod Preparation" breath="none">
+		<soundName twosided="false">splitswide_to_headstandtripodpreparation</soundName>
+		<soundName twosided="false">splitswide_to_headstandtripodpreparation_2</soundName>
+	</move>		
+
+	<move name="splitswide_to_tortoise" fromPose="Splits Wide" toPose="Tortoise" breath="none">
+		<soundName twosided="false">splitswide_to_tortoise</soundName>
+	</move>	
+		
+
+	// Staff
+	<move name="staff_to_marichI" fromPose="Staff" toPose="Marichi I" breath="none">
+	</move>	
+	<move name="staff_to_marichIII" fromPose="Staff" toPose="Marichi III" breath="none">
+	</move>	
+
+	
+	// Standing Head To Knee 
+	<move name="standingheadtoknee_to_mountain" fromPose="Standing Head To Knee" toPose="Mountain" breath="none">
+	</move>	
+	
+	// Standing Head To Knee Preparation
+	<move name="standingheadtokneepreparation_to_standingheadtoknee" fromPose="Standing Head To Knee Preparation" toPose="Standing Head To Knee" breath="none">
+	</move>	
+	<move name="standingheadtokneepreparation_to_mountain" fromPose="Standing Head To Knee Preparation" toPose="Mountain" breath="none">
+		<soundName twosided="true">tree_to_mountain</soundName>
+	</move>	
+	
+	
+	// Tortoise
+	<move name="tortoise_to_scale" fromPose="Tortoise" toPose="Scale" breath="none">
+		<soundName twosided="false">tortoise_to_scale</soundName>
+	</move>	
+	<move name="tortoise_to_splitswide" fromPose="Tortoise" toPose="Splits Wide" breath="none">
+	</move>	
+	<move name="tortoise_to_tortoisebind" fromPose="Tortoise" toPose="Tortoise Bind" breath="none">
+		<soundName twosided="false">tortoise_to_tortoisebind</soundName>
+	</move>	
+	
+	// Tortoise Bind
+	<move name="tortoisebind_to_scale" fromPose="Tortoise Bind" toPose="Scale" breath="none">
+		<soundName twosided="false">tortoise_to_scale</soundName>
+	</move>	
+	
+	// Turtle
+	<move name="turtle_to_corpse" fromPose="Turtle" toPose="Corpse" breath="none">
+		<soundName twosided="false">turtle_to_corpse</soundName>
+	</move>	
+	
+	// Tree
+	<move name="tree_to_mountain" fromPose="Tree" toPose="Mountain" breath="none">
+		<soundName twosided="true">tree_to_mountain</soundName>
+	</move>	
+	<move name="tree_to_pigeonflying" fromPose="Tree" toPose="Pigeon Flying" breath="none">
+	</move>
+	
+	// Triangle
+	<move name="triangle_to_triangleforward" fromPose="Triangle" toPose="Triangle Forward" breath="exhale">
+		<soundName twosided="false">triangle_to_triangleforward</soundName>
+		<soundName twosided="false">triangle_to_triangleforward_2</soundName>
+	</move>	
+	<move name="triangle_to_warriorII" fromPose="Triangle" toPose="Warrior II" breath="none">
+		<soundName twosided="false">triangle_to_warriorII</soundName>
+	</move>	
+	<move name="triangle_to_trianglerevolved" fromPose="Triangle" toPose="Triangle Revolved" breath="exhale">
+	</move>	
+		
+	// Triangle Forward
+	<move name="triangleforward_to_triangle" fromPose="Triangle Forward" toPose="Triangle" breath="inhale">
+		<soundName twosided="true">triangleforward_to_triangle</soundName>
+		<soundName twosided="false">triangleforward_to_triangle_2</soundName>
+	</move>
+	<move name="triangleforward_to_halfmoon" fromPose="Triangle Forward" toPose="Half Moon" breath="none">
+	</move>
+	
+	// Triangle Revolved
+	<move name="trianglerevolved_to_triangle" fromPose="Triangle Revolved" toPose="Triangle" breath="inhale">
+	</move>	
+	<move name="trianglerevolved_to_halfmoonrevolved" fromPose="Triangle Revolved" toPose="Half Moon Revolved" breath="none">
+	</move>
+	
+	// Upward Dog
+	
+	<move name="upwarddog_to_child" fromPose="Upward Dog" toPose="Child" breath="exhale">
+	</move>
+	<move name="upwarddog_to_downwarddog" fromPose="Upward Dog" toPose="Downward Dog" breath="exhale">
+		<soundName twosided="false">upwarddog_to_downwarddog</soundName>
+	</move>	
+	<move name="upwarddog_to_downwarddog-pushup" fromPose="Upward Dog" toPose="Downward Dog" breath="exhale">
+		<soundName twosided="false">upwarddog_to_downwarddog-pushup</soundName>
+	</move>	
+	
+								
+	// Warrior I
+	<move name="warriorI_to_warriorIhandsonhips" fromPose="Warrior I" toPose="Warrior I Hands On Hips" breath="none">
+		<soundName twosided="false">warriorI_to_warriorIhandsonhips</soundName>
+	</move>
+	<move name="warriorI_to_warriorII" fromPose="Warrior I" toPose="Warrior II" breath="exhale">
+		<soundName twosided="false">warriorI_to_warriorII</soundName>
+	</move>	
+	<move name="warriorI_to_warriorprayer" fromPose="Warrior I" toPose="Warrior Prayer" breath="none">
+		<soundName twosided="false">mountainarmsup_to_mountain</soundName>
+		<soundName twosided="false">mountainarmsup_to_mountain_2</soundName>
+	</move>
+	<move name="warriorI_to_fourlimbedstaff" fromPose="Warrior I" toPose="Four Limbed Staff" breath="exhale">
+	</move>
+	<move name="warriorI_to_warriorIforward" fromPose="Warrior I" toPose="Warrior I Forward" breath="exhale">
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward</soundName>
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward_2</soundName>
+	</move>
+	<move name="warriorI_to_warriorIII" fromPose="Warrior I" toPose="Warrior III" breath="exhale">
+	</move>
+	
+	// Warrior I Hands On Hips
+	<move name="warriorIhandsonhips_to_warriorI" fromPose="Warrior I Hands On Hips" toPose="Warrior I" breath="none">
+	</move>
+	<move name="warriorIhandsonhips_to_warriorII" fromPose="Warrior I Hands On Hips" toPose="Warrior II" breath="exhale">
+		<soundName twosided="false">warriorI_to_warriorII</soundName>
+	</move>	
+	<move name="warriorIhandsonhips_to_warriorIhandsonhipsforward" fromPose="Warrior I Hands On Hips" toPose="Warrior I Hands On Hips Forward" breath="exhale">
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward</soundName>
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward_2</soundName>
+	</move>	
+		
+	// Warrior I Hands On Hips Forward
+	<move name="warriorIhandsonhipsforward_to_warriorIhandsonhips" fromPose="Warrior I Hands On Hips Forward" toPose="Warrior I Hands On Hips" breath="inhale">
+		<soundName twosided="false">warriorIhandssteepledforward_to_warriorIhandssteepled</soundName>
+	</move>
+	
+		
+	// Warrior I Forward
+	<move name="warriorIforward_to_warriorI" fromPose="Warrior I Forward" toPose="Warrior I" breath="inhale">
+		<soundName twosided="false">warriorIhandssteepledforward_to_warriorIhandssteepled</soundName>
+	</move>	
+	<move name="warriorIforward_to_warriorIII" fromPose="Warrior I Forward" toPose="Warrior III" breath="none">
+	</move>	
+	
+	// Warrior I Kneeling
+	<move name="warriorIkneeling_to_forwardbend" fromPose="Warrior I Kneeling" toPose="Forward Bend" breath="exhale">
+		<soundName twosided="false">warriorIkneeling_to_forwardbend</soundName>
+	</move>	
+	<move name="warriorIkneeling_to_fourlimbedstaff" fromPose="Warrior I Kneeling" toPose="Four Limbed Staff" breath="exhale">
+		<soundName twosided="false">warriorIkneeling_to_fourlimbedstaff</soundName>
+		<soundName twosided="false">warriorIkneeling_to_fourlimbedstaff_2</soundName>
+	</move>		
+
+	
+	// Warrior II		
+	<move name="warriorII_to_fourlimbedstaff" fromPose="Warrior II" toPose="Four Limbed Staff" breath="exhale">
+		<soundName twosided="false">warriorII_to_fourlimbedstaff</soundName>
+		<soundName twosided="false">warriorII_to_fourlimbedstaff_2</soundName>
+	</move>		
+	<move name="warriorII_to_lunge" fromPose="Warrior II" toPose="Lunge" breath="exhale">
+	</move>
+	<move name="warriorII_to_lungekneeling" fromPose="Warrior II" toPose="Lunge Kneeling" breath="exhale">
+		<soundName twosided="true">warriorII_to_lungekneeling</soundName>
+	</move>	
+	<move name="warriorII_to_plank" fromPose="Warrior II" toPose="Plank" breath="exhale">
+		<soundName twosided="false">warriorII_to_plank</soundName>
+	</move>	
+	<move name="warriorII_to_plankkneeling" fromPose="Warrior II" toPose="Plank Kneeling" breath="exhale">
+		<soundName twosided="false">warriorII_to_plankkneeling</soundName>
+	</move>	
+	<move name="warriorII_to_triangle" fromPose="Warrior II" toPose="Triangle" breath="none">
+		<soundName twosided="false">warriorII_to_triangle</soundName>
+	</move>		
+	<move name="warriorII_to_warriorI" fromPose="Warrior II" toPose="Warrior I" breath="inhale">
+	</move>		
+	<move name="warriorII_to_warriorIIforward" fromPose="Warrior II" toPose="Warrior II Forward" breath="exhale">
+		<soundName twosided="false">warriorIhandssteepled_to_warriorIhandssteepledforward</soundName>
+	</move>
+	<move name="warriorII_to_warriorIIreverse" fromPose="Warrior II" toPose="Warrior II Reverse" breath="inhale">
+		<soundName twosided="true">warriorII_to_warriorIIreverse</soundName>
+		<soundName twosided="false">warriorII_to_warriorIIreverse_2</soundName>
+	</move>	
+	<move name="warriorII_to_warriorprayer" fromPose="Warrior II" toPose="Warrior Prayer" breath="exhale">
+	</move>	
+	<move name="warriorII_to_halfmoon" fromPose="Warrior II" toPose="Half Moon" breath="none">
+	</move>	
+	
+
+	// Warrior II Forward
+	<move name="warriorIIforward_to_lungebind" fromPose="Warrior II Forward" toPose="Lunge Bind" breath="none">
+		<soundName twosided="false">chairtwistextended_to_chairtwistbind</soundName>
+	</move>	
+	<move name="warriorIIforward_to_warriorII" fromPose="Warrior II Forward" toPose="Warrior II" breath="inhale">
+		<soundName twosided="true">triangleforward_to_triangle</soundName>
+		<soundName twosided="false">triangleforward_to_triangle_2</soundName>
+	</move>		
+	<move name="warriorIIforward_to_warriorIIreverse" fromPose="Warrior II Forward" toPose="Warrior II Reverse" breath="inhale">
+		<soundName twosided="true">warriorII_to_warriorIIreverse</soundName>
+		<soundName twosided="false">warriorII_to_warriorIIreverse_2</soundName>
+	</move>	
+	<move name="warriorIIforward_to_warriorIIforwardarmforward" fromPose="Warrior II Forward" toPose="Warrior II Forward Arm Forward" breath="none">
+		<soundName twosided="false">warriorIIforward_to_warriorIIforwardarmforward</soundName>
+	</move>	
+	<move name="warriorIIforward_to_halfmoon" fromPose="Warrior II Forward" toPose="Half Moon" breath="none">
+	</move>
+	
+	// Warrior II Forward Arm Forward
+	<move name="warriorIIforwardarmforward_to_lungebind" fromPose="Warrior II Forward Arm Forward" toPose="Lunge Bind" breath="none">
+		<soundName twosided="false">chairtwistextended_to_chairtwistbind</soundName>
+	</move>
+	<move name="warriorIIforwardarmforward_to_lungehandsonmat" fromPose="Warrior II Forward Arm Forward" toPose="Lunge Hands On Mat" breath="none">
+		<soundName twosided="false">lungebind_to_lungehandsonmat</soundName>
+		<soundName twosided="false">lungebind_to_lungehandsonmat_2</soundName>
+	</move>
+	<move name="warriorIIforwardarmforward_to_warriorIIreverse" fromPose="Warrior II Forward Arm Forward" toPose="Warrior II Reverse" breath="inhale">
+		<soundName twosided="true">warriorII_to_warriorIIreverse</soundName>
+		<soundName twosided="false">warriorII_to_warriorIIreverse_2</soundName>
+	</move>
+    
+
+	// Warrior II Reverse
+	<move name="warriorIIreverse_to_warriorII" fromPose="Warrior II Reverse" toPose="Warrior II" breath="none">
+		<soundName twosided="false">warriorIIreverse_to_warriorII</soundName>
+	</move>
+	<move name="warriorIIreverse_to_warriorIIforward" fromPose="Warrior II Reverse" toPose="Warrior II Forward" breath="exhale">
+		<soundName twosided="false">warriorIIreverse_to_warriorIIforward</soundName>
+	</move>	
+	<move name="warriorIIreverse_to_warriorIIforwardarmforward" fromPose="Warrior II Reverse" toPose="Warrior II Forward Arm Forward" breath="exhale">
+	</move>
+	<move name="warriorIIreverse_to_lunge" fromPose="Warrior II Reverse" toPose="Lunge" breath="exhale">
+	</move>
+	<move name="warriorIIreverse_to_lungekneeling" fromPose="Warrior II Reverse" toPose="Lunge Kneeling" breath="exhale">
+	</move>
+
+	// Warrior III
+	<move name="warriorIII_to_warriorI" fromPose="Warrior III" toPose="Warrior I" breath="inhale">
+	</move>	
+	<move name="warriorIII_to_halfmoon" fromPose="Warrior III" toPose="Half Moon" breath="inhale">
+	</move>	
+	<move name="warriorIII_to_lungecrescent" fromPose="Warrior III" toPose="Lunge Crescent" breath="inhale">
+	</move>
+		
+			
+	// Warrior Prayer
+	<move name="warriorprayer_to_warriortwist" fromPose="Warrior Prayer" toPose="Warrior Twist" breath="none">
+		<soundName twosided="true">warriorprayer_to_warriortwist</soundName>
+	</move>
+	<move name="warriorprayer_to_warriorII" fromPose="Warrior Prayer" toPose="Warrior II" breath="exhale">
+		<soundName twosided="false">warriorI_to_warriorII</soundName>
+	</move>
+	<move name="warriorprayer_to_warriorI" fromPose="Warrior Prayer" toPose="Warrior I" breath="none">
+	</move>
+	
+		
+	// Warrior Twist
+	<move name="warriortwist_to_warriortwistextended" fromPose="Warrior Twist" toPose="Warrior Twist Extended" breath="none">
+		<soundName twosided="false">warriortwist_to_warriortwistextended</soundName>
+	</move>	
+	<move name="warriortwist_to_warriorprayer" fromPose="Warrior Twist" toPose="Warrior Prayer" breath="none">
+		<soundName twosided="false">chairtwist_to_chairprayer</soundName>
+	</move>		
+	
+	// Warrior Twist Extended
+	<move name="warriortwistextended_to_warriortwist" fromPose="Warrior Twist Extended" toPose="Warrior Twist" breath="none">
+		<soundName twosided="false">warriortwistextended_to_warriortwist</soundName>
+	</move>	
+		
+			
+		
+		
+	// Wheel
+	<move name="wheel_to_corpse" fromPose="Wheel" toPose="Corpse" breath="none">
+		<soundName twosided="false">wheel_to_corpse</soundName>
+	</move>	
+	<move name="wheel_to_wheellegup" fromPose="Wheel" toPose="Wheel Leg Up" breath="none">
+		<soundName twosided="true">wheel_to_wheellegup</soundName>
+	</move>	
+	
+	// Wheel Leg Up
+	<move name="wheellegup_to_wheel" fromPose="Wheel Leg Up" toPose="Wheel" breath="none">
+		<soundName twosided="true">wheellegup_to_wheel</soundName>
+	</move>	
+	
+	
+	// Wheel Flip
+	<move name="wheelflip_to_downwarddoglegup" fromPose="Wheel Flip" toPose="Downward Dog Leg Up" breath="none">
+		<soundName twosided="true">wheelflip_to_downwarddoglegup</soundName>
+	</move>			
+	<move name="wheelflip_to_wheelfliplegup" fromPose="Wheel Flip" toPose="Wheel Flip Leg Up" breath="none">
+		<soundName twosided="true">wheel_to_wheellegup</soundName>
+	</move>	
+	
+	// Wheel Flip Leg Up
+	<move name="wheelfliplegup_to_wheelflip" fromPose="Wheel Flip Leg Up" toPose="Wheel Flip" breath="none">
+		<soundName twosided="true">wheellegup_to_wheel</soundName>
+	</move>	
+	
+
+	// Wind Removing
+	<move name="windremoving_to_corpse" fromPose="Wind Removing" toPose="Corpse" breath="none">
+	</move>		
+
+		  	
+</moves>

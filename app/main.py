@@ -100,11 +100,13 @@ app.include_router(settings_router.router, tags=["Settings"])
 # ============================================
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+_NO_CACHE = {"Cache-Control": "no-cache, no-store, must-revalidate"}
+
 @app.get("/")
 @app.get("/index.html")
 async def serve_index():
     if os.path.exists("index.html"):
-        return FileResponse("index.html")
+        return FileResponse("index.html", headers=_NO_CACHE)
     return {"status": "ok", "message": "Cosmic Oracle is running"}
 
 
@@ -112,7 +114,7 @@ async def serve_index():
 async def serve_admin_page():
     """صفحه‌ی پنل مدیریت — صفحه‌ی مستقل admin-panel.js"""
     if os.path.exists("static/admin.html"):
-        return FileResponse("static/admin.html")
+        return FileResponse("static/admin.html", headers=_NO_CACHE)
     return FileResponse("index.html")
 
 
@@ -120,7 +122,7 @@ async def serve_admin_page():
 async def serve_account_page():
     """صفحه‌ی تنظیمات حساب — صفحه‌ی مستقل account-page.js"""
     if os.path.exists("static/account.html"):
-        return FileResponse("static/account.html")
+        return FileResponse("static/account.html", headers=_NO_CACHE)
     return FileResponse("index.html")
 
 
@@ -128,7 +130,7 @@ async def serve_account_page():
 async def serve_yoga_studio():
     """محیط تمرین یوگا — صفحه‌ی تمام‌صفحه با تایم‌لاین و پخش جلسه"""
     if os.path.exists("yoga.html"):
-        return FileResponse("yoga.html")
+        return FileResponse("yoga.html", headers=_NO_CACHE)
     raise HTTPException(status_code=404, detail="yoga.html not found")
 
 
@@ -136,8 +138,18 @@ async def serve_yoga_studio():
 async def serve_yoga_classic():
     """بازسازی وفادار Pocket Yoga — مستقیم از static/yoga-data/resources/"""
     if os.path.exists("yoga-classic.html"):
-        return FileResponse("yoga-classic.html")
+        return FileResponse("yoga-classic.html", headers=_NO_CACHE)
     raise HTTPException(status_code=404, detail="yoga-classic.html not found")
+
+
+@app.get("/sw.js")
+async def serve_service_worker():
+    """Service Worker — باید از ریشه سرو شود (scope: /) تا نوتیف‌های تعاملی در همه صفحات کار کنند"""
+    sw_path = os.path.join("static", "sw.js")
+    if os.path.exists(sw_path):
+        return FileResponse(sw_path, media_type="application/javascript",
+                            headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"})
+    raise HTTPException(status_code=404, detail="sw.js not found")
 
 
 @app.get("/yoga-cue/{key}")

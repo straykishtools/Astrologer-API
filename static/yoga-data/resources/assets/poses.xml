@@ -1,0 +1,1665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<poses>	
+
+
+	// New poses (needs illustration + audio)
+	// ---------
+	
+	<pose name="Half Moon Bound" twosided="true" offset="60" hasmissingaudio="true">
+		<baseName>half_moon_bound</baseName>
+		<sanskritName>Baddha Ardha Chandrāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Child Traditional" twosided="false">
+		<baseName>child_traditional</baseName>
+		<sanskritName>Balāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	<pose name="Bound Angle" offset="82" twosided="false">
+		<baseName>bound_angle</baseName>
+		<sanskritName>Baddha Koṇāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+	<pose name="Easy" offset="82" twosided="false">
+		<baseName>easy</baseName>
+		<sanskritName>Sukhāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+	<pose name="Fire Log" offset="82" twosided="true">
+		<baseName>fire_log</baseName>
+		<sanskritName>Agnistambhāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+	<pose name="Caterpillar" twosided="false">
+		<baseName>caterpillar</baseName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	<pose name="Bridge Leg Up" twosided="true">
+		<baseName>bridge_leg_up</baseName>
+		<sanskritName>Eka Pāda Setu Bandha Sarvāṅgāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>supine</category>
+		<subcategory>backbend</subcategory>
+    </pose>
+	
+	<pose name="Lunge Kneeling Hands On Mat" twosided="true">
+		<baseName>lunge_kneeling_hands_on_mat</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Lunge Crescent Forward Bend" twosided="true">
+		<baseName>lunge_crescent_forward_bend</baseName>
+		<soundInstructionName>warrior_I_hands_steepled_forward_INS</soundInstructionName>
+		<soundInstructionName>warrior_I_hands_steepled_forward_INS_2</soundInstructionName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Lunge Crescent Twist" twosided="true">
+		<baseName>lunge_crescent_twist</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Lunge Crescent Twist Reverse" twosided="true">
+		<baseName>lunge_crescent_twist_reverse</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Lunge Crescent Kneeling Forward Bend" twosided="true">
+		<baseName>lunge_crescent_kneeling_forward_bend</baseName>
+		<soundInstructionName>warrior_I_hands_steepled_forward_INS_2</soundInstructionName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Lunge Crescent Kneeling Twist" twosided="true">
+		<baseName>lunge_crescent_kneeling_twist</baseName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Lunge Crescent Kneeling Twist Reverse" twosided="true">
+		<baseName>lunge_crescent_kneeling_twist_reverse</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Wild Thing" twosided="true" preferredside="left">
+		<baseName>wild_thing</baseName>
+		<sanskritName>Camatkārāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>
+	
+	<pose name="Bird Of Paradise Revolved Preparation" twosided="true" preferredside="left" offset="82">
+		<baseName>bird_of_paradise_revolved_preparation</baseName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>
+	<pose name="Bird Of Paradise Revolved" twosided="true" preferredside="left" offset="82">
+		<baseName>bird_of_paradise_revolved</baseName>
+		<sanskritName>Parivṛtta Svarga Dvijāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Flying Man Revolved" twosided="true" preferredside="left" offset="39">
+		<baseName>flying_man_revolved</baseName>
+		<sanskritName>Parivṛtta Eka Pāda Kouṇḍinyāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Eight Angle" twosided="true" preferredside="left" offset="39">
+		<baseName>eight_angle</baseName>
+		<sanskritName>Aṣṭāvakrāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	<pose name="Plank Side Extended" twosided="true" preferredside="left">
+		<baseName>plank_side_extended</baseName>
+		<sanskritName>Utthita Vasiṣṭhāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	// New poses (needs audio)
+	// ---------
+    
+	<pose name="Standing Knee To Chest" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>standing_knee_to_chest</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Pigeon Forward Bend" twosided="true" offset="39" hasmissingaudio="true">
+		<baseName>pigeon_forward_bend</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+	
+	//recommended name = One Legged Sage 
+	<pose name="Pigeon Flying" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>pigeon_flying</baseName>
+		<sanskritName>Eka Pāda Gālavāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+	
+	<pose name="Supine Spinal Twist" twosided="true" hasmissingaudio="true">
+		<baseName>supine_spinal_twist</baseName>
+        <sanskritName>Supta Jaṭhara Parivartānāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>supine</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	
+	<pose name="Standing Hand To Toe" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>standing_hand_to_toe</baseName>
+        <sanskritName>Hasta Pādāṅguṣṭhāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	<pose name="Standing Hand To Toe Extended" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>standing_hand_to_toe_extended</baseName>
+        <sanskritName>Utthita Hasta Pādāṅguṣṭhāsana</sanskritName> 
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	
+	<pose name="Sphinx" twosided="false" hasmissingaudio="true">
+		<baseName>sphinx</baseName>
+        <sanskritName>Sālamba Bhujaṅgāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+    //recommended name = One legged King Pigeon
+	<pose name="Pigeon King" twosided="true" hasmissingaudio="true">
+		<baseName>pigeon_king</baseName>
+        <sanskritName>Eka Pāda Rājakapotāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>seated</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+	
+	<pose name="Lotus Full" twosided="false" offset="82" hasmissingaudio="true">
+		<baseName>lotus_full</baseName>
+		<sanskritName>Padmāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+    
+	<pose name="Lotus Half" twosided="false" offset="82" hasmissingaudio="true">
+		<baseName>lotus_half</baseName>
+		<sanskritName>Ardha Padmāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+	
+	<pose name="Lotus Levitating" twosided="false" excludefromdictionary="true" offset="82" hasmissingaudio="true">
+		<baseName>lotus_levitating</baseName>
+		<difficulty>expert</difficulty>
+		<category>seated</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+
+	
+	<pose name="Pyramid Kneeling" twosided="true" hasmissingaudio="true">
+		<baseName>pyramid_kneeling</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+	
+	
+	
+	<pose name="Half Moon Revolved" twosided="true" offset="60" hasmissingaudio="true">
+		<baseName>half_moon_revolved</baseName>
+		<sanskritName>Parivṛtta Ardha Chandrāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	
+	
+	
+	
+	
+	<pose name="Lunge Prayer" twosided="true" hasmissingaudio="true">
+		<baseName>lunge_prayer</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+    
+	<pose name="Lunge Twist" twosided="true" hasmissingaudio="true">
+		<baseName>lunge_twist</baseName>
+		<sanskritName>Parivṛtta Aṅjaneyāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+    
+	<pose name="Lunge Twist Extended" twosided="true" hasmissingaudio="true">
+		<baseName>lunge_twist_extended</baseName>
+		<sanskritName>Utthita Parivṛtta Aṅjaneyāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>
+	
+	<pose name="Lunge Twist Extended Bound" twosided="true" hasmissingaudio="true">
+		<baseName>lunge_twist_extended_bound</baseName>
+        <sanskritName>Parivṛtta Baddha Aṅjaneyāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	
+	
+	
+
+	<pose name="Lunge Kneeling Prayer" twosided="true" hasmissingaudio="true">
+		<baseName>lunge_kneeling_prayer</baseName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+    
+	<pose name="Lunge Kneeling Twist" twosided="true" hasmissingaudio="true">
+		<baseName>lunge_kneeling_twist</baseName>
+        <sanskritName>Parivṛtta Aṅjaneyāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+    
+	<pose name="Lunge Kneeling Twist Extended" twosided="true" hasmissingaudio="true">
+		<baseName>lunge_kneeling_twist_extended</baseName>
+        <sanskritName>Utthita Parivṛtta Aṅjaneyāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	<pose name="Lunge Kneeling Twist Extended Bound" twosided="true" hasmissingaudio="true">
+		<baseName>lunge_kneeling_twist_extended_bound</baseName>
+        <sanskritName>Parivṛtta Baddha Aṅjaneyāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	
+	
+	<pose name="Cat Balance" twosided="true" hasmissingaudio="true">
+		<baseName>cat_balance</baseName>
+        <sanskritName>Utthita Cakravākāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+    <pose name="Bow Half" twosided="true" hasmissingaudio="true">
+		<baseName>bow_half</baseName>
+        <sanskritName>Ardha Dhanurāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+	
+	
+	
+	
+	<pose name="Seated On Heels Twist Bound" preferredside="left" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>seated_on_heels_twist_bound</baseName>
+        <sanskritName>Pāśasana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>seated</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	
+	
+	// Current poses
+	// -------------
+	
+	
+	<pose name="Awkward" twosided="false" offset="82">
+		<baseName>awkward</baseName>
+		<sanskritName>Utkaṭāsana</sanskritName>
+		<variation>Chair</variation>
+		<variation>Chair Prayer</variation>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+
+	<pose name="Blissful Baby" twosided="false" offset="-48">
+		<baseName>blissful_baby</baseName>
+		<sanskritName>Ānanda Bālāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>supine</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	<pose name="Boat Full" twosided="false">
+		<baseName>boat_full</baseName>
+		<sanskritName>Nāvāsana</sanskritName>
+		<variation>Boat Half</variation>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>		
+	
+	<pose name="Boat Half" twosided="false">
+		<baseName>boat_half</baseName>
+		<sanskritName>Ardha Nāvāsana</sanskritName>
+		<variation>Boat Full</variation>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	<pose name="Bow" twosided="false">
+		<baseName>bow</baseName>
+		<sanskritName>Dhanurāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>prone</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+	<pose name="Bow Preparation" twosided="false">
+		<baseName>bow_preparation</baseName>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+	<pose name="Box Hand To Ankle" twosided="true">
+		<baseName>box_hand_to_ankle</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	
+	<pose name="Box Neutral" twosided="false">
+		<baseName>box_neutral</baseName>
+        <sanskritName>Cakravākāsana</sanskritName>
+		<soundInstructionName>box_neutral_INS</soundInstructionName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>neutral</subcategory>
+    </pose>		
+	
+	<pose name="Bridge" twosided="false">
+		<baseName>bridge</baseName>
+		<sanskritName>Setu Bandha Sarvāṅgāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>supine</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+		
+	<pose name="Camel" twosided="false" offset="82">
+		<baseName>camel</baseName>
+		<sanskritName>Uṣṭrāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+
+	<pose name="Cat" twosided="false">
+		<baseName>cat</baseName>
+		<soundInstructionName>cat_INS</soundInstructionName>
+		<sanskritName>Marjaryāsana</sanskritName>	
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+	<pose name="Chair" twosided="false" offset="82">
+		<baseName>chair</baseName>
+		<soundInstructionName>chair_INS</soundInstructionName>
+		<soundInstructionName>chair_INS_2</soundInstructionName>
+		<soundInstructionName>chair_INS_3</soundInstructionName>
+		<sanskritName>Utkaṭāsana</sanskritName>
+		<variation>Awkward</variation>
+		<variation>Chair Prayer</variation>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>  	
+	
+	<pose name="Chair Prayer" twosided="false" offset="82">
+		<baseName>chair_prayer</baseName>
+		<variation>Awkward</variation>
+		<variation>Chair</variation>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>   
+	
+	<pose name="Chair Twist" twosided="true" offset="82">
+		<baseName>chair_twist</baseName>
+		<sanskritName>Parivṛtta Utkaṭāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose> 
+	
+	<pose name="Chair Twist Bind" twosided="true" offset="82">
+		<baseName>chair_twist_bind</baseName>
+        <sanskritName>Parivṛtta Baddha Utkaṭāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose> 
+	
+	<pose name="Chair Twist Bind Up" twosided="true" offset="82">
+		<baseName>chair_twist_bind_up</baseName>
+		<sanskritName>Svarga Dvijāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose> 
+	
+	<pose name="Chair Twist Extended" twosided="true" offset="82">
+		<baseName>chair_twist_extended</baseName>
+        <sanskritName>Utthita Parivṛtta Utkaṭāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose> 
+	
+	<pose name="Child" twosided="false">
+		<baseName>child</baseName>
+		<sanskritName>Utthita Balāsana</sanskritName>
+		<variation>Child Wide</variation>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+	<pose name="Child Wide" twosided="false">
+		<baseName>child_wide</baseName>
+		<soundInstructionName>child_wide_INS</soundInstructionName>
+		<soundInstructionName>child_wide_INS_2</soundInstructionName>
+		<sanskritName>Balāsana</sanskritName>
+		<variation>Child</variation>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+	<pose name="Child Wide Side Lean" twosided="true">
+		<baseName>child_wide_side_lean</baseName>
+		<soundInstructionName>child_wide_side_lean_INS</soundInstructionName>
+		<soundInstructionName>child_wide_side_lean_INS_2</soundInstructionName>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+	
+	<pose name="Child Wide Start" twosided="false" excludefromdictionary="true" excludefromtimeline="true">
+		<baseName>child_wide</baseName>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+	
+	<pose name="Cobra" twosided="false">
+		<baseName>cobra</baseName>
+		<sanskritName>Bhujaṅgāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+    <pose name="Corpse" twosided="false">
+		<baseName>corpse</baseName>
+		<sanskritName>Śavāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>supine</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+
+    <pose name="Corpse Double Leg Raise" twosided="false" offset="-48">
+		<baseName>corpse_double_leg_raise</baseName>
+		<soundInstructionName>corpse_double_leg_raise_INS</soundInstructionName>
+		<soundInstructionName>corpse_double_leg_raise_INS_2</soundInstructionName>
+		<sanskritName>Supta Daṇḍāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>supine</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+			
+	<pose name="Corpse Front" twosided="false">
+		<baseName>corpse_front</baseName>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+	
+	<pose name="Crescent Moon" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>crescent_moon</baseName>
+        <sanskritName>Ashta Chandrāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>lateral_bend</subcategory>
+    </pose>	
+	
+    <pose name="Crow" twosided="false" offset="82">
+		<baseName>crow</baseName>
+		<sanskritName>Bakāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+	</pose>
+	
+    <pose name="Crow Flying" twosided="true" preferredside="left" offset="82">
+		<baseName>crow_flying</baseName>
+		<sanskritName>Eka Pāda Bakāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+	</pose>
+	
+	<pose name="Crow Side" preferredside="left" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>crow_side</baseName>
+		<sanskritName>Pārśva Bakāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	
+	<pose name="Crow Side Preparation" preferredside="left" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>crow_side_preparation</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>twist</subcategory>
+    </pose>		
+    
+    <pose name="Deaf Man" twosided="false" offset="-85">
+		<baseName>deaf_man</baseName>
+		<soundInstructionName>deaf_man_INS</soundInstructionName>
+		<soundInstructionName>deaf_man_INS_2</soundInstructionName>
+		<sanskritName>Karṇapīḍāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>forward_bend</subcategory>
+    </pose> 	
+		
+	<pose name="Dog" twosided="false">
+		<baseName>dog</baseName>
+		<soundInstructionName>dog_INS</soundInstructionName>
+		<sanskritName>Bitilāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+	<pose name="Dolphin" twosided="false">
+		<baseName>dolphin</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+	<pose name="Dolphin Leg Up" twosided="true">
+		<baseName>dolphin_leg_up</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+    <pose name="Downward Dog" twosided="false">
+		<baseName>downward_dog</baseName>
+		<soundInstructionName>downward_dog_INS</soundInstructionName>
+		<soundInstructionName>downward_dog_INS_2</soundInstructionName>
+		<soundInstructionName>downward_dog_INS_3</soundInstructionName>
+		<sanskritName>Adho Mukha Śvānāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>  
+	
+    <pose name="Downward Dog Bent Knees" twosided="false">
+		<baseName>downward_dog_bent_knees</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose> 
+	
+    <pose name="Downward Dog Hamstring" twosided="true">
+		<baseName>downward_dog_hamstring</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>     
+	
+    <pose name="Downward Dog Hand To Ankle" twosided="true">
+		<baseName>downward_dog_hand_to_ankle</baseName>
+		<sanskritName>Parivṛtta Adho Mukha Śvānāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>twist</subcategory>
+    </pose>   
+	
+    <pose name="Downward Dog Knee To Forehead" twosided="true">
+		<baseName>downward_dog_knee_to_forehead</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>    
+	
+    <pose name="Downward Dog Knee To Forehead Kneeling" twosided="true">
+		<baseName>downward_dog_knee_to_forehead_kneeling</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose> 
+	
+	<pose name="Downward Dog Leg Up" twosided="true">
+		<baseName>downward_dog_leg_up</baseName>
+        <sanskritName>Eka Pāda Adho Mukha Śvānāsana</sanskritName>
+		<soundInstructionName>downward_dog_leg_up_INS</soundInstructionName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose> 
+	
+	<pose name="Downward Dog Leg Up Kneeling" twosided="true">
+		<baseName>downward_dog_leg_up_kneeling</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose> 
+	
+	<pose name="Downward Dog Leg Up Stack Hips" twosided="true">
+		<baseName>downward_dog_leg_up_stack_hips</baseName>
+		<soundInstructionName>downward_dog_leg_up_stack_hips_INS</soundInstructionName>
+		<soundInstructionName>downward_dog_leg_up_stack_hips_INS_2</soundInstructionName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose> 
+	
+	<pose name="Downward Dog On Toes" twosided="false">
+		<baseName>downward_dog_on_toes</baseName>
+		<soundInstructionName>downward_dog_on_toes_INS</soundInstructionName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose> 
+	
+	<pose name="Downward Dog Start" twosided="false" excludefromdictionary="true" excludefromtimeline="true">
+		<baseName>downward_dog</baseName>
+		<sanskritName>Adho Mukha Svanāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+	
+	<pose name="Eagle" twosided="true" offset="82" preferredside="left">
+		<baseName>eagle</baseName>
+		<sanskritName>Garuḍāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+
+    <pose name="Feathered Peacock" twosided="false" offset="82">
+		<baseName>feathered_peacock</baseName>
+		<soundInstructionName>feathered_peacock_INS</soundInstructionName>
+		<sanskritName>Pīñcha Mayūrāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>  
+	
+    <pose name="Firefly" twosided="false" offset="82">
+		<baseName>firefly</baseName>
+		<sanskritName>Tittibhāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+
+	<pose name="Fish" twosided="false">
+		<baseName>fish</baseName>
+		<sanskritName>Matsyāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>supine</category>
+		<subcategory>backbend</subcategory>
+    </pose>		
+	
+    <pose name="Forward Bend" twosided="false" offset="82">
+		<baseName>forward_bend</baseName>
+		<soundInstructionName>forward_bend_INS</soundInstructionName>
+		<sanskritName>Uttānāsana</sanskritName>
+		<variation>Forward Bend Deep</variation>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+    <pose name="Forward Bend Deep" twosided="false" offset="82">
+		<baseName>forward_bend_deep</baseName>
+		<soundInstructionName>forward_bend_deep_INS</soundInstructionName>
+		<soundInstructionName>forward_bend_deep_INS_2</soundInstructionName>
+        <sanskritName>Uttānāsana</sanskritName>
+		<variation>Forward Bend</variation>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+    <pose name="Forward Bend Half Way" twosided="false" offset="82">
+		<baseName>forward_bend_half_way</baseName>
+		<sanskritName>Ardha Uttānāsana</sanskritName>
+		<soundInstructionName>forward_bend_half_way_INS</soundInstructionName>
+		<soundInstructionName>forward_bend_half_way_INS_2</soundInstructionName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+    <pose name="Four Limbed Staff" twosided="false">
+		<baseName>four_limbed_staff</baseName>
+		<sanskritName>Chaturaṅga Daṇḍāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>  
+	
+	<pose name="Frog" twosided="false" hasmissingaudio="true">
+		<baseName>frog</baseName>
+		<difficulty>intermediate</difficulty>
+        <sanskritName>Bhekāsana</sanskritName>
+		<category>arm_leg_support</category>
+		<subcategory>neutral</subcategory>
+    </pose>		
+	
+	<pose name="Garland" twosided="false" offset="82">
+		<baseName>garland</baseName>
+		<sanskritName>Mālāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>		
+	
+	<pose name="Gorilla" twosided="false" offset="82">
+		<baseName>gorilla</baseName>
+		<sanskritName>Pādahastāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+	
+	<pose name="Half Moon" twosided="true" offset="60">
+		<baseName>half_moon</baseName>
+		<sanskritName>Ardha Chandrāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>		
+	
+	<pose name="Handstand" twosided="false" offset="82">
+		<baseName>handstand</baseName>
+		<sanskritName>Adho Mukha Vṛkṣāsana</sanskritName>
+		<variation>Handstand Splits</variation>
+		<variation>Handstand Scorpion</variation>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>		
+	
+	<pose name="Handstand Scorpion" twosided="false" offset="82">
+		<baseName>handstand_scorpion</baseName>
+		<sanskritName>Vṛśchikāsana II</sanskritName>
+		<variation>Handstand</variation>
+		<variation>Handstand Splits</variation>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	<pose name="Handstand Splits" twosided="false" offset="82">
+		<baseName>handstand_splits</baseName>
+		<variation>Handstand</variation>
+		<variation>Handstand Scorpion</variation>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	<pose name="Headstand Supported" twosided="false" offset="82">
+		<baseName>headstand_supported</baseName>
+		<sanskritName>Sālamba Śīrṣāsana I</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>		
+	
+	<pose name="Headstand Supported Preparation" twosided="false" offset="39">
+		<baseName>headstand_supported_preparation</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+		
+    <pose name="Headstand Tripod" twosided="false" offset="39">
+		<baseName>headstand_tripod</baseName>
+		<soundInstructionName>feathered_peacock_INS</soundInstructionName>
+		<sanskritName>Sālamba Śīrṣāsana II</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+	</pose>    
+	
+    <pose name="Headstand Tripod Knees On Elbows" twosided="false" offset="39">
+		<baseName>headstand_tripod_knees_on_elbows</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>   
+	
+    <pose name="Headstand Tripod Preparation" twosided="false" offset="39">
+		<baseName>headstand_tripod_preparation</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose> 
+	
+	<pose name="Headstand Tripod Spiral Legs" twosided="false" offset="39">
+		<baseName>headstand_tripod_spiral_legs</baseName>
+        <sanskritName>Parivṛttaikapāda Śīrṣāsana II</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>  
+	
+	<pose name="Hero" twosided="false" offset="82">
+		<baseName>hero</baseName>
+		<sanskritName>Vīrāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>backbend</subcategory>
+    </pose>		
+	
+	<pose name="Hero Reclining" twosided="false">
+		<baseName>hero_reclining</baseName>
+		<sanskritName>Supta Vīrāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>supine</category>
+		<subcategory>backbend</subcategory>
+    </pose>		
+	
+	<pose name="Hero Reclining Extended" twosided="false" hasmissingaudio="true">
+		<baseName>hero_reclining_extended</baseName>
+        <sanskritName>Utthita Supta Vīrāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>supine</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+	
+	<pose name="Knee Pile" twosided="true">
+		<baseName>knee_pile</baseName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>twist</subcategory>
+    </pose>  
+	
+	<pose name="Knee Pile Bind" twosided="true">
+		<baseName>knee_pile_bind</baseName>
+		<sanskritName>Gomukhāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>twist</subcategory>
+    </pose>  
+		
+	<pose name="Locust" twosided="false">
+		<baseName>locust</baseName>
+		<sanskritName>Śalabhāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>prone</category>
+		<subcategory>backbend</subcategory>
+    </pose>				
+	
+	<pose name="Locust Half" twosided="true">
+		<baseName>locust_half</baseName>
+		<sanskritName>Ardha Śalabhāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>prone</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+	<pose name="Lord Of The Dance" twosided="true" offset="82">
+		<baseName>lord_of_the_dance</baseName>
+		<sanskritName>Naṭarājāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+
+	<pose name="Lord Of The Dance Full" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>lord_of_the_dance_full</baseName>
+        <sanskritName>Naṭarājāsana</sanskritName>
+		<variation>Lord Of The Dance</variation>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+    <pose name="Lunge" twosided="true">
+		<baseName>lunge</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+    <pose name="Lunge Arm Forward" twosided="true">
+		<baseName>lunge_arm_forward</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>	     
+	
+    <pose name="Lunge Arm Up" twosided="true">
+		<baseName>lunge_arm_up</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>twist</subcategory>
+    </pose>	     
+	
+	<pose name="Lunge Bind" twosided="true">
+		<sanskritName>Baddha Pārśvakoṇāsana</sanskritName>
+		<baseName>lunge_bind</baseName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>  
+	
+	<pose name="Lunge Crescent" twosided="true">
+		<baseName>lunge_crescent</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>  
+	
+    <pose name="Lunge Kneeling" twosided="true">
+		<baseName>lunge_kneeling</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>	     
+	
+    <pose name="Lunge Kneeling Arm Forward" twosided="true">
+		<baseName>lunge_kneeling_arm_forward</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>	     
+	
+    <pose name="Lunge Kneeling Arm Up" twosided="true">
+		<baseName>lunge_kneeling_arm_up</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>twist</subcategory>
+    </pose>	     
+	
+	<pose name="Lunge Hands On Mat" twosided="true">
+		<baseName>lunge_hands_on_mat</baseName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Lunge Hands On Mat Back" twosided="true">
+		<baseName>lunge_hands_on_mat_back</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+	
+	<pose name="Lunge Hands On Mat Flying" twosided="true" preferredside="left" offset="39">
+		<baseName>lunge_hands_on_mat_flying</baseName>
+		<sanskritName>Eka Pāda Kouṇḍinyāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+    <pose name="Marichi I" twosided="true" preferredside="left">
+		<baseName>marichi_I</baseName>
+        <sanskritName>Marīchyāsana I</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>twist</subcategory>
+    </pose>
+				
+    <pose name="Marichi III" twosided="true" preferredside="left">
+		<baseName>marichi_III</baseName>
+		<sanskritName>Marīchyāsana III</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>twist</subcategory>
+    </pose>
+				
+    <pose name="Mountain" twosided="false" offset="82">
+		<baseName>mountain</baseName>
+		<sanskritName>Tāḍāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+	
+	<pose name="Mountain Arms Up" twosided="false" offset="82">
+		<baseName>mountain_arms_up</baseName>
+		<soundInstructionName>mountain_arms_up_INS</soundInstructionName>
+		<sanskritName>Tāḍāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>backbend</subcategory>
+    </pose>
+
+	<pose name="Pigeon Full" twosided="true">
+		<baseName>pigeon_full</baseName>
+		<sanskritName>Eka Pāda Rājakapotāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>backbend</subcategory>
+    </pose>   
+	
+    <pose name="Pigeon Half" twosided="true">
+		<baseName>pigeon_half</baseName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>backbend</subcategory>
+    </pose> 
+	
+	<pose name="Pigeon" twosided="false">
+		<baseName>pigeon</baseName>
+		<sanskritName>Kapotāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+    <pose name="Plank" twosided="false">
+		<baseName>plank</baseName>
+        <sanskritName>Phalakāsana</sanskritName>
+		<variation>Plank Kneeling</variation>
+		<variation>Plank Dolphin</variation>
+		<variation>Plank Leg Up</variation>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>   
+	
+	<pose name="Plank Side" twosided="true" preferredside="left">
+		<baseName>plank_side</baseName>
+		<sanskritName>Vasiṣṭhāsana</sanskritName>
+		<variation>Plank Kneeling Side</variation>
+		<variation>Plank Dolphin Side</variation>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+		
+	<pose name="Plank Dolphin" twosided="false">
+		<baseName>plank_dolphin</baseName>
+		<variation>Plank</variation>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	<pose name="Plank Dolphin Side" twosided="true" preferredside="left">
+		<baseName>plank_dolphin_side</baseName>
+		<variation>Plank Side</variation>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+    <pose name="Plank Kneeling" twosided="false">
+		<baseName>plank_kneeling</baseName>
+		<variation>Plank</variation>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>    
+	
+	<pose name="Plank Kneeling Side" twosided="true" preferredside="left">
+		<baseName>plank_kneeling_side</baseName>
+		<variation>Plank Side</variation>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>   	
+	
+    <pose name="Plank Leg Up" twosided="true">
+		<baseName>plank_leg_up</baseName>
+        <sanskritName>Eka Pāda Phalakāsana</sanskritName>
+		<variation>Plank</variation>
+		<variation>Plank Leg Up Kneeling</variation>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>   
+	
+    <pose name="Plank Leg Up Kneeling" twosided="true">
+		<baseName>plank_leg_up_kneeling</baseName>
+		<variation>Plank Kneeling</variation>
+		<variation>Plank Leg Up</variation>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>   
+
+    <pose name="Plank Upward" twosided="false" hasmissingaudio="true">
+		<baseName>plank_upward</baseName>
+		<sanskritName>Pūrvottānāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+    <pose name="Plow" twosided="false" offset="-85">
+		<baseName>plow</baseName>
+		<sanskritName>Halāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>forward_bend</subcategory>
+    </pose> 	
+	
+	<pose name="Puppy Extended" twosided="false">
+		<baseName>puppy_extended</baseName>
+		<sanskritName>Uttāna Shishosana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>prone</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+
+	<pose name="Pyramid" twosided="true">
+		<baseName>pyramid</baseName>
+		<sanskritName>Pārśvottānāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+	
+	<pose name="Rabbit" twosided="false">
+		<baseName>rabbit</baseName>
+		<sanskritName>Sasangāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+	
+    <pose name="Savasana" twosided="false" excludefromdictionary="true" excludefromtimeline="true">
+		<baseName>corpse</baseName>
+		<soundInstructionName>savasana_INS</soundInstructionName>
+		<soundInstructionName>savasana_INS_2</soundInstructionName>
+		<soundInstructionName>savasana_INS_3</soundInstructionName>
+		<soundInstructionName>savasana_INS_4</soundInstructionName>
+        <sanskritName>Śavāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>supine</category>
+		<subcategory>neutral</subcategory>
+    </pose>
+	
+    <pose name="Scale" twosided="false" offset="82">
+		<baseName>scale</baseName>
+		<sanskritName>Tolāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Scorpion" twosided="false" offset="82">
+		<baseName>scorpion</baseName>
+		<sanskritName>Vṛśchikāsana I</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose>  	
+	
+	<pose name="Seated Forward Bend" twosided="false">
+		<baseName>seated_forward_bend</baseName>
+		<soundInstructionName>seated_forward_bend_INS</soundInstructionName>
+		<sanskritName>Paśchimottānāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+	<pose name="Seated Forward Bend Preparation" twosided="false">
+		<baseName>seated_forward_bend_preparation</baseName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+
+    //recommended name = Toe Squat
+	<pose name="Seated On Heels Prayer" twosided="false" offset="82">
+		<baseName>seated_on_heels_prayer</baseName>
+		<soundInstructionName>seated_on_heels_prayer_INS</soundInstructionName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Seated On Heels Prayer Closed Eyes" twosided="false" offset="82" excludefromdictionary="true">
+		<baseName>seated_on_heels_prayer_closed_eyes</baseName>
+		<soundInstructionName>seated_on_heels_prayer_closed_eyes_INS</soundInstructionName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Seated On Heels Prayer Opened Knees" twosided="false" offset="82">
+		<baseName>seated_on_heels_prayer_opened_knees</baseName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	<pose name="Seated On Heels Hands On Mat Opened Knees" twosided="false" offset="82">
+		<baseName>seated_on_heels_hands_on_mat_opened_knees</baseName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Seated On Heels Prayer Twist" preferredside="left" twosided="true" offset="82" hasmissingaudio="true">
+		<baseName>seated_on_heels_prayer_twist</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>seated</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+
+    <pose name="Shoulderstand Supported" twosided="false" offset="-85">
+		<baseName>shoulderstand_supported</baseName>
+		<soundInstructionName>shoulderstand_supported_INS</soundInstructionName>
+		<soundInstructionName>shoulderstand_supported_INS_2</soundInstructionName>
+		<sanskritName>Sālamba Sarvāṅgāsana</sanskritName>
+		<variation>Shoulderstand Unsupported</variation>
+		<difficulty>intermediate</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose> 	
+	
+    <pose name="Shoulderstand Unsupported" twosided="false" offset="-85">
+		<baseName>shoulderstand_unsupported</baseName>
+		<sanskritName>Nirālamba Sarvāṅgāsana</sanskritName>
+		<variation>Shoulderstand Supported</variation>
+		<difficulty>expert</difficulty>
+		<category>arm_balance_and_inversion</category>
+		<subcategory>balancing</subcategory>
+    </pose> 		
+	
+	<pose name="Splits Front" twosided="true">
+		<baseName>splits_front</baseName>
+		<sanskritName>Hanumānāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Splits Wide" twosided="false" offset="39">
+		<baseName>splits_wide</baseName>
+		<soundInstructionName>splits_wide_INS</soundInstructionName>
+		<soundInstructionName>splits_wide_INS_2</soundInstructionName>
+		<soundInstructionName>splits_wide_INS_3</soundInstructionName>
+		<sanskritName>Upaviṣṭha Koṇāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>seated</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+	<pose name="Splits Standing" twosided="true" offset="82">
+		<baseName>splits_standing</baseName>
+		<sanskritName>Ūrdhva Prasārita Eka Pādāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>		
+	
+	<pose name="Staff" twosided="false">
+		<baseName>staff</baseName>
+		<sanskritName>Daṇḍāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>seated</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+	
+	<pose name="Staff Inverted" twosided="false" hasmissingaudio="true">
+		<baseName>staff_inverted</baseName>
+		<sanskritName>Dvi Pāda Viparīta Daṇḍāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+	
+	<pose name="Standing Head To Knee" twosided="true" offset="82">
+		<baseName>standing_head_to_knee</baseName>
+		<sanskritName>Daṇḍayamana Jānushīrāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+	<pose name="Standing Head To Knee Preparation" twosided="true" offset="82">
+		<baseName>standing_head_to_knee_preparation</baseName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>	
+	
+    <pose name="Supine Bound Angle" twosided="false" hasmissingaudio="true">
+		<baseName>supine_bound_angle</baseName>
+        <sanskritName>Supta Baddha Koṇāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>supine</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+	
+	<pose name="Supine Hand To Toe" twosided="true" hasmissingaudio="true">
+		<baseName>supine_hand_to_toe</baseName>
+        <sanskritName>Supta Hasta Pādāṅguṣṭhāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>supine</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+	
+	<pose name="Supine Hand To Toe Extended" twosided="true" hasmissingaudio="true">
+		<baseName>supine_hand_to_toe_extended</baseName>
+        <sanskritName>Utthita Supta Hasta Pādāṅguṣṭhāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>supine</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+	
+	<pose name="Supine Pigeon" twosided="true" offset="-48" hasmissingaudio="true">
+		<baseName>supine_pigeon</baseName>
+        <sanskritName>Supta Kapotāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>supine</category>
+		<subcategory>neutral</subcategory>
+    </pose>	
+	
+			
+	<pose name="Table" twosided="false" hasmissingaudio="true">
+		<baseName>table</baseName>
+        <sanskritName>Pūrvottānāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>	
+    
+
+    <pose name="Tortoise" twosided="false" offset="82">
+		<baseName>tortoise</baseName>
+		<soundInstructionName>tortoise_INS</soundInstructionName>
+		<soundInstructionName>tortoise_INS_2</soundInstructionName>
+        <difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+	<pose name="Tortoise Bind" twosided="false" offset="82">
+		<baseName>tortoise_bind</baseName>
+		<sanskritName>Kūrmāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+    <pose name="Tree" twosided="true" preferredside="left" offset="82">
+		<baseName>tree</baseName>
+		<sanskritName>Vṛkṣāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>   
+		
+	<pose name="Triangle" twosided="true">
+		<baseName>triangle</baseName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose> 
+	
+	<pose name="Triangle Forward" twosided="true">
+		<baseName>triangle_forward</baseName>
+		<soundInstructionName twosided="true">triangle_forward_INS</soundInstructionName>
+		<sanskritName>Trikoṇāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>lateral_bend</subcategory>
+    </pose> 
+
+	<pose name="Triangle Revolved" twosided="true">
+		<baseName>triangle_revolved</baseName>
+		<sanskritName>Parivṛtta Trikoṇāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>		
+	
+    <pose name="Turtle" twosided="false" offset="-48">
+		<baseName>turtle</baseName>
+		<sanskritName>Pavanamuktāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>supine</category>
+		<subcategory>forward_bend</subcategory>
+    </pose> 
+	
+	<pose name="Upward Dog" twosided="false">
+		<baseName>upward_dog</baseName>
+		<soundInstructionName>upward_dog_INS</soundInstructionName>
+		<soundInstructionName>upward_dog_INS_2</soundInstructionName>
+		<sanskritName>Ūrdhva Mukha Śvānāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose> 
+
+						
+    <pose name="Warrior I" twosided="true">
+		<baseName>warrior_I</baseName>
+		<soundInstructionName>warrior_I_INS</soundInstructionName>
+		<soundInstructionName>warrior_I_INS_2</soundInstructionName>
+		<sanskritName>Vīrabhadrāsana I</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>  
+	
+    <pose name="Warrior I Hands On Hips" twosided="true">
+		<baseName>warrior_I_hands_on_hips</baseName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>   
+	
+    <pose name="Warrior I Hands On Hips Forward" twosided="true">
+		<baseName>warrior_I_hands_on_hips_forward</baseName>
+		<soundInstructionName>warrior_I_hands_steepled_forward_INS</soundInstructionName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+    <pose name="Warrior I Forward" twosided="true">
+		<baseName>warrior_I_forward</baseName>
+		<soundInstructionName>warrior_I_hands_steepled_forward_INS</soundInstructionName>
+		<soundInstructionName>warrior_I_hands_steepled_forward_INS_2</soundInstructionName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>
+	
+    <pose name="Warrior I Kneeling" twosided="true">
+		<baseName>warrior_I_kneeling</baseName>
+		<soundInstructionName>warrior_I_kneeling_INS</soundInstructionName>
+        <sanskritName>Aṅjaneyāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose> 
+	
+    <pose name="Warrior II" twosided="true">
+		<baseName>warrior_II</baseName>
+		<soundInstructionName>warrior_II_INS</soundInstructionName>
+		<soundInstructionName>warrior_II_INS_2</soundInstructionName>
+		<soundInstructionName>warrior_II_INS_3</soundInstructionName>
+		<sanskritName>Vīrabhadrāsana II</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+	
+    <pose name="Warrior II Forward" twosided="true">
+		<baseName>warrior_II_forward</baseName>
+		<soundInstructionName>warrior_II_forward_INS</soundInstructionName>
+		<soundInstructionName twosided="true">warrior_II_forward_INS_2</soundInstructionName>
+        <sanskritName>Pārśvakoṇāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>lateral_bend</subcategory>
+    </pose>
+	
+    <pose name="Warrior II Forward Arm Forward" twosided="true">
+		<baseName>warrior_II_forward_arm_forward</baseName>
+		<sanskritName>Utthita Pārśvakoṇāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>lateral_bend</subcategory>
+    </pose>
+	
+    <pose name="Warrior II Reverse" twosided="true">
+		<baseName>warrior_II_reverse</baseName>
+		<sanskritName>Pārśva Vīrabhadrāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>lateral_bend</subcategory>
+    </pose>  
+	
+	<pose name="Warrior III" twosided="true" offset="82">
+		<baseName>warrior_III</baseName>
+		<sanskritName>Vīrabhadrāsana III</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>
+		
+    <pose name="Warrior Prayer" twosided="true">
+		<baseName>warrior_prayer</baseName>
+		<difficulty>beginner</difficulty>
+		<category>standing</category>
+		<subcategory>balancing</subcategory>
+    </pose>  
+	
+    <pose name="Warrior Twist" twosided="true">
+		<baseName>warrior_twist</baseName>
+		<soundInstructionName twosided="true">warrior_twist_INS</soundInstructionName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>  
+	
+    <pose name="Warrior Twist Extended" twosided="true">
+		<baseName>warrior_twist_extended</baseName>
+		<sanskritName>Parivṛtta Pārśvakoṇāsana</sanskritName>
+		<difficulty>intermediate</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>  
+	
+	<pose name="Warrior Twist Extended Bound" twosided="true" hasmissingaudio="true">
+		<baseName>warrior_twist_extended_bound</baseName>
+        <sanskritName>Parivṛtta Baddha Pārśvakoṇāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>standing</category>
+		<subcategory>twist</subcategory>
+    </pose>	
+	
+    <pose name="Wheel" twosided="false">
+		<baseName>wheel</baseName>
+		<soundInstructionName>wheel_INS</soundInstructionName>
+		<soundInstructionName>wheel_INS_2</soundInstructionName>
+		<sanskritName>Ūrdhva Dhanurāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>  
+
+    <pose name="Wheel Leg Up" twosided="true">
+		<baseName>wheel_leg_up</baseName>
+        <sanskritName>Eka Pāda Ūrdhva Dhanurāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>  
+
+	<pose name="Wheel Flip" twosided="false" excludefromdictionary="true">
+		<baseName>wheel_flip</baseName>
+		<sanskritName>Ūrdhva Dhanurāsana</sanskritName>
+		<difficulty>expert</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>backbend</subcategory>
+    </pose>  
+	
+    <pose name="Wheel Flip Leg Up" twosided="true" excludefromdictionary="true">
+		<baseName>wheel_flip_leg_up</baseName>
+		<difficulty>expert</difficulty>
+		<category>arm_leg_support</category>
+		<subcategory>balancing</subcategory>
+    </pose>  
+	
+	<pose name="Wind Removing" twosided="true">
+		<baseName>wind_removing</baseName>
+		<sanskritName>Eka Pāda Pavanamuktāsana</sanskritName>
+		<difficulty>beginner</difficulty>
+		<category>supine</category>
+		<subcategory>forward_bend</subcategory>
+    </pose>	
+
+</poses>
+

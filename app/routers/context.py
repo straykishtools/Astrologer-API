@@ -337,7 +337,9 @@ async def analyze_chart(request: AnalysisRequest):
     """
     Sends chart context + Vedic summary to the local proxy and returns the AI analysis.
     """
-    api_key = os.getenv("DEEPSEEK_API_KEY", "sk-76422dc5ee03d9c3-j1m8he-be3fb0c5")
+    api_key = os.getenv("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="سرویس تحلیل هوش مصنوعی پیکربندی نشده است")
 
     prompt = f"""
 You are an experienced astrologer specializing in Vedic astrology.

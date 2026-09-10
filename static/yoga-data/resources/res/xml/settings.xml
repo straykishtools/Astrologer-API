@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/voice">
+        <com.rainfrog.yoga.view.settings.VolumeSliderPreference
+            android:icon="@drawable/volume_preference"
+            android:persistent="false"
+            android:title="@string/voice_volume"
+            android:key="voice_volume"/>
+        <com.rainfrog.yoga.view.settings.VolumeEnabledPreference
+            android:icon="@android:color/transparent"
+            android:persistent="false"
+            android:title="@string/enabled"
+            android:key="voice_enabled"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/music">
+        <com.rainfrog.yoga.view.settings.VolumeSliderPreference
+            android:icon="@drawable/volume_preference"
+            android:persistent="false"
+            android:title="@string/music_volume"
+            android:key="music_volume"/>
+        <com.rainfrog.yoga.view.settings.VolumeEnabledPreference
+            android:icon="@android:color/transparent"
+            android:persistent="false"
+            android:title="@string/enabled"
+            android:key="music_enabled"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/overlay_displays">
+        <CheckBoxPreference
+            android:persistent="true"
+            android:title="@string/preference_calories_burned"
+            android:key="overlay_calories_enabled"
+            android:defaultValue="false"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:persistent="false"
+        android:title="@string/soundtrack"
+        android:key="soundtrack">
+        <Preference
+            android:persistent="false"
+            android:title="@string/manage_playlists"
+            android:key="manage_playlists"/>
+        <com.rainfrog.yoga.view.settings.SoundtrackPreference
+            android:persistent="false"
+            android:title="@string/warm_up"
+            android:key="soundtrack_warm_up"
+            android:summary="@string/_default"/>
+        <com.rainfrog.yoga.view.settings.SoundtrackPreference
+            android:persistent="false"
+            android:title="@string/flow"
+            android:key="soundtrack_flow"
+            android:summary="@string/_default"/>
+        <com.rainfrog.yoga.view.settings.SoundtrackPreference
+            android:persistent="false"
+            android:title="@string/cool_down"
+            android:key="soundtrack_cool_down"
+            android:summary="@string/_default"/>
+        <com.rainfrog.yoga.view.settings.SoundtrackPreference
+            android:persistent="false"
+            android:title="@string/rest"
+            android:key="soundtrack_rest"
+            android:summary="@string/_default"/>
+    </PreferenceCategory>
+</PreferenceScreen>

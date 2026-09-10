@@ -200,12 +200,19 @@ class HafezService:
         # ============================================
         # ۵. خروجی دوستونه (شعر | تفسیر + متادیتا)
         # ============================================
+        # تعبیر تفأل بر اساس مضمونِ غزل
+        from app.services.hafez_interpreter import HafezInterpreter
+        _interp = HafezInterpreter().interpret(ghazal_number, question)
+
         result = {
             # ----- بخش شعر (سمت راست / بالا) -----
             "poem": poem_text if poem_text else "🍃 فال حافظ دریافت شد، اما متن شعر در دسترس نیست.",
-            
+
             # ----- بخش تفسیر (سمت چپ / پایین) -----
             "interpretation": interpretation,
+
+            # ----- تعبیر تفأل (مضمون + پیام + مشورت) -----
+            "faal": _interp,
             
             # ----- متادیتا (اطلاعات غزل) -----
             "metadata": {

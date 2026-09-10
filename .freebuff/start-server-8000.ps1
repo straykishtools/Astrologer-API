@@ -1,2 +1,0 @@
-$proc = Start-Process -FilePath 'cmd.exe' -ArgumentList '/c','C:\Users\Lucid\Documents\GitHub\Astrologer-API\.freebuff\start-preview-8000.bat' -RedirectStandardOutput 'C:\Users\Lucid\Documents\GitHub\Astrologer-API\.freebuff\preview-ed3ec4e9-ceb4-4bcb-bf8c-c4fc82eff90f.log' -RedirectStandardError 'C:\Users\Lucid\Documents\GitHub\Astrologer-API\.freebuff\preview-ed3ec4e9-ceb4-4bcb-bf8c-c4fc82eff90f.log.err' -WindowStyle Hidden -PassThru
-Write-Output $proc.Id

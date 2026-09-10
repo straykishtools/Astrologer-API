@@ -725,11 +725,12 @@ function renderTabs() {
         daily: { wrap: 'yogaDailyPanel' },
         breath: { wrap: 'yogaBreathPanel' },
         practice: { wrap: 'yogaPlayerPanel' },
-        coach: { wrap: 'yogaCoachPanel' }
+        coach: { wrap: 'yogaCoachPanel' },
+        karmastore: { wrap: 'yogaKarmaStorePanel' }
     };
     var cfg = map[_activeTab] || map.library;
     var detailShow = !!activeDetailPose;
-    var ids = ['yogaGridWrap', 'yogaDailyPanel', 'yogaBreathPanel', 'yogaPracticePanel', 'yogaPlayerPanel', 'yogaCoachPanel', 'yogaDetail'];
+    var ids = ['yogaGridWrap', 'yogaDailyPanel', 'yogaBreathPanel', 'yogaPracticePanel', 'yogaPlayerPanel', 'yogaCoachPanel', 'yogaKarmaStorePanel', 'yogaDetail'];
     ids.forEach(function (id) {
         var el = document.getElementById(id);
         if (!el) return;
@@ -747,6 +748,7 @@ function renderTabs() {
         if (window.YogaPractice) window.YogaPractice.init();
         if (window.YogaPracticeUI) window.YogaPracticeUI.init();
     }
+    if (_activeTab === 'karmastore' && window.YogaKarmaStore) { window.YogaKarmaStore.render(); window.YogaKarmaStore.bind(); }
     if (_activeTab === 'coach') {
         if (window.YogaCoachUI) window.YogaCoachUI.init();
     }

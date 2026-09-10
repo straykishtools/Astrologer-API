@@ -1,0 +1,25 @@
+{
+  "name": "astrologer-api",
+  "version": "1.0.0",
+  "description": "Astrologer API lets you add **professional-grade astrology features** to any app — fast.   It delivers **plug-and-play SVG charts**, **rich astrological data**, and **AI-optimized XML context** for natal, synastry, transits, composites, returns, and moon phases.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "python -m pytest tests/test_yoga_engine_timing.py tests/test_yoga_session_fa.py tests/test_yoga_audio_scheduling.py tests/test_yoga_audio_anchors.py tests/test_yoga_core_aliases.py tests/test_yoga_refs.py tests/test_yoga_calconvert.py -q",
+    "test:all": "python -m pytest tests -q"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/straykishtools/Astrologer-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/straykishtools/Astrologer-API/issues"
+  },
+  "homepage": "https://github.com/straykishtools/Astrologer-API#readme"
+}

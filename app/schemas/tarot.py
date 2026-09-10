@@ -10,7 +10,7 @@ class TarotHistoryCreate(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
-    spread_type: str = Field(default="daily", pattern="^(daily|three-card|celtic-cross|custom)$")
+    spread_type: str = Field(default="daily", pattern="^(daily|three-card|celtic-cross|custom|hand-pick)$")
     card_ids: Optional[list] = None
     reversed: Optional[list] = None
     question: Optional[str] = None

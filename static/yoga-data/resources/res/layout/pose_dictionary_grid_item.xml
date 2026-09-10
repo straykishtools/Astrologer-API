@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.rainfrog.yoga.view.util.SquareFrameLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    app:maxDimen="true">
+    <ImageView
+        android:id="@+id/icon"
+        android:background="@drawable/slot_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/poses"/>
+</com.rainfrog.yoga.view.util.SquareFrameLayout>

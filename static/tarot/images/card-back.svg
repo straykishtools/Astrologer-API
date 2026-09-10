@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1030" viewBox="0 0 600 1030">
+<defs>
+<radialGradient id="glow" cx="0.5" cy="0.34" r="0.55">
+<stop offset="0" stop-color="#e8b84a" stop-opacity="0.95"/>
+<stop offset="0.45" stop-color="#c99a2e" stop-opacity="0.5"/>
+<stop offset="1" stop-color="#1a1611" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#221d2b"/>
+<stop offset="0.5" stop-color="#181420"/>
+<stop offset="1" stop-color="#120e18"/>
+</linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#f5d67a"/>
+<stop offset="0.5" stop-color="#c99a2e"/>
+<stop offset="1" stop-color="#8a6a1c"/>
+</linearGradient>
+<linearGradient id="blade" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#9a9a9a"/>
+<stop offset="0.5" stop-color="#e8e8e8"/>
+<stop offset="1" stop-color="#8a8a8a"/>
+</linearGradient>
+<linearGradient id="roots" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#e8b84a"/>
+<stop offset="1" stop-color="#8a6a1c" stop-opacity="0.2"/>
+</linearGradient>
+<filter id="soft"><feGaussianBlur stdDeviation="2"/></filter>
+</defs>
+
+<!-- پس‌زمینه -->
+<rect width="600" height="1030" rx="26" fill="url(#bg)"/>
+<rect x="14" y="14" width="572" height="1002" rx="20" fill="none" stroke="url(#gold)" stroke-width="3"/>
+<rect x="26" y="26" width="548" height="978" rx="14" fill="none" stroke="url(#gold)" stroke-opacity="0.5" stroke-width="1.4"/>
+
+<!-- گوشه‌های تزئینی -->
+<path d="M30 90 Q30 30 90 30 L30 30 Z" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+<path d="M570 90 Q570 30 510 30 L570 30 Z" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+<path d="M30 940 Q30 1000 90 1000 L30 1000 Z" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+<path d="M570 940 Q570 1000 510 1000 L570 1000 Z" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+<circle cx="46" cy="46" r="8" fill="none" stroke="url(#gold)" stroke-width="1.6"/>
+<circle cx="554" cy="46" r="8" fill="none" stroke="url(#gold)" stroke-width="1.6"/>
+<circle cx="46" cy="984" r="8" fill="none" stroke="url(#gold)" stroke-width="1.6"/>
+<circle cx="554" cy="984" r="8" fill="none" stroke="url(#gold)" stroke-width="1.6"/>
+
+<!-- هالهٔ خورشیدی پشت شمشیر -->
+<circle cx="300" cy="330" r="180" fill="url(#glow)"/>
+<circle cx="300" cy="330" r="150" fill="none" stroke="#e8b84a" stroke-opacity="0.5" stroke-width="2" filter="url(#soft)"/>
+<circle cx="300" cy="330" r="128" fill="none" stroke="#e8b84a" stroke-opacity="0.35" stroke-width="1.2"/>
+<g stroke="#e8b84a" stroke-opacity="0.4" stroke-width="1.1">
+<line x1="300" y1="180" x2="300" y2="152"/>
+<line x1="386" y1="212" x2="406" y2="192"/>
+<line x1="424" y1="300" x2="452" y2="300"/>
+<line x1="214" y1="212" x2="194" y2="192"/>
+<line x1="176" y1="300" x2="148" y2="300"/>
+<line x1="386" y1="448" x2="406" y2="468"/>
+<line x1="214" y1="448" x2="194" y2="468"/>
+<line x1="300" y1="480" x2="300" y2="508"/>
+</g>
+<!-- زبان‌های شعاعی -->
+<g stroke="#e8b84a" stroke-opacity="0.3" stroke-width="1">
+<line x1="300" y1="330" x2="300" y2="185"/><line x1="300" y1="330" x2="356" y2="200"/>
+<line x1="300" y1="330" x2="420" y2="255"/><line x1="300" y1="330" x2="445" y2="330"/>
+<line x1="300" y1="330" x2="420" y2="405"/><line x1="300" y1="330" x2="356" y2="460"/>
+<line x1="300" y1="330" x2="300" y2="475"/><line x1="300" y1="330" x2="244" y2="460"/>
+<line x1="300" y1="330" x2="180" y2="405"/><line x1="300" y1="330" x2="155" y2="330"/>
+<line x1="300" y1="330" x2="180" y2="255"/><line x1="300" y1="330" x2="244" y2="200"/>
+</g>
+
+<!-- شمشیر -->
+<g>
+<!-- تیغه -->
+<path d="M300 120 L318 180 L318 470 L300 540 L282 470 L282 180 Z" fill="url(#blade)" stroke="#6a6a6a" stroke-width="1.5"/>
+<path d="M300 130 L300 530" stroke="#ffffff" stroke-opacity="0.65" stroke-width="2"/>
+<!-- گارد -->
+<path d="M215 470 Q300 440 385 470 Q300 505 215 470 Z" fill="url(#gold)" stroke="#8a6a1c" stroke-width="1.5"/>
+<circle cx="300" cy="466" r="10" fill="#f5d67a" stroke="#8a6a1c" stroke-width="1.2"/>
+<!-- دسته -->
+<rect x="288" y="90" width="24" height="42" rx="8" fill="#3a3020" stroke="url(#gold)" stroke-width="1.6"/>
+<path d="M288 100 h24 M288 110 h24 M288 120 h24" stroke="url(#gold)" stroke-opacity="0.7" stroke-width="1.2"/>
+<!-- پومل -->
+<circle cx="300" cy="82" r="12" fill="url(#gold)" stroke="#8a6a1c" stroke-width="1.2"/>
+<circle cx="300" cy="82" r="5" fill="#f5d67a"/>
+</g>
+
+<!-- نور از نوک تیغه -->
+<path d="M300 540 L318 560 L306 585 L322 610" stroke="#e8b84a" stroke-width="2.5" fill="none" stroke-opacity="0.8" filter="url(#soft)"/>
+
+<!-- ریشه‌های طلایی -->
+<g stroke="url(#roots)" fill="none" stroke-linecap="round">
+<path d="M300 590 C280 660 230 700 170 760" stroke-width="2.4"/>
+<path d="M300 590 C320 660 370 700 430 760" stroke-width="2.4"/>
+<path d="M300 590 C295 680 260 760 210 840" stroke-width="2"/>
+<path d="M300 590 C305 680 340 760 390 840" stroke-width="2"/>
+<path d="M300 590 C300 700 300 780 300 880" stroke-width="2.6"/>
+<path d="M300 620 C340 640 420 640 470 690" stroke-width="1.6"/>
+<path d="M300 620 C260 640 180 640 130 690" stroke-width="1.6"/>
+<path d="M240 720 C220 760 190 790 150 820" stroke-width="1.4"/>
+<path d="M360 720 C380 760 410 790 450 820" stroke-width="1.4"/>
+<path d="M280 700 C260 750 230 810 200 870" stroke-width="1.3"/>
+<path d="M320 700 C340 750 370 810 400 870" stroke-width="1.3"/>
+<path d="M300 760 C295 820 285 870 270 910" stroke-width="1.2"/>
+<path d="M300 760 C305 820 315 870 330 910" stroke-width="1.2"/>
+</g>
+
+<!-- پلاک پایین با واژه TAROT -->
+<rect x="150" y="920" width="300" height="62" rx="10" fill="#0d0b12" stroke="url(#gold)" stroke-width="2"/>
+<text x="300" y="964" font-family="Georgia, 'Times New Roman', serif" font-size="40" letter-spacing="10" text-anchor="middle" fill="url(#gold)">TAROT</text>
+
+<!-- برجک بالا -->
+<path d="M270 14 L330 14 L300 62 Z" fill="#0d0b12" stroke="url(#gold)" stroke-width="2"/>
+<circle cx="300" cy="38" r="13" fill="none" stroke="url(#gold)" stroke-width="1.8"/>
+<circle cx="300" cy="38" r="4.5" fill="url(#gold)"/>
+</svg>

@@ -448,44 +448,17 @@ async function updateLocation(lat, lng) {
 // ================================================================
 //   HEADER ACTIONS
 // ================================================================
-// ─── Actions Dropdown ───
+// ─── Actions Dropdown / Profile Dropdown: مدیریت توسط TOPBAR DROPDOWN COORDINATOR در index.html ───
+// (هندلرهای قدیمی حذف شدند — دوبار toggle باعث می‌شد پنل‌ها باز به نظر نرسند)
 (function() {
-    var menuBtn = document.getElementById('actionsMenuBtn');
     var menu = document.getElementById('actionsMenu');
-    if (menuBtn && menu) {
-        menuBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            menu.classList.toggle('open');
-        });
-        document.addEventListener('click', function(e) {
-            if (!menu.contains(e.target) && e.target !== menuBtn) {
-                menu.classList.remove('open');
-            }
-        });
+    if (menu) {
         menu.querySelectorAll('.topbar-actions-item').forEach(function(item) {
             item.addEventListener('click', function() {
                 menu.classList.remove('open');
             });
         });
     }
-})();
-// ─── Profile / Plans Dropdown ───
-(function() {
-    var trigger = document.getElementById('payBtn');
-    var panel = document.getElementById('profilePanel');
-    if (!trigger || !panel) return;
-    trigger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        // Close actions menu if open
-        var am = document.getElementById('actionsMenu');
-        if (am) am.classList.remove('open');
-        panel.classList.toggle('open');
-    });
-    document.addEventListener('click', function(e) {
-        if (!panel.contains(e.target) && e.target !== trigger && !trigger.contains(e.target)) {
-            panel.classList.remove('open');
-        }
-    });
 })();
 
 document.getElementById('saveBtn').addEventListener('click', () => {
@@ -556,6 +529,20 @@ function getScoreColorClass(score) {
     return 'score-green';
 }
 
+// ── نگاشت جنبه‌های سیناستری/کامپوزیت به گلایف‌های SVG ──
+var ASPECT_GLYPHS = {
+    '⭐': 'star', '⚡': 'bolt', '🏠': 'home', '🔮': 'birth', '🔥': 'fire',
+    '💕': 'synastry', '🔗': 'composite',
+    'emotional': 'heart', 'intellectual': 'brain', 'spiritual': 'spirit'
+};
+function aspectIcon(key, size) {
+    var n = ASPECT_GLYPHS[key];
+    if (n) return window.uiIcon(n, size || 20);
+    // اگر خودِ کلید نام یک آیکون SVG باشد مستقیم استفاده کن
+    if (key && /^[a-z-]+$/.test(key)) return window.uiIcon(key, size || 20);
+    return '';
+}
+
 function displayGenericChart(data, title, chartType) {
     var chart = data.chart_data || data;
     var subject = chart.subject || {};
@@ -577,7 +564,7 @@ function displayGenericChart(data, title, chartType) {
         var backendInterp = data.interpretation;
         var interp = backendInterp && backendInterp.level ? backendInterp : {level: score + '/100', title: 'امتیاز', text: 'امتیاز شما ' + score + ' از ۱۰۰ است.'};
         var colorCls = getScoreColorClass(score);
-        var sectionEmoji = isComposite ? '\u{1f517}' : '\u{1f495}';
+        var sectionEmoji = aspectIcon(isComposite ? '🔗' : '💕');
         var sectionTitle = isComposite ? '\u0647ویت \u0631\u0627\u0628\u0637\u0647' : '\u0627\u0645\u062a\u06cc\u0627\u0632';
         html += '<div class="section-card visible synastry-result"><div class="section-title"><span class="emoji-big">' + sectionEmoji + '</span> ' + sectionTitle + '</div>';
         html += '<div class="score-display"><span class="score-number ' + colorCls + '">' + score + '</span><span class="score-label">\u0627\u0632 \u06f1\u06f0\u06f0</span></div>';
@@ -654,7 +641,7 @@ function displayGenericChart(data, title, chartType) {
                 var catId = 'cat-detail-' + idx;
                 html += '<div class="cat-item">';
                 html += '<div class="cat-header cat-toggle" data-target="' + catId + '">';
-                html += '<span class="cat-emoji">' + cat.emoji + '</span>';
+                html += '<span class="cat-emoji">' + (ASPECT_GLYPHS[key] ? aspectIcon(key, 18) : cat.emoji) + '</span>';
                 html += '<span class="cat-label">' + cat.label + '</span>';
                 html += '<span class="cat-score" style="color:' + cat.color + '">' + cat.score + '/100</span>';
                 html += '<span class="cat-expand-icon">▶</span>';
@@ -725,8 +712,8 @@ function displayGenericChart(data, title, chartType) {
                 'saturn_hard': 3, 'pluto_power': 3, 'neptune_dream': 3, 'uranus_change': 3,
                 'element_balance': 4
             };
-            var catNames = ['⭐ جنبه‌های اصلی', '⚡ جنبه‌های سیاره‌ای', '🏠 خانه‌ها و طالع', '🔮 سیارات فراسویی', '🔥 تعادل عناصر'];
-            var catEmojis = ['⭐', '⚡', '🏠', '🔮', '🔥'];
+            var catNames = ['جنبه‌های اصلی', 'جنبه‌های سیاره‌ای', 'خانه‌ها و طالع', 'سیارات فراسویی', 'تعادل عناصر'];
+            var catEmojis = ['star', 'bolt', 'home', 'birth', 'fire'];
             // ── Group items by category ──
             var groups = {};
             var ordered = [];
@@ -750,7 +737,7 @@ function displayGenericChart(data, title, chartType) {
                 var items = groups[cat];
                 html += '<div class="breakdown-category">';
                 html += '<div class="breakdown-cat-header">';
-                html += '<span class="breakdown-cat-emoji">' + (catEmojis[cat] || '📌') + '</span>';
+                html += '<span class="breakdown-cat-emoji">' + (catEmojis[cat] ? aspectIcon(catEmojis[cat], 17) : '📌') + '</span>';
                 html += '<span class="breakdown-cat-name">' + (catNames[cat] || 'سایر') + '</span>';
                 html += '</div>';
                 items.forEach(function(b) {
@@ -872,7 +859,7 @@ function displayScoreInterpretation(chartData, title, chartType) {
         }
     }
     var ctxHtml = ctxParts.length > 0 ? '<div class="score-context">' + ctxParts.join(' \u00b7 ') + '</div>' : '';
-    var html = '<div class="section-card visible synastry-result"><div class="section-title"><span class="emoji-big">\u{1f30d}</span> '+title+'</div>';
+    var html = '<div class="section-card visible synastry-result"><div class="section-title"><span class="emoji-big">' + window.uiIcon('transit', 20) + '</span> '+title+'</div>';
     html += '<div class="score-display"><span class="score-number ' + colorCls + '">' + score + '</span><span class="score-label">\u0627\u0632 \u06f1\u06f0\u06f0</span></div>' + ctxHtml;
     html += '<div class="score-progress-wrap"><div class="score-progress-track"><div class="score-progress-fill ' + colorCls + '" style="width:0%" data-target="' + score + '"></div></div></div>';
     html += '<div class="interp-title">' + interp.level + '</div>';
@@ -1032,12 +1019,20 @@ function syncSharedInputsFromForm() {
     if (numYear && numMonth && numDay && numYear.value && numMonth.value && numDay.value) {
         sharedInputs.birthDate = { year: parseInt(numYear.value), month: parseInt(numMonth.value), day: parseInt(numDay.value) };
     }
-    // Also capture from Biorhythm date picker
+    // Also capture from Biorhythm date picker — but if the user already has
+    // a REGISTERED profile birth, the bio picker is a test-date and must
+    // never overwrite the profile birth date.
     var bioBirthDP = document.getElementById('bioBirthDP_hidden');
     if (bioBirthDP && bioBirthDP.value) {
         var parts2 = bioBirthDP.value.split('-');
-        if (parts2.length >= 3) sharedInputs.birthDate = { year: parseInt(parts2[0]), month: parseInt(parts2[1]), day: parseInt(parts2[2]) };
+        if (parts2.length >= 3 && !getProfileBirthISO()) {
+            sharedInputs.birthDate = { year: parseInt(parts2[0]), month: parseInt(parts2[1]), day: parseInt(parts2[2]) };
+        }
     }
+    // Persist across reloads (localStorage) and, for logged-in users, to the
+    // server profile so every service + the yoga/dashboard pages can use it
+    persistSharedInputsLocal();
+    saveProfileToServer();
 }
 
 // ================================================================
@@ -1100,8 +1095,26 @@ function updateLocationBar() {
 }
 
 // ================================================================
-//  SHIMMER / SKELETON LOADING HELPERS
+//  SHIMMER / SKELETON LOADING HELPERS + آیکون‌های یکپارچه
 // ================================================================
+window.uiIcon = function (name, size) {
+    size = size || 15;
+    return '<img class="ui-inline-icon" src="static/images/ui/' + name + '.svg" alt="" style="width:' + size + 'px;height:' + size + 'px;">';
+};
+
+function deEmoji(text) {
+    if (!text) return text;
+    return String(text)
+        .replace(/⏳/g, '<span class="ui-spin">' + window.uiIcon('loader', 13) + '</span>')
+        .replace(/💕/g, window.uiIcon('synastry'))
+        .replace(/🧬/g, window.uiIcon('mizaj'))
+        .replace(/❓/g, window.uiIcon('daily-question'))
+        .replace(/✨/g, window.uiIcon('star'))
+        .replace(/🍃/g, window.uiIcon('hafez'))
+        .replace(/📝/g, window.uiIcon('qol'))
+        .replace(/📖/g, window.uiIcon('hafez'));
+}
+
 function makeShimmerLoading(text) {
     return '<div class="shimmer-loading">' +
         '<div class="shimmer-line-circle"></div>' +
@@ -1110,7 +1123,7 @@ function makeShimmerLoading(text) {
         '<div class="shimmer-line"></div>' +
         '<div class="shimmer-line"></div>' +
         '<div class="shimmer-line"></div>' +
-        '<div class="shimmer-text">' + (text || '⏳ در حال دریافت اطلاعات...') + '</div>' +
+        '<div class="shimmer-text">' + deEmoji(text || '⏳ در حال دریافت اطلاعات...') + '</div>' +
         '</div>';
 }
 
@@ -1119,7 +1132,7 @@ function makeShimmerCompact(text) {
         '<div class="shimmer-line" style="width:70%;margin:0 auto 10px;"></div>' +
         '<div class="shimmer-line" style="width:90%;margin:0 auto 10px;"></div>' +
         '<div class="shimmer-line" style="width:50%;margin:0 auto 10px;"></div>' +
-        '<div class="shimmer-text">' + (text || '⏳ در حال دریافت...') + '</div>' +
+        '<div class="shimmer-text">' + deEmoji(text || '⏳ در حال دریافت...') + '</div>' +
         '</div>';
 }
 
@@ -1288,7 +1301,12 @@ function makeDatePickerTrigger(triggerId, opts) {
     var displayId = triggerId + '_display';
     var hiddenId = triggerId + '_hidden';
     var cal = opts.calendarType || 'shamsi';
-    var defaultVal = opts.defaultValue || { year: cal === 'shamsi' ? 1379 : 2000, month: cal === 'shamsi' ? 1 : 1, day: 1 };
+    var defaultVal = opts.defaultValue || { year: cal === 'shamsi' ? 1379 : 2000, month: 1, day: 1 };
+    /* guard: sharedInputs.birthDate can arrive with missing/NaN fields —
+       an invalid default made the wheel render nothing and stick at 1300 */
+    if (!defaultVal.year || isNaN(defaultVal.year) || !defaultVal.month || !defaultVal.day) {
+        defaultVal = cal === 'shamsi' ? { year: 1379, month: 1, day: 1 } : { year: 2000, month: 1, day: 1 };
+    }
     _dpState[triggerId] = { calType: cal, value: defaultVal };
     return '<input type="hidden" id="' + hiddenId + '" value="' + defaultVal.year + '-' + String(defaultVal.month).padStart(2,'0') + '-' + String(defaultVal.day).padStart(2,'0') + '">' +
         '<button type="button" class="dp-trigger" id="' + triggerId + '">' +
@@ -1319,11 +1337,27 @@ function attachDatePicker(triggerId, opts) {
     var displayId = triggerId + '_display';
     btn.addEventListener('click', function () {
         var state = _dpState[triggerId] || {};
+        var openCal = opts.calendarType || state.calType || 'shamsi';
+        /* defaultValue is stored in ITS OWN calendar — convert it into the
+           calendar the picker will open with, otherwise shamsi/miladi
+           toggling compounds a wrong-date drift every cycle */
+        var defVal = state.value || opts.defaultValue;
+        if (defVal && state.calType && state.calType !== openCal && window.DateWheelPicker) {
+            try {
+                if (state.calType === 'shamsi' && openCal === 'miladi') {
+                    var g = window.DateWheelPicker.shamsiToMiladi(defVal.year, defVal.month, defVal.day);
+                    defVal = { year: g.year, month: g.month, day: g.day };
+                } else if (state.calType === 'miladi' && openCal === 'shamsi') {
+                    var j = window.DateWheelPicker.miladiToShamsi(defVal.year, defVal.month, defVal.day);
+                    defVal = { year: j.year, month: j.month, day: j.day };
+                }
+            } catch (e) {}
+        }
         DateWheelPicker.open({
-            calendarType: opts.calendarType || state.calType || 'shamsi',
-            defaultValue: state.value || opts.defaultValue,
-            minYear: opts.minYear,
-            maxYear: opts.maxYear,
+            calendarType: openCal,
+            defaultValue: defVal,
+            minYear: opts.minYear || (openCal === 'shamsi' ? 1300 : 1921),
+            maxYear: opts.maxYear || (openCal === 'shamsi' ? 1450 : 2071),
             yearStep: opts.yearStep,
             digits: opts.digits || 'fa',
             loop: false,
@@ -1392,14 +1426,23 @@ function attachDatePickerTriggers(tab) {
         attachDatePicker('bioBirthDP', opts);
         attachDatePicker('bioMonthlyBirthDP', opts);
     }
+    if (tab === 'numerology') {
+        attachDatePicker('pyBirthDP', opts); // پیکر مجزای سال اختیاری
+    }
+}
+
+// هدر ابزار: مدالیون سرویس (هماهنگ با گرید خانه) + عنوان
+// اندازه‌ها به‌صورت ویژگی (attribute) هم ست می‌شوند تا با وجود کش شدن CSS هرگز بزرگ رندر نشود
+function toolHead(name, svg) {
+    return '<img class="tool-medallion" width="36" height="36" src="static/images/services/' + svg + '.svg" alt="">' + name;
 }
 
 var formBuilders = {
-    'birth': function() { formTitle.innerHTML = '🪐 اطلاعات تولد'; calcBtn.innerHTML = '🔮 دریافت چارت'; return buildBirthForm(); },
-    'synastry': function() { formTitle.innerHTML = '💕 سیناستری'; calcBtn.innerHTML = '💕 محاسبه'; return buildPersonForm('p1','شخص اول','inner')+'<div class="person-divider"><span>+</span></div>'+buildPersonForm('p2','شخص دوم','outer'); },
-    'composite': function() { formTitle.innerHTML = '🔗 کامپوزیت'; calcBtn.innerHTML = '🔗 محاسبه'; return buildPersonForm('p1','شخص اول','primary')+'<div class="person-divider"><span>🔗</span></div>'+buildPersonForm('p2','شخص دوم','secondary'); },
+    'birth': function() { formTitle.innerHTML = toolHead('اطلاعات تولد', 'birth'); calcBtn.innerHTML = window.uiIcon('birth') + ' دریافت چارت'; return buildBirthForm(); },
+    'synastry': function() { formTitle.innerHTML = toolHead('سیناستری', 'synastry'); calcBtn.innerHTML = window.uiIcon('synastry') + ' محاسبه'; return buildPersonForm('p1','شخص اول','inner')+'<div class="person-divider"><span>+</span></div>'+buildPersonForm('p2','شخص دوم','outer'); },
+    'composite': function() { formTitle.innerHTML = toolHead('کامپوزیت', 'composite'); calcBtn.innerHTML = window.uiIcon('composite') + ' محاسبه'; return buildPersonForm('p1','شخص اول','primary')+'<div class="person-divider"><span>🔗</span></div>'+buildPersonForm('p2','شخص دوم','secondary'); },
     'transit': function() {
-        formTitle.innerHTML = '🌍 ترانزیت'; calcBtn.innerHTML = '🌍 محاسبه';
+        formTitle.innerHTML = toolHead('ترانزیت', 'transit'); calcBtn.innerHTML = window.uiIcon('transit') + ' محاسبه';
         return buildPersonForm('p1','چارت تولد','natal')+
             '<div class="person-divider"><span>🌍</span></div>'+
             '<div class="person-label">🌍 لحظه ترانزیت</div>'+
@@ -1410,7 +1453,7 @@ var formBuilders = {
             '</div></div>';
     },
     'solar-return': function() {
-        formTitle.innerHTML = '☀️ بازگشت خورشیدی'; calcBtn.innerHTML = '☀️ محاسبه';
+        formTitle.innerHTML = toolHead('بازگشت خورشیدی', 'solar-return'); calcBtn.innerHTML = window.uiIcon('solar-return') + ' محاسبه';
         var currentYear = new Date().getFullYear();
         var yearOpts = '';
         for (var y = currentYear; y <= currentYear + 10; y++) yearOpts += makeOption(y, y);
@@ -1419,19 +1462,19 @@ var formBuilders = {
             '<div class="form-group"><label>☀️ سال بازگشت</label><select id="return_year">'+yearOpts+'</select></div>'+
             '</div></div>';
     },
-    'mizaj': function() { formTitle.innerHTML = '🧬 مزاج‌شناسی'; calcBtn.style.display = 'none'; return getMizajForm(); },
-    'abjad': function() { formTitle.innerHTML = '🔢 ابجد'; calcBtn.style.display = 'none'; return getAbjadForm(); },
-    'tarot': function() { formTitle.innerHTML = '🔮 تاروت'; calcBtn.style.display = 'none'; return getTarotForm(); },
-    'numerology': function() { formTitle.innerHTML = '🔢 عددشناسی'; calcBtn.style.display = 'none'; return getNumerologyForm(); },
-    'biorhythm': function() { formTitle.innerHTML = '🔬 بیوریتم'; calcBtn.style.display = 'none'; return getBiorhythmForm(); },
-    'zodiac': function() { formTitle.innerHTML = '🐉 سال حیوانی'; calcBtn.style.display = 'none'; return getZodiacForm(); },
-    'daily-question': function() { formTitle.innerHTML = '❓ پرسش روزانه'; calcBtn.style.display = 'none'; return getDailyQuestionForm(); },
-    'hafez': function() { formTitle.innerHTML = '🍃 فال حافظ'; calcBtn.style.display = 'none'; return getHafezForm(); },
-    'nasa': function() { formTitle.innerHTML = '🌌 ناسا'; calcBtn.style.display = 'none'; return getNasaForm(); },
-    'moon-phase': function() { formTitle.innerHTML = '🌙 فاز ماه'; calcBtn.style.display = 'none'; return getMoonPhaseForm(); },
+    'mizaj': function() { formTitle.innerHTML = toolHead('مزاج‌شناسی', 'mizaj'); calcBtn.style.display = 'none'; return getMizajForm(); },
+    'abjad': function() { formTitle.innerHTML = toolHead('ابجد', 'abjad'); calcBtn.style.display = 'none'; return getAbjadForm(); },
+    'tarot': function() { formTitle.innerHTML = toolHead('تاروت', 'tarot'); calcBtn.style.display = 'none'; return getTarotForm(); },
+    'numerology': function() { formTitle.innerHTML = toolHead('عددشناسی', 'numerology'); calcBtn.style.display = 'none'; return getNumerologyForm(); },
+    'biorhythm': function() { formTitle.innerHTML = toolHead('بیوریتم', 'biorhythm'); calcBtn.style.display = 'none'; return getBiorhythmForm(); },
+    'zodiac': function() { formTitle.innerHTML = toolHead('سال حیوانی', 'zodiac'); calcBtn.style.display = 'none'; return getZodiacForm(); },
+    'daily-question': function() { formTitle.innerHTML = toolHead('پرسش روزانه', 'daily-question'); calcBtn.style.display = 'none'; return getDailyQuestionForm(); },
+    'hafez': function() { formTitle.innerHTML = toolHead('فال حافظ', 'hafez'); calcBtn.style.display = 'none'; return getHafezForm(); },
+    'nasa': function() { formTitle.innerHTML = toolHead('ناسا', 'nasa'); calcBtn.style.display = 'none'; return getNasaForm(); },
+    'moon-phase': function() { formTitle.innerHTML = toolHead('فاز ماه', 'moon-phase'); calcBtn.style.display = 'none'; return getMoonPhaseForm(); },
 
     'lunar-return': function() {
-        formTitle.innerHTML = '🌙 بازگشت ماهانه'; calcBtn.innerHTML = '🌙 محاسبه';
+        formTitle.innerHTML = toolHead('بازگشت ماهانه', 'lunar-return'); calcBtn.innerHTML = window.uiIcon('lunar-return') + ' محاسبه';
         var currentYear = new Date().getFullYear();
         var yearOpts = '';
         for (var y = currentYear; y <= currentYear + 1; y++) yearOpts += makeOption(y, y);
@@ -1446,6 +1489,13 @@ var formBuilders = {
     }
 };
 
+function attachSharedInputListeners() {
+    formContainer.querySelectorAll('input, select').forEach(function(el) {
+        el.addEventListener('change', syncSharedInputsFromForm);
+        el.addEventListener('input', syncSharedInputsFromForm);
+    });
+}
+
 function doSwitchTab(tab) {
     // Always update calcBtn + orb-wrapper visibility, even on same tab
     var usesCalcBtn = ['birth', 'synastry', 'composite', 'transit', 'solar-return', 'lunar-return'].indexOf(tab) !== -1;
@@ -1458,8 +1508,9 @@ function doSwitchTab(tab) {
     // Also sync via liquidOrb API if available (handles race with lazy-loaded orb)
     if (window.liquidOrb && window.liquidOrb.sync) window.liquidOrb.sync();
 
-    // Early return if same tab already rendered
-    if (tab === currentTab && formContainer.innerHTML.trim() !== '') return;
+    // Early return فقط اگر فرمِ همان تب واقعاً موجود است
+    // (currentTab ممکن است از بازدید قبلی stale باشد و formContainer خالی/متعلق به تب دیگر)
+    if (tab === currentTab && formContainer.innerHTML.trim() !== '' && formContainer.querySelector('[data-tab-content="' + tab + '"]')) return;
     syncSharedInputsFromForm();
     document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
     var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
@@ -1468,6 +1519,8 @@ function doSwitchTab(tab) {
     var formHtml = formBuilders[tab]();
     var info = TAB_INFO[tab];
     if (info) formHtml = makeInfoSection(info.title, info.text) + formHtml;
+    // نشانگر تب فعال برای early-return درست
+    formHtml = formHtml.replace('<div style="max-width', '<div data-tab-content="' + tab + '" style="max-width');
     formContainer.innerHTML = formHtml;
     attachCityAutocomplete();
     reattachMapButton();
@@ -1477,10 +1530,11 @@ function doSwitchTab(tab) {
     updateLocationBar();
     document.getElementById('result').style.display = 'none';
     document.getElementById('status').style.display = 'none';
-    formContainer.querySelectorAll('input, select').forEach(function(el) {
-        el.addEventListener('change', syncSharedInputsFromForm);
-        el.addEventListener('input', syncSharedInputsFromForm);
-    });
+    attachSharedInputListeners();
+    // بادبزن ۱۲ حیوان — فقط در تب زودیاک
+    if (tab === 'zodiac' && typeof _zcInitFan === 'function') {
+        setTimeout(_zcInitFan, 50);
+    }
 }
 window.switchTab = doSwitchTab;
 
@@ -1590,11 +1644,20 @@ function buildSubject(prefix) {
     if (!dateEl || !dateEl.value) return null;
     var parts = dateEl.value.split('-');
     if (parts.length < 3) return null;
-    var yr = parseInt(parts[0]);
+    // The wheel picker stores the date in the SELECTED calendar (default shamsi).
+    // Convert 1300–1600 range to Gregorian before sending to the backend, which
+    // computes in Gregorian CE only — otherwise the chart is silently wrong.
+    var dpState = _dpState[(p ? p.replace(/_$/, '') : '') + 'date'] || _dpState['birthDatePicker'] || {};
+    var pickedCal = dpState.calType || 'shamsi';
+    var yr = parseInt(parts[0]), mo = parseInt(parts[1]), dy = parseInt(parts[2]);
+    if (pickedCal === 'shamsi' && yr >= 1300 && yr <= 1600 && window.shamsiToGregorianDate) {
+        var g = window.shamsiToGregorianDate(yr, mo, dy);
+        if (g) { yr = g.gy; mo = g.gm; dy = g.gd; }
+    }
     if (yr < 1279) throw new Error('مردگان ستاره‌ای در چارت ندارند 🌌');
     var tzOffset = String(parseFloat(tzEl.value));
     return {
-        year: yr, month: parseInt(parts[1]), day: parseInt(parts[2]),
+        year: yr, month: mo, day: dy,
         hour: parseInt(hourEl.value) || 12, minute: parseInt(minEl.value) || 0, second: 0,
         longitude: parseFloat(lngEl.value) || 51.3890, latitude: parseFloat(latEl.value) || 35.6892,
         timezone: TZ_OFFSET_TO_IANA[tzOffset] || 'Etc/UTC',
@@ -1853,7 +1916,7 @@ async function handleSynastry() {
     var s1 = buildSubject('p1'), s2 = buildSubject('p2');
     if (!s1 || !s2) throw new Error('اطلاعات هر دو شخص لازم است.');
     var data = await fetchWithCache('/api/v5/chart-data/synastry', { first_subject: s1, second_subject: s2 });
-    document.getElementById('result').innerHTML = displayGenericChart(data, '💕 سیناستری', 'synastry');
+    document.getElementById('result').innerHTML = displayGenericChart(data, window.uiIcon('synastry') + ' سیناستری', 'synastry');
     document.getElementById('result').classList.add('result-crossfade');
     animateScoreProgressBars();
     addShareButton('synastry', { p1: buildSubject('p1'), p2: buildSubject('p2') });
@@ -1945,7 +2008,7 @@ async function displayResult(data, context, svgContent) {
         html += `<div class="section-card" id="section-deepseek">
             <div class="section-title"><span class="emoji-big">🧠</span> در حال تحلیل و آماده‌سازی تفسیر چارت</div>
             <div class="analysis-box" id="deepseek-box">
-                <span style="color:#5a526e;">⏳ در حال دریافت تفسیر چارت...</span>
+                <span style="color:#5a526e;">${deEmoji('⏳ در حال دریافت تفسیر چارت...')}</span>
             </div>
         </div>`;
     } else {
@@ -2345,6 +2408,23 @@ function getTarotForm() {
                 <div id="tarotDrawResult" style="margin-top: 15px;"></div>
             </div>
 
+            <!-- Interactive Spread: کاربر خودش کارت برمی‌دارد -->
+            <div style="background: rgba(108,92,231,0.06); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(108,92,231,0.25);">
+                <h4 style="color: #fdcb6e; margin-top: 0;">✋ فال دست‌خود — از ۷۸ کارت، خودت بکش</h4>
+                <p style="color:#8fb4ff;font-size:0.85rem;margin:6px 0 12px;">کارت‌ها پشت‌رو چیده شده‌اند. به تعداد فالت (۳ یا ۱۰) از پخش کارت بردار — همان‌جا به جایگاهش در پایین می‌رود و آشکار می‌شود. <span style="color:#6c8cff;">دابل‌کلیک روی کارت انتخابی = وارونه کشیدن آن.</span></p>
+                <div class="form-group" style="max-width:220px;">
+                    <label>تعداد کارت فال</label>
+                    <select id="tarotPickCount" style="width:100%; padding:10px; border-radius:8px; background:rgba(0,0,0,0.3); color:#fff; border:1px solid rgba(255,255,255,0.1);">
+                        <option value="1">۱ کارت — پاسخ سریع</option>
+                        <option value="3" selected>۳ کارت — گذشته/حال/آینده</option>
+                        <option value="5">۵ کارت — صلیب کوچک</option>
+                        <option value="10">۱۰ کارت — سلتیک کراس</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="startTarotPick()">🂠 شروع چیدن کارت‌ها</button>
+                <div id="tarotPickArea" style="margin-top: 18px;"></div>
+            </div>
+
             <!-- Three Card Spread (SECONDARY) -->
             <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
                 <h4 style="color: #fdcb6e; margin-top: 0;">📜 اسپرید ۳ کارتی (گذشته، حال، آینده)</h4>
@@ -2364,10 +2444,35 @@ function getTarotForm() {
 
 // ---------- Tarot API Calls ----------
 
+// «وارد شوید» در راهنمای مهمان تاروت — مودال لاگین را همان‌جا باز می‌کند
+// و پس از لاگین کارت روزانه را دوباره می‌کشد تا این‌بار در تاریخچه ثبت شود.
+window.__tarotAuthReturn = function () {
+    if (window.onAfterLogin) {
+        window.onAfterLogin(function () {
+            try { if (typeof submitDailyCard === 'function') submitDailyCard(); } catch (e) {}
+        });
+    }
+    if (window.openLoginModal) window.openLoginModal();
+    else if (window.showToast) showToast('برای ذخیره کارت‌ها، ابتدا وارد شوید', 'info');
+};
+
 // Save a draw to the user's tarot history (logged-in users only, fire-and-forget)
 function saveTarotHistory(spreadType, drawn, question) {
     const token = localStorage.getItem('cosmic_token');
-    if (!token) return;
+    // Guest hint: make it visible why the draw is not recorded
+    if (!token) {
+        ['tarotDailyResult', 'tarotDrawResult', 'tarotThreeResult', 'tarotCelticResult'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el && el.innerHTML.trim() && !el.querySelector('.tarot-login-hint')) {
+                var hint = document.createElement('p');
+                hint.className = 'tarot-login-hint';
+                hint.style.cssText = 'color:#8fb4ff;font-size:0.85rem;margin:10px 0 0;text-align:center;';
+                hint.innerHTML = '💡 کارت‌های شما ذخیره نمی‌شوند — برای تاریخچه و استریک <a href="#" onclick="window.__tarotAuthReturn && window.__tarotAuthReturn(); return false;" style="color:#a9c6ff;font-weight:700;text-decoration:underline;">وارد شوید</a>';
+                el.appendChild(hint);
+            }
+        });
+        return;
+    }
     const cardIds = (drawn || []).map(function (d) { return d.card && d.card.id; });
     const reversed = (drawn || []).map(function (d) { return !!(d.is_reversed); });
     if (cardIds.length === 0) return;
@@ -2451,13 +2556,285 @@ async function submitCelticCross() {
     }
 }
 
+// ================================================================
+//   فال دست‌خود — بادبزنِ ۷۸ کارت، سبک کلاسیک (شبیه Arcane/ериکوس)
+// ================================================================
+var _tarotPickState = null;
+
+// لایت‌باکس بزرگنمایی تصویر کارت
+function showTarotImageZoom(imgUrl, title) {
+    var ov = document.getElementById('tarotZoomOverlay');
+    if (!ov) {
+        ov = document.createElement('div');
+        ov.id = 'tarotZoomOverlay';
+        ov.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(5,8,20,0.9);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;cursor:zoom-out;padding:20px;';
+        ov.addEventListener('click', function () { ov.style.display = 'none'; });
+        document.body.appendChild(ov);
+    }
+    ov.innerHTML = '<div style="color:#fdcb6e;font-size:1rem;font-weight:800;">' + (title || '') + '</div>' +
+        '<img src="' + imgUrl + '" style="max-height:80vh;max-width:90vw;border-radius:14px;box-shadow:0 20px 70px rgba(0,0,0,0.8);" onclick="event.stopPropagation();">';
+    ov.style.display = 'flex';
+}
+window.showTarotImageZoom = showTarotImageZoom;
+
+function _tarotShuffle(n) {
+    var a = [];
+    for (var i = 0; i < n; i++) a.push(i);
+    for (var j = n - 1; j > 0; j--) {
+        var k = Math.floor(Math.random() * (j + 1));
+        var t = a[j]; a[j] = a[k]; a[k] = t;
+    }
+    return a;
+}
+
+var _tarotCardCache = null;
+async function _tarotGetCards() {
+    if (_tarotCardCache) return _tarotCardCache;
+    const res = await fetch('/api/v5/tarot/cards');
+    const data = await res.json();
+    if (data.status === 'success' && Array.isArray(data.data)) {
+        _tarotCardCache = data.data;
+        return _tarotCardCache;
+    }
+    throw new Error('no cards');
+}
+
+async function startTarotPick(reshuffled) {
+    const area = document.getElementById('tarotPickArea');
+    if (!area) return;
+    const count = parseInt((document.getElementById('tarotPickCount') || {}).value) || 3;
+    _tarotPickState = { allCards: [], order: [], count: count, picked: [], shuffleCount: reshuffled ? ((_tarotPickState && _tarotPickState.shuffleCount || 0) + 1) : 1 };
+
+    if (!_tarotCardCache) area.innerHTML = makeShimmerLoading('⏳ در حال بُر زدن ۷۸ کارت...');
+    try {
+        _tarotPickState.allCards = await _tarotGetCards();
+    } catch (e) {
+        area.innerHTML = '<p style="color:#ff6b6b;">❌ خطا در دریافت کارت‌ها</p>';
+        return;
+    }
+    _tarotPickState.order = _tarotShuffle(_tarotPickState.allCards.length);
+
+    const msg = reshuffled
+        ? 'کارت‌ها دوباره بُر خورد. حالا روی <a href="javascript:void(0)" class="tp-begin" style="color:#fdcb6e;font-weight:700;text-decoration:underline;" onclick="document.getElementById(\'tpFan\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">بادبزن کارت‌ها</a> بزن و ' + count + ' کارت انتخاب کن — یا <a href="javascript:void(0)" class="tp-shuffle" style="color:#a29bfe;font-weight:700;text-decoration:underline;" onclick="startTarotPick(true)">اینجا</a> را بزن تا دوباره بُر بخورد.'
+        : 'کارت‌ها ' + (3 + Math.floor(Math.random() * 4)) + ' بار بُر خوردند. حالا روی <a href="javascript:void(0)" class="tp-begin" style="color:#fdcb6e;font-weight:700;text-decoration:underline;" onclick="document.getElementById(\'tpFan\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">بادبزن کارت‌ها</a> بزن و ' + count + ' کارت انتخاب کن — یا <a href="javascript:void(0)" class="tp-shuffle" style="color:#a29bfe;font-weight:700;text-decoration:underline;" onclick="startTarotPick(true)">اینجا</a> را بزن تا دوباره بُر بخورد.';
+
+    const slotLabels = _tarotSlotLabels(count);
+    area.innerHTML = `
+        <div class="tp-wrap">
+            <div class="tp-bubble">${msg}</div>
+            <div class="tp-guide" id="tpGuide">انتخاب کن: <b>${count}</b> کارت — کلیک ساده = راست، دابل‌کلیک = وارونه</div>
+            <div class="tp-fan-outer" id="tpFan">
+                <div class="tp-fan" id="tpFanRow"></div>
+            </div>
+            <div class="tp-progress" id="tpCounter"></div>
+            <div style="margin-top:20px;">
+                <h5 style="color:#a29bfe;text-align:center;margin:0 0 12px;">🃏 جایگاه‌های فال</h5>
+                <div id="tpSlots" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;">
+                    ${slotLabels.map((lb, i) => `<div id="tpSlot${i}" style="min-height:130px;border:1.5px dashed rgba(162,155,254,0.35);border-radius:12px;padding:10px;text-align:center;background:rgba(0,0,0,0.2);"><div style="color:#8fb4ff;font-size:0.72rem;margin-bottom:8px;">${lb}</div><div class="tp-slot-body" style="color:#555;font-size:1.6rem;padding-top:14px;">⬜</div></div>`).join('')}
+                </div>
+            </div>
+            <div style="text-align:center;margin-top:16px;" id="tpDoneBtn"></div>
+            <div id="tpDone" style="margin-top:14px;"></div>
+        </div>`;
+
+    _renderFan();
+    _updateTpGuide();
+}
+
+function _renderFan() {
+    const row = document.getElementById('tpFanRow');
+    if (!row || !_tarotPickState) return;
+    const n = _tarotPickState.allCards.length;
+
+    // پهنای واقعی کانتینر — واکنش‌گرا (موبایل: ردیف‌های رول، دسکتاپ: بادبزن باز)
+    const containerW = Math.min(row.parentElement ? row.parentElement.clientWidth : 700, 900);
+    const isNarrow = containerW < 620;
+
+    // اندازه کارت بر اساس عرض — ۱۵٪ جمع‌تر
+    const cardW = Math.round((isNarrow ? 58 : 74) * 0.85);
+    const cardH = Math.round(cardW * 1.6);
+
+    // فاصله افقی هر کارت — بازتر برای لمس آسان (۱۵٪ جمع‌تر)
+    const overlap = Math.round((isNarrow ? 16 : 26) * 0.85);
+    const totalW = n > 1 ? (cardW + (n - 1) * overlap) : cardW;
+    const rightShift = isNarrow ? 12 : 28; // جابه‌جایی به راست
+
+    const CARD_BACK = '/static/tarot/images/card-back.svg';
+    let html = '';
+    if (isNarrow && totalW > containerW - 24) {
+        // ─── موبایل: چند ردیف — هر ردیف یک لایه از دسته، همه کارت‌ها کاملاً قابل‌لمس ───
+        const perRow = Math.max(4, Math.floor((containerW - 24) / overlap));
+        const rows = Math.ceil(n / perRow);
+        const rowH = Math.round(cardH * 0.42); // هر ردیف فقط سرشاخه‌ها را نشان می‌دهد (کارت‌های لبه بالا)
+        row.style.cssText = `position:relative;height:${rows * rowH + cardH * 0.6 + 10}px;overflow:visible;`;
+        for (let i = 0; i < n; i++) {
+            const r = Math.floor(i / perRow);
+            const c = i % perRow;
+            const perThis = Math.min(perRow, n - r * perRow);
+            const x = ((containerW - perThis * overlap - cardW) / 2) + c * overlap + rightShift;
+            const y = r * rowH;
+            html += `<div class="tp-card" data-pos="${i}" onclick="pickTarotCard(this)" ondblclick="pickTarotCard(this,true)" title="کلیک = راست · دابل‌کلیک = وارونه"
+                style="position:absolute;left:${x}px;top:${y}px;z-index:${i + 1};cursor:pointer;width:${cardW}px;height:${cardH}px;border-radius:9px;background:url('${CARD_BACK}') center/cover no-repeat,#241b47;border:1px solid rgba(253,203,110,0.35);box-shadow:0 3px 8px rgba(0,0,0,0.5);transition:transform .18s,opacity .25s,box-shadow .18s;"
+                onmouseover="if(this.dataset.used!=='1'){this.style.boxShadow='0 0 16px rgba(253,203,110,0.55)';this.style.borderColor='#fdcb6e';}"
+                onmouseout="if(this.dataset.used!=='1'){this.style.boxShadow='0 3px 8px rgba(0,0,0,0.5)';this.style.borderColor='rgba(253,203,110,0.35)';}"
+            ></div>`;
+        }
+    } else {
+        // ─── دسکتاپ/تابلت: بادبزنِ کلاسیکِ باز با فاصله بیشتر ───
+        const fanAngle = Math.min(150, 24 + n * 1.1);           // قوس وسیع‌تر از قبل
+        const spreadX = Math.min(containerW - cardW - 20, n * (overlap + 2));
+        for (let i = 0; i < n; i++) {
+            const t = n === 1 ? 0.5 : i / (n - 1);
+            const angle = (t - 0.5) * fanAngle * 0.5;
+            const lift = Math.abs(t - 0.5) * 30;
+            const z = i + 1;
+            const x = (containerW / 2 - cardW / 2) + (t - 0.5) * spreadX + rightShift;
+            html += `<div class="tp-card" data-pos="${i}" onclick="pickTarotCard(this)" ondblclick="pickTarotCard(this,true)" title="کلیک = راست · دابل‌کلیک = وارونه"
+                style="position:absolute;left:${x}px;top:${lift}px;transform-origin:50% 140%;transform:rotate(${angle}deg);z-index:${z};cursor:pointer;width:${cardW}px;height:${cardH}px;border-radius:9px;background:url('${CARD_BACK}') center/cover no-repeat,#241b47;border:1px solid rgba(253,203,110,0.35);box-shadow:0 3px 10px rgba(0,0,0,0.5);transition:transform .18s,opacity .25s,box-shadow .18s;"
+                onmouseover="if(this.dataset.used!=='1'){this.style.transform+=' translateY(-18px)';this.style.borderColor='#fdcb6e';this.style.boxShadow='0 0 16px rgba(253,203,110,0.55)';}"
+                onmouseout="if(this.dataset.used!=='1'){this.style.transform=this.style.transform.replace(' translateY(-18px)','');this.style.borderColor='rgba(253,203,110,0.35)';this.style.boxShadow='0 3px 10px rgba(0,0,0,0.5)';}"
+            ></div>`;
+        }
+        row.style.cssText = `position:relative;height:${cardH + 60}px;overflow:visible;`;
+        row.innerHTML = html;
+        return;
+    }
+    row.innerHTML = html;
+}
+
+// بازچینش بادبزن با تغییر اندازه پنجره (بدون از دست رفتن انتخاب‌ها)
+var _tpResizeTimer = null;
+window.addEventListener('resize', function () {
+    if (!_tarotPickState || !document.getElementById('tpFanRow')) return;
+    clearTimeout(_tpResizeTimer);
+    _tpResizeTimer = setTimeout(function () {
+        // فقط کارت‌های استفاده‌نشده باید دوباره رندر شوند — state می‌ماند
+        _renderFan();
+        // کارت‌های قبلاً برداشته‌شده را دوباره محو کن
+        document.querySelectorAll('.tp-card[data-used="1"]').forEach(function (el) {
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
+        });
+    }, 180);
+});
+
+function _updateTpGuide() {
+    const g = document.getElementById('tpGuide');
+    if (!g || !_tarotPickState) return;
+    const remain = _tarotPickState.count - _tarotPickState.picked.length;
+    g.innerHTML = remain > 0
+        ? `انتخاب کن: <b style="color:#fdcb6e;">${remain}</b> کارتِ دیگر${remain === 1 ? '' : ''} — کلیک ساده = راست، دابل‌کلیک = وارونه`
+        : `همه کارت‌ها انتخاب شدند ✨`;
+}
+
+function _tarotSlotLabels(count) {
+    if (count === 1) return ['پاسخ'];
+    if (count === 3) return ['گذشته', 'حال', 'آینده'];
+    if (count === 5) return ['وضعیت', 'چالش', 'راهنما', 'زیرِ سطح', 'نتیجه'];
+    return ['۱. وضعیت', '۲. چالش', '۳. بنیاد', '۴. گذشته', '۵. بالای سر', '۶. آینده نزدیک', '۷. خودِ تو', '۸. محیط', '۹. امید/ترس', '۱۰. نتیجه'];
+}
+
+function pickTarotCard(el, forceReversed) {
+    const st = _tarotPickState;
+    if (!st || !el || el.dataset.used === '1') return;
+    if (st.picked.length >= st.count) return;
+
+    const pos = parseInt(el.dataset.pos);
+    const cardIdx = st.order[pos];
+    const card = st.allCards[cardIdx];
+    const isReversed = forceReversed === true ? true : (Math.random() > 0.85);
+    el.dataset.used = '1';
+    el.style.opacity = '0';
+    el.style.pointerEvents = 'none';
+
+    st.picked.push({ card: card, is_reversed: isReversed });
+
+    const slot = st.picked.length - 1;
+    const slotEl = document.getElementById('tpSlot' + slot);
+    if (slotEl) {
+        const imgUrl = card.image || '/static/tarot/images/card-back.svg';
+        const body = slotEl.querySelector('.tp-slot-body');
+        // کارت واقعی بلافاصله — انیمیشن ظهور ساده
+        body.innerHTML = `
+            <img src="${imgUrl}" alt="${card.name || ''}" style="width:100%;max-width:110px;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,0.5);${isReversed ? 'transform:rotate(180deg);' : ''}animation:tpPop .4s ease-out;cursor:zoom-in;" onclick="showTarotImageZoom('${imgUrl}','${(card.name||'').replace(/'/g,'')}')" onerror="this.style.display='none'">
+            <div style="color:#fdcb6e;font-size:0.72rem;font-weight:700;margin-top:5px;">${card.name || ''}</div>
+            <div style="color:${isReversed ? '#e17055' : '#2ecc71'};font-size:0.62rem;">${isReversed ? '🔄 وارونه' : '⬆️ راست'}</div>`;
+    }
+
+    _updateTpGuide();
+    if (st.picked.length === st.count) {
+        // حد نصاب کامل شد — آشکارسازی خودکار (بدون دکمه)
+        setTimeout(revealTarotPick, 450);
+    }
+}
+
+function revealTarotPick() {
+    const st = _tarotPickState;
+    const done = document.getElementById('tpDone');
+    if (!st || !done) return;
+    const fan = document.getElementById('tpFan');
+    if (fan) fan.style.display = 'none';
+    const btn = document.getElementById('tpDoneBtn');
+    if (btn) btn.innerHTML = '';
+
+    const labels = _tarotSlotLabels(st.count);
+    let html = '<div style="background: rgba(108,92,231,0.08); border: 1px solid rgba(108,92,231,0.25); border-radius: 14px; padding: 16px;">';
+    html += '<h5 style="color:#fdcb6e;text-align:center;margin:0 0 12px;">🔮 فال تو آشکار شد</h5>';
+    st.picked.forEach(function (p, i) {
+        const rev = p.is_reversed;
+        const deep = rev ? (p.card.deep_interp_reversed || '') : (p.card.deep_interp_upright || '');
+        const meaning = rev ? (p.card.meaning_reversed || '') : (p.card.meaning_upright || '');
+        const mood = rev ? (p.card.mood_reversed || '') : (p.card.mood || '');
+        const spiritual = rev ? (p.card.spiritual_reversed || '') : (p.card.spiritual || '');
+        const yesNo = rev ? (p.card.yes_no_reversed || '') : (p.card.yes_no || '');
+        html += `<div style="margin-bottom:12px;padding:12px;background:rgba(0,0,0,0.2);border-radius:10px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">`;
+        // تصویر کارت — وارونه اگر reversed
+        const cImg = p.card.image || '/static/tarot/images/card-back.svg';
+        html += `<div style="flex-shrink:0;width:110px;">
+            <img src="${cImg}" alt="${p.card.name || ''}" style="width:100%;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,0.5);${rev ? 'transform:rotate(180deg);' : ''}cursor:zoom-in;" onclick="showTarotImageZoom('${cImg}','${(p.card.name||'').replace(/'/g,'')}')" onerror="this.style.display='none'">
+        </div>`;
+        html += `<div style="flex:1;min-width:180px;">`;
+        html += `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;"><b style="color:#fdcb6e;">${labels[i]}</b><span style="color:${rev ? '#e17055' : '#2ecc71'};font-size:0.75rem;">${p.card.name} ${rev ? '🔄' : '⬆️'}</span></div>`;
+        if (p.card.keywords_upright) {
+            const kws = rev ? (p.card.keywords_reversed || []) : (p.card.keywords_upright || []);
+            if (kws.length) html += `<div style="color:#8fb4ff;font-size:0.75rem;margin-top:4px;">${kws.join(' · ')}</div>`;
+        }
+        html += `<div style="color:#ccc;font-size:0.85rem;line-height:1.9;margin-top:6px;">${meaning}</div>`;
+        if (deep) {
+            html += `<div style="background:rgba(253,203,110,0.05);border-right:3px solid rgba(253,203,110,0.4);border-radius:8px;padding:10px 14px;margin-top:8px;line-height:2;color:#ccc;font-size:0.84rem;"><b style="color:#fdcb6e;">📜 تفسیر:</b><br>${deep}</div>`;
+        }
+        if (p.card.love) {
+            const love = rev ? (p.card.love_reversed || '') : (p.card.love || '');
+            if (love) html += `<div style="margin-top:8px;font-size:0.8rem;color:#ff8fab;line-height:1.9;">❤️ <b>عشق:</b> ${love}</div>`;
+        }
+        if (p.card.career) {
+            const career = rev ? (p.card.career_reversed || '') : (p.card.career || '');
+            if (career) html += `<div style="margin-top:4px;font-size:0.8rem;color:#74b9ff;line-height:1.9;">💼 <b>کار:</b> ${career}</div>`;
+        }
+        if (mood) html += `<div style="margin-top:4px;font-size:0.78rem;color:#a29bfe;">🎭 حال و هوا: ${mood}</div>`;
+        if (spiritual) html += `<div style="margin-top:4px;font-size:0.78rem;color:#8fe3b4;line-height:1.9;">🕊️ <b>معنویت:</b> ${spiritual}</div>`;
+        if (yesNo) {
+            const yesFa = { yes: 'بله ✅', no: 'خیر ❌', maybe: 'شاید ⚖️' }[String(yesNo).toLowerCase()] || yesNo;
+            html += `<div style="margin-top:6px;font-size:0.8rem;color:var(--ink-dim);">سؤالی داری؟ پاسخ کارت: <b style="color:#fdcb6e;">${yesFa}</b></div>`;
+        }
+        html += `</div>`; // پایان ستون متن
+        html += `</div>`; // پایان ردیف کارت
+    });
+    html += '<button class="btn-secondary" onclick="startTarotPick(true)" style="width:100%;">🔄 بُر زدن مجدد و انتخاب تازه</button>';
+    html += '</div>';
+    done.innerHTML = html;
+    done.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    saveTarotHistory('hand-pick', st.picked);
+}
+
 // ---------- Tarot Display Functions ----------
 
 function displayTarotCard(data, container) {
     const card = data.card;
     const isReversed = data.is_reversed || false;
     const status = isReversed ? '🔄 وارونه' : '⬆️ راست';
-    const imgUrl = card.image || '/static/tarot/images/placeholder.webp';
+    const imgUrl = card.image || '/static/tarot/images/card-back.svg';
     container.innerHTML = `
         <div style="background: rgba(108,92,231,0.1); border: 1px solid rgba(108,92,231,0.3); border-radius: 16px; padding: 20px; margin-top: 10px;">
             <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
@@ -2465,7 +2842,7 @@ function displayTarotCard(data, container) {
                     <div class="tarot-flip-inner">
                         <div class="tarot-flip-front"><div class="card-back-pattern">🌟</div></div>
                         <div class="tarot-flip-back">
-                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/card-back.svg'">
                         </div>
                     </div>
                     <span class="flip-hint">کلیک کنید</span>
@@ -2477,6 +2854,7 @@ function displayTarotCard(data, container) {
                     </div>
                     <div style="margin-top: 10px; color: #ddd; line-height: 1.8;">
                         <p><strong>معنی:</strong> ${data.meaning || 'توضیحی موجود نیست'}</p>
+                        ${data.deep_interp ? `<div style="background: rgba(253,203,110,0.06); border-right: 3px solid rgba(253,203,110,0.4); border-radius: 8px; padding: 10px 14px; margin: 10px 0; line-height: 2;"><strong style="color:#fdcb6e;">📜 تفسیر:</strong><br>${data.deep_interp}</div>` : ''}
                         <p><strong>کلمات کلیدی:</strong> ${Array.isArray(data.keywords) ? data.keywords.join('، ') : data.keywords || '—'}</p>
                         <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px;">
                             ${data.love ? `<span style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px;">❤️ ${data.love}</span>` : ''}
@@ -2495,7 +2873,7 @@ function displayTarotCards(cards, container) {
         const card = item.card;
         const isReversed = item.is_reversed || false;
         const status = isReversed ? '🔄 وارونه' : '⬆️ راست';
-        const imgUrl = card.image || '/static/tarot/images/placeholder.webp';
+        const imgUrl = card.image || '/static/tarot/images/card-back.svg';
         const delay = index * 300;
         html += `
             <div style="background: rgba(108,92,231,0.08); border: 1px solid rgba(108,92,231,0.2); border-radius: 12px; padding: 15px; margin-top: 10px; display: flex; gap: 15px; align-items: flex-start;">
@@ -2503,7 +2881,7 @@ function displayTarotCards(cards, container) {
                     <div class="tarot-flip-inner" style="animation-delay:${delay}ms;">
                         <div class="tarot-flip-front"><div class="card-back-pattern">🌟</div></div>
                         <div class="tarot-flip-back">
-                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/card-back.svg'">
                         </div>
                     </div>
                     <span class="flip-hint">کلیک</span>
@@ -2514,6 +2892,7 @@ function displayTarotCards(cards, container) {
                         <span style="background: ${isReversed ? '#e17055' : '#00b894'}; padding: 2px 12px; border-radius: 20px; color: #fff; font-size: 0.7rem;">${status}</span>
                     </div>
                     <p style="color: #ccc; margin: 8px 0 0 0; font-size: 0.9rem;">${item.meaning || ''}</p>
+                    ${item.deep_interp ? `<details style="margin-top: 8px;"><summary style="color: #a29bfe; cursor: pointer; font-size: 0.85rem;">📜 تفسیر کامل</summary><div style="color: #bbb; line-height: 2; margin-top: 8px; padding: 10px 14px; background: rgba(253,203,110,0.05); border-radius: 8px; border-right: 3px solid rgba(253,203,110,0.35); font-size: 0.88rem;">${item.deep_interp}</div></details>` : ''}
                 </div>
             </div>
         `;
@@ -2527,7 +2906,7 @@ function displayTarotSpread(data, container) {
     positions.forEach((pos, index) => {
         const card = pos.card?.card || {};
         const isReversed = pos.card?.is_reversed || false;
-        const imgUrl = card.image || '/static/tarot/images/placeholder.webp';
+        const imgUrl = card.image || '/static/tarot/images/card-back.svg';
         const delay = index * 400;
         html += `
             <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-top: 10px; display: flex; gap: 15px; align-items: flex-start;">
@@ -2535,7 +2914,7 @@ function displayTarotSpread(data, container) {
                     <div class="tarot-flip-inner" style="animation-delay:${delay}ms;">
                         <div class="tarot-flip-front"><div class="card-back-pattern">🌟</div></div>
                         <div class="tarot-flip-back">
-                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/placeholder.webp'">
+                            <img src="${imgUrl}" class="${isReversed ? 'reversed' : ''}" alt="${card.name || ''}" onerror="this.src='/static/tarot/images/card-back.svg'">
                         </div>
                     </div>
                     <span class="flip-hint">کلیک</span>
@@ -2545,6 +2924,7 @@ function displayTarotSpread(data, container) {
                         <h5 style="color: #fdcb6e; margin: 0;">${index+1}. ${pos.position || ''}</h5>
                         <span style="background: ${isReversed ? '#e17055' : '#00b894'}; padding: 2px 12px; border-radius: 20px; color: #fff; font-size: 0.7rem;">${isReversed ? 'وارونه' : 'راست'}</span>
                     </div>
+                    ${pos.position_guide ? `<p style="color:#a29bfe;font-size:0.78rem;margin:6px 0 0 0;line-height:1.8;">${pos.position_guide}</p>` : ''}
                     <p style="color: #ddd; margin: 8px 0 0 0;"><strong>${card.name || ''}</strong> — ${pos.card?.meaning || ''}</p>
                 </div>
             </div>
@@ -2558,27 +2938,34 @@ function displayTarotSpread(data, container) {
 // ============================================
 
 function getNumerologyForm() {
+    // تاریخ تولد مشترک — از birthDatePicker چارت (هم‌ست با بقیه سایت)
+    var hasBirth = !!(sharedInputs.birthDate && sharedInputs.birthDate.year);
+    var birthDisplay = hasBirth ? formatDpDisplay(sharedInputs.birthDate, 'shamsi', 'fa') : 'ثبت نشده';
+    var birthHtml = hasBirth
+        ? '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(46,204,113,0.06);border:1px solid rgba(46,204,113,0.2);border-radius:12px;margin-bottom:12px;">' +
+          '<span style="font-size:1.3rem;">📅</span>' +
+          '<div style="flex:1;"><div style="font-size:0.85rem;color:#2ecc71;font-weight:700;">تاریخ تولد شما: ' + birthDisplay + '</div>' +
+          '<div style="font-size:0.72rem;color:#8fb4ff;margin-top:2px;">برای تغییر، به <a href="javascript:void(0)" onclick="if(window.showPage)showPage(\'dashboard\')" style="color:#a29bfe;text-decoration:underline;">داشبورد کاربری</a> بروید — تغییر این‌جا فقط برای محاسبات این بخش موقتی است.</div></div></div>'
+        : '<div style="padding:10px 14px;background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.25);border-radius:12px;margin-bottom:12px;font-size:0.85rem;color:#fdcb6e;">⚠️ تاریخ تولد ثبت نشده — ابتدا در بخش چارت تولد وارد کنید.</div>';
+
     return `
         <div style="max-width: 100%; margin: 0 auto;">
             <h3 style="color: #a29bfe; text-align: center;">🔢 عددشناسی - رمز اعداد زندگی</h3>
 
-            <!-- Life Path Number (PRIMARY) -->
+            <!-- Life Path Number (PRIMARY) — از تاریخ تولد مشترک -->
             <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
                 <h4 style="color: #fdcb6e; margin-top: 0;">🛤️ عدد مسیر زندگی</h4>
-                <div class="form-group"><label>سال تولد</label><input id="numYear" type="number" value="1990"></div>
-                <div class="form-group"><label>ماه تولد</label><input id="numMonth" type="number" value="1"></div>
-                <div class="form-group"><label>روز تولد</label><input id="numDay" type="number" value="1"></div>
+                ${birthHtml}
                 <button class="btn-primary" onclick="submitLifePath()">🛤️ محاسبه مسیر زندگی</button>
                 <div id="numLifePathResult" style="margin-top: 15px;"></div>
             </div>
 
-            <!-- Personal Year (SECONDARY) -->
+            <!-- Personal Year (SECONDARY) — birthDatePicker مجزا، بدون ذخیره -->
             <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
-                <h4 style="color: #fdcb6e; margin-top: 0;">📅 سال شخصی</h4>
-                <div class="form-group"><label>سال تولد</label><input id="pyYear" type="number" value="1990"></div>
-                <div class="form-group"><label>ماه تولد</label><input id="pyMonth" type="number" value="1"></div>
-                <div class="form-group"><label>روز تولد</label><input id="pyDay" type="number" value="1"></div>
-                <div class="form-group"><label>سال هدف (اختیاری، خالی = سال جاری)</label><input id="pyTarget" type="number" placeholder="مثلاً 2026"></div>
+                <h4 style="color: #fdcb6e; margin-top: 0;">📅 سال اختیاری (سال شخصی هر سالی که بخواهی)</h4>
+                <p style="color:#8fb4ff;font-size:0.8rem;margin:4px 0 10px;">تاریخ تولد را همین‌جا وارد کن (ذخیره نمی‌شود — فقط برای همین محاسبه) و سال دلخواهت را بزن تا ببینی آن سال در چه فضایی خواهی بود.</p>
+                <div class="form-group">${makeDatePickerTrigger('pyBirthDP', {label:'تاریخ تولد', calendarType:'shamsi', digits:'fa'})}</div>
+                <div class="form-group"><label>سال موردنظر</label><input id="pyTarget" type="number" placeholder="خالی = سال جاری" value=""></div>
                 <button class="btn-secondary" onclick="submitPersonalYear()" style="width:100%;">📅 محاسبه سال شخصی</button>
                 <div id="numPersonalYearResult" style="margin-top: 15px;"></div>
             </div>
@@ -2602,8 +2989,8 @@ function getNumerologyForm() {
             <!-- Compatibility (SECONDARY) -->
             <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
                 <h4 style="color: #fdcb6e; margin-top: 0;">💞 سازگاری عددی</h4>
-                <div class="form-group"><label>عدد اول</label><input id="numComp1" type="number" value="1"></div>
-                <div class="form-group"><label>عدد دوم</label><input id="numComp2" type="number" value="2"></div>
+                <div class="form-group"><label>عدد اول</label><input id="numComp1" type="number" value="1" min="1" max="33"></div>
+                <div class="form-group"><label>عدد دوم</label><input id="numComp2" type="number" value="2" min="1" max="33"></div>
                 <button class="btn-secondary" onclick="submitCompatibility()" style="width:100%;">💞 بررسی سازگاری</button>
                 <div id="numCompResult" style="margin-top: 15px;"></div>
             </div>
@@ -2614,12 +3001,19 @@ function getNumerologyForm() {
 // ---------- API Calls ----------
 
 async function submitLifePath() {
-    const year = parseInt(document.getElementById('numYear').value);
-    const month = parseInt(document.getElementById('numMonth').value);
-    const day = parseInt(document.getElementById('numDay').value);
+    // از تاریخ تولد مشترک (هم‌ست با چارت و بقیه سایت)
+    var bd = sharedInputs.birthDate;
+    var year, month, day;
+    if (bd && bd.year && bd.month && bd.day) {
+        // تبدیل شمسی → میلادی برای محاسبه درست
+        var g = bd.year >= 1300 && bd.year <= 1600 ? (window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(bd.year + '-' + String(bd.month).padStart(2,'0') + '-' + String(bd.day).padStart(2,'0')).split('-') : [bd.year, bd.month, bd.day]) : [bd.year, bd.month, bd.day];
+        year = parseInt(g[0]); month = parseInt(g[1]); day = parseInt(g[2]);
+    } else {
+        var resultDiv0 = document.getElementById('numLifePathResult');
+        if (resultDiv0) resultDiv0.innerHTML = '<p style="color:#fdcb6b;">⚠️ تاریخ تولد ثبت نشده — ابتدا در بخش چارت تولد وارد کنید یا به داشبورد بروید.</p>';
+        return;
+    }
     const resultDiv = document.getElementById('numLifePathResult');
-    if (!year || !month || !day) { resultDiv.innerHTML = '<p style="color:#ff6b6b;">❌ لطفاً تاریخ تولد را کامل وارد کنید</p>'; return; }
-    if (year < 1279) { resultDiv.innerHTML = '<p style="color:#e74c3c;">❌ مردگان ستاره‌ای در چارت ندارند 🌌</p>'; return; }
     resultDiv.innerHTML = makeShimmerCompact('⏳ در حال محاسبه مسیر زندگی...');
     try {
         const res = await fetch('/api/v5/numerology/life-path', {
@@ -2637,14 +3031,16 @@ async function submitLifePath() {
 }
 
 async function submitPersonalYear() {
-    const birth_year = parseInt(document.getElementById('pyYear').value);
-    const birth_month = parseInt(document.getElementById('pyMonth').value);
-    const birth_day = parseInt(document.getElementById('pyDay').value);
+    // از پیکرِ مجزای pyBirthDP — بدون ذخیره‌سازی
+    const pyHidden = document.getElementById('pyBirthDP_hidden');
+    const birth = pyHidden ? window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(pyHidden.value) : pyHidden.value : '';
     const targetInput = document.getElementById('pyTarget').value;
     const target_year = targetInput ? parseInt(targetInput) : null;
     const resultDiv = document.getElementById('numPersonalYearResult');
-    if (!birth_year || !birth_month || !birth_day) { resultDiv.innerHTML = '<p style="color:#ff6b6b;">❌ لطفاً تاریخ تولد را کامل وارد کنید</p>'; return; }
-    if (birth_year < 1279) { resultDiv.innerHTML = '<p style="color:#e74c3c;">❌ مردگان ستاره‌ای در چارت ندارند 🌌</p>'; return; }
+    if (!birth) { resultDiv.innerHTML = '<p style="color:#ff6b6b;">❌ لطفاً تاریخ تولد را وارد کنید</p>'; return; }
+    var parts = birth.split('-').map(function(x){ return parseInt(x, 10); });
+    const birth_year = parts[0], birth_month = parts[1], birth_day = parts[2];
+    if (birth_year < 1279 && (birth_year < 1000)) { /* میلادی است — ok */ }
     resultDiv.innerHTML = makeShimmerCompact('⏳ در حال محاسبه سال شخصی...');
     try {
         const res = await fetch('/api/v5/numerology/personal-year', {
@@ -2654,7 +3050,7 @@ async function submitPersonalYear() {
         });
         const data = await res.json();
         if (data.status === 'success') {
-            displayNumerologyResult(data.data, resultDiv, '📅 سال شخصی');
+            displayNumerologyResult(data.data, resultDiv, '📅 سال شخصی — سال ' + (target_year || new Date().getFullYear()));
         } else {
             resultDiv.innerHTML = '<p style="color:#ff6b6b;">❌ ' + (data.detail || 'خطای ناشناخته') + '</p>';
         }
@@ -2726,7 +3122,33 @@ async function submitCompatibility() {
 function displayNumerologyResult(data, container, title) {
     let html = '<div style="background:rgba(108,92,231,0.1);border:1px solid rgba(108,92,231,0.3);border-radius:16px;padding:20px;margin-top:10px;">';
     html += '<h4 style="color:#fdcb6e;margin-top:0;">' + title + '</h4>';
+
+    // ─── تفسیر عمیق (اگر موجود) — قبل از جزئیات عددی ───
+    var deep = data.deep || null;
+    if (deep && deep.identity) {
+        html += '<div style="margin:8px 0 14px;padding:14px 16px;background:rgba(253,203,110,0.06);border-right:3px solid rgba(253,203,110,0.45);border-radius:10px;">';
+        html += '<div style="font-size:1.05rem;font-weight:800;color:#fdcb6e;margin-bottom:8px;">' + deep.identity + '</div>';
+        html += '<div style="line-height:2;color:#ddd;font-size:0.9rem;margin-bottom:8px;">' + deep.essence + '</div>';
+        html += '<div style="line-height:2;color:#8fe3b4;font-size:0.85rem;margin-bottom:6px;"><b>💪 نقاط قوت:</b> ' + deep.strengths + '</div>';
+        html += '<div style="line-height:2;color:#ff8fab;font-size:0.85rem;margin-bottom:6px;"><b>🌑 سایه / چالش:</b> ' + deep.shadow + '</div>';
+        html += '<div style="line-height:2;color:#8fb4ff;font-size:0.85rem;"><b>🌱 مسیر رشد:</b> ' + deep.growth + '</div>';
+        html += '</div>';
+    }
+
+    // تفسیر سال شخصی
+    if (data.deep_year) {
+        html += '<div style="margin:8px 0 14px;padding:14px 16px;background:rgba(162,155,254,0.08);border-right:3px solid rgba(162,155,254,0.45);border-radius:10px;line-height:2;color:#ddd;font-size:0.9rem;">';
+        html += '<b style="color:#a29bfe;">🔮 این سال چگونه خواهد بود:</b><br>' + data.deep_year + '</div>';
+    }
+
+    // استعداد روز تولد
+    if (data.birth_day_talent) {
+        html += '<div style="margin:8px 0 14px;padding:12px 16px;background:rgba(46,204,113,0.07);border-right:3px solid rgba(46,204,113,0.4);border-radius:10px;line-height:2;color:#ddd;font-size:0.88rem;">';
+        html += '<b style="color:#2ecc71;">✨ استعداد روز تولد (روز ' + data.birth_day_number + '):</b> ' + data.birth_day_talent + '</div>';
+    }
+
     for (const [key, value] of Object.entries(data)) {
+        if (['deep', 'deep_year', 'birth_day_talent', 'birth_day_number', 'birth_day_deep', 'dynamic', 'challenges', 'advice'].includes(key)) continue;
         if (key === 'details' && Array.isArray(value)) {
             html += '<div style="color:#aaa;font-size:0.85rem;margin:5px 0;"><strong>جزئیات:</strong> ';
             html += value.map(function(d) { return d.char + '=' + d.value; }).join(' + ');
@@ -2753,6 +3175,24 @@ function displayNumerologyResult(data, container, title) {
             html += '<div style="margin:5px 0;color:#ddd;"><strong>' + label + ':</strong> ' + value + '</div>';
         }
     }
+
+    // ─── تحلیل پویای سازگاری ───
+    if (data.dynamic) {
+        html += '<div style="margin:12px 0;padding:14px 16px;background:rgba(108,92,231,0.08);border-right:3px solid rgba(108,92,231,0.5);border-radius:10px;line-height:2;color:#ddd;font-size:0.9rem;">';
+        html += '<b style="color:#a29bfe;">🎭 پویایی رابطه:</b><br>' + data.dynamic + '</div>';
+    }
+    if (data.challenges && data.challenges.length) {
+        html += '<div style="margin:10px 0;padding:12px 16px;background:rgba(231,76,60,0.06);border-right:3px solid rgba(231,76,60,0.4);border-radius:10px;">';
+        html += '<b style="color:#e17055;">⚠️ چالش‌های محتمل:</b><ul style="margin:6px 0 0;padding-right:18px;color:#ddd;font-size:0.85rem;line-height:2;">';
+        data.challenges.forEach(function (c) { html += '<li>' + c + '</li>'; });
+        html += '</ul></div>';
+    }
+    if (data.advice && data.advice.length) {
+        html += '<div style="margin:10px 0;padding:12px 16px;background:rgba(46,204,113,0.06);border-right:3px solid rgba(46,204,113,0.4);border-radius:10px;">';
+        html += '<b style="color:#2ecc71;">💡 توصیه‌های عملی:</b><ul style="margin:6px 0 0;padding-right:18px;color:#ddd;font-size:0.85rem;line-height:2;">';
+        data.advice.forEach(function (a) { html += '<li>' + a + '</li>'; });
+        html += '</ul></div>';
+    }
     html += '</div>';
     container.innerHTML = html;
 }
@@ -2764,16 +3204,33 @@ function displayNumerologyResult(data, container, title) {
 // ============================================
 
 function getBiorhythmForm() {
+    var profileISO = getProfileBirthISO();
+    var hasProfile = !!profileISO;
     var defaultYear = sharedInputs.birthDate ? sharedInputs.birthDate.year : 1379;
     var defaultDate = sharedInputs.birthDate ? sharedInputs.birthDate : { year: defaultYear, month: 1, day: 1 };
+    var profileShamsi = '';
+    if (hasProfile && sharedInputs.birthDate) {
+        profileShamsi = formatDpDisplay(sharedInputs.birthDate, 'shamsi', 'fa');
+    }
+    var banner = hasProfile
+        ? `<div style="background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.35);border-radius:14px;padding:14px 18px;margin-bottom:16px;">
+             <b style="color:#2ecc71;">✅ بیوریتم شما</b>
+             <div style="font-size:0.85rem;color:#ccc;margin-top:4px;">تاریخ تولد ثبت‌شده‌ی پروفایل: <b style="color:#fff;">${profileShamsi || profileISO}</b></div>
+             <div style="font-size:0.78rem;color:#999;margin-top:4px;">محاسبه‌ها بر اساس همین تاریخ انجام می‌شود. برای تغییر تاریخ تولد به <button onclick="navigate('dashboard')" style="background:none;border:none;color:#fdcb6e;cursor:pointer;font-family:inherit;font-size:0.78rem;text-decoration:underline;padding:0;">داشبورد کاربری ← تنظیمات تولد</button> بروید. تاریخ دلخواهِ پایین فقط برای «آزمایش» است.</div>
+           </div>`
+        : `<div style="background:rgba(253,203,110,0.08);border:1px solid rgba(253,203,110,0.35);border-radius:14px;padding:14px 18px;margin-bottom:16px;">
+             <b style="color:#fdcb6e;">📅 تاریخ تولد ثبت نشده</b>
+             <div style="font-size:0.82rem;color:#ccc;margin-top:4px;">اگر وارد شده‌اید، تاریخ انتخابی زیر به‌عنوان تاریخ تولد پروفایل شما ثبت می‌شود. برای تغییر بعدی به داشبورد کاربری ← تنظیمات تولد بروید.</div>
+           </div>`;
     return `
         <div style="max-width:900px;margin:0 auto;">
             <h3 style="color:#a29bfe;text-align:center;">🔬 بیوریتم - انرژی امروز شما</h3>
-            
+            ${banner}
+
             <!-- Main Calculator -->
             <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.05);">
                 <h4 style="color:#fdcb6e;margin-top:0;">📅 محاسبه بیوریتم</h4>
-                <div class="form-group"><label>تاریخ تولد</label>${makeDatePickerTrigger('bioBirthDP', {label:'تاریخ تولد', calendarType:'shamsi', digits:'fa', defaultValue: defaultDate})}</div>
+                <div class="form-group"><label>${hasProfile ? 'تاریخ دلخواه (آزمایشی — روی پروفایل اثری ندارد)' : 'تاریخ تولد'}</label>${makeDatePickerTrigger('bioBirthDP', {label: hasProfile ? 'تاریخ دلخواه' : 'تاریخ تولد', calendarType:'shamsi', digits:'fa', defaultValue: defaultDate})}</div>
                 <div class="form-group"><label>تاریخ هدف (اختیاری، خالی = امروز)</label><input id="bioTarget" placeholder="YYYY-MM-DD"></div>
                 <button class="btn-primary" onclick="submitBiorhythm()">🔬 محاسبه بیوریتم</button>
                 <div id="bioResult" style="margin-top:15px;"></div>
@@ -2782,7 +3239,11 @@ function getBiorhythmForm() {
             <!-- Monthly Overview -->
             <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.05);">
                 <h4 style="color:#fdcb6e;margin-top:0;">📊 نمای ماهانه</h4>
-                <div class="form-group"><label>تاریخ تولد</label>${makeDatePickerTrigger('bioMonthlyBirthDP', {label:'تاریخ تولد', calendarType:'shamsi', digits:'fa', defaultValue: defaultDate})}</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+                    <button class="btn-secondary" onclick="submitMyMonthlyView()">🌙 نمای ماهانه من</button>
+                    <span style="font-size:0.78rem;color:#999;">بر اساس تاریخ تولد ${hasProfile ? 'ثبت‌شده‌ی' : 'انتخاب‌شده‌ی'} شما در ماهِ تولدتان</span>
+                </div>
+                <div class="form-group"><label>تاریخ تولد (دلخواه/آزمایشی)</label>${makeDatePickerTrigger('bioMonthlyBirthDP', {label:'تاریخ تولد', calendarType:'shamsi', digits:'fa', defaultValue: defaultDate})}</div>
                 <div class="form-group"><label>سال</label><input id="bioMonthlyYear" type="number" value="2026"></div>
                 <div class="form-group"><label>ماه</label><input id="bioMonthlyMonth" type="number" value="8" min="1" max="12"></div>
                 <button class="btn-secondary" onclick="submitMonthlyOverview()">📊 نمای ماهانه</button>
@@ -2792,14 +3253,74 @@ function getBiorhythmForm() {
     `;
 }
 
+/* resolve which birth date a biorhythm calc should use:
+   1) profile birth (if registered)  2) picked test date  */
+function resolveBioBirth(pickerId) {
+    var profileISO = getProfileBirthISO();
+    if (profileISO) return { iso: profileISO, source: 'profile' };
+    var h = document.getElementById(pickerId + '_hidden');
+    if (h && h.value) return { iso: isoShamsiToGregorian(h.value), source: 'picked' };
+    return null;
+}
+
+/* «نمای ماهانه من» — uses profile (or picked) birth, targets the birth
+   month of the CURRENT year (or the month the user registered in) */
+async function submitMyMonthlyView() {
+    var r = resolveBioBirth('bioMonthlyBirthDP');
+    var resultDiv = document.getElementById('bioMonthlyResult');
+    if (!r) { resultDiv.innerHTML = '❌ ابتدا تاریخ تولد را انتخاب کنید یا در پروفایل ثبت کنید'; return; }
+    if (parseInt(r.iso.split('-')[0]) < 1279) { resultDiv.innerHTML = '<span style="color:#e74c3c;">❌ مردگان ستاره‌ای در چارت ندارند 🌌</span>'; return; }
+    var bd = new Date(r.iso + 'T00:00:00');
+    var year = new Date().getFullYear();
+    var month = bd.getMonth() + 1;   /* the user's birth month */
+    resultDiv.innerHTML = makeShimmerCompact('⏳ در حال محاسبه نمای ماهانه شما... (' + month + '/' + year + ')');
+    try {
+        const res = await fetch('/api/v5/biorhythm/monthly', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ birth_date: r.iso, year: year, month: month })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            displayMonthlyOverview(data.data, resultDiv);
+        } else {
+            resultDiv.innerHTML = `❌ ${data.detail || 'خطا'}`;
+        }
+    } catch(e) { resultDiv.innerHTML = '❌ خطا در ارتباط با سرور'; }
+}
+
+// ─── تبدیل تاریخ ISO شمسی (1300–1600) به میلادی برای بک‌اند ───
+// از zodiac-display.js استفاده می‌کند (سال+ماه+روز کامل)
+function isoShamsiToGregorian(iso) {
+    if (window.isoShamsiToGregorianISO) return window.isoShamsiToGregorianISO(iso);
+    return iso;
+}
+
 async function submitBiorhythm() {
-    var bioHidden = document.getElementById('bioBirthDP_hidden');
-    const birth = bioHidden ? bioHidden.value : '';
-    const target = document.getElementById('bioTarget').value;
     const resultDiv = document.getElementById('bioResult');
+    var profileISO = getProfileBirthISO();
+    var bioHidden = document.getElementById('bioBirthDP_hidden');
+    var birth;
+    if (profileISO) {
+        /* profile birth always wins for the main calc */
+        birth = profileISO;
+    } else {
+        birth = isoShamsiToGregorian(bioHidden ? bioHidden.value : '');
+        /* guest picking a birth date here → register it to their profile
+           (server-side if logged in; locally always) */
+        if (birth && bioHidden && bioHidden.value) {
+            var parts2 = bioHidden.value.split('-');
+            if (parts2.length >= 3) {
+                sharedInputs.birthDate = { year: parseInt(parts2[0]), month: parseInt(parts2[1]), day: parseInt(parts2[2]) };
+                persistSharedInputsLocal();
+                saveProfileToServer();
+            }
+        }
+    }
+    const target = document.getElementById('bioTarget').value;
     if (!birth) { resultDiv.innerHTML = '❌ تاریخ تولد را وارد کنید'; return; }
     if (parseInt(birth.split('-')[0]) < 1279) { resultDiv.innerHTML = '<span style="color:#e74c3c;">❌ مردگان ستاره‌ای در چارت ندارند 🌌</span>'; return; }
-    resultDiv.innerHTML = '⏳ در حال محاسبه...';
+    resultDiv.innerHTML = deEmoji('⏳ در حال محاسبه...');
     try {
         const res = await fetch('/api/v5/biorhythm', {
             method: 'POST',
@@ -2816,8 +3337,9 @@ async function submitBiorhythm() {
 }
 
 async function submitMonthlyOverview() {
+    var profileISO = getProfileBirthISO();
     var mbHidden = document.getElementById('bioMonthlyBirthDP_hidden');
-    const birth = mbHidden ? mbHidden.value : '';
+    const birth = profileISO || isoShamsiToGregorian(mbHidden ? mbHidden.value : '');
     const year = parseInt(document.getElementById('bioMonthlyYear').value);
     const month = parseInt(document.getElementById('bioMonthlyMonth').value);
     const resultDiv = document.getElementById('bioMonthlyResult');
@@ -2848,39 +3370,76 @@ function displayBiorhythm(data, container) {
         if (val > -70) return '#e17055';
         return '#d63031';
     }
-    function barWidth(val) {
-        return Math.abs(val) + '%';
-    }
 
     let html = `<div style="background:rgba(108,92,231,0.1);border:1px solid rgba(108,92,231,0.3);border-radius:16px;padding:20px;margin-top:10px;">`;
     html += `<h4 style="color:#fdcb6e;margin-top:0;">📊 بیوریتم — ${data.target_date}</h4>`;
     html += `<p style="color:#aaa;">⏳ ${data.days} روز از تولد (${data.birth_day_of_week}) گذشته است</p>`;
-    
+
+    // ─── تفسیر ترکیبی روز (اگر بک‌اند فرستاده) ───
+    if (data.combined) {
+        html += `<div style="margin:14px 0;padding:16px 18px;background:rgba(253,203,110,0.07);border-right:3px solid rgba(253,203,110,0.5);border-radius:12px;">`;
+        html += `<div style="font-size:1.15rem;font-weight:800;color:#fdcb6e;margin-bottom:6px;">${data.combined.headline}</div>`;
+        html += `<div style="line-height:2;color:#ddd;font-size:0.9rem;">${data.combined.summary}</div>`;
+        if (data.combined.suggestions && data.combined.suggestions.length) {
+            html += `<div style="margin-top:10px;"><b style="color:#a29bfe;">💡 پیشنهادهای امروز:</b><ul style="margin:6px 0 0;padding-right:18px;color:#ccc;font-size:0.85rem;line-height:2;">`;
+            data.combined.suggestions.forEach(function (s) { html += '<li>' + s + '</li>'; });
+            html += `</ul></div>`;
+        }
+        html += `</div>`;
+    }
+
     const cycles = [
-        { label: '💪 فیزیکی', key: 'physical', status: data.physical_status, phase: data.physical_phase },
-        { label: '❤️ عاطفی', key: 'emotional', status: data.emotional_status, phase: data.emotional_phase },
-        { label: '🧠 ذهنی', key: 'intellectual', status: data.intellectual_status, phase: data.intellectual_phase },
+        { label: '💪 فیزیکی', key: 'physical', status: data.physical_status, phase: data.physical_phase, pt: data.physical_phase_type, cd: data.cycle_details && data.cycle_details.physical },
+        { label: '❤️ عاطفی', key: 'emotional', status: data.emotional_status, phase: data.emotional_phase, pt: data.emotional_phase_type, cd: data.cycle_details && data.cycle_details.emotional },
+        { label: '🧠 ذهنی', key: 'intellectual', status: data.intellectual_status, phase: data.intellectual_phase, pt: data.intellectual_phase_type, cd: data.cycle_details && data.cycle_details.intellectual },
     ];
-    
+
     html += `<div style="margin-top:15px;">`;
     cycles.forEach(c => {
         const val = data[c.key];
         const color = barColor(val);
         const isPositive = val >= 0;
+        const phaseBadge = c.pt ? `<span style="font-size:0.7rem;padding:2px 10px;border-radius:12px;background:${c.pt.critical ? 'rgba(231,76,60,0.15);color:#e17055' : c.pt.type.startsWith('مثبت') ? 'rgba(0,184,148,0.15);color:#00b894' : 'rgba(253,203,110,0.15);color:#fdcb6e'};margin-right:6px;">${c.pt.type} ${c.pt.direction}</span>` : '';
         html += `
             <div style="margin:12px 0;background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                    <span style="color:#ddd;font-weight:bold;">${c.label}</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+                    <span style="color:#ddd;font-weight:bold;">${c.label} ${phaseBadge}</span>
                     <span style="color:${color};font-weight:bold;">${val}% ${c.status}</span>
                 </div>
                 <div style="background:rgba(255,255,255,0.05);border-radius:6px;height:10px;overflow:hidden;position:relative;">
-                    <div style="position:absolute;top:0;${isPositive ? 'left:50%' : 'right:50%'};width:25%;height:100%;background:${color};opacity:0.8;border-radius:6px;"></div>
+                    <div style="position:absolute;top:0;${isPositive ? 'left:50%' : 'right:50%'};width:${Math.abs(val) / 2}%;height:100%;background:${color};opacity:0.8;border-radius:6px;"></div>
                     <div style="position:absolute;top:0;left:50%;width:2px;height:100%;background:rgba(255,255,255,0.2);"></div>
                 </div>
-                <div style="color:#aaa;font-size:0.8rem;margin-top:4px;">فاز: ${c.phase}</div>
+                <div style="color:#aaa;font-size:0.78rem;margin-top:5px;line-height:1.8;">
+                    فاز: ${c.phase}${c.pt && c.pt.critical ? ' — <span style="color:#e17055;">' + c.pt.desc + '</span>' : ''}
+                    ${c.cd ? `<br>📅 روز ${c.cd.position_in_cycle} از چرخهٔ ${c.cd.cycle}روزه · روز بحرانیِ بعدی: ${c.cd.days_to_critical} روز دیگر` : ''}
+                </div>
             </div>`;
     });
     html += `</div>`;
+
+    // ─── چرخه‌های فرعی ───
+    if (data.secondary_cycles) {
+        const sec = data.secondary_cycles;
+        html += `<div style="margin-top:16px;padding:14px 16px;background:rgba(162,155,254,0.06);border:1px solid rgba(162,155,254,0.2);border-radius:12px;">`;
+        html += `<h5 style="color:#a29bfe;margin:0 0 10px;">🌟 چرخه‌های فرعی (ترکیبی)</h5>`;
+        Object.keys(sec).forEach(function (k) {
+            const s = sec[k];
+            const color = barColor(s.value);
+            html += `<div style="margin:10px 0;">
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px;">
+                    <span style="color:#ddd;font-weight:700;">${s.label} <span style="color:#888;font-weight:400;">(${s.cycle} روزه)</span></span>
+                    <span style="color:${color};font-weight:800;">${s.value}%</span>
+                </div>
+                <div style="background:rgba(255,255,255,0.05);border-radius:5px;height:7px;overflow:hidden;position:relative;">
+                    <div style="position:absolute;top:0;${s.value >= 0 ? 'left:50%' : 'right:50%'};width:${Math.abs(s.value) / 2}%;height:100%;background:${color};opacity:0.8;border-radius:5px;"></div>
+                    <div style="position:absolute;top:0;left:50%;width:2px;height:100%;background:rgba(255,255,255,0.2);"></div>
+                </div>
+                <div style="color:#888;font-size:0.75rem;margin-top:3px;line-height:1.7;">${s.desc}</div>
+            </div>`;
+        });
+        html += `</div>`;
+    }
 
     // Tomorrow preview
     if (data.next_day) {
@@ -2891,7 +3450,7 @@ function displayBiorhythm(data, container) {
             </div>
         </div>`;
     }
-    
+
     html += `</div>`;
     container.innerHTML = html;
 }
@@ -2925,6 +3484,15 @@ function displayMonthlyOverview(data, container) {
             </div>`;
     });
     html += `</div>`;
+    // روزهای بحرانی ماه
+    if (data.critical_days && data.critical_days.length) {
+        html += `<div style="margin-top:14px;padding:12px 16px;background:rgba(231,76,60,0.07);border-right:3px solid rgba(231,76,60,0.4);border-radius:10px;">`;
+        html += `<b style="color:#e17055;">⚡ روزهای بحرانی این ماه:</b><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">`;
+        data.critical_days.forEach(function (cd) {
+            html += `<span style="background:rgba(231,76,60,0.12);padding:4px 12px;border-radius:14px;font-size:0.8rem;color:#ddd;">روز ${cd.day} — ${cd.cycle}</span>`;
+        });
+        html += `</div><div style="color:#888;font-size:0.75rem;margin-top:6px;">روزِ عبور چرخه از خط صفر — بیشترین ریسکِ خطا؛ مراقبت و تصمیم‌نگرفتن در این روزها توصیه می‌شود.</div></div>`;
+    }
     html += `<div style="margin-top:12px;color:#aaa;font-size:0.8rem;">💪 فیزیکی · ❤️ عاطفی · 🧠 ذهنی (درصد)</div>`;
     html += `</div>`;
     container.innerHTML = html;
@@ -2935,16 +3503,26 @@ function displayMonthlyOverview(data, container) {
 // ============================================
 
 function getZodiacForm() {
+    var zodiacYearDefault = window.sharedInputs && window.sharedInputs.birthDate && window.sharedInputs.birthDate.year >= 1300 && window.sharedInputs.birthDate.year <= 1600
+        ? (window.normalizeBirthYearToGregorian ? window.normalizeBirthYearToGregorian(window.sharedInputs.birthDate.year, window.sharedInputs.birthDate.month, window.sharedInputs.birthDate.day) : 1990)
+        : 1990;
     return `
         <div style="max-width:900px;margin:0 auto;">
             <h3 style="color:#a29bfe;text-align:center;">🐉 سال حیوانی چینی</h3>
-            
+
             <!-- Zodiac Calculator -->
             <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.05);">
                 <h4 style="color:#fdcb6e;margin-top:0;">🐭 محاسبه حیوان سال تولد</h4>
-                <div class="form-group"><label>سال تولد (میلادی)</label><input id="zodiacYear" type="number" value="1990"></div>
+                <div class="form-group"><label>سال تولد (میلادی)</label><input id="zodiacYear" type="number" value="${zodiacYearDefault}"></div>
                 <button class="btn-primary" onclick="submitZodiac()">🐉 محاسبه</button>
                 <div id="zodiacResult" style="margin-top:15px;"></div>
+            </div>
+
+            <!-- ═══ اکتشاف: بادبزن ۱۲ حیوان ═══ -->
+            <div style="background:rgba(108,92,231,0.06);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid rgba(108,92,231,0.25);">
+                <h4 style="color:#fdcb6e;margin-top:0;">🏮 کاوشِ ۱۲ حیوان — روی هر حیوان بزن</h4>
+                <div id="zcFan" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:14px 0;"></div>
+                <div id="zcDetail" style="display:none;margin-top:10px;"></div>
             </div>
 
             <!-- Compatibility -->
@@ -2964,6 +3542,77 @@ function getZodiacForm() {
         </div>
     `;
 }
+
+// بادبزن ۱۲ حیوان — کلیک: نمایش تفسیر عمیق + محاسبهٔ سال
+function _zcInitFan() {
+    const fan = document.getElementById('zcFan');
+    if (!fan) return;
+    const animals = [
+        { n:'موش', e:'🐭', y:2020 }, { n:'گاو', e:'🐮', y:2021 },
+        { n:'ببر', e:'🐯', y:2022 }, { n:'خرگوش', e:'🐰', y:2023 },
+        { n:'اژدها', e:'🐲', y:2024 }, { n:'مار', e:'🐍', y:2025 },
+        { n:'اسب', e:'🐴', y:2026 }, { n:'بز', e:'🐐', y:2027 },
+        { n:'میمون', e:'🐵', y:2028 }, { n:'خروس', e:'🐔', y:2029 },
+        { n:'سگ', e:'🐶', y:2030 }, { n:'گراز', e:'🐷', y:2031 }
+    ];
+    fan.innerHTML = animals.map(function (a, i) {
+        return `<button class="zc-card" data-animal="${a.n}" data-year="${a.y}" onclick="zcShow('${a.n}','${a.y}',this)"
+            style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 10px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(162,155,254,0.2);cursor:pointer;transition:all .2s;min-width:74px;"
+            onmouseover="this.style.borderColor='#fdcb6e';this.style.transform='translateY(-4px)';"
+            onmouseout="this.style.borderColor='rgba(162,155,254,0.2)';this.style.transform='';"
+        ><span style="font-size:2rem;">${a.e}</span><span style="font-size:0.78rem;color:#ddd;">${a.n}</span><span style="font-size:0.65rem;color:#888;">${a.y}</span></button>`;
+    }).join('');
+}
+
+async function zcShow(animal, year, btn) {
+    const detail = document.getElementById('zcDetail');
+    if (!detail) return;
+    // هایلایت انتخاب
+    document.querySelectorAll('.zc-card').forEach(function (c) {
+        c.style.background = 'rgba(255,255,255,0.03)';
+        c.style.borderColor = 'rgba(162,155,254,0.2)';
+    });
+    if (btn) { btn.style.background = 'rgba(253,203,110,0.12)'; btn.style.borderColor = '#fdcb6e'; }
+
+    detail.style.display = 'block';
+    detail.innerHTML = makeShimmerCompact('⏳ در حال آشکار شدن...');
+
+    try {
+        const res = await fetch('/api/v5/chinese-zodiac', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ year: parseInt(year) })
+        });
+        const data = await res.json();
+        if (data.status !== 'success') { detail.innerHTML = '<p style="color:#ff6b6b;">❌ خطا</p>'; return; }
+        const d = data.data.deep || {};
+        const best = (data.data.compatibility.best_matches || []).join('، ');
+        const avoid = (data.data.compatibility.avoid || []).join('، ');
+
+        detail.innerHTML = `
+            <div style="background:rgba(253,203,110,0.05);border-radius:14px;padding:18px;border:1px solid rgba(253,203,110,0.2);">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <span style="font-size:2.6rem;">${data.data.animal_emoji}</span>
+                    <div>
+                        <div style="font-size:1.15rem;font-weight:800;color:#fdcb6e;">${data.data.description}</div>
+                        <div style="font-size:0.78rem;color:#8fb4ff;">نمونهٔ سال: ${data.data.year} · تکرار بعدی: ${data.data.next_occurrence}</div>
+                    </div>
+                </div>
+                <div style="margin-top:12px;line-height:2;color:#ddd;font-size:0.88rem;">${d.legend || data.data.personality}</div>
+                ${d.strengths ? `<div style="margin-top:10px;line-height:2;color:#8fe3b4;font-size:0.85rem;"><b>💪 نقاط قوت:</b> ${d.strengths}</div>` : ''}
+                ${d.shadow ? `<div style="margin-top:8px;line-height:2;color:#ff8fab;font-size:0.85rem;"><b>🌑 سایه:</b> ${d.shadow}</div>` : ''}
+                ${d.career ? `<div style="margin-top:8px;line-height:2;color:#74b9ff;font-size:0.85rem;"><b>💼 شغل‌های مناسب:</b> ${d.career}</div>` : ''}
+                ${d.love ? `<div style="margin-top:8px;line-height:2;color:#ff8fab;font-size:0.85rem;"><b>❤️ در عشق:</b> ${d.love}</div>` : ''}
+                <div style="margin-top:10px;font-size:0.82rem;">
+                    ${best ? `<div style="color:#00b894;">⭐ بهترین جفت‌ها: ${best}</div>` : ''}
+                    ${avoid ? `<div style="color:#e17055;">⚠️ اجتناب: ${avoid}</div>` : ''}
+                </div>
+            </div>`;
+    } catch (e) {
+        detail.innerHTML = '<p style="color:#ff6b6b;">❌ خطا در ارتباط با سرور</p>';
+    }
+}
+window.zcShow = zcShow;
 
 async function submitZodiac() {
     const year = parseInt(document.getElementById('zodiacYear').value);
@@ -2990,7 +3639,7 @@ async function submitZodiacCompat() {
     const animal1 = document.getElementById('zodiacAnimal1').value;
     const animal2 = document.getElementById('zodiacAnimal2').value;
     const resultDiv = document.getElementById('zodiacCompatResult');
-    resultDiv.innerHTML = '⏳ در حال بررسی...';
+    resultDiv.innerHTML = deEmoji('⏳ در حال بررسی...');
     try {
         const res = await fetch('/api/v5/chinese-zodiac/compatibility', {
             method: 'POST',
@@ -3501,17 +4150,25 @@ function displayNasaPlanets(data, container) {
 
 function getHafezForm() {
     return `
-        <div style="max-width:900px;margin:0 auto;">
-            <h3 style="color:#a29bfe;text-align:center;">🍃 فال حافظ</h3>
-            <p style="color:#8a82a0;text-align:center;font-size:13px;margin-bottom:16px;">سوال خود را بنویسید و فال حافظ دریافت کنید</p>
-            
-            <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.05);">
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label style="color:#b8aec8;">❓ سوال شما (اختیاری)</label>
-                    <input id="hafezQuestion" type="text" placeholder="مثلاً: آیا امروز روز خوبی است؟" style="width:100%;padding:12px;border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;border:1px solid rgba(255,255,255,0.1);font-size:14px;font-family:inherit;">
+        <div style="max-width:820px;margin:0 auto;">
+            <!-- سربرگِ کتاب خطی -->
+            <div style="text-align:center;margin-bottom:20px;">
+                <div style="display:inline-flex;align-items:center;gap:14px;">
+                    <span style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#c9a227);"></span>
+                    <span style="font-size:2rem;filter:drop-shadow(0 0 10px rgba(201,162,39,0.4));">📜</span>
+                    <span style="width:60px;height:1px;background:linear-gradient(270deg,transparent,#c9a227);"></span>
                 </div>
-                <button class="btn-primary" onclick="submitHafez()">🍃 فال گرفتن</button>
-                <div id="hafezResult" style="margin-top:16px;"></div>
+                <h3 style="font-family:'Reem Kufi','Vazirmatn',sans-serif;color:#ecd9a0;margin:8px 0 4px;font-size:1.5rem;letter-spacing:0.05em;">فالِ حافظ</h3>
+                <p style="color:#8a82a0;font-size:0.85rem;margin:0;">نیت کن، سؤالِ دل را بنویس، و بر دیوانِ خواجه تفأل بزن</p>
+            </div>
+
+            <div style="background:linear-gradient(160deg,rgba(37,53,107,0.35),rgba(10,15,35,0.85));border:1px solid rgba(201,162,39,0.3);border-radius:20px;padding:24px;box-shadow:0 16px 50px rgba(0,0,0,0.5);">
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label style="color:#b8aec8;font-size:0.85rem;">❓ نیت و سؤال شما (اختیاری — عشق، کار، سفر...)</label>
+                    <input id="hafezQuestion" type="text" placeholder="مثلاً: آیا در کارم موفق می‌شوم؟" style="width:100%;padding:13px 16px;border-radius:12px;background:rgba(0,0,0,0.35);color:#fff;border:1px solid rgba(201,162,39,0.25);font-size:14px;font-family:inherit;">
+                </div>
+                <button class="btn-primary" onclick="submitHafez()" style="background:linear-gradient(180deg,#ecd9a0,#c9a227 60%,#a8812a);color:#070c1f;font-weight:800;">📜 تفأل بزن</button>
+                <div id="hafezResult" style="margin-top:18px;"></div>
             </div>
         </div>
     `;
@@ -3520,7 +4177,12 @@ function getHafezForm() {
 async function submitHafez() {
     const question = document.getElementById('hafezQuestion').value.trim();
     const resultDiv = document.getElementById('hafezResult');
-    resultDiv.innerHTML = '<p style="color:#aaa;"><span class="spinner"></span> ⏳ در حال دریافت فال...</p>';
+    // انیمیشن ورق‌زدن
+    resultDiv.innerHTML = `
+        <div style="text-align:center;padding:40px 20px;">
+            <div style="font-size:3rem;animation:hafezShuffle 1s ease infinite;">📜</div>
+            <p style="color:#c9a227;font-family:'Reem Kufi','Vazirmatn',sans-serif;margin-top:12px;">دیوان می‌گشاییم...</p>
+        </div>`;
     try {
         const res = await fetch('/api/v5/hafez', {
             method: 'POST',
@@ -3539,45 +4201,57 @@ async function submitHafez() {
 }
 
 function displayHafez(data, container) {
-    let html = `<div class="hafez-result-card">`;
-    
-    if (data.question) {
-        html += `<div style="color:#fdcb6e;font-style:italic;margin-bottom:16px;font-size:15px;">📝 سوال: ${data.question}</div>`;
-    }
-    
-    // Poem (if available from API — most APIs only provide interpretation)
-    if (data.poem) {
-        html += `<div class="hafez-poem">`;
-        html += data.poem.replace(/\n/g, '<br>');
-        html += `</div>`;
-        html += `<div class="hafez-divider"></div>`;
-    }
-    
-    // Interpretation (main content — always shown)
-    var interpText = data.interpretation || data.poem || '';
-    if (interpText) {
-        html += `<div style="color:#a29bfe;font-weight:bold;margin-bottom:8px;">📖 تفسیر:</div>`;
-        html += `<div style="color:#ddd;line-height:2;font-size:15px;">${interpText}</div>`;
-    }
-    
-    // Ghazal number
-    if (data.ghazal_number_fa) {
-        html += `<div style="color:#888;font-size:0.85rem;margin-top:12px;">📜 غزل شماره: ${data.ghazal_number_fa}</div>`;
-    }
-    
-    // Shamsi date
-    if (data.date_shamsi_fa) {
-        html += `<div style="color:#888;font-size:0.85rem;margin-top:4px;">📅 ${data.date_shamsi_fa}</div>`;
-    } else if (data.date) {
-        html += `<div style="color:#888;font-size:0.85rem;margin-top:4px;">📅 ${data.date}</div>`;
-    }
-    
-    // Source
-    if (data.source) {
-        html += `<div style="color:#666;font-size:0.8rem;margin-top:8px;">📚 ${data.source}</div>`;
-    }
-    
-    html += `</div>`;
+    const faal = data.faal || {};
+
+    const html = `
+    <div style="animation:hafezOpen .7s ease-out;">
+        <div style="background:linear-gradient(155deg,#1a1230 0%,#0f0b1e 60%,#141028 100%);border:2px solid rgba(201,162,39,0.45);border-radius:18px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,0.65),inset 0 0 0 1px rgba(201,162,39,0.15);">
+            <div style="text-align:center;padding:18px 20px 12px;background:linear-gradient(180deg,rgba(201,162,39,0.12),transparent);border-bottom:1px solid rgba(201,162,39,0.25);">
+                <div style="font-family:'Reem Kufi','Vazirmatn',sans-serif;font-size:1.25rem;color:#ecd9a0;letter-spacing:0.06em;">📜 فالِ حافظ</div>
+                ${data.metadata && data.metadata.ghazal_number_fa ? `<div style="color:#8a82a0;font-size:0.8rem;margin-top:4px;">غزلِ ${data.metadata.ghazal_number_fa} · ${faal.tone || ''}</div>` : ''}
+            </div>
+
+            <div style="padding:24px 26px;">
+                ${data.question ? `<div style="color:#c9a227;font-style:italic;margin-bottom:16px;font-size:0.9rem;text-align:center;border-bottom:1px dashed rgba(201,162,39,0.25);padding-bottom:12px;">«${data.question}»</div>` : ''}
+
+                ${faal.theme_title ? `<div style="text-align:center;margin-bottom:14px;"><span style="display:inline-block;background:rgba(201,162,39,0.14);border:1px solid rgba(201,162,39,0.35);padding:6px 20px;border-radius:20px;color:#ecd9a0;font-size:0.95rem;font-weight:700;">${faal.theme_title}</span></div>` : ''}
+
+                <!-- شعر — دوستونه به سبکِ نسخه -->
+                ${data.poem ? `<div style="background:rgba(0,0,0,0.25);border-radius:12px;padding:18px 14px;margin-bottom:16px;">
+                    ${data.poem.split('\n').filter(l=>l.trim()).reduce(function(rows, line, i, arr) {
+                        if (i % 2 === 0) rows.push([line, arr[i+1] || '']);
+                        return rows;
+                    }, []).map(function(pair) {
+                        return `<div style="display:flex;justify-content:center;gap:18px;margin:7px 0;">` +
+                            `<span style="flex:1;text-align:center;color:#e8dfc8;font-size:1.02rem;line-height:2.1;font-family:'Vazirmatn',serif;">${pair[0]}</span>` +
+                            (pair[1] ? `<span style="flex:1;text-align:center;color:#e8dfc8;font-size:1.02rem;line-height:2.1;">${pair[1]}</span>` : `<span style="flex:1;"></span>`) +
+                        `</div>`;
+                    }).join('')}
+                </div>` : ''}
+
+                <!-- تعبیر -->
+                ${faal.omen ? `<div style="margin:16px 0;padding:16px 18px;background:rgba(162,155,254,0.06);border-right:3px solid rgba(201,162,39,0.5);border-radius:12px;">
+                    <div style="color:#ecd9a0;font-weight:800;font-size:0.9rem;margin-bottom:6px;">🔮 پیامِ فال</div>
+                    <div style="color:#ddd;line-height:2.1;font-size:0.92rem;">${faal.omen}</div>
+                </div>` : ''}
+
+                ${faal.question_specific ? `<div style="margin:12px 0;padding:14px 18px;background:rgba(201,162,39,0.08);border-right:3px solid rgba(201,162,39,0.5);border-radius:12px;line-height:2.1;color:#e8dfc8;font-size:0.9rem;">
+                    <b style="color:#fdcb6e;">🎯 در پاسخِ نیتِ شما:</b><br>${faal.question_specific}</div>` : ''}
+
+                ${faal.advice ? `<div style="margin:12px 0;padding:14px 18px;background:rgba(46,204,113,0.06);border-right:3px solid rgba(46,204,113,0.45);border-radius:12px;line-height:2.1;color:#ccc;font-size:0.88rem;">
+                    <b style="color:#2ecc71;">🕯️ مشورتِ حافظ:</b> ${faal.advice}</div>` : ''}
+
+                <!-- پانوشت -->
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:12px;border-top:1px dashed rgba(201,162,39,0.25);color:#777;font-size:0.75rem;">
+                    <span>${data.metadata && data.metadata.title ? '📖 ' + data.metadata.title : ''}</span>
+                    <span>${data.metadata && data.metadata.source ? '📚 ' + data.metadata.source : ''}</span>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:14px;">
+            <button class="btn-secondary" onclick="submitHafez()" style="max-width:280px;">📜 تفألِ دیگر</button>
+        </div>
+    </div>`;
     container.innerHTML = html;
 }
 
@@ -3588,7 +4262,7 @@ function displayHafez(data, container) {
 function getDailyQuestionForm() {
     return `
         <div class="daily-question-form">
-            <h3>❓ پرسش روزانه — پاسخ از ۳ موتور</h3>
+            <h3>${window.uiIcon('daily-question', 18)} پرسش روزانه — پاسخ از ۳ موتور</h3>
             <p style="color:#8a82a0;text-align:center;font-size:13px;margin-bottom:16px;">سوال خود را بنویسید و پاسخ ترکیبی از بیوریتم، سال حیوانی و تاروت دریافت کنید</p>
             
             <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.05);">
@@ -3600,7 +4274,7 @@ function getDailyQuestionForm() {
                     <label style="color:#b8aec8;">📅 تاریخ تولد</label>
                     ${makeDatePickerTrigger('dqDatePicker', {label:'تاریخ تولد', calendarType:'shamsi', digits:'fa'})}
                 </div>
-                <button class="btn-primary" onclick="submitDailyQuestion()">✨ دریافت پاسخ</button>
+                <button class="btn-primary" onclick="submitDailyQuestion()">${window.uiIcon('star')} دریافت پاسخ</button>
                 <div id="dqResult" style="margin-top:16px;"></div>
             </div>
         </div>
@@ -3653,7 +4327,7 @@ function displayDailyQuestion(data, container) {
     const tarotRaw = raw.tarot || {};
     const card = tarotRaw.card || {};
     const isReversed = tarotRaw.is_reversed || false;
-    const imgUrl = card.image || '/static/tarot/images/placeholder.webp';
+    const imgUrl = card.image || '/static/tarot/images/card-back.svg';
     
     let html = '<div class="daily-question-result">';
     html += '<h4 style="color:#fdcb6e;margin-bottom:8px;">📝 سوال: ' + (data.question || '') + '</h4>';
@@ -3661,7 +4335,7 @@ function displayDailyQuestion(data, container) {
     
     // Tarot card with flip animation
     html += '<div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;">';
-    html += '<div class="tarot-flip-container auto-flip" onclick="this.classList.toggle(\"auto-flip\");this.classList.toggle(\"flipped\");" title="کلیک کنید تا کارت برگرد">' + '<div class="tarot-flip-inner">' + '<div class="tarot-flip-front"><div class="card-back-pattern">🌟</div></div>' + '<div class="tarot-flip-back"><img src="' + imgUrl + '" class="' + (isReversed ? 'reversed' : '') + '" alt="' + (card.name || '') + '" onerror="this.src=\'/static/tarot/images/placeholder.webp\'"></div>' + '</div>' + '<span class="flip-hint">کلیک کنید</span>' + '</div>';
+    html += '<div class="tarot-flip-container auto-flip" onclick="this.classList.toggle(\"auto-flip\");this.classList.toggle(\"flipped\");" title="کلیک کنید تا کارت برگرد">' + '<div class="tarot-flip-inner">' + '<div class="tarot-flip-front"><div class="card-back-pattern">🌟</div></div>' + '<div class="tarot-flip-back"><img src="' + imgUrl + '" class="' + (isReversed ? 'reversed' : '') + '" alt="' + (card.name || '') + '" onerror="this.src=\'/static/tarot/images/card-back.svg\'"></div>' + '</div>' + '<span class="flip-hint">کلیک کنید</span>' + '</div>';
     html += '<div style="flex:1;min-width:200px;">';
     html += '<div style="color:#a29bfe;font-weight:bold;font-size:15px;margin-bottom:8px;">🃏 کارت راهنما: ' + (card.name || 'ناشناس') + '</div>';
     html += '<div style="color:#aaa;font-size:13px;">' + (isReversed ? '🔄 وارونه' : '⬆️ راست') + '</div>';
@@ -3709,6 +4383,143 @@ function displayDailyQuestion(data, container) {
 }
 
 // ================================================================
+//  BIRTH PROFILE SYNC — save/prefill birth data for logged-in users
+//  (persisted server-side via /api/v5/user/profile; guests fall back
+//   to localStorage so at least the form survives reloads)
+// ================================================================
+
+var _profileSaveInFlight = false;
+var _lastProfileSavedSig = null; // فینگرپرینت آخرین ذخیره موفق — برای جلوگیری از توست تکراری
+
+function _profileToken() {
+    try { return localStorage.getItem('cosmic_token') || ''; } catch (_) { return ''; }
+}
+
+function _gregorianBirth() {
+    var bd = sharedInputs.birthDate;
+    if (!bd || !bd.year) return null;
+    // sharedInputs.birthDate holds the picked calendar values (default shamsi)
+    var y = bd.year, m = bd.month, d = bd.day;
+    if (y >= 1300 && y <= 1600 && window.shamsiToGregorianDate) {
+        var g = window.shamsiToGregorianDate(y, m, d);
+        if (g) { y = g.gy; m = g.gm; d = g.gd; }
+    }
+    return { year: y, month: m, day: d };
+}
+
+function saveProfileToServer() {
+    var token = _profileToken();
+    if (!token || _profileSaveInFlight) return;
+    var g = _gregorianBirth();
+    if (!g) return; // nothing to save yet
+    var body = {
+        name: sharedInputs.name || undefined,
+        birth_year: g.year,
+        birth_month: g.month,
+        birth_day: g.day,
+        birth_hour: sharedInputs.birthHour || 0,
+        birth_minute: sharedInputs.birthMinute || 0,
+        city: sharedInputs.city || undefined,
+        latitude: sharedInputs.latitude,
+        longitude: sharedInputs.longitude,
+        timezone: TZ_OFFSET_TO_IANA[String(parseFloat(sharedInputs.timezone))] || undefined
+    };
+    _profileSaveInFlight = true;
+    fetch('/api/v5/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(body)
+    }).then(function (r) {
+        // تأیید کوچک — فقط وقتی وضعیت واقعاً تغییر کرده باشد (نه هر کلید)
+        if (!r.ok) return;
+        var sig = JSON.stringify(body);
+        if (sig !== _lastProfileSavedSig) {
+            _lastProfileSavedSig = sig;
+            if (window.showToast) showToast('💾 اطلاعات تولد در حساب شما ذخیره شد', 'success');
+        }
+    }).catch(function () {}).finally(function () { _profileSaveInFlight = false; });
+}
+
+function persistSharedInputsLocal() {
+    try {
+        localStorage.setItem('cosmic_shared_inputs', JSON.stringify({
+            name: sharedInputs.name,
+            birthDate: sharedInputs.birthDate,
+            birthHour: sharedInputs.birthHour,
+            birthMinute: sharedInputs.birthMinute,
+            city: sharedInputs.city,
+            latitude: sharedInputs.latitude,
+            longitude: sharedInputs.longitude,
+            timezone: sharedInputs.timezone
+        }));
+    } catch (_) {}
+}
+
+function loadLocalSharedInputs() {
+    try {
+        var saved = JSON.parse(localStorage.getItem('cosmic_shared_inputs') || 'null');
+        if (!saved) return;
+        ['name', 'birthDate', 'birthHour', 'birthMinute', 'city', 'latitude', 'longitude', 'timezone'].forEach(function (k) {
+            if (saved[k] !== undefined && saved[k] !== null && saved[k] !== '') sharedInputs[k] = saved[k];
+        });
+    } catch (_) {}
+}
+
+
+/* ── Biorhythm: profile-first helpers ──
+   Returns the logged-in user's registered birth date (gregorian y-m-d)
+   or null. Never mutates the profile. */
+function getProfileBirthISO() {
+    try {
+        var p = JSON.parse(localStorage.getItem('cosmic_profile') || 'null');
+        if (p && p.birth_year && p.birth_month && p.birth_day) {
+            return p.birth_year + '-' + String(p.birth_month).padStart(2,'0') + '-' + String(p.birth_day).padStart(2,'0');
+        }
+    } catch (e) {}
+    // fall back to sharedInputs if it was already persisted to the server
+    var g = _gregorianBirth ? _gregorianBirth() : null;
+    return g || null;
+}
+
+function isProfileBirthRegistered() {
+    return !!getProfileBirthISO();
+}
+
+/* store profile into localStorage cache when prefill runs so getProfileBirthISO works offline */
+function cacheProfileBirth(p) {
+    try { localStorage.setItem('cosmic_profile', JSON.stringify(p)); } catch (e) {}
+}
+
+function prefillProfileFromServer() {
+    var token = _profileToken();
+    if (!token) return;
+    fetch('/api/v5/user/profile', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (p) {
+            if (!p || !p.birth_year) return;
+            cacheProfileBirth(p);
+            // Server stores Gregorian. Only apply if the user hasn't picked a
+            // date locally in the meantime (local input wins while typing).
+            if (sharedInputs.birthDate && sharedInputs.birthDate.year) return;
+            sharedInputs.birthDate = { year: p.birth_year, month: p.birth_month || 1, day: p.birth_day || 1 };
+            if (p.name && !sharedInputs.name) sharedInputs.name = p.name;
+            if (p.city && !sharedInputs.city) sharedInputs.city = p.city;
+            if (typeof p.latitude === 'number') sharedInputs.latitude = p.latitude;
+            if (typeof p.longitude === 'number') sharedInputs.longitude = p.longitude;
+            if (p.timezone) {
+                // Map IANA back to the select's offset value
+                var keys = Object.keys(TZ_OFFSET_TO_IANA || {});
+                for (var i = 0; i < keys.length; i++) {
+                    if (TZ_OFFSET_TO_IANA[keys[i]] === p.timezone) { sharedInputs.timezone = keys[i]; break; }
+                }
+            }
+            persistSharedInputsLocal();
+            if (formContainer && formContainer.innerHTML.trim() !== '') applySharedInputs();
+        })
+        .catch(function () {});
+}
+
+// ================================================================
 window.addEventListener('DOMContentLoaded', function() {
     // Build initial birth form
     if (formBuilders && formBuilders['birth']) {
@@ -3716,6 +4527,7 @@ window.addEventListener('DOMContentLoaded', function() {
         attachCityAutocomplete();
         reattachMapButton();
         attachDatePickerTriggers('birth');
+        attachSharedInputListeners();
     }
     // Map modal close/confirm listeners (static elements in HTML)
     if (closeMapBtn) closeMapBtn.addEventListener('click', function() { mapModal.classList.remove('active'); });
@@ -3729,6 +4541,12 @@ window.addEventListener('DOMContentLoaded', function() {
     var d = String(today.getDate()).padStart(2, '0');
     var bd = document.getElementById('birthDate');
     if (bd) bd.value = y + '-' + m + '-' + d;
+
+    // Restore birth inputs from localStorage (guests) and then from the
+    // server profile (logged-in users — server wins only if nothing picked yet)
+    loadLocalSharedInputs();
+    applySharedInputs();
+    prefillProfileFromServer();
 
     // Initialize location bar
     updateLocationBar();

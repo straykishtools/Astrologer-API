@@ -444,24 +444,44 @@ function setSfxVolume(v) {
    UI: PLAYER WIDGET
    ═══════════════════════════════════════ */
 
+/* ─── SVG icon set for the player (crisp, replaces emoji) ─── */
+var APW_ICONS = {
+    play: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.6c0-.9 1-1.5 1.8-1L14 6.9c.8.5.8 1.7 0 2.2L6.3 14.4c-.8.5-1.8-.1-1.8-1V2.6z"/></svg>',
+    pause: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2.5" width="3.6" height="11" rx="1.2"/><rect x="9.4" y="2.5" width="3.6" height="11" rx="1.2"/></svg>',
+    prev: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3a1 1 0 0 1 2 0v3.6l6.4-4.3c.9-.6 2 .1 2 1.2v9c0 1.1-1.1 1.8-2 1.2L5 9.4V13a1 1 0 0 1-2 0V3z"/></svg>',
+    next: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 3a1 1 0 0 0-2 0v3.6L4.6 2.3c-.9-.6-2 .1-2 1.2v9c0 1.1 1.1 1.8 2 1.2L11 9.4V13a1 1 0 0 0 2 0V3z"/></svg>',
+    vol: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8.3 2.2c.5-.4 1.2 0 1.2.6v10.4c0 .6-.7 1-1.2.6L4.9 11H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.9l3.4-2.8z"/><path d="M11.5 5.2a1 1 0 0 1 1.4.2A4.6 4.6 0 0 1 13.9 8c0 1-.3 1.9-.9 2.7a1 1 0 1 1-1.6-1.2c.3-.5.5-1 .5-1.5s-.2-1-.5-1.5a1 1 0 0 1 .1-1.3z"/></svg>',
+    muted: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8.3 2.2c.5-.4 1.2 0 1.2.6v10.4c0 .6-.7 1-1.2.6L4.9 11H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.9l3.4-2.8z"/><path d="M11.3 6.1a.9.9 0 0 1 1.3 0l1 1 1-1a.9.9 0 1 1 1.3 1.3l-1 1 1 1a.9.9 0 1 1-1.3 1.3l-1-1-1 1a.9.9 0 1 1-1.3-1.3l1-1-1-1a.9.9 0 0 1 0-1.3z"/></svg>'
+};
+
 function createPlayerWidget() {
     // Inject compact player into topbar
     var slot = document.getElementById('topbarPlayerSlot');
     if (slot && slot.querySelector('#apwPlayPause')) return; // already injected
+
+    // audio-player.css فقط در admin.html لود می‌شود؛ اینجا حداقلی را تزریق می‌کنیم
+    if (!document.getElementById('apwInlineStyle')) {
+        var st = document.createElement('style');
+        st.id = 'apwInlineStyle';
+        st.textContent =
+            '#audioPlayerWidget{display:flex;align-items:center;gap:2px;position:relative;min-width:0}' +
+            '.apw-playlist{position:absolute;top:calc(100% + 10px);left:0;margin:0}' +
+            '@media(max-width:640px){#audioPlayerWidget .apw-info{max-width:90px}}';
+        document.head.appendChild(st);
+    }
 
     var container = slot || document.body;
     var w = document.createElement('div');
     w.id = 'audioPlayerWidget';
     w.className = slot ? '' : 'audio-player-widget';
     w.innerHTML =
-        '<button class="apw-btn apw-play" id="apwPlayPause" title="پخش/مکث">▶️</button>' +
-        '<div class="apw-info" id="apwInfo">' +
+        '<button class="apw-btn apw-play" id="apwPlayPause" title="پخش/مکث">' + APW_ICONS.play + '</button>' +
+        '<div class="apw-info" id="apwInfo" title="فهرست پخش">' +
             '<div class="apw-track" id="apwTrackName">انتخاب موسیقی</div>' +
+            '<span class="apw-eq" aria-hidden="true"><span></span><span></span><span></span></span>' +
         '</div>' +
-        '<button class="apw-btn" id="apwPrev" title="قبلی">⏮️</button>' +
-        '<button class="apw-btn" id="apwNext" title="بعدی">⏭️</button>' +
         '<input type="range" class="apw-volume" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="' + (prefs.bgmVolume || 0.5) + '" title="صدا">' +
-        '<button class="apw-btn" id="apwMute" title="بی‌صدا">🔊</button>' +
+        '<button class="apw-btn" id="apwMute" title="بی‌صدا">' + APW_ICONS.vol + '</button>' +
         '<div class="apw-playlist" id="apwPlaylist" style="display:none;">' +
             '<div class="apw-playlist-title">🎵 فهرست پخش</div>' +
             '<div class="apw-playlist-items" id="apwPlaylistItems"></div>' +
@@ -474,6 +494,7 @@ function createPlayerWidget() {
     bindPlayerEvents();
     renderPlaylist();
     updatePlayerUI();
+    syncVolumeFill(document.getElementById('bgmVolumeSlider'));
 }
 
 function bindPlayerEvents() {
@@ -500,11 +521,11 @@ function bindPlayerEvents() {
     });
     if (prev) prev.addEventListener('click', function() { playSfx('click'); prevTrack(); });
     if (next) next.addEventListener('click', function() { playSfx('click'); nextTrack(); });
-    if (vol) vol.addEventListener('input', function() { setBgmVolume(parseFloat(this.value)); });
+    if (vol) vol.addEventListener('input', function() { setBgmVolume(parseFloat(this.value)); syncVolumeFill(vol); });
     if (mute) mute.addEventListener('click', function() { playSfx('click'); toggleMute(); });
     if (sfxToggle) sfxToggle.addEventListener('click', function() { playSfx('click'); });
     if (sfxCheck) sfxCheck.addEventListener('change', function() { setSfxEnabled(this.checked); });
-    if (sfxVol) sfxVol.addEventListener('input', function() { setSfxVolume(parseFloat(this.value)); });
+    if (sfxVol) sfxVol.addEventListener('input', function() { setSfxVolume(parseFloat(this.value)); syncVolumeFill(sfxVol); });
 
     // Click on track name to toggle playlist
     if (info) info.style.cursor = 'pointer';
@@ -512,6 +533,15 @@ function bindPlayerEvents() {
         var pl = document.getElementById('apwPlaylist');
         if (pl) pl.style.display = pl.style.display === 'none' ? '' : 'none';
     });
+}
+
+/* ─── Keep the --vol CSS var in sync so the volume track shows a gold fill ─── */
+function syncVolumeFill(input) {
+    if (!input) return;
+    var min = parseFloat(input.min) || 0;
+    var max = parseFloat(input.max) || 1;
+    var val = parseFloat(input.value) || 0;
+    input.style.setProperty('--vol', (((val - min) / (max - min)) * 100).toFixed(1) + '%');
 }
 
 function renderPlaylist() {
@@ -543,9 +573,18 @@ function updatePlayerUI() {
     var mute = document.getElementById('apwMute');
     var trackName = document.getElementById('apwTrackName');
 
-    if (playPause) playPause.textContent = bgmPlaying && !bgmPaused ? '⏸️' : '▶️';
+    var isPlaying = bgmPlaying && !bgmPaused;
+
+    if (playPause) playPause.innerHTML = isPlaying ? APW_ICONS.pause : APW_ICONS.play;
     if (toggle) toggle.textContent = prefs.muted ? '🔇' : (bgmPlaying ? '🔊' : '🎵');
-    if (mute) mute.textContent = prefs.muted ? '🔇' : '🔊';
+    if (mute) {
+        mute.innerHTML = prefs.muted ? APW_ICONS.muted : APW_ICONS.vol;
+        mute.classList.toggle('is-active', prefs.muted);
+    }
+
+    // Playing state on the widget (drives the mini equalizer)
+    var widget = document.getElementById('audioPlayerWidget');
+    if (widget) widget.classList.toggle('apw-playing', isPlaying);
 
     var track = TRACKS.find(function(t) { return t.id === prefs.currentTrack; });
     if (trackName) trackName.textContent = track ? track.icon + ' ' + track.name : 'انتخاب موسیقی';

@@ -8,9 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&family=Cinzel:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="static/images/ui/logo.svg">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0c1430">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="static/images/ui/logo.svg">
     <link rel="stylesheet" href="static/style.css?v=6">
-    <link rel="stylesheet" href="static/date-wheel-picker.css">
-    <link rel="stylesheet" href="static/yoga-v3.css?v=7">
+    <link rel="stylesheet" href="static/date-wheel-picker.css?v=2">
+    <link rel="stylesheet" href="static/yoga-v3.css?v=9">
 
     <style>
         /* ============================================================
@@ -671,7 +676,7 @@
             position: absolute;
             top: calc(100% + 8px);
             left: 0;
-            width: 310px;
+            width: 320px;
             background: rgba(10, 15, 35, 0.97);
             border: 1px solid var(--line-strong);
             border-radius: 18px;
@@ -684,9 +689,59 @@
             -webkit-backdrop-filter: blur(18px);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(221, 192, 112, 0.08);
             overflow: hidden;
-            max-height: 420px;
+            max-height: min(74vh, 640px);
             overflow-y: auto;
+            overscroll-behavior: contain;
         }
+        /* ─── Earth Status Dropdown (آب‌وهوا/کیفیت هوا/سیارک‌ها) ─── */
+        .earth-status-dropdown { position: relative; }
+        .earth-status-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 320px;
+            background: rgba(10, 15, 35, 0.97);
+            border: 1px solid var(--line-strong);
+            border-radius: 18px;
+            z-index: 5000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.95);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(221, 192, 112, 0.08);
+            overflow: hidden;
+            max-height: min(74vh, 640px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+        .earth-status-panel.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .es-header {
+            padding: 16px 18px 12px;
+            background: linear-gradient(135deg, rgba(46, 134, 89, 0.28), rgba(16, 26, 61, 0.3));
+            border-bottom: 1px solid var(--line);
+        }
+        .es-header-title {
+            font-family: 'Reem Kufi', 'Vazirmatn', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gold-200);
+        }
+        .es-header-date { font-size: 11px; color: var(--ink-dim); margin-top: 4px; }
+        .es-section { padding: 12px 18px; }
+        .es-row { display: flex; align-items: center; gap: 10px; }
+        .es-row-emoji { font-size: 26px; flex-shrink: 0; }
+        .es-row-info { flex: 1; min-width: 0; }
+        .es-row-label { font-size: 11px; color: var(--ink-dim); margin-bottom: 2px; }
+        .es-row-value { font-size: 14px; font-weight: 700; color: var(--gold-200); }
+        .es-row-sub { font-size: 11px; color: var(--ink-dim); margin-top: 6px; }
+        .es-section-title { font-size: 11px; font-weight: 700; color: var(--gold-200); margin-bottom: 8px; }
+
         .cosmic-status-panel.open {
             opacity: 1;
             visibility: visible;
@@ -773,6 +828,24 @@
         }
         .cs-cd-icon { font-size: 13px; animation: csCdPulse 2s ease infinite; }
         @keyframes csCdPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* ─── ظهور کارت تاروت در جایگاه ─── */
+        @keyframes tpPop {
+            0%   { transform: scale(0.5); opacity: 0; }
+            70%  { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ─── فال حافظ: ورق‌زدن و گشودنِ صفحه ─── */
+        @keyframes hafezShuffle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-8deg) scale(1.05); }
+            75% { transform: rotate(8deg) scale(1.05); }
+        }
+        @keyframes hafezOpen {
+            0%   { transform: perspective(900px) rotateX(24deg) scale(0.94); opacity: 0; }
+            100% { transform: perspective(900px) rotateX(0deg) scale(1); opacity: 1; }
+        }
 
         /* ─── Yoga Celebration Animation ─── */
         @keyframes ysConfettiBurst {
@@ -1881,6 +1954,19 @@
            MY DASHBOARD — داشبورد کاربر
         ════════════════════════════════════════════ */
         .mydash-wrap { max-width: 860px; margin: 24px auto 0; }
+        .mydash-profile {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px; padding: 12px 16px; margin-bottom: 12px; font-size: 13px;
+        }
+        .mydash-profile .mdp-avatar {
+            width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #6c8cff, #9c79ff); color: #fff; font-weight: 800; font-size: 16px;
+        }
+        .mydash-profile .mdp-name { font-weight: 800; color: var(--gold-300, #e8c76a); font-size: 14px; }
+        .mydash-profile .mdp-meta { color: var(--ink-dim, #8b93b0); font-size: 12px; }
+        .mydash-profile[hidden] { display: none; }
         .mydash-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
         .mydash-tab {
             appearance: none; border: 1px solid var(--line-strong);
@@ -1915,6 +2001,62 @@
             padding: 8px 18px; border-radius: 10px; cursor: pointer;
         }
         .mdb-cta:hover { background: rgba(221, 192, 112, 0.2); }
+
+        /* ─── کارت‌های دسته‌بندی تب آسمان/زمین ─── */
+        .mdu-card-title {
+            font-size: 13px; font-weight: 700; color: var(--gold-200);
+            margin-bottom: 10px; padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .mdu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+        }
+        .mdu-grid-2 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+        .mdu-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 9px 12px;
+            text-align: center;
+        }
+        .mdu-item-label { font-size: 10px; color: var(--ink-dim); margin-bottom: 3px; }
+        .mdu-item-value { font-size: 13px; font-weight: 700; color: var(--ink); }
+        .mdu-line {
+            font-size: 11.5px; color: var(--ink-dim);
+            line-height: 1.9; margin-top: 6px;
+        }
+        .mdu-line:first-of-type { margin-top: 0; }
+
+        /* ─── بخش‌های مستقیم آسمان/زمین در صفحه — گرید دوستونه ─── */
+        .mdu-section { margin-top: 22px; }
+        .mdu-section-title {
+            font-family: 'Reem Kufi', 'Vazirmatn', sans-serif;
+            font-size: 17px; font-weight: 700; color: var(--gold-200);
+            margin-bottom: 12px;
+        }
+        .mdu-section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+        .mdu-card {
+            background: rgba(9, 14, 34, 0.6);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 0;
+        }
+        .mdu-card .cs-moon-week { margin-top: 6px; }
+        @media (max-width: 760px) {
+            .mdu-section-grid { grid-template-columns: 1fr; }
+        }
+        .mdu-card-wide { grid-column: 1 / -1; }
+        @media (max-width: 560px) {
+            .mdu-grid, .mdu-grid-2 { grid-template-columns: 1fr 1fr; }
+            .mdu-item { padding: 8px; }
+        }
 
         /* ============================================================
            مودال نقشه — نمایش با کلاس .active (طبق script.js)
@@ -2498,7 +2640,183 @@
             .apw-playlist { min-width: 220px; }
         }
 
-    </style>
+    
+        /* ═════════════ COSMIC UI FACELIFT — stats cards / topbar summary / pyc strip ═════════════
+           Pure presentation polish — nothing removed, everything restyled. */
+        .cosmic-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .cosmic-stat-card {
+            position: relative;
+            background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 18px;
+            padding: 18px 14px 16px;
+            text-align: center;
+            overflow: hidden;
+            transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+        }
+        .cosmic-stat-card::before {
+            content: '';
+            position: absolute; inset: 0 0 auto 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold-300), transparent);
+            opacity: 0; transition: opacity .25s;
+        }
+        .cosmic-stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(221, 192, 112, 0.35);
+            box-shadow: 0 14px 34px rgba(0,0,0,0.35);
+        }
+        .cosmic-stat-card:hover::before { opacity: 1; }
+        .cosmic-stat-card .cs-icon {
+            font-size: 1.6rem; line-height: 1;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
+        }
+        .cosmic-stat-card .cs-value {
+            font-family: 'Cinzel', 'Vazirmatn', serif;
+            font-size: 1.35rem; font-weight: 800; color: #fff;
+            margin-top: 8px; letter-spacing: .5px;
+        }
+        .cosmic-stat-card .cs-label { color: #8d93a8; font-size: .78rem; margin-top: 3px; }
+        .cosmic-stat-card .cs-spark {
+            height: 3px; width: 26px; margin: 10px auto 0; border-radius: 2px;
+            background: linear-gradient(90deg, var(--gold-300), rgba(162,155,254,.6));
+            opacity: .55; transition: width .3s ease, opacity .3s;
+        }
+        .cosmic-stat-card:hover .cs-spark { width: 46px; opacity: 1; }
+
+        /* cosmic content pages modal (terms/privacy/about) */
+        .cosmic-page-box { max-width: 720px; width: min(92vw, 720px); max-height: 84vh; display: flex; flex-direction: column; }
+        .cosmic-page-body { overflow-y: auto; padding: 18px 24px 24px; font-size: 13.5px; line-height: 2.1; color: #d6dcec; user-select: text; }
+        .cosmic-page-body h4 { color: var(--gold-300); font-size: 14.5px; margin: 16px 0 6px; }
+        .cosmic-page-body h4:first-child { margin-top: 0; }
+        .cosmic-page-body p { margin: 6px 0; }
+        .cosmic-page-body ul { margin: 6px 0; padding-right: 20px; }
+        .cosmic-page-body li { margin-bottom: 4px; }
+        .cosmic-page-body b { color: #fff; }
+
+        /* topbar yoga summary — glass panel polish */
+        .yoga-summary-panel {
+            border-radius: 18px;
+            border: 1px solid rgba(221, 192, 112, 0.18);
+            box-shadow: 0 22px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.03) inset;
+            backdrop-filter: blur(18px) saturate(1.2);
+            overflow: hidden;
+        }
+        .yoga-summary-panel .ys-header {
+            background: linear-gradient(135deg, rgba(162,155,254,0.2), rgba(221,192,112,0.1));
+        }
+        .yoga-summary-panel .ys-stat {
+            background: transparent;
+            transition: background .2s;
+        }
+        .yoga-summary-panel .ys-stat:hover { background: rgba(221,192,112,0.06); }
+        .yoga-summary-panel .ys-stat-num { font-size: 19px; }
+
+        /* pyc strip — pill upgrade to match */
+        .yoga-page-header .pyc-stats {
+            background: linear-gradient(135deg, rgba(249,217,118,0.1), rgba(162,155,254,0.08));
+            border: 1px solid rgba(249,217,118,0.3);
+            border-radius: 16px;
+            padding: 6px 14px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 6px 20px rgba(0,0,0,.25);
+            flex-wrap: wrap;
+        }
+        .pyc-stats .pyc-stat {
+            color: #d8cba0; padding: 2px 4px; position: relative;
+        }
+        .pyc-stats .pyc-stat + .pyc-stat::before {
+            content: ''; position: absolute; right: -3px; top: 15%; height: 70%;
+            width: 1px; background: rgba(249,217,118,.2);
+        }
+        .pyc-stats .pyc-stat b { font-size: 13px; }
+        @media (max-width: 640px) {
+            .cosmic-stat-grid { gap: 10px; }
+            .cosmic-stat-card { padding: 14px 8px 12px; }
+            .cosmic-stat-card .cs-value { font-size: 1.15rem; }
+            .yoga-page-header .pyc-stats { width: 100%; margin-top: 8px; margin-right: 0; }
+        }
+
+        /* ═════════════ COSMIC FOOTER — full site footer ═════════════
+           Replaces the thin footer-premium bars visually; the original
+           footer-premium blocks remain in markup but the new shared
+           footer is injected after them at runtime. */
+        .site-footer {
+            position: relative; margin-top: 42px;
+            background:
+                radial-gradient(ellipse at 50% 120%, rgba(37,53,107,0.5) 0%, transparent 65%),
+                linear-gradient(180deg, rgba(10,16,38,0.55) 0%, rgba(5,9,24,0.98) 100%);
+            border-top: 1px solid var(--line);
+            border-radius: 26px 26px 0 0;
+            overflow: hidden;
+        }
+        .site-footer .sf-ornament {
+            display: block; text-align: center; padding-top: 18px;
+            font-size: 9px; letter-spacing: 8px; color: var(--gold-500); opacity: .45;
+        }
+        .site-footer .sf-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+            gap: 30px; padding: 26px 34px 22px;
+            max-width: 1080px; margin: 0 auto;
+        }
+        .site-footer .sf-brand .sf-logo {
+            font-family: 'Cinzel', 'Reem Kufi', serif;
+            font-size: 19px; font-weight: 800; color: var(--gold-200);
+            display: flex; align-items: center; gap: 9px; margin-bottom: 10px;
+        }
+        .site-footer .sf-brand .sf-logo img { width: 30px; height: 30px; border-radius: 8px; }
+        .site-footer .sf-brand p { font-size: 12.5px; color: var(--ink-dim); line-height: 2; margin: 0; }
+        .site-footer .sf-col h4 {
+            font-family: 'Reem Kufi', 'Vazirmatn', sans-serif;
+            font-size: 13.5px; font-weight: 700; color: var(--gold-200);
+            margin: 4px 0 12px; padding-bottom: 8px;
+            border-bottom: 1px solid var(--line);
+        }
+        .site-footer .sf-col a, .site-footer .sf-col button {
+            display: flex; align-items: center; gap: 7px;
+            color: var(--ink-dim); text-decoration: none;
+            font-size: 12.5px; padding: 5px 0; background: none; border: none;
+            cursor: pointer; font-family: inherit; width: 100%; text-align: right;
+            transition: color .18s, transform .18s;
+        }
+        .site-footer .sf-col a:hover, .site-footer .sf-col button:hover {
+            color: var(--gold-200); transform: translateX(-3px);
+        }
+        .site-footer .sf-col .sf-ico { font-size: 14px; width: 18px; text-align: center; }
+        .site-footer .sf-bottom {
+            border-top: 1px solid var(--line);
+            padding: 14px 34px 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; flex-wrap: wrap;
+            font-size: 11.5px; color: var(--ink-dim);
+            max-width: 1080px; margin: 0 auto;
+        }
+        .site-footer .sf-social { display: flex; gap: 8px; }
+        .site-footer .sf-social a {
+            width: 34px; height: 34px; border-radius: 11px;
+            display: grid; place-items: center; font-size: 15px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--line);
+            color: var(--ink-dim); transition: .2s;
+        }
+        .site-footer .sf-social a:hover {
+            color: var(--gold-200); border-color: rgba(221,192,112,.4);
+            transform: translateY(-3px); background: rgba(221,192,112,.08);
+        }
+        .site-footer .sf-legal { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .site-footer .sf-legal a { color: var(--ink-dim); text-decoration: none; transition: color .2s; }
+        .site-footer .sf-legal a:hover { color: var(--gold-200); }
+        @media (max-width: 760px) {
+            .site-footer .sf-grid { grid-template-columns: 1fr 1fr; gap: 22px; padding: 22px 20px 16px; }
+            .site-footer .sf-brand { grid-column: 1 / -1; }
+            .site-footer .sf-bottom { padding: 12px 20px 16px; justify-content: center; }
+        }
+
+</style>
 </head>
 <body class="cosmic">
 
@@ -2723,6 +3041,10 @@
                     <button class="btn-action tb-icon-only" id="cosmicStatusBtn" title="وضعیت نجومی">🌌</button>
                     <div class="cosmic-status-panel" id="cosmicStatusPanel"></div>
                 </div>
+                <div class="earth-status-dropdown" id="earthStatusDropdown">
+                    <button class="btn-action tb-icon-only" id="earthStatusBtn" title="وضعیت زمین — آب‌وهوا، کیفیت هوا، سیارک‌ها">🌍</button>
+                    <div class="earth-status-panel" id="earthStatusPanel"></div>
+                </div>
                 <div class="topbar-profile-dropdown" id="profileDropdown">
                     <button class="btn-action topbar-profile-trigger tb-icon-only" id="payBtn">
                         <span class="topbar-profile-avatar" id="profileAvatar">🔑</span>
@@ -2801,6 +3123,7 @@
                 { btn: 'yogaEngineToggle', panel: 'yogaSummaryPanel' },
                 { btn: 'zodiacTrigger',    panel: 'zodiacPanel' },
                 { btn: 'cosmicStatusBtn',  panel: 'cosmicStatusPanel' },
+                { btn: 'earthStatusBtn',   panel: 'earthStatusPanel' },
                 { btn: 'payBtn',           panel: 'profilePanel' },
                 { btn: 'actionsMenuBtn',   panel: 'actionsMenu' },
                 { btn: 'apwInfo',          panel: 'apwPlaylist' }
@@ -3077,11 +3400,7 @@
                 </div>
             </div>
 
-            <div class="footer-premium">
-                ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
-                <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
-                <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
-            </div>
+            <div class="footer-premium" data-cosmic-footer-slot></div>
         </section>
 
         <!-- ======================= صفحه ابزارها ======================= -->
@@ -3106,11 +3425,7 @@
             <!-- نتایج -->
             <div id="result"></div>
 
-            <div class="footer-premium">
-                ✨ تمام محاسبات توسط موتور ودیک انجام می‌شود ·
-                <a href="#" onclick="alert('قوانین استفاده'); return false;">قوانین</a> ·
-                <a href="#" onclick="alert('پشتیبانی: support@cosmic-oracle.com'); return false;">پشتیبانی</a>
-            </div>
+            <div class="footer-premium" data-cosmic-footer-slot></div>
         </section>
 
         <!-- ======================= صفحه کتابخانه یوگا ======================= -->
@@ -3120,6 +3435,14 @@
                 <div class="yoga-page-header">
                     <h2>🧘 یوگا</h2>
                     <span class="yoga-count" id="yogaCount">— حرکت</span>
+                    <!-- استودیو کلاسیک: کارما و آمار جلسات -->
+                    <div class="pyc-stats" id="pycStats" title="آمار استودیو کلاسیک">
+                        <span class="pyc-stat">🪷 <b id="pycKarma">۰</b> کارما</span>
+                        <span class="pyc-stat">🧘 <b id="pycSessions">۰</b> جلسه</span>
+                        <span class="pyc-stat">⏱ <b id="pycTime">۰</b> دقیقه</span>
+                        <span class="pyc-stat">📅 <b id="pycWeek">۰</b> این هفته</span>
+                        <span class="pyc-stat" id="pycLastWrap" style="display:none;">🕊 آخرین: <b id="pycLast">—</b></span>
+                    </div>
                 </div>
                 <!-- تب‌های اصلی -->
                 <div class="yoga-tabs">
@@ -3128,6 +3451,7 @@
                     <button class="yoga-tab" data-tab="practice">🧘 جلسه تمرین</button>
                     <button class="yoga-tab" data-tab="coach">👨‍🏫 مربی یوگا</button>
                     <button class="yoga-tab" data-tab="breath">🌬️ تنفس و مدیتیشن</button>
+                    <button class="yoga-tab" data-tab="karmastore">🪷 فروشگاه کارما</button>
                 </div>
                 <!-- نوار تست تشخیص تمرین -->
                 <div id="yogaTestZone"></div>
@@ -3148,6 +3472,8 @@
                 <div id="yogaPlayerPanel" style="display:none;"></div>
                 <!-- پنل مربی یوگا -->
                 <div id="yogaCoachPanel" style="display:none;"></div>
+                <!-- پنل فروشگاه کارما (پس‌زمینه‌های استودیو کلاسیک) -->
+                <div id="yogaKarmaStorePanel" style="display:none;"></div>
                 <!-- صفحه جزئیات -->
                 <div id="yogaDetail" style="display:none;"></div>
             </div>
@@ -3217,12 +3543,34 @@
 
                 <!-- ═══ داشبورد کاربر — چارت‌ها، جلسات یوگا، روند بیوریتم ═══ -->
                 <div class="mydash-wrap" id="myDashboard">
+                    <div class="mydash-profile" id="myDashProfile" hidden></div>
+                    <!-- 🔔 یادآورهای روزانه -->
+                    <div id="notifDashboardSection"></div>
                     <div class="mydash-tabs">
                         <button class="mydash-tab active" data-mtab="bio">📈 روند بیوریتم ۷ روزه</button>
                         <button class="mydash-tab" data-mtab="yoga">🧘 جلسات یوگا</button>
                         <button class="mydash-tab" data-mtab="charts">🔮 چارت‌های من</button>
                     </div>
                     <div class="mydash-body" id="myDashBody"></div>
+
+                    <!-- آسمان و زمین — گرید دوستونه، مستقیم در صفحه -->
+                    <div class="mdu-section" id="skySection">
+                        <div class="mdu-section-title">🌌 آسمان امروز</div>
+                        <div class="mdu-section-grid">
+                            <div class="mdu-card" id="skyMoonCard"><div class="mdu-card-title">🌙 ماه</div><div class="mdb-empty">⏳</div></div>
+                            <div class="mdu-card" id="skySunCard"><div class="mdu-card-title">🌞 فعالیت خورشیدی</div><div class="mdb-empty">⏳</div></div>
+                            <div class="mdu-card" id="skyMansionCard"><div class="mdu-card-title">🏛️ منزل قمر</div><div class="mdb-empty">⏳</div></div>
+                            <div class="mdu-card mdu-card-wide" id="skyPlanetsCard"><div class="mdu-card-title">🪐 موقعیت سیارات</div><div class="mdb-empty">⏳</div></div>
+                        </div>
+                    </div>
+                    <div class="mdu-section" id="earthSection">
+                        <div class="mdu-section-title">🌍 وضعیت زمین</div>
+                        <div class="mdu-section-grid">
+                            <div class="mdu-card" id="earthWeatherCard"><div class="mdu-card-title">🌤️ آب‌وهوا</div><div class="mdb-empty">⏳</div></div>
+                            <div class="mdu-card" id="earthAirCard"><div class="mdu-card-title">🍃 کیفیت هوا</div><div class="mdb-empty">⏳</div></div>
+                            <div class="mdu-card mdu-card-wide" id="earthAstCard"><div class="mdu-card-title">☄️ سیارک‌های نزدیک زمین</div><div class="mdb-empty">⏳</div></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -3457,30 +3805,160 @@
         </div>
     </div>
 
+    <!-- ===== مودال صفحات محتوایی (قوانین / حریم خصوصی / درباره ما) ===== -->
+    <div class="modal-overlay" id="cosmicPageModal">
+        <div class="modal-box cosmic-page-box">
+            <div class="modal-header">
+                <h3 id="cosmicPageTitle">—</h3>
+                <button class="modal-close" id="cosmicPageClose" aria-label="بستن">✕</button>
+            </div>
+            <div class="cosmic-page-body" id="cosmicPageBody"></div>
+        </div>
+    </div>
+
+    <script>
+    /* ═════════════ صفحات محتوایی — قوانین / حریم خصوصی / درباره ما ═════════════ */
+    (function () {
+        var PAGES = {
+            terms: {
+                title: '📜 قوانین استفاده',
+                html: '' +
+'<h4>۱. پذیرش قوانین</h4>' +
+'<p>با ایجاد حساب کاربری یا استفاده از هر بخش از کاسمیک اوراکل («سرویس»)، شما می‌پذیرید که این قوانین استفاده را خوانده‌اید و به آن‌ها پایبندید. اگر با هر بخش موافق نیستید، لطفاً از سرویس استفاده نکنید.</p>' +
+'<h4>۲. ماهیت خدمات — سلب مسئولیت مهم</h4>' +
+'<p>خدمات کاسمیک اوراکل (چارت تولد، تاروت، بیوریتم، عددشناسی و پیشنهادهای یوگا) ابزارهایی برای <b>سرگرمی، خودشناسی و سلامت سبک زندگی</b> هستند:</p>' +
+'<ul>' +
+'<li>خروجی‌های نجومی و تاروت <b>جایگزین مشاوره پزشکی، روان‌شناختی، مالی یا حقوقی نیستند</b> و نباید برای تصمیم‌های درمانی، سرمایه‌گذاری یا حقوقی به آن‌ها اتکا کرد.</li>' +
+'<li>پیشنهادهای حرکتی یوگا عمومی‌اند؛ در صورت بارداری، آسیب‌دیدگی یا بیماری، پیش از تمرین با پزشک مشورت کنید و تمرین را در حد توان انجام دهید.</li>' +
+'<li>محاسبات بر پایه‌ی موتور ودیک و الگوریتم‌های اعلام‌شده انجام می‌شود و ما دقت علمی ادعاهای طالع‌بینی را تضمین نمی‌کنیم.</li>' +
+'</ul>' +
+'<h4>۳. حساب کاربری و اشتراک</h4>' +
+'<ul>' +
+'<li>مسئولیت حفظ امنیت حساب (رمز عبور) با شماست.</li>' +
+'<li>اشتراک‌های طلایی/الماسی دسترسی به ابزارهای پرمیوم را باز می‌کنند؛ تمدید و لغو طبق شرایط اعلام‌شده در صفحه خرید است.</li>' +
+'<li>امتیاز کارما واحد پاداش درون‌برنامه‌ای برای تمرین است، قابل خرید و فروش نیست و هیچ ارزش پولی ندارد.</li>' +
+'</ul>' +
+'<h4>۴. رفتار کاربران</h4>' +
+'<p>ارسال محتوای غیرقانونی، توهین‌آمیز یا تلاش برای دسترسی غیرمجاز به سیستم، موجب تعلیق حساب می‌شود.</p>' +
+'<h4>۵. مالکیت فکری</h4>' +
+'<p>رابط کاربری، متن‌ها و کد سرویس متعلق به کاسمیک اوراکل است. چارت‌ها و نتایج شخصی شما متعلق به خودتان است و می‌توانید آن‌ها را ذخیره یا به اشتراک بگذارید.</p>' +
+'<h4>۶. تغییر قوانین</h4>' +
+'<p>این قوانین ممکن است به‌روزرسانی شود؛ نسخه‌ی جاری همیشه همین صفحه است و ادامه‌ی استفاده پس از تغییر، به معنای پذیرش آن است.</p>' +
+'<h4>۷. تماس</h4>' +
+'<p>برای هرگونه سوال: <b>support@cosmic-oracle.com</b></p>'
+            },
+            privacy: {
+                title: '🔒 حریم خصوصی',
+                html: '' +
+'<h4>۱. اصول ما</h4>' +
+'<p>حریم خصوصی شما خط قرمز ماست. ما این‌جا فروشنده‌ی داده نیستیم؛ خدمتگزار آرامش و خودشناسی شما هستیم. این سیاست شفاف توضیح می‌دهد چه چیزی ذخیره می‌شود، کجا و چرا.</p>' +
+'<h4>۲. چه داده‌هایی جمع می‌کنیم؟</h4>' +
+'<ul>' +
+'<li><b>داده‌ی تولد:</b> تاریخ و ساعت و مکان تولد — تنها برای محاسبه چارت، طالع، بیوریتم و پیشنهادهای شخصی. بدون این داده، سرویس‌ها شخصی نمی‌شوند.</li>' +
+'<li><b>جلسات و پیشرفت:</b> تاریخچه‌ی تمرین‌های یوگا، جلسات تاروت، امتیاز کارما و آمار استفاده — برای داشبورد پیشرفت شما.</li>' +
+'<li><b>داده‌ی حساب:</b> نام کاربری، ایمیل و رمز عبورِ هش‌شده برای احراز هویت.</li>' +
+'</ul>' +
+'<h4>۳. داده کجا ذخیره می‌شود؟</h4>' +
+'<ul>' +
+'<li><b>روی دستگاه شما (localStorage):</b> تنظیمات ظاهری، تاریخ انتخابی، آمار استودیو یوگا و پیش‌فرض‌های فرم — بدون این‌ها حتی لازم نیست وارد شوید.</li>' +
+'<li><b>روی سرور ما:</b> برای کاربران واردشده — پروفایل (شامل تاریخ تولد) و تاریخچه جلسات، تا از هر دستگاهی در دسترس باشند.</li>' +
+'</ul>' +
+'<h4>۴. چه کاری با داده‌های شما <b>نمی‌کنیم</b>؟</h4>' +
+'<ul>' +
+'<li>❌ فروش، اجاره یا اشتراک‌گذاری داده‌های شخصی شما با هیچ شخص ثالثی — نه برای تبلیغات، نه هیچ‌وقت.</li>' +
+'<li>❌ ارسال داده‌ی تولد یا نتایج تاروت شما به شبکه‌های تبلیغاتی یا ردیاب‌های خارجی.</li>' +
+'<li>❌ خواندن محتوای خصوصی شما بدون نیازِ مستقیمِ ارائه‌ی سرویس.</li>' +
+'</ul>' +
+'<h4>۵. اشخاص ثالث</h4>' +
+'<p>تنها سرویس خارجی مورد استفاده، نقشه‌ی انتخاب مکان (برای طول و عرض جغرافیایی چارت) است که فقط مختصات انتخابی شما را پردازش می‌کند.</p>' +
+'<h4>۶. حقوق شما</h4>' +
+'<ul>' +
+'<li>هر زمان بخواهید می‌توانید داده‌ی تولد خود را اصلاح یا از پیشخوان حساب، تاریخچه و داده‌ها را حذف کنید.</li>' +
+'<li>برای دریافت نسخه‌ی کامل داده‌ها یا حذف کامل حساب، به <b>support@cosmic-oracle.com</b> mail بزنید؛ حداکثر تا ۷ روز انجام می‌شود.</li>' +
+'</ul>' +
+'<h4>۷. کوکی و ذخیره‌سازی محلی</h4>' +
+'<p>ما از کوکی‌های تبلیغاتی استفاده نمی‌کنیم؛ فقط localStorage برای یادآوری تنظیمات شما.</p>'
+            },
+            about: {
+                title: '✨ درباره ما',
+                html: '' +
+'<div style="text-align:center;margin-bottom:18px;">' +
+'<div style="font-size:40px;margin-bottom:6px;">🌌</div>' +
+'<h3 style="color:var(--gold-300);margin:0;">کاسمیک اوراکل</h3>' +
+'<div style="font-size:0.85rem;color:#999;">آسمان، در خدمت زندگی بهتر</div>' +
+'</div>' +
+'<h4>چرا کاسمیک اوراکل وجود دارد؟</h4>' +
+'<p>ما با یک باور ساده شروع کردیم: <b>ابزارهای خودشناسی نباید لوکس یا گران باشند.</b> سال‌ها دیدیم که خدمات طالع‌بینی و سلامت، یا سطحی و تجاری ارائه می‌شوند یا قیمت‌هایی دارند که از دست‌رس خارج است. کاسمیک اوراکل ساخته شد تا دقیقاً برعکس باشد.</p>' +
+'<h4>هدف ما — کیفیت زندگی، نه فروش بیشتر</h4>' +
+'<p>اگر روزی سرویس یا اشتراکی ارائه شود، درآمد آن صرف یک هدف می‌شود: <b>کامل‌تر کردن خدمات در جهت بهبود سبک و کیفیت زندگی هموطنان‌مان.</b> یعنی:</p>' +
+'<ul>' +
+'<li>🧘 <b>سلامت واقعی:</b> یوگا و تنفس با راهنمای صوتی کامل، رایگان و با کیفیت جهانی — نه دم‌دستی.</li>' +
+'<li>🔭 <b>دقت نجومی:</b> محاسبات ودیک جدی، شفاف و بدون اغراق.</li>' +
+'<li>🇮🇷 <b>برای هموطنان:</b> تقویم شمسی، زبان فارسی و طراحی برای زندگی همین‌جا.</li>' +
+'<li>🆓 <b>رایگان ماندن هسته:</b> چارت، فال و بیوریتم پایه برای همه باز است؛ توسعه‌مان را تمرین کاربران تأمین می‌کند، نه فشار روی شما.</li>' +
+'</ul>' +
+'<h4>تیم ما</h4>' +
+'<p>یک گروه کوچک از علاقه‌مندان نجوم، توسعه‌دهندگان و مربیان یوگا که باور دارند فناوری می‌تواند آرامش بیاورد. ما محصول‌مان را با گوش دادن به بازخورد شما می‌سازیم — هر پیشنهادی دارید، برایمان بفرستید.</p>' +
+'<div style="background:rgba(249,217,118,.08);border:1px solid rgba(249,217,118,.25);border-radius:14px;padding:12px 16px;margin-top:14px;font-size:0.85rem;">' +
+'💡 <b>مسیر پیش‌رو:</b> آموزش‌های ویدیویی یوگا، یادآورهای هوشمند بیوریتم و نسخه‌ی همگانی رایگان کامل — قدم‌به‌قدم با فیدبک شما.' +
+'</div>' +
+'<p style="text-align:center;margin-top:14px;color:var(--gold-300);">under the same sky — زیر همین آسمان 🌙</p>'
+            }
+        };
+
+        function openPage(key) {
+            var p = PAGES[key];
+            if (!p) return;
+            document.getElementById('cosmicPageTitle').textContent = p.title;
+            document.getElementById('cosmicPageBody').innerHTML = p.html;
+            document.getElementById('cosmicPageModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closePage() {
+            document.getElementById('cosmicPageModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        window.cosmicOpenPage = openPage;
+        window.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('cosmicPageClose').addEventListener('click', closePage);
+            document.getElementById('cosmicPageModal').addEventListener('click', function (e) {
+                if (e.target === this) closePage();
+            });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePage(); });
+            /* wire footer buttons (replacing alert placeholders) */
+            document.querySelectorAll('.site-footer [data-cosmic-page]').forEach(function (b) {
+                b.addEventListener('click', function () { openPage(b.getAttribute('data-cosmic-page')); });
+            });
+        });
+    })();
+    </script>
+
     <!-- ===== اسکریپت‌های ضروری (کوچک) — موتورهای سنگین lazy هستند ===== -->
     <script src="static/persian-provinces.js?v=1"></script>
-    <script src="static/date-wheel-picker.js?v=15"></script>
+    <script src="static/date-wheel-picker.js?v=16"></script>
     <script src="static/city-selector.js?v=9"></script>
     <script src="static/spa-router.js?v=8"></script>
-    <script src="static/script.js?v=19"></script>
+    <script src="static/script.js?v=38"></script>
     <script src="static/yoga-data-loader.js?v=1"></script>
     <script src="static/yoga-core.js?v=2"></script>
     <script src="static/yoga-library.js?v=14"></script>
     <script src="static/yoga-engine.js?v=2"></script>
     <script src="static/yoga-practice.js?v=5"></script>
-    <script src="static/yoga-player.js?v=15"></script>
+    <script src="static/yoga-player.js?v=19"></script>
+    <script src="static/yoga-karma-store.js?v=1"></script>
     <script src="static/admin-panel.js?v=3"></script>
     <script src="static/breath-module.js?v=1"></script>
     <script src="static/quality-of-life.js?v=1"></script>
     <script src="static/moon-phase.js?v=4"></script>
     <script src="static/zodiac-display.js?v=7"></script>
-    <script src="static/cosmic-status.js?v=8"></script>
+    <script src="static/cosmic-status.js?v=13"></script>
+    <script src="static/earth-status.js?v=3"></script>
     <script src="static/yoga-summary.js?v=1"></script>
     <script src="static/yoga-test.js?v=3"></script>
-    <script src="static/daily-dashboard.js?v=3"></script>
+    <script src="static/daily-dashboard.js?v=6"></script>
     <script src="static/audio-manager.js?v=5"></script>
-    <script src="static/my-dashboard.js?v=3"></script>
-    <script src="static/daily-reminder.js?v=3"></script>
+    <script src="static/my-dashboard.js?v=10"></script>
+    <script src="static/daily-reminder.js?v=5"></script>
 
     <script>
     /* ================================================================
@@ -3594,8 +4072,8 @@
 
         /* موتورهایی که فقط با باز شدن تبِ خودشان بارگذاری می‌شوند */
         var TAB_SCRIPTS = {
-            mizaj: 'static/mizaj.js',
-            abjad: 'static/abjad.js'
+            abjad: 'static/abjad.js?v=2',
+            mizaj: 'static/mizaj.js?v=2'
         };
 
         function ensureTabScripts(tab) {
@@ -4005,7 +4483,7 @@
             setTimeout(function () {
                 loadScript('static/liquid-orb.js?v=2');
                 loadScript('static/email-verification.js?v=2');
-                loadScript('static/auth-panel.js?v=10');
+                loadScript('static/auth-panel.js?v=12');
             }, 1500);
         });
 
@@ -4291,6 +4769,59 @@
         }
         addPremiumBadges();
 
+    })();
+
+    /* ═════════════ COSMIC SITE FOOTER — injected into both slots ═════════════ */
+    (function () {
+        var FOOTER_HTML =
+            '<footer class="site-footer">' +
+                '<span class="sf-ornament">✦ ✦ ✦</span>' +
+                '<div class="sf-grid">' +
+                    '<div class="sf-brand">' +
+                        '<div class="sf-logo"><img src="static/images/ui/oracle-logo.png" alt="" onerror="this.style.display=\'none\'">کاسمیک اوراکل</div>' +
+                        '<p>پیشگوی کهکشانی شما — چارت ودیک، تاروت، بیوریتم و یوگا در یک آسمان. دقت نجومی، زیبایی کهکشانی.</p>' +
+                    '</div>' +
+                    '<div class="sf-col">' +
+                        '<h4>سرویس‌ها</h4>' +
+                        '<button onclick="showPage(\'tools\')"><span class="sf-ico">🌌</span>چارت تولد</button>' +
+                        '<button onclick="openService(\'tarot\')"><span class="sf-ico">🔮</span>تاروت</button>' +
+                        '<button onclick="openService(\'biorhythm\')"><span class="sf-ico">📈</span>بیوریتم</button>' +
+                        '<button onclick="openService(\'numerology\')"><span class="sf-ico">🔢</span>عددشناسی</button>' +
+                        '<button onclick="openService(\'yoga\')"><span class="sf-ico">🧘</span>یوگا</button>' +
+                        '<button onclick="openService(\'breath\')"><span class="sf-ico">🌬️</span>تنفس</button>' +
+                    '</div>' +
+                    '<div class="sf-col">' +
+                        '<h4>دسترسی سریع</h4>' +
+                        '<button onclick="navigate(\'dashboard\')"><span class="sf-ico">📊</span>داشبورد من</button>' +
+                        '<button onclick="showPage(\'tools\')"><span class="sf-ico">🪐</span>ابزارها</button>' +
+                        '<button onclick="showPage(\'landing\')"><span class="sf-ico">✨</span>خانه</button>' +
+                        '<button onclick="openService(\'qol\')"><span class="sf-ico">🌿</span>کیفیت زندگی</button>' +
+                    '</div>' +
+                    '<div class="sf-col">' +
+                        '<h4>تماس و پشتیبانی</h4>' +
+                        '<a href="mailto:support@cosmic-oracle.com"><span class="sf-ico">✉️</span>support@cosmic-oracle.com</a>' +
+                        '<button data-cosmic-page="terms"><span class="sf-ico">📜</span>قوانین استفاده</button>' +
+                        '<button data-cosmic-page="privacy"><span class="sf-ico">🔒</span>حریم خصوصی</button>' +
+                        '<button data-cosmic-page="about"><span class="sf-ico">🌌</span>درباره ما</button>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="sf-bottom">' +
+                    '<span>© ' + new Date().getFullYear() + ' Cosmic Oracle — ساخته‌شده با ✨ تحت آسمان</span>' +
+                    '<div class="sf-social">' +
+                        '<a href="#" onclick="alert(\'Instagram\'); return false;" title="Instagram">📷</a>' +
+                        '<a href="#" onclick="alert(\'Telegram\'); return false;" title="Telegram">✈️</a>' +
+                        '<a href="mailto:support@cosmic-oracle.com" title="Email">✉️</a>' +
+                    '</div>' +
+                '</div>' +
+            '</footer>';
+
+        function inject() {
+            document.querySelectorAll('[data-cosmic-footer-slot]').forEach(function (slot) {
+                slot.outerHTML = FOOTER_HTML;
+            });
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inject);
+        else inject();
     })();
     </script>
 </body>

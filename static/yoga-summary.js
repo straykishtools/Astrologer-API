@@ -143,6 +143,17 @@ function getTodayRecommendation() {
 }
 
 // ─── Render Dropdown ───
+function classicStats() {
+    /* classic-studio (Pocket Yoga rebuild) karma + sessions + minutes */
+    try {
+        var k = JSON.parse(localStorage.getItem('py_karma') || '0') || 0;
+        var hist = JSON.parse(localStorage.getItem('py_history') || '[]') || [];
+        var min = 0;
+        hist.forEach(function (h) { min += Math.round((h.seconds || 0) / 60); });
+        return { karma: k, sessions: hist.length, minutes: min };
+    } catch (e) { return { karma: 0, sessions: 0, minutes: 0 }; }
+}
+
 function render() {
     if (!dom.panel) return;
 
@@ -150,6 +161,9 @@ function render() {
     var totalSessions = getLog().sessions.length;
     var totalMinutes = getLog().totalMinutes || 0;
     var streak = getStreak();
+    var cs = classicStats();
+    totalSessions += cs.sessions;
+    totalMinutes += cs.minutes;
     var progress = getProgress();
     var todayMin = getTodayMinutes();
     var rec = getTodayRecommendation();
@@ -173,6 +187,7 @@ function render() {
     html += '<div class="ys-stat"><div class="ys-stat-num">' + totalSessions + '</div><div class="ys-stat-label">کل جلسات</div></div>';
     html += '<div class="ys-stat ys-stat-streak"><div class="ys-streak-fire ys-fire-' + fireSize + '">' + fireStr + '</div><div class="ys-stat-num">' + streak + '</div><div class="ys-stat-label">🔴 روز متوالی</div></div>';
     html += '<div class="ys-stat"><div class="ys-stat-num">' + totalMinutes + '</div><div class="ys-stat-label">دقیقه کل</div></div>';
+    html += '<div class="ys-stat"><div class="ys-stat-num">' + cs.karma + '</div><div class="ys-stat-label">🪷 کارما</div></div>';
     html += '<div class="ys-stat"><div class="ys-stat-num">' + todayMin + '</div><div class="ys-stat-label">دقیقه امروز</div></div>';
     html += '</div>';
 

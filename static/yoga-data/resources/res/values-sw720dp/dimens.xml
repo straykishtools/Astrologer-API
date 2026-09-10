@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="pose_detail_drawer_width">520dp</dimen>
+    <dimen name="pose_detail_drawer_width_minus_25">495dp</dimen>
+    <dimen name="store_background_column_width">360dp</dimen>
+</resources>

@@ -46,7 +46,7 @@ SOLAR_EVENTS = {
     "SPE": ("پرتو ذرات خورشیدی", "solar particle event"),
     "ACT": ("فعالیت خورشیدی", "solar activity"),
     "WIN": ("باد خورشیدی", "solar wind"),
-    "ABS": ("宕ient", "absorption"),
+    "ABS": ("جذبِ پرتو", "absorption"),
     "CUE": ("پیش\u200cآگاهی CME", "CME alert"),
 }
 

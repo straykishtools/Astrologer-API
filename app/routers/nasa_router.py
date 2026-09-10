@@ -3,6 +3,7 @@ NASA API Router — proxies all NASA API calls through the backend.
 """
 
 from typing import Optional
+from datetime import date as _date
 from fastapi import APIRouter, HTTPException, Query
 
 from app.services.apod_service import APODService
@@ -60,12 +61,15 @@ async def get_apod(date: Optional[str] = Query(None, description="Date YYYY-MM-D
 # ============================================
 @router.get("/planets")
 async def get_planets(date: str = Query(..., description="Date YYYY-MM-DD")):
-    """موقعیت سیارات؛ JPL Horizons با fallback محلی"""
+    """موقعیت سیارات؛ JPL Horizons با fallback محلی + تفسیر فارسی سیاره-برج"""
     try:
         _validate_date(date)
         result = await ssd_svc.get_planetary_positions_live(date)
         if "error" in result:
             raise HTTPException(status_code=502, detail=result["error"])
+        # لایه تفسیر
+        from app.services.planet_sign_interpreter import interpret_all
+        result["interpretations"] = interpret_all(result.get("planets", {}))
         return {"status": "success", "data": result}
     except HTTPException:
         raise
@@ -170,6 +174,37 @@ async def get_asteroids(
         if endDate:
             _validate_date(endDate, "endDate")
         result = await neo_svc.get_asteroids(startDate, endDate)
+        if "error" in result:
+            raise HTTPException(status_code=502, detail=result["error"])
+        return {"status": "success", "data": result}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================
+# 5b. Space Weather — خلاصه فارسی امروز (پنل کیهانی)
+# ============================================
+@router.get("/space-weather/today")
+async def get_space_weather_today():
+    """فعالیت خورشیدی و طوفان مغناطیسی ۲۴ ساعت اخیر با توضیح فارسی"""
+    try:
+        result = await donki_svc.get_today_overview_fa()
+        return {"status": "success", "data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================
+# 5c. Asteroids — خلاصه فارسی امروز (پنل کیهانی)
+# ============================================
+@router.get("/asteroids/today")
+async def get_asteroids_today():
+    """سیارک‌های نزدیک‌شونده به زمین امروز با توضیح فارسی"""
+    try:
+        today = _date.today().isoformat()
+        result = await neo_svc.get_asteroids(today, today)
         if "error" in result:
             raise HTTPException(status_code=502, detail=result["error"])
         return {"status": "success", "data": result}

@@ -45,49 +45,143 @@ var SOLAR_EVENTS = [
     { month: 12, day: 29, name: 'شب چهارشنبه سوری', emoji: '🔥', desc: 'آخرین چهارشنبه سال — جشن آتش و نو شدن' }
 ];
 
-// ─── پیام‌های روزانه ───
-var DAILY_MESSAGES = [
-    'امروز زمان خوبی برای شروع یک عادت جدید است.',
-    'با خودت مهربان باش. هر قدم کوچکی اهمیت دارد.',
-    'از لحظه‌ی فعلی لذت ببر. گذشته و آینده را رها کن.',
-    'امروز به کسی کمک کن. مهربانی بازتاب دارد.',
-    ' نفس عمیق بکش. تو قوی‌تر از آنی که فکر می‌کنی.',
-    'امروز زمان یادگیری چیز جدیدی است.',
-    'سکوت کن و به صدای درونی‌ات گوش بده.',
-    'امروز از منطقه امن خود خارج شو.',
-    'قدردان چیزهای کوچک باش. زیبایی در جزئیات است.',
-    'امروز به بدن خود توجه کن. کمی حرکت کن.'
-];
+// ─── پیام‌های روزانه — ۷۰+ پیام متنوع بر اساس روزِ هفته/فصل ───
+var DAILY_MESSAGES = {
+    // پیام‌های عمومی (همیشه در استخر)
+    general: [
+        'با خودت مهربان باش. هر قدم کوچکی اهمیت دارد.',
+        'از لحظه‌ی فعلی لذت ببر. گذشته و آینده را رها کن.',
+        'نفس عمیق بکش. تو قوی‌تر از آنی که فکر می‌کنی.',
+        'سکوت کن و به صدای درونی‌ات گوش بده.',
+        'قدردان چیزهای کوچک باش. زیبایی در جزئیات است.',
+        'امروز به بدن خود توجه کن. کمی حرکت کن.',
+        'یک چیز کوچک را کامل کن؛ احساسِ پایان‌دادن، سوختِ فرداست.',
+        'یک آدم را امروز غافلگیر کن — با یک پیامِ ناگهانیِ مهر.',
+        'آبی بنوش و پنج دقیقه زیرِ آسمان بایست. همین.',
+        'امروز یک صفحه بنویس، هرچه — فردا از آن ممنون خواهی بود.',
+        'باور کن که همین حالا کافی هستی؛ بقیه‌اش ساخته می‌شود.',
+        'آرامش را در شروعِ روز جست‌وجو نکن؛ خودت بسازش.',
+        'انرژی‌ات را جایی خرج کن که دو سالِ دیگر هم به آن افتخار کنی.',
+        'امروز یک «نه» بگو به چیزی که انرژی‌ات را می‌خورد.',
+        'چیزی که ازش می‌ترسی، فقط یک قدمِ بزرگ‌تر از توست. قدم بردار.'
+    ],
+    // روزهای هفته — حال‌وهوای هر روز
+    weekday: {
+        0: [ // یکشنبه
+            'یکشنبه، روزِ شروعِ تازه: هفته را با یک نیتِ روشن آغاز کن.',
+            'روزِ خورشید ☀️ — مثلِ آن بدرخش، حتی اگر ابری است.',
+            'یکشنبه‌ها برایِ ریست‌کردن ساخته شده‌اند: فهرستِ هفته را امروز بنویس.'
+        ],
+        1: [ // دوشنبه
+            'دوشنبه، روزِ ماه 🌙 — به احساساتت گوش بده، نه فقط به تقویم.',
+            'شروعِ رسمیِ هفته: یک کارِ مهم را قبل از ظهر تمام کن.',
+            'ماه امشب به تو یادآوری می‌کند: نرمی هم نوعی قدرت است.'
+        ],
+        2: [ // سه‌شنبه
+            'سه‌شنبه، روزِ مریخ ♂ — انرژیِ عمل: آن چیزِ معوقه را بزن.',
+            'مریخ پشتِ توست؛ بهانه‌ها را امروز جا بگذار.',
+            'سه‌شنبه‌ها مالِ شروع‌هایِ جسورانه‌اند — بترسان به کار.'
+        ],
+        3: [ // چهارشنبه
+            'چهارشنبه، روزِ عطارد ☿ — ذهنت تیز است: یادگیری و مذاکره.',
+            'نیمه‌ی هفته: یک پاداشِ کوچک برایِ خودت بگذار تا انرژی بماند.',
+            'عطارد امروز حرف‌هایت را می‌شنود؛ آن مهم‌ترین را بگو.'
+        ],
+        4: [ // پنجشنبه
+            'پنجشنبه، روزِ مشتری ♃ — روزِ گسترش و بخت؛ بزرگ فکر کن.',
+            'مشتری امروز دستِ توست: آن فرصت را رد نکن.',
+            'پنجشنبه‌ها برایِ تصمیم‌هایِ بلندپروازانه ساخته شده‌اند.'
+        ],
+        5: [ // جمعه
+            'جمعه، روزِ کیوان ♄ — جمعِ هفته: حساب‌وکتابِ خوبی‌ها را بکن.',
+            'جمعه‌ها مالِ خانواده و سکوت است — عجله را تعطیل کن.',
+            'کیوان می‌گوید: به خودت هم مثلِ یک کارِ مهم، وقتِ باکیفیت بده.'
+        ],
+        6: [ // شنبه
+            'شنبه، روزِ ناهید ♀ — زیبایی و عشق: خودت و خانه‌ات را بپروران.',
+            'شنبه‌ها نرم‌اند: یک لذتِ حسیِ ساده — موسیقی، چایِ خوب، آسمان.',
+            'ناهید امروز کنارت است: چیزی بساز که قشنگ است، فقط برایِ لذت.'
+        ]
+    },
+    // فصل‌ها
+    season: {
+        spring: [
+            'بهار است: مثلِ طبیعت، یک چیزِ تازه در خودت بکار.',
+            'هوایِ بهاری برایِ شروع‌ها ساخته شده — زمینِ تو آماده است.',
+            'در بهار، حتی قدم‌هایِ کوچک سریع جواب می‌دهند.'
+        ],
+        summer: [
+            'تابستان، فصلِ اوج است: انرژی‌ات را در پروژه‌ی اصلی بریز.',
+            'آفتابِ تابستان یادت می‌دهد نور، داخل هم پیدا می‌شود.',
+            'در گرمایِ تابستان، آبِ بیشتر و عجله‌ی کمتر.'
+        ],
+        autumn: [
+            'پاییز، فصلِ رهاکردن است: چیزهایِ کهنه را مثلِ برگ، بگذار بروند.',
+            'پاییز یادت می‌دهد زیبایی در پایان‌ها هم هست.',
+            'در پاییز، جمع‌کردنِ ثمرِ تلاش‌ها مهم‌تر از کاشتنِ تازه است.'
+        ],
+        winter: [
+            'زمستان، فصلِ درون است: به خواب و تأملت احترام بگذار.',
+            'در زمستان، ریشه‌ها زیرِ برف کار می‌کنند — تو هم همین‌طور.',
+            'گرمایِ زمستان را بساز: چای، کتاب، و آدم‌هایِ امن.'
+        ]
+    }
+};
 
-// ─── کارت‌های تاروت ساده ───
-var TAROT_CARDS = [
-    { name: 'D', nameFA: 'دلقک', emoji: '🃏', message: 'شروعی تازه و پر از شادی در راه است.' },
-    { name: 'M', nameFA: 'جادوگر', emoji: '🎩', message: 'تو تمام ابزارهای لازم را داری. فقط عمل کن.' },
-    { name: 'HP', nameFA: 'کاهنه', emoji: '🌙', message: 'به شهود خودت اعتماد کن. پاسخ در درون توست.' },
-    { name: 'E', nameFA: 'امپراتریس', emoji: '👑', message: 'فراوانی و خلاقیت در زندگی‌ات جاری است.' },
-    { name: 'EM', nameFA: 'امپراتور', emoji: '🏛️', message: 'ثبات و ساختار به زندگی‌ات اضافه کن.' },
-    { name: 'H', nameFA: 'کاهن اعظم', emoji: '📿', message: 'سنت و خرد قدیمی‌ها راهنمایت باشد.' },
-    { name: 'LO', nameFA: 'عاشقان', emoji: '💕', message: 'عشق و ارتباطات عمیق در کانون توجه امروز است.' },
-    { name: 'J', nameFA: 'گردون', emoji: '🎡', message: 'چرخ زندگی می‌چرخد. صبور باش، همه چیز درست می‌شود.' },
-    { name: 'ST', nameFA: 'ستاره', emoji: '⭐', message: 'امید و الهام در زندگی‌ات جاری است. رویاهایت را دنبال کن.' },
-    { name: 'MO', nameFA: 'ماه', emoji: '🌕', message: 'رازها و رمزها آشکار می‌شوند. به حس درونی‌ات گوش بده.' },
-    { name: 'SU', nameFA: 'خورشید', emoji: '☀️', message: 'شادی و موفقیت در راه است. روز درخشانی در پیش داری!' },
-    { name: 'JD', nameFA: 'دادگر', emoji: '⚖️', message: 'انصاف و تعادل را در تصمیم‌گیری رعایت کن.' }
-];
+// انتخاب پیام روز: deterministic بر اساس تاریخ (هر روز یکی، همه‌جا یکی)
+function pickDailyMessage() {
+    var now = new Date();
+    var seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+    var pool = (DAILY_MESSAGES.weekday[now.getDay()] || []).concat(DAILY_MESSAGES.general);
+    // پیام فصلی: هر ۳ روز یک‌بار واردِ چرخش شود
+    var month = now.getMonth() + 1;
+    var seasonKey = (month >= 3 && month <= 5) ? 'spring' : (month >= 6 && month <= 8) ? 'summer' : (month >= 9 && month <= 11) ? 'autumn' : 'winter';
+    if (seed % 3 === 0) {
+        pool = (DAILY_MESSAGES.season[seasonKey] || []).concat(pool);
+    }
+    return pool[seed % pool.length];
+}
 
-// ─── بیوریتم ساده ───
-function calcBiorhythm(dayOfYear) {
-    var physical = Math.sin(2 * Math.PI * dayOfYear / 23) * 100;
-    var emotional = Math.sin(2 * Math.PI * dayOfYear / 28) * 100;
-    var intellectual = Math.sin(2 * Math.PI * dayOfYear / 33) * 100;
+// ─── کارت تاروت روزانه — از بک‌اند (/api/v5/tarot/daily با ۷۸ کارت + تفسیر عمیق) ───
+var TAROT_CARDS = []; // fallback قدیمی حذف شد — کارت روزانه از API می‌آید
+var _dailyTarotCache = { at: 0, data: null };
+
+function fetchDailyTarot() {
+    if (_dailyTarotCache.data && (Date.now() - _dailyTarotCache.at) < 10 * 60 * 1000) {
+        return Promise.resolve(_dailyTarotCache.data);
+    }
+    return fetch('/api/v5/tarot/daily')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+            if (d && d.status === 'success' && d.data) {
+                _dailyTarotCache = { at: Date.now(), data: d.data };
+                return _dailyTarotCache.data;
+            }
+            return null;
+        })
+        .catch(function () { return null; });
+}
+
+// ─── بیوریتم — واقعی: روزهای سپری‌شده از تولد (مثل موتور بک‌اند) ───
+function calcBiorhythm(daysSinceBirth) {
+    var physical = Math.sin(2 * Math.PI * daysSinceBirth / 23) * 100;
+    var emotional = Math.sin(2 * Math.PI * daysSinceBirth / 28) * 100;
+    var intellectual = Math.sin(2 * Math.PI * daysSinceBirth / 33) * 100;
     return { physical: Math.round(physical), emotional: Math.round(emotional), intellectual: Math.round(intellectual) };
 }
 
-function getDayOfYear() {
-    var now = new Date();
-    var start = new Date(now.getFullYear(), 0, 0);
-    var diff = now - start;
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
+function getDaysSinceBirth() {
+    var bd = window.sharedInputs && window.sharedInputs.birthDate;
+    if (!bd || !bd.year || !bd.month || !bd.day) return null;
+    var birth;
+    if (window.shamsiToGregorianDate) {
+        var g = window.shamsiToGregorianDate(bd.year, bd.month, bd.day);
+        birth = new Date(g.gy, g.gm - 1, g.gd);
+    } else {
+        birth = new Date(bd.year, bd.month - 1, bd.day);
+    }
+    var diff = Math.floor((Date.now() - birth.getTime()) / 86400000);
+    return (isNaN(diff) || diff < 0) ? null : diff;
 }
 
 // ─── تاریخ شمسی ساده ───
@@ -152,15 +246,30 @@ function renderDashboard(containerId) {
 
     var animal = getZodiacAnimal();
     var zodiac = animal ? ZODIAC[animal] : null;
-    var bio = calcBiorhythm(getDayOfYear());
-    var tarot = TAROT_CARDS[new Date().getDate() % TAROT_CARDS.length];
-    var msg = DAILY_MESSAGES[new Date().getDate() % DAILY_MESSAGES.length];
+    var daysSinceBio = getDaysSinceBirth();
+    var bio = daysSinceBio !== null ? calcBiorhythm(daysSinceBio) : { physical: 0, emotional: 0, intellectual: 0 };
+    var msg = pickDailyMessage();
     var events = getUpcomingSolarEvents(2);
     var solarDate = getSolarDate();
 
     var zodiacHtml = zodiac
         ? '<div class="dd-zodiac"><span class="dd-zodiac-emoji">' + zodiac.emoji + '</span><div><div class="dd-zodiac-name">' + animal + ' <span class="dd-zodiac-element" style="color:' + zodiac.elementColor + '">' + zodiac.element + '</span></div><div class="dd-zodiac-personality">' + zodiac.personality + '</div></div></div>'
         : '<div class="dd-zodiac dd-zodiac-empty"><span class="dd-zodiac-emoji">🐉</span><div><div class="dd-zodiac-name">تاریخ تولد ثبت نشده</div><div class="dd-zodiac-personality">برای فعال‌سازی، تاریخ تولد را وارد کنید</div></div></div>';
+
+    /* ⚙️ تنظیمات تولد — ویرایش تاریخ تولد مستقیم از داشبورد
+       (بازکردن DateWheelPicker، ذخیره در sharedInputs + پروفایل سرور) */
+    var birthEditHtml =
+        '<div class="dd-card dd-birth-edit">' +
+            '<div class="dd-card-title">⚙️ تنظیمات تولد</div>' +
+            '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+                '<button id="ddBirthEditBtn" class="dd-birth-btn">📅 ' +
+                    (window.sharedInputs && window.sharedInputs.birthDate
+                        ? 'تغییر تاریخ تولد (' + (function(){ var b=window.sharedInputs.birthDate; var fa=function(n){return String(n).replace(/[0-9]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'[+d]});}; return fa(b.year)+'/'+fa(b.month)+'/'+fa(b.day); })() + ')'
+                        : 'ثبت تاریخ تولد') +
+                '</button>' +
+                '<span style="font-size:11px;color:#8d93a8;">برای همه سرویس‌ها (چارت، بیوریتم، یوگا) به‌روز می‌شود</span>' +
+            '</div>' +
+        '</div>';
 
     function bioBar(val, label, color) {
         var w = Math.abs(val);
@@ -199,11 +308,10 @@ function renderDashboard(containerId) {
                 bioBar(bio.emotional, 'عاطفی 💕', '#e84393') +
                 bioBar(bio.intellectual, 'ذهنی 🧠', '#5b8dee') +
             '</div>' +
-            '<div class="dd-card dd-tarot">' +
+            birthEditHtml +
+            '<div class="dd-card dd-tarot" id="ddTarotCard">' +
                 '<div class="dd-card-title">🔮 فال امروز</div>' +
-                '<div class="dd-tarot-emoji">' + tarot.emoji + '</div>' +
-                '<div class="dd-tarot-name">' + tarot.nameFA + '</div>' +
-                '<div class="dd-tarot-msg">' + tarot.message + '</div>' +
+                '<div class="dd-yoga-loading">در حال آشکار شدن کارت روز…</div>' +
             '</div>' +
             (yogaHtml ? '<div class="dd-card">' + yogaHtml + '</div>' : '') +
             (isLoggedIn() ? '<div class="dd-card dd-yoga-stats" id="ddYogaStats"><div class="dd-card-title">🧘 سوابق یوگای من</div><div class="dd-yoga-loading">در حال بارگذاری…</div></div>' : '') +
@@ -215,6 +323,40 @@ function renderDashboard(containerId) {
 
     // سوابق یوگا از دیتابیس (فقط کاربران واردشده)
     loadYogaStats();
+
+    // کارت روزانه واقعی از بک‌اند
+    fetchDailyTarot().then(function (t) {
+        var host = document.getElementById('ddTarotCard');
+        if (!host) return;
+        if (!t) {
+            host.innerHTML = '<div class="dd-card-title">🔮 فال امروز</div><div class="dd-yoga-loading">سرویس فال در دسترس نیست.</div>';
+            return;
+        }
+        var card = t.card || {};
+        var rev = t.is_reversed;
+        var deep = t.deep_interp || '';
+        var html = '<div class="dd-card-title">🔮 فال امروز</div>';
+        html += '<div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;">';
+        if (card.image) {
+            html += '<img src="' + card.image + '" alt="' + (card.name || '') + '" style="width:86px;border-radius:12px;' + (rev ? 'transform:rotate(180deg);' : '') + '" onerror="this.style.display=\'none\'">';
+        }
+        html += '<div style="flex:1;min-width:150px;">';
+        html += '<div style="font-size:1.05rem;font-weight:800;color:var(--gold-300);">' + (card.name || '—') + ' <span style="font-size:0.72rem;font-weight:600;padding:2px 9px;border-radius:12px;background:' + (rev ? 'rgba(231,76,60,0.18);color:#e17055' : 'rgba(46,204,113,0.15);color:#2ecc71') + ';">' + (rev ? '🔄 وارونه' : '⬆️ راست') + '</span></div>';
+        if (t.keywords && t.keywords.length) {
+            html += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-top:4px;">' + t.keywords.slice(0, 4).join(' · ') + '</div>';
+        }
+        if (t.deep_interp) {
+            html += '<details style="margin-top:8px;"><summary style="color:var(--gold-300);cursor:pointer;font-size:0.82rem;">📜 تفسیر کامل</summary><div style="color:var(--ink-dim);line-height:1.9;font-size:0.82rem;margin-top:6px;padding:8px 12px;background:rgba(253,203,110,0.05);border-radius:8px;border-right:2px solid rgba(253,203,110,0.35);">' + t.deep_interp + '</div></details>';
+        } else if (t.meaning) {
+            html += '<div style="font-size:0.85rem;color:var(--ink-dim);margin-top:6px;line-height:1.9;">' + t.meaning + '</div>';
+        }
+        if (t.yes_no) {
+            var yesFa = { yes: 'بله ✅', no: 'خیر ❌', maybe: 'شاید ⚖️' }[String(t.yes_no).toLowerCase()] || t.yes_no;
+            html += '<div style="font-size:0.78rem;color:var(--ink-dim);margin-top:6px;">سؤالی داری؟ پاسخ کارت: <b style="color:var(--gold-300);">' + yesFa + '</b></div>';
+        }
+        html += '</div></div>';
+        host.innerHTML = html;
+    });
 }
 
 function isLoggedIn() {
@@ -311,7 +453,7 @@ function scheduleDailyNotification() {
             if (localStorage.getItem(sentKey)) return;
             var animal = getZodiacAnimal();
             var zodiac = animal ? ZODIAC[animal] : null;
-            var msg = DAILY_MESSAGES[now.getDate() % DAILY_MESSAGES.length];
+            var msg = pickDailyMessage();
             var title = '🌅 صبح بخیر!' + (zodiac ? ' ' + zodiac.emoji + ' ' + animal : '');
             new Notification(title, { body: msg, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><text x="32" y="44" text-anchor="middle" font-size="40">' + (zodiac ? zodiac.emoji : '🌌') + '</text></svg>' });
             localStorage.setItem(sentKey, '1');
@@ -323,9 +465,52 @@ function scheduleDailyNotification() {
 function init() {
     renderDashboard('dailyDashboard');
     scheduleDailyNotification();
+    bindBirthEdit();
 
     // آپدیت هر ۵ ثانیه (اگر تاریخ تولد تغییر کرد)
     setInterval(function () { renderDashboard('dailyDashboard'); }, 5000);
+}
+
+/* ⚙️ ویرایش تاریخ تولد از داشبورد — DateWheelPicker + ذخیره محلی/سرور */
+function bindBirthEdit() {
+    var btn = document.getElementById('ddBirthEditBtn');
+    if (!btn || btn._ddBound) return;
+    btn._ddBound = true;
+    btn.addEventListener('click', function () {
+        if (!window.DateWheelPicker) return;
+        var cur = (window.sharedInputs && window.sharedInputs.birthDate) || null;
+        DateWheelPicker.open({
+            calendarType: 'shamsi',
+            digits: 'fa',
+            defaultValue: cur || { year: 1379, month: 1, day: 1 },
+            minYear: 1300, maxYear: 1450,
+            onSave: function (date) {
+                if (!window.sharedInputs) window.sharedInputs = {};
+                window.sharedInputs.birthDate = { year: date.year, month: date.month, day: date.day };
+                try { localStorage.setItem('cosmic_shared_inputs', JSON.stringify(window.sharedInputs)); } catch (e) {}
+                /* ثبت در پروفایل سرور (کاربر لاگین) */
+                var token = null;
+                try { token = localStorage.getItem('cosmic_token'); } catch (e) {}
+                if (token && window.isoShamsiToGregorianISO) {
+                    var iso = window.sharedInputs.birthDate.year + '-' +
+                        String(window.sharedInputs.birthDate.month).padStart(2, '0') + '-' +
+                        String(window.sharedInputs.birthDate.day).padStart(2, '0');
+                    var gIso = window.isoShamsiToGregorianISO(iso);
+                    var gp = gIso.split('-');
+                    fetch('/api/v5/user/profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({
+                            birth_year: parseInt(gp[0]), birth_month: parseInt(gp[1]), birth_day: parseInt(gp[2])
+                        })
+                    }).catch(function () {});
+                }
+                /* هر ۵ ثانیه رندر می‌شود؛ برای فیدبک فوری یک‌بار همین حالا */
+                renderDashboard('dailyDashboard');
+                if (window.showToast) window.showToast('تاریخ تولد به‌روزرسانی شد ✅', 'success');
+            }
+        });
+    });
 }
 
 return { init: init, renderDashboard: renderDashboard, applyElementTheme: applyElementTheme, resetTheme: resetTheme };

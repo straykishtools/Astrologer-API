@@ -541,6 +541,8 @@ window.doLogin = async function() {
         // Claim any guest session usage
         claimGuestSession();
         if (window.showToast) showToast('✅ ورود موفقیت‌آمیز بود', 'success');
+        // بازگشت به همان‌جایی که کاربر بود — هوک‌های ثبت‌شده قبل از لاگین
+        runAfterLoginHooks();
         // تلنگر ملایم برای کاربر تأییدنشده — نوار زرد تأیید اکنون بالای صفحه است؛
         // با تأخیر کوتاه نشان داده می‌شود تا پیام موفقیت ورود قاب خوانا بماند.
         if (data.user && data.user.email_verified === false) {
@@ -552,6 +554,20 @@ window.doLogin = async function() {
         errEl.textContent = e.message;
     }
 };
+
+// ─── Post-login hooks: return the user to what they were doing ───
+// Usage: window.onAfterLogin(function(){ ... }) — registered while logged out,
+// fired (and cleared) once after a successful login.
+var _afterLoginHooks = [];
+window.onAfterLogin = function (fn) {
+    if (typeof fn === 'function') _afterLoginHooks.push(fn);
+};
+function runAfterLoginHooks() {
+    var hooks = _afterLoginHooks.splice(0, _afterLoginHooks.length);
+    hooks.forEach(function (fn) {
+        try { fn(); } catch (e) { try { console.warn('afterLogin hook failed', e); } catch (_) {} }
+    });
+}
 
 // ─── Register ───
 window.doRegister = async function() {
@@ -567,6 +583,7 @@ window.doRegister = async function() {
         setUser(data.user);
         updateAuthUI();
         closeAuthModal();
+        runAfterLoginHooks();
         // Claim any guest session usage
         claimGuestSession();
         if (window.showToast) showToast('✅ ثبت‌نام موفقیت‌آمیز بود', 'success');

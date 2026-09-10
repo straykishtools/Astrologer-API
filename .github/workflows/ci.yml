@@ -6,8 +6,8 @@ name: CI
 #                   regression that re-enables quota gating fails immediately
 #                   with a clear step name.
 #   yoga-guards   — the browser-JS yoga guards (timing, FA coverage, audio
-#                   scheduling, alias matching, //ref// resolution) driven
-#                   under Node.
+#                   scheduling, alias matching, //ref// resolution, the
+#                   shamsi→gregorian conversion) driven under Node.
 # Consolidates the former ci.yml + yoga-tests.yml; pip is cached between runs.
 
 on:

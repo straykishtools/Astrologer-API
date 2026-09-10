@@ -59,7 +59,14 @@ var loadPromise = null;
 // while the yoga.txt/yoga-images catalogs are keyed by camelCase technical
 // names ("DownwardDog"). A normalized key maps every form onto one pose.
 function keyOf(s) {
-    return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]+/g, '');
+    /* Normalize a lookup key: lowercase, drop separators (spaces, - , _, and
+       the ZWNJ/ZWNBSP used inconsistently in Persian) and keep Latin letters /
+       digits PLUS the Persian/Arabic script — so Persian name_fa aliases
+       resolve, not just Latin names. Mirrors the FA matcher's faAlnum so
+       cross-view lookups stay consistent. */
+    return String(s == null ? '' : s).toLowerCase()
+        .replace(/[\s\-_\u200c\u200b]+/g, '')
+        .replace(/[^a-z0-9\u0600-\u06ff]+/g, '');
 }
 function addAlias(map, k, pose) {
     var n = keyOf(k);
@@ -67,8 +74,15 @@ function addAlias(map, k, pose) {
 }
 function buildAliases() {
     aliasMap = {};
+    /* Name-first priority: a record's own `name` is authoritative and must
+       beat any OTHER record's display_name / name_fa / aka / sanskrit (the
+       collision families are "base pose vs variant whose display_name = base
+       name": CobraFull displays as "Cobra", TreePrayer as "Tree", ...). With
+       array-order first-wins, a variant appearing earlier in yoga.txt could
+       shadow its own base pose. Two passes fix it: pass 1 claims every
+       record-name, pass 2 lets aliases only fill keys no name claims. */
+    poses.forEach(function (p) { addAlias(aliasMap, p.name, p); });
     poses.forEach(function (p) {
-        addAlias(aliasMap, p.name, p);
         addAlias(aliasMap, p.display_name, p);
         addAlias(aliasMap, p.name_fa, p);
         (p.aka || []).forEach(function (a) { addAlias(aliasMap, a, p); });

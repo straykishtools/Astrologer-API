@@ -253,20 +253,40 @@ async function loadDashboardCharts() {
             var streakMap = {};
             (dash.streaks || []).forEach(function (s) { streakMap[s.streak_type] = s.current_streak || 0; });
             var fa = function (n) { return String(n == null ? 0 : n).replace(/[0-9]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[+d]; }); };
+            /* classic-studio session log feeds yoga stats too */
+            var pyHist = [], pyKarma = 0;
+            try {
+                pyHist = JSON.parse(localStorage.getItem('py_history') || '[]') || [];
+                pyKarma = JSON.parse(localStorage.getItem('py_karma') || '0') || 0;
+            } catch (e) {}
+            var pyMin = 0;
+            pyHist.forEach(function (h) { pyMin += Math.round((h.seconds || 0) / 60); });
+
+            /* refresh classic strip counters each time dashboard renders */
+            try {
+                var pyHist2 = pyHist, pyKarma2 = pyKarma;
+                var setT = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = fa(v); };
+                setT('pycKarma', pyKarma2);
+                setT('pycSessions', pyHist2.length);
+                var pm2 = 0; pyHist2.forEach(function (h) { pm2 += Math.round((h.seconds || 0) / 60); });
+                setT('pycTime', pm2);
+            } catch (e) {}
             var cards = [
                 { icon: '🔥', label: 'استریک یوگا', value: fa(streakMap.yoga || y.streak) + ' روز' },
-                { icon: '🧘', label: 'جلسات یوگا', value: fa(y.total_sessions || 0) + ' جلسه' },
-                { icon: '⏱️', label: 'زمان تمرین', value: fa(y.total_minutes || 0) + ' دقیقه' },
+                { icon: '🧘', label: 'جلسات یوگا', value: fa((y.total_sessions || 0) + pyHist.length) + ' جلسه' },
+                { icon: '⏱️', label: 'زمان تمرین', value: fa((y.total_minutes || 0) + pyMin) + ' دقیقه' },
+                { icon: '🪷', label: 'کارما کلاسیک', value: fa(pyKarma) },
                 { icon: '🔮', label: 'دست‌های تاروت', value: fa(t.total_draws || 0) },
                 { icon: '📊', label: 'چارت‌های ذخیره‌شده', value: fa((c.total || 0) + (dash.legacy_charts || []).length) },
                 { icon: '⚡', label: 'استریک تاروت', value: fa(streakMap.tarot || 0) + ' روز' }
             ];
-            statsHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px;">' +
+            statsHtml = '<div class="cosmic-stat-grid">' +
                 cards.map(function (cd) {
-                    return '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px;text-align:center;">' +
-                        '<div style="font-size:1.5rem;">' + cd.icon + '</div>' +
-                        '<div style="font-size:1.3rem;font-weight:800;color:#fff;margin-top:4px;">' + cd.value + '</div>' +
-                        '<div style="color:#888;font-size:0.78rem;margin-top:2px;">' + cd.label + '</div></div>';
+                    return '<div class="cosmic-stat-card">' +
+                        '<div class="cs-icon">' + cd.icon + '</div>' +
+                        '<div class="cs-value">' + cd.value + '</div>' +
+                        '<div class="cs-label">' + cd.label + '</div>' +
+                        '<div class="cs-spark"></div></div>';
                 }).join('') + '</div>';
 
             // 🧘 جلسات یوگای اخیر — از سوابق واقعی دیتابیس

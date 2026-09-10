@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="48dp"
+    android:layout_marginBottom="48dp"
+    android:overScrollMode="ifContentScrolls">
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/edittext_container"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textColor="?android:attr/textColorSecondary"
+            android:id="@android:id/message"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
+            style="?android:attr/textAppearanceSmall"/>
+    </LinearLayout>
+</ScrollView>

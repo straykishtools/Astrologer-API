@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from kerykeion import AstrologicalSubjectFactory, MoonPhaseDetailsFactory
 
+from ..services.moon_mansion_service import moon_mansion_service
 from ..types.request_models import MoonPhaseRequestModel, NowMoonPhaseRequestModel
 from ..types.response_models import (
     MoonPhaseContextResponseModel,
@@ -30,6 +31,26 @@ from ..utils.router_utils import (
 logger = getLogger(__name__)
 
 router = APIRouter()
+
+
+@router.get("/api/v5/moon-mansion")
+async def moon_mansion():
+    """
+    **GET** `/api/v5/moon-mansion`
+
+    منزل قمر (Lunar Mansion) فعلی — ماه الان در کدام‌یک از ۲۸ منزل سنتی است.
+
+    شامل: شماره، نام فارسی، ستاره‌ها، معنا، تفسیر کامل فارسی، مزاج منزل،
+    درصد طی‌شده و زمان ورود به منزل بعدی.
+    """
+    from fastapi.responses import JSONResponse as _JR
+
+    try:
+        data = moon_mansion_service.get_current_mansion()
+        return _JR(content={"status": "success", "data": data})
+    except Exception as exc:
+        logger.warning("moon-mansion failed: %s", exc)
+        return _JR(content={"status": "ERROR", "message": str(exc)}, status_code=500)
 
 
 @router.post("/api/v5/moon-phase", response_model=MoonPhaseResponseModel)

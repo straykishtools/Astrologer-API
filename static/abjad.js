@@ -115,6 +115,22 @@ function displayAbjadResult(data, container) {
     }).join(' ');
 
     var methodLabel = data.method === 'kabir' ? '\u06a9\u0628\u06cc\u0631' : '\u0635\u063a\u06cc\u0631';
+    var interp = data.interp || {};
+
+    var interpHtml = '';
+    if (data.method === 'kabir' && interp.element) {
+        interpHtml = '<div style="margin-top:14px;padding:14px 16px;background:rgba(253,203,110,0.06);border-right:3px solid rgba(253,203,110,0.45);border-radius:10px;">';
+        // \u0639\u0646\u0635\u0631
+        interpHtml += '<div style="font-size:1rem;font-weight:800;color:#fdcb6e;">' + interp.element + '</div>';
+        interpHtml += '<div style="font-size:0.85rem;color:#ccc;line-height:1.9;margin-top:4px;">' + interp.element_desc + '</div>';
+        // \u0645\u0639\u0646\u0627\u06cc \u0645\u0633\u062a\u0642\u06cc\u0645 \u0639\u062f\u062f
+        if (interp.direct_meaning) {
+            interpHtml += '<div style="margin-top:10px;line-height:2;color:#ddd;font-size:0.9rem;"><b style="color:#a29bfe;">\u{1f52e} \u0645\u0639\u0646\u0627\u06cc \u0639\u062f\u062f ' + data.total + ':</b><br>' + interp.direct_meaning + '</div>';
+        } else if (interp.reduced_meaning) {
+            interpHtml += '<div style="margin-top:10px;line-height:2;color:#ddd;font-size:0.9rem;"><b style="color:#a29bfe;">\u{1f52e} \u062a\u0641\u0633\u06cc\u0631 (\u0631\u0642\u0645 ' + interp.reduced + '):</b><br>' + interp.reduced_meaning + '</div>';
+        }
+        interpHtml += '</div>';
+    }
 
     container.innerHTML =
         '<div style="background:rgba(108,92,231,0.1);border:1px solid rgba(108,92,231,0.3);border-radius:16px;padding:20px;margin-top:10px;">' +
@@ -126,7 +142,9 @@ function displayAbjadResult(data, container) {
         '<div>\u{1f4dd} \u0645\u062a\u0646: <strong>' + data.text + '</strong></div>' +
         '<div style="margin-top:4px;">\u{1f522} \u062c\u0645\u0639 \u0627\u0631\u0642\u0627\u0645: <strong>' + data.digit_sum + '</strong></div>' +
         '<div style="margin-top:8px;">' + detailsHtml + '</div>' +
-        '</div></div>';
+        '</div>' +
+        interpHtml +
+        '</div>';
 }
 
 function displayAbjadCompareResult(data, container) {
@@ -138,6 +156,7 @@ function displayAbjadCompareResult(data, container) {
     };
     var color = compatColors[data.compatibility] || '#fff';
     var methodLabel = data.method === 'kabir' ? '\u06a9\u0628\u06cc\u0631' : '\u0635\u063a\u06cc\u0631';
+    var fa = data.fa || '';
 
     container.innerHTML =
         '<div style="background:rgba(108,92,231,0.1);border:1px solid rgba(108,92,231,0.3);border-radius:16px;padding:20px;margin-top:10px;">' +
@@ -151,5 +170,6 @@ function displayAbjadCompareResult(data, container) {
         '<div><strong style="color:#fdcb6e;">' + data.name2 + '</strong><br><span style="font-size:1.3rem;">' + data.value2 + '</span></div>' +
         '</div>' +
         '<div style="text-align:center;margin-top:12px;color:#ccc;">\u062a\u0641\u0627\u0648\u062a: <strong>' + data.difference + '</strong></div>' +
+        (fa ? '<div style="margin-top:14px;padding:12px 16px;background:rgba(253,203,110,0.06);border-right:3px solid rgba(253,203,110,0.45);border-radius:10px;line-height:2;color:#ddd;font-size:0.9rem;"><b style="color:#fdcb6e;">\u{1f52e} \u062a\u0641\u0633\u06cc\u0631 \u067e\u06cc\u0648\u0646\u062f:</b><br>' + fa + '</div>' : '') +
         '</div>';
 }

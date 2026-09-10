@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <TextView
+            android:textSize="14sp"
+            android:textStyle="normal"
+            android:textColor="#666"
+            android:background="#fff"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/eula_key"/>
+    </ScrollView>
+    <FrameLayout
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+        <Button
+            android:layout_gravity="center"
+            android:id="@+id/agree"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/i_agree"/>
+    </FrameLayout>
+</LinearLayout>

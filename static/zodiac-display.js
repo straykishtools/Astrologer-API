@@ -5,6 +5,7 @@
 var ZodiacDisplay = (function () {
 'use strict';
 
+
 var ZODIAC_DATA = {
     'موش': { emoji: '🐭', element: 'آب', personality: 'باهوش، جذاب، مدبر، اما گاهی محتاط.', dailyAdvice: 'امروز بر روی روابط خود تمرکز کن. یک پیام محبت‌آمیز بفرست.', yogaPose: 'پوزیشن کودک (Balasana)', yogaDesc: 'برای آرامش ذهن و کاهش استرس.' },
     'گاو': { emoji: '🐮', element: 'خاک', personality: 'صبور، قابل اعتماد، سخت‌کوش، با اراده‌ای آهنین.', dailyAdvice: 'روز خوبی برای برنامه‌ریزی بلندمدت. قدم‌های کوچک بردار.', yogaPose: 'پوزیشن کوه (Tadasana)', yogaDesc: 'برای ثبات و تمرکز.' },
@@ -52,16 +53,12 @@ function getDayOfYear() {
 function getBirthDaysSince() {
     var bd = window.sharedInputs && window.sharedInputs.birthDate;
     if (!bd || !bd.year || !bd.month || !bd.day) return null;
-    var shamsiMonth = [1,31,59,90,120,151,181,212,243,273,304,334];
-    var birthDayOfYear = (shamsiMonth[bd.month - 1] || 0) + bd.day;
+    var g = shamsiToGregorianDate(bd.year, bd.month, bd.day);
+    var birth = new Date(g.gy, g.gm - 1, g.gd);
     var now = new Date();
-    var thisDayOfYear = getDayOfYear();
-    var birthYear = bd.year;
-    var currentYear = now.getFullYear();
-    var yearsDiff = currentYear - birthYear;
-    var totalDays = yearsDiff * 365 + (thisDayOfYear - birthDayOfYear);
-    if (totalDays < 0) totalDays = 0;
-    return totalDays;
+    var days = Math.floor((now - birth) / 86400000);
+    if (isNaN(days) || days < 0) return null;
+    return days;
 }
 
 function getBiorhythmHtml() {
@@ -109,7 +106,7 @@ function getBiorhythmHtml() {
 
     function makeItem(label, val, nxt, color, emoji, idx) {
         var forecast = bioPct(val) + arrow(val, nxt) + ' ' + bioPct(nxt);
-        return '<span class="zodiac-bio-item bio-anim-in" style="animation-delay:' + (idx * 0.12) + 's" data-tooltip-rich="1" '
+        return '<span class="zodiac-bio-item bio-anim-in" style="animation-delay:' + (idx * 0.12) + 's;--bio-c:' + color + '" data-tooltip-rich="1" '
             + 'data-tt-label="' + label + '" data-tt-val="' + bioPct(val) + '" '
             + 'data-tt-next="' + forecast + '" data-tt-color="' + color + '" '
             + 'data-tt-days="' + daysSince + '" data-tt-cycle="' + (label === 'فیزیکی' ? 23 : label === 'احساسی' ? 28 : 33) + '">'
@@ -120,18 +117,115 @@ function getBiorhythmHtml() {
         + makeItem('احساسی', bio.emotional, bioNext.emotional, bioColor(bio.emotional), bioEmoji(bio.emotional), 1)
         + makeItem('ذهنی', bio.mental, bioNext.mental, bioColor(bio.mental), bioEmoji(bio.mental), 2);
 
-    return '<div class="zodiac-bio">' + items + '</div>';
+    return items; // chips injected directly into #zodiacBio (no nested wrapper)
 }
 
 function getZodiacFromYear(year) {
     if (!year || isNaN(year)) return null;
+    // همان فرمول موتور بک‌اند (ChineseZodiacEngine.calculate): (year - 4) % 12
+    // سال ۴ میلادی = سال موش — با /api/v5/chinese-zodiac یکسان است
     var animals = ['موش', 'گاو', 'ببر', 'خرگوش', 'اژدها', 'مار', 'اسب', 'بز', 'میمون', 'خروس', 'سگ', 'گراز'];
-    var idx = (year - 1900) % 12;
-    return animals[idx >= 0 ? idx : idx + 12];
+    var idx = (year - 4) % 12;
+    idx = ((idx % 12) + 12) % 12;
+    return animals[idx];
 }
 
 function getZodiacData(animal) {
     return ZODIAC_DATA[animal] || null;
+}
+
+/* ─── تبدیل تاریخ شمسی (جلالی) به میلادی — الگوریتم jdf استاندارد (تست‌شده) ─── */
+function jalaliToGregorian(jy, jm, jd) {
+    jy += 1595;
+    var days = -355668 + (365 * jy) + (~~(jy / 33) * 8) + ~~(((jy % 33) + 3) / 4) + jd
+        + ((jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186);
+    var gy = 400 * ~~(days / 146097);
+    days %= 146097;
+    if (days > 36524) {
+        gy += 100 * ~~(--days / 36524);
+        days %= 36524;
+        if (days >= 365) days++;
+    }
+    gy += 4 * ~~(days / 1461);
+    days %= 1461;
+    if (days > 365) {
+        gy += ~~((days - 1) / 365);
+        days = (days - 1) % 365;
+    }
+    var gd = days + 1;
+    var sal_a = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    var gm;
+    for (gm = 0; gm < 13 && gd > sal_a[gm]; gm++) gd -= sal_a[gm];
+    return { gy: gy, gm: gm, gd: gd };
+}
+
+/* سال تولد را به میلادی نرمال می‌کند (ورودی پیکر چارت شمسی است) */
+function normalizeBirthYearToGregorian(year, month, day) {
+    if (!year || isNaN(year)) return null;
+    // بازه ۱۳۰۰–۱۶۰۰ = شمسی → تبدیل (فقط سال؛ برای سازگاری کد قدیمی)
+    if (year >= 1300 && year <= 1600) {
+        var g = jalaliToGregorian(year, month || 1, day || 1);
+        return g.gy;
+    }
+    return year;
+}
+
+/* ISO شمسی "YYYY-MM-DD" → ISO میلادی (سال+ماه+روز کامل) */
+function isoShamsiToGregorianISO(iso) {
+    if (!iso) return iso;
+    var p = String(iso).split('-').map(function (x) { return parseInt(x, 10); });
+    if (p.length !== 3 || isNaN(p[0])) return iso;
+    var g = shamsiToGregorianDate(p[0], p[1], p[2]);
+    if (!g) return iso;
+    return g.gy + '-' + String(g.gm).padStart(2, '0') + '-' + String(g.gd).padStart(2, '0');
+}
+window.isoShamsiToGregorianISO = isoShamsiToGregorianISO;
+
+/* تبدیل کامل تاریخ شمسی → میلادی (سال + ماه + روز) — برای بیوریتم و غیره */
+function shamsiToGregorianDate(jy, jm, jd) {
+    if (!jy || isNaN(jy)) return null;
+    if (jy >= 1300 && jy <= 1600) {
+        var g = jalaliToGregorian(jy, jm || 1, jd || 1);
+        return { gy: g.gy, gm: g.gm, gd: g.gd };
+    }
+    return { gy: jy, gm: jm || 1, gd: jd || 1 };
+}
+window.shamsiToGregorianDate = shamsiToGregorianDate;
+
+function getGregorianBirthYear() {
+    var bd = (window.sharedInputs && window.sharedInputs.birthDate) || null;
+    if (bd && bd.year && !isNaN(bd.year)) {
+        return normalizeBirthYearToGregorian(bd.year, bd.month, bd.day);
+    }
+    try {
+        var state = localStorage.getItem('yoga_state');
+        if (state) { var d = JSON.parse(state); if (d.birthYear) return normalizeBirthYearToGregorian(d.birthYear, d.birthMonth || 1, d.birthDay || 1); }
+    } catch (_) {}
+    var yearEl = document.getElementById('numYear');
+    if (yearEl && yearEl.value) return normalizeBirthYearToGregorian(parseInt(yearEl.value));
+    return null;
+}
+window.normalizeBirthYearToGregorian = normalizeBirthYearToGregorian;
+
+/* ─── سرویس بک‌اند: حیوان + عنصر دقیق سال (کش به ازای هر سال) ─── */
+var _zodiacSvcCache = {};
+async function fetchZodiacFromService(gYear) {
+    if (!gYear || isNaN(gYear)) return null;
+    if (_zodiacSvcCache[gYear]) return _zodiacSvcCache[gYear];
+    try {
+        var resp = await fetch('/api/v5/chinese-zodiac', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ year: gYear })
+        });
+        if (!resp.ok) return null;
+        var data = await resp.json();
+        if (data.status === 'success' && data.data) {
+            _zodiacSvcCache[gYear] = data.data;
+            return data.data;
+        }
+        return null;
+    } catch (e) { return null; }
 }
 
 function updateTopbar(animal, data) {
@@ -143,35 +237,118 @@ function updateTopbar(animal, data) {
     if (bioContainer) { bioContainer.innerHTML = getBiorhythmHtml(); }
 }
 
-function showModal(animal, data) {
-    var modal = document.getElementById('zodiacModal');
-    var body = document.getElementById('zodiacModalBody');
-    if (!modal || !body) return;
+/* ─── پنل کشویی زیر دکمه زودیاک (جایگزین مودال) ─── */
+function getBiorhythmRowsHtml() {
+    var daysSince = getBirthDaysSince();
+    if (daysSince === null || daysSince <= 0) return '';
+    var bio = calcBiorhythm(daysSince);
+    var bioNext = calcBiorhythm(daysSince + 1);
+    function bioColor(val) {
+        if (val >= 30) return '#2ecc71';
+        if (val >= 0) return '#f1c40f';
+        if (val >= -30) return '#e67e22';
+        return '#e74c3c';
+    }
+    function bioEmoji(val) {
+        if (val >= 50) return '😊';
+        if (val >= 0) return '😐';
+        if (val >= -50) return '😔';
+        return '😟';
+    }
+    function bioPct(val) { return (val >= 0 ? '+' : '') + val + '%'; }
+    function arrow(cur, nxt) { return nxt > cur ? ' ↗' : nxt < cur ? ' ↘' : ' →'; }
+    function row(label, val, nxt, idx) {
+        var c = bioColor(val);
+        return '<div class="zp-bio-row bio-anim-in" style="animation-delay:' + (idx * 0.1) + 's">'
+            + '<span class="zp-bio-emoji">' + bioEmoji(val) + '</span>'
+            + '<span class="zp-bio-label">' + label + '</span>'
+            + '<span class="zp-bio-bar"><span class="zp-bio-bar-fill" style="background:' + c + ';width:' + Math.abs(val) / 2 + '%;margin-right:' + (val < 0 ? 0 : '50') + '%;"></span>'
+            + '<span class="zp-bio-bar-zero"></span></span>'
+            + '<span class="zp-bio-val" style="color:' + c + '">' + bioPct(val) + arrow(val, nxt) + '</span>'
+            + '</div>';
+    }
+    return row('فیزیکی', bio.physical, bioNext.physical, 0)
+        + row('احساسی', bio.emotional, bioNext.emotional, 1)
+        + row('ذهنی', bio.mental, bioNext.mental, 2)
+        + '<div class="zp-bio-days">🌟 ' + daysSince.toLocaleString('fa-IR') + ' روز از تولد شما می‌گذرد</div>';
+}
+
+function renderZodiacPanel(animal, data) {
+    var panel = document.getElementById('zodiacPanel');
+    if (!panel) return;
     if (!animal || !data) {
-        body.innerHTML = '<p style="color:var(--ink-dim);font-size:16px;">🧘 لطفاً تاریخ تولد خود را در بخش <strong>چارت تولد</strong> وارد کنید.</p>';
-        modal.classList.add('active'); return;
+        panel.innerHTML = '<div class="zp-empty">🧘 لطفاً تاریخ تولد خود را در بخش <strong>چارت تولد</strong> وارد کنید.</div>';
+        return;
     }
     var quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-    body.innerHTML =
-        '<span class="z-emoji">' + data.emoji + '</span>' +
-        '<div class="z-title">' + animal + '</div>' +
-        '<div class="z-sub">عنصر: ' + data.element + ' · امروز ' + getPersianDate() + '</div>' +
-        '<div class="z-message"><strong>🧬 شخصیت:</strong> ' + data.personality + '</div>' +
-        '<div class="z-message" style="border-color:#5b8dee;"><strong>🌟 توصیه روزانه:</strong> ' + data.dailyAdvice + '</div>' +
-        '<div class="z-yoga"><div class="z-yoga-label">🧘 حرکت یوگای پیشنهادی</div><div class="z-yoga-name">' + data.yogaPose + '</div><div class="z-yoga-desc">' + data.yogaDesc + '</div></div>' +
-        '<div class="z-quote">' + quote + '</div>';
-    modal.classList.add('active');
+    var bioRows = getBiorhythmRowsHtml();
+
+    panel.innerHTML =
+        '<div class="zp-header">'
+            + '<span class="zp-emoji">' + data.emoji + '</span>'
+            + '<div class="zp-header-info">'
+                + '<div class="zp-title">' + animal + '</div>'
+                + '<div class="zp-sub">عنصر: ' + data.element + ' · امروز ' + getPersianDate() + '</div>'
+            + '</div>'
+        + '</div>'
+        + (bioRows ? '<div class="zp-bio"><div class="zp-section-title">🌙 ریتم‌های زیستی امروز</div>' + bioRows + '</div>' : '')
+        + '<div class="zp-message"><strong>🧬 شخصیت:</strong> ' + data.personality + '</div>'
+        + '<div class="zp-message zp-advice"><strong>🌟 توصیه روزانه:</strong> ' + data.dailyAdvice + '</div>'
+        + '<div class="zp-yoga"><div class="zp-yoga-label">🧘 حرکت یوگای پیشنهادی</div><div class="zp-yoga-name">' + data.yogaPose + '</div><div class="zp-yoga-desc">' + data.yogaDesc + '</div></div>'
+        + '<div class="zp-quote">' + quote + '</div>';
+}
+
+function openZodiacPanel() {
+    var panel = document.getElementById('zodiacPanel');
+    if (!panel) return;
+    renderZodiacPanel(currentZodiac && currentZodiac.animal ? currentZodiac.animal : null,
+                      currentZodiac && currentZodiac.data ? currentZodiac.data : null);
+    panel.classList.add('open');
+}
+
+function closeZodiacPanel() {
+    var panel = document.getElementById('zodiacPanel');
+    if (panel) panel.classList.remove('open');
+}
+
+/* سازگاری با کدهای قدیمی که showModal را صدا می‌زنند */
+var showModal = openZodiacPanel;
+
+/* ─── هسته رندر: سال میلادی → حیوان (محلی فوری + سرویس بک‌اند برای دقت) ─── */
+var _lastResolvedAnimal = null;
+
+function applyZodiac(animal) {
+    var data = animal ? getZodiacData(animal) : null;
+    if (animal && data) {
+        currentZodiac = { animal: animal, data: data };
+        updateTopbar(animal, data);
+    } else {
+        updateTopbar(null, null);
+    }
+}
+
+async function resolveAndRender(gYear) {
+    // فوری: محاسبه محلی (همان فرمول بک‌اند)
+    var localAnimal = getZodiacFromYear(gYear);
+    if (localAnimal && localAnimal !== _lastResolvedAnimal) {
+        _lastResolvedAnimal = localAnimal;
+        applyZodiac(localAnimal);
+    } else if (!gYear && _lastResolvedAnimal) {
+        _lastResolvedAnimal = null;
+        applyZodiac(null);
+    }
+    // دقیق: از سرویس بک‌اند (عنصر + جزئیات) — فقط اگر حیوان متفاوت بود جایگزین کن
+    if (gYear) {
+        var svc = await fetchZodiacFromService(gYear);
+        if (svc && svc.animal && svc.animal !== _lastResolvedAnimal) {
+            _lastResolvedAnimal = svc.animal;
+            applyZodiac(svc.animal);
+        }
+    }
 }
 
 function getBirthYearFromProject() {
-    if (window.sharedInputs && window.sharedInputs.birthDate) return window.sharedInputs.birthDate.year;
-    try {
-        var state = localStorage.getItem('yoga_state');
-        if (state) { var data = JSON.parse(state); if (data.birthYear) return data.birthYear; }
-    } catch (_) {}
-    var yearEl = document.getElementById('numYear');
-    if (yearEl && yearEl.value) return parseInt(yearEl.value);
-    return null;
+    return getGregorianBirthYear();
 }
 
 function init() {
@@ -181,36 +358,18 @@ function init() {
     dom.trigger = document.getElementById('zodiacTrigger');
 
     var year = getBirthYearFromProject();
-    if (year) {
-        var animal = getZodiacFromYear(year);
-        var data = animal ? getZodiacData(animal) : null;
-        if (animal && data) { currentZodiac = { animal: animal, data: data }; updateTopbar(animal, data); }
-        else updateTopbar(null, null);
-    } else updateTopbar(null, null);
+    resolveAndRender(year);
 
+    // کلیک روی تریگر = باز شدن پنل کشویی (هماهنگ با TOPBAR DROPDOWN COORDINATOR)
     if (dom.trigger) {
         dom.trigger.addEventListener('click', function () {
-            var y = getBirthYearFromProject();
-            if (y) { var a = getZodiacFromYear(y); var d = a ? getZodiacData(a) : null; showModal(a, d); }
-            else showModal(null, null);
+            openZodiacPanel();
         });
     }
 
-    var closeBtn = document.getElementById('zodiacModalClose');
-    var modal = document.getElementById('zodiacModal');
-    if (closeBtn) closeBtn.addEventListener('click', function () { modal.classList.remove('active'); });
-    if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) modal.classList.remove('active'); });
-
     setInterval(function () {
         var y = getBirthYearFromProject();
-        if (y) {
-            var a = getZodiacFromYear(y);
-            var d = a ? getZodiacData(a) : null;
-            if (a && d && (!currentZodiac || currentZodiac.animal !== a)) {
-                currentZodiac = { animal: a, data: d };
-                updateTopbar(a, d);
-            }
-        }
+        resolveAndRender(y);
     }, 5000);
 
     // ─── Inline sparkline on hover ───
@@ -235,8 +394,10 @@ function init() {
     }
 
     function showInlineSparkline(el) {
+        var bio = document.getElementById('zodiacBio');
+        if (!bio) return;
         // Remove any existing sparkline
-        var existing = el.parentNode.querySelector('.zodiac-bio-sparkline');
+        var existing = bio.querySelector('.zodiac-bio-sparkline');
         if (existing) existing.remove();
 
         var color = el.getAttribute('data-tt-color');
@@ -252,27 +413,35 @@ function init() {
             + buildSparkline(days, 0, cycle, color)
             + '<span class="zbs-next">' + nextText + '</span>';
 
-        el.parentNode.insertBefore(spark, el.nextSibling);
+        // شناور بالای چیپ — چیدمان نوار بالا را جابه‌جا نمی‌کند
+        spark.style.position = 'absolute';
+        spark.style.bottom = 'calc(100% + 8px)';
+        spark.style.right = '0';
+        spark.style.margin = '0';
+        el.style.position = 'relative';
+        el.appendChild(spark);
     }
 
     function hideInlineSparkline(el) {
-        var spark = el.parentNode && el.parentNode.querySelector('.zodiac-bio-sparkline');
-        if (spark) spark.remove();
+        var bio = document.getElementById('zodiacBio');
+        if (bio) {
+            var spark = bio.querySelector('.zodiac-bio-sparkline');
+            if (spark) spark.remove();
+        }
     }
 
-    function bindTooltips() {
-        document.querySelectorAll('.zodiac-bio-item[data-tooltip-rich]').forEach(function(item) {
-            item.addEventListener('mouseenter', function() { showInlineSparkline(this); });
-            item.addEventListener('mouseleave', function() { hideInlineSparkline(this); });
+    // ─── Event delegation: با re-render چیپ‌ها هم کار می‌کند ───
+    var bioHost = document.getElementById('zodiacBio');
+    if (bioHost) {
+        bioHost.addEventListener('mouseover', function (e) {
+            var item = e.target.closest('.zodiac-bio-item');
+            if (item) showInlineSparkline(item);
+        });
+        bioHost.addEventListener('mouseout', function (e) {
+            var item = e.target.closest('.zodiac-bio-item');
+            if (item && !item.contains(e.relatedTarget)) hideInlineSparkline(item);
         });
     }
-    bindTooltips();
-    // Re-bind when topbar updates
-    var _origUpdate = updateTopbar;
-    updateTopbar = function(a, d) {
-        _origUpdate(a, d);
-        setTimeout(bindTooltips, 50);
-    };
 }
 
 return {
@@ -282,11 +451,7 @@ return {
     updateTopbar: updateTopbar,
     refresh: function () {
         var y = getBirthYearFromProject();
-        if (y) {
-            var a = getZodiacFromYear(y);
-            var d = a ? getZodiacData(a) : null;
-            if (a && d) { currentZodiac = { animal: a, data: d }; updateTopbar(a, d); }
-        }
+        resolveAndRender(y);
     }
 };
 })();

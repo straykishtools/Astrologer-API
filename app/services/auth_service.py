@@ -32,7 +32,10 @@ from app.config.database import get_db
 from app.models import GuestSession, Plan, SavedChart, User
 
 # Must match the legacy auth config (shared secret key) so existing JWTs work.
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "cosmic-oracle-secret-key-change-in-production")
+# Security fix: never fall back to a known constant. app.config.security resolves
+# JWT_SECRET_KEY from the environment and, when unset (dev/test), generates a
+# random per-process key so tokens can never be forged with a guessable secret.
+from app.config.security import JWT_SECRET_KEY as SECRET_KEY  # noqa: E402
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 VERIFICATION_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
@@ -276,7 +279,9 @@ def user_response_dict(user: User) -> dict:
 # ─── Daily chart quota ───
 
 def _today() -> str:
-    return datetime.now().strftime("%Y-%m-%d")
+    # UTC — کوتیای روزانه باید با rate-limit middleware و محدودیت مهمان‌ها
+    # (که هر دو UTC هستند) یک مرز ریست داشته باشد
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
 async def _plan_limit(db: AsyncSession, plan_name: str) -> int:

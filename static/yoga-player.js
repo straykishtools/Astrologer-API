@@ -639,6 +639,34 @@ var PracticeUI = {
     init: function () {
         var el = document.getElementById(this.panelId);
         if (!el) return;
+        /* classic-studio stats strip (karma / sessions / minutes / week / last) */
+        try {
+            var k = JSON.parse(localStorage.getItem('py_karma') || '0') || 0;
+            var hist = JSON.parse(localStorage.getItem('py_history') || '[]') || [];
+            var totalMin = 0, weekCount = 0, weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+            var last = null;
+            hist.forEach(function (h) {
+                totalMin += Math.round((h.seconds || 0) / 60);
+                if (h.date && new Date(h.date) >= weekStart) weekCount++;
+                if (!last || h.date > last.date) last = h;
+            });
+            var faD = function (n) { return String(n == null ? 0 : n).replace(/[0-9]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[+d]; }); };
+            var set = function (id, v) { var e2 = document.getElementById(id); if (e2) e2.textContent = faNum(v); };
+            set('pycKarma', k);
+            set('pycSessions', hist.length);
+            set('pycTime', totalMin);
+            set('pycWeek', weekCount);
+            var lw = document.getElementById('pycLastWrap');
+            if (lw && last) {
+                lw.style.display = '';
+                var title = last.title || last.practice || '';
+                var mins = Math.max(1, Math.round((last.seconds || 0) / 60));
+                var le = document.getElementById('pycLast');
+                if (le) le.textContent = title + ' (' + faD(mins) + '′)';
+            }
+        } catch (e) {}
         var self = this;
         self._detail = false;
         D.whenReady(function () {
@@ -741,7 +769,9 @@ var PracticeUI = {
         el.innerHTML =
             '<div class="yp-selector">' +
                 '<div class="yp-selector-head"><h3>تمرین‌های آماده</h3>' +
-                    '<span class="yp-note">یک تمرین انتخاب کنید؛ سطح و مدت را تنظیم و شروع کنید</span></div>' +
+                    '<span class="yp-note">یک تمرین انتخاب کنید؛ سطح و مدت را تنظیم و شروع کنید</span>' +
+                    '<button class="yp-classic-btn" data-yp-classic title="بازسازی وفادار Pocket Yoga با صدای اصلی">🎧 استودیو کلاسیک</button>' +
+                '</div>' +
                 '<div class="yp-practice-grid">' + cards + '</div>' +
                 '<div class="yp-settings">' +
                     '<div class="yp-set"><span class="yp-set-label">سطح دشواری</span>' +
@@ -777,6 +807,18 @@ var PracticeUI = {
         this._bound = true;
         el.addEventListener('click', function (e) {
             var t = e.target;
+            // 🎧 استودیو کلاسیک — بازکردن بازسازی Pocket Yoga در مودال تمام‌صفحه
+            var classicBtn = t.closest('[data-yp-classic]');
+            if (classicBtn) {
+                var q = [];
+                if (self.selected) {
+                    q.push('practice=' + encodeURIComponent(self.selected.name));
+                    q.push('dur=' + (self.duration || 30));
+                    q.push('lvl=' + encodeURIComponent(self.level || 'beginner'));
+                }
+                YogaClassicModal.open(q.length ? '?' + q.join('&') : '');
+                return;
+            }
             // دکمه‌ی پیش‌نمایشِ داخل هر کارت — قبل از انتخاب کارت بررسی شود
             var prevBtn = t.closest('[data-yp-preview]');
             if (prevBtn) {
@@ -960,6 +1002,7 @@ var PracticeUI = {
                 '<div class="yp-stat"><b>' + faNum(done) + ' از ' + faNum(total || 0) + '</b><span>حرکت</span></div>' +
             '</div>' +
             (completed && authToken() ? '<p class="yp-note">✅ جلسه در سوابق شما ذخیره شد</p>' : '') +
+            (!authToken() ? '<p class="yp-note yp-login-hint">💡 برای ذخیره جلسات و استریک، <a href="#" onclick="window.__ypAuthReturn && window.__ypAuthReturn(); return false;">وارد شوید</a></p>' : '') +
             '<div class="yp-done-actions">' +
                 '<button class="yp-btn primary" data-yp-back-list>📚 بازگشت به تمرین‌ها</button>' +
                 '<button class="yp-btn" data-yp-back-list2>بستن</button>' +
@@ -1006,6 +1049,7 @@ var PracticeUI = {
                             '<div class="yp-stat"><b>' + faNum(total ? Math.min(100, Math.round(elapsed / (self.targetSeconds() || 1) * 100)) : 0) + '٪</b><span>تکمیل</span></div>' +
                         '</div>' +
                         (completed && authToken() ? '<p class="yp-note">✅ جلسه در سوابق شما ذخیره شد</p>' : '') +
+            (!authToken() ? '<p class="yp-note yp-login-hint">💡 برای ذخیره جلسات و استریک، <a href="#" onclick="window.__ypAuthReturn && window.__ypAuthReturn(); return false;">وارد شوید</a></p>' : '') +
                         '<div class="yp-done-actions">' +
                             '<button class="yp-btn primary" data-yp-back-list>📚 بازگشت به تمرین‌ها</button>' +
                         '</div>' +
@@ -1149,6 +1193,14 @@ var CoachUI = {
             .catch(function () { return DEFAULT_INSTRUCTORS; });
     },
 
+    refreshStats: function () {
+        // پس از لاگین — فقط بخش آمار را تازه می‌کند بدون رندر کامل پنل
+        var box = document.getElementById('yogaCoachStats');
+        if (!box) return;
+        box.innerHTML = '<span class="yp-note">در حال بارگذاری آمار…</span>';
+        this._loadStats();
+    },
+
     _loadStats: function (el) {
         var token = authToken();
         if (!token) return;
@@ -1162,6 +1214,22 @@ var CoachUI = {
                     '<div class="yp-stat"><b>' + faNum(stats.total_sessions || 0) + '</b><span>جلسه</span></div>' +
                     '<div class="yp-stat"><b>' + faNum(stats.total_minutes || 0) + '</b><span>دقیقه تمرین</span></div>' +
                     '<div class="yp-stat"><b>' + faNum(stats.streak || 0) + '</b><span>روز استریک</span></div>';
+            })
+            .catch(function () {});
+        // نشان «داده‌های شما ذخیره شده» — تولد/شهر کاربر از پروفایل ذخیره‌شده
+        fetch('/api/v5/user/profile', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (p) {
+                if (!p || !p.birth_year) return;
+                var box = document.getElementById('yogaCoachStats');
+                if (!box) return;
+                var dt = faNum(p.birth_year) + '/' + faNum(String(p.birth_month || 1).padStart(2, '0')) + '/' + faNum(String(p.birth_day || 1).padStart(2, '0'));
+                var line = '👤 ' + esc(p.name || 'کاربر') + ' · 📅 ' + dt + (p.city ? ' · 📍 ' + esc(p.city) : '') + ' — ✅ در حساب شما ذخیره شده';
+                var note = document.createElement('div');
+                note.className = 'yp-note yp-profile-note';
+                note.style.cssText = 'width:100%;font-size:11.5px;margin-top:2px;';
+                note.textContent = line;
+                box.appendChild(note);
             })
             .catch(function () {});
     },
@@ -1393,4 +1461,75 @@ window.YogaSessionPlayer = YogaSessionPlayer;
 window.YogaPracticeUI = PracticeUI;
 window.YogaCoachUI = CoachUI;
 
+/* «وارد شوید» در کارت پایان تمرین — مودال لاگین را همان‌جا باز می‌کند
+   و پس از لاگین، پنل مربی/تمرین را دوباره رندر می‌کند تا آمار و استریک ظاهر شود */
+window.__ypAuthReturn = function () {
+    if (window.onAfterLogin) {
+        window.onAfterLogin(function () {
+            try { if (window.YogaCoachUI) YogaCoachUI.init(); } catch (e) {}
+            try { if (window.YogaPracticeUI && YogaPracticeUI.refreshStats) YogaPracticeUI.refreshStats(); } catch (e) {}
+        });
+    }
+    if (window.openLoginModal) window.openLoginModal();
+    else if (window.showToast) window.showToast('برای ذخیره جلسات، ابتدا وارد شوید', 'info');
+};
+
 })();
+
+/* ════════════════════════════════════════════════════════════════
+   YogaClassicModal — fullscreen iframe modal for yoga-classic.html
+   (faithful Pocket Yoga rebuild). Listens for session-end messages
+   from the iframe and records them via the existing session API.
+   ════════════════════════════════════════════════════════════════ */
+var YogaClassicModal = {
+    _el: null,
+    open: function (query) {
+        if (this._el) { this.close(); }
+        var wrap = document.createElement('div');
+        wrap.id = 'yogaClassicModal';
+        wrap.innerHTML =
+            '<div class="ycm-backdrop"></div>' +
+            '<div class="ycm-frame">' +
+                '<button class="ycm-close" title="بستن استودیو کلاسیک">✕</button>' +
+                '<iframe src="yoga-classic.html' + (query || '') + '" allow="autoplay" allowfullscreen></iframe>' +
+            '</div>';
+        document.body.appendChild(wrap);
+        document.body.style.overflow = 'hidden';
+        this._el = wrap;
+        var self = this;
+        wrap.querySelector('.ycm-close').onclick = function () { self.close(); };
+        wrap.querySelector('.ycm-backdrop').onclick = function () { self.close(); };
+        this._msgHandler = function (ev) {
+            var d = ev.data || {};
+            if (d.source !== 'yoga-classic') return;
+            if (d.type === 'close') { self.close(); return; }
+            if (d.type === 'session-end' && d.seconds >= 30) {
+                /* record via the same session API the XML player uses */
+                try {
+                    var token = localStorage.getItem('cosmic_token') || '';
+                    fetch('/api/v5/yoga/session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({
+                            pose_id: null,
+                            pose_name: d.practice || 'Pocket Yoga Classic',
+                            category: 'asanas',
+                            duration_seconds: Math.round(d.seconds),
+                            completed: !!d.completed,
+                            notes: 'استودیو کلاسیک (' + (d.practice || '') + ')'
+                        })
+                    }).catch(function () {});
+                } catch (e) {}
+            }
+        };
+        window.addEventListener('message', this._msgHandler);
+    },
+    close: function () {
+        if (!this._el) return;
+        if (this._msgHandler) window.removeEventListener('message', this._msgHandler);
+        this._msgHandler = null;
+        this._el.remove();
+        this._el = null;
+        document.body.style.overflow = '';
+    }
+};

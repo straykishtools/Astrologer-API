@@ -173,8 +173,20 @@ var mizajState = {
 function getMizajForm() {
     return '<div class="mizaj-container">' +
         '<div class="mizaj-header">' +
-            '<h3 class="mizaj-title">🧬 تعیین مزاج</h3>' +
-            '<p class="mizaj-subtitle">طبع خود را بشناسید و توصیه‌های اختصاصی دریافت کنید</p>' +
+            '<h3 class="mizaj-title">🧬 مزاج‌شناسی — طبع خود را بشناس</h3>' +
+            '<p class="mizaj-subtitle">بر اساس طب سنتی ایرانی: چهار مزاج اصلی از ترکیبِ دو محورِ گرمی/سردی و تَری/خشکی</p>' +
+        '</div>' +
+        // ─── شفاف‌سازی سیستم ───
+        '<div style="background:rgba(162,155,254,0.06);border:1px solid rgba(162,155,254,0.25);border-radius:16px;padding:16px 18px;margin-bottom:20px;">' +
+            '<h4 style="color:#a29bfe;margin:0 0 10px;font-size:0.95rem;">🌟 مزاج‌شناسی چیست؟</h4>' +
+            '<p style="color:#ccc;font-size:0.85rem;line-height:2;margin:0 0 8px;">در طب سنتی ایرانی، هر انسان ترکیبی از <b style="color:#fdcb6e;">دو محور</b> است: <b>گرمی/سردی</b> و <b>تَری/خشکی</b>. ترکیب این دو، مزاجِ شما را می‌سازد — یکی از این چهار تیپِ اصلی:</p>' +
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0;">' +
+                '<div style="background:rgba(231,76,60,0.08);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:1.4rem;">🩸</div><b style="color:#e17055;font-size:0.8rem;">دموی</b><div style="font-size:0.68rem;color:#aaa;">گرم و تَر · عنصرِ هوا · بهار</div></div>' +
+                '<div style="background:rgba(243,156,18,0.08);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:1.4rem;">🔥</div><b style="color:#f39c12;font-size:0.8rem;">صفراوی</b><div style="font-size:0.68rem;color:#aaa;">گرم و خشک · آتش · تابستان</div></div>' +
+                '<div style="background:rgba(116,185,255,0.08);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:1.4rem;">💧</div><b style="color:#74b9ff;font-size:0.8rem;">بلغمی</b><div style="font-size:0.68rem;color:#aaa;">سرد و تَر · آب · زمستان</div></div>' +
+                '<div style="background:rgba(155,89,182,0.08);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:1.4rem;">🌑</div><b style="color:#a29bfe;font-size:0.8rem;">سوداوی</b><div style="font-size:0.68rem;color:#aaa;">سرد و خشک · خاک · پاییز</div></div>' +
+            '</div>' +
+            '<p style="color:#8fb4ff;font-size:0.78rem;line-height:1.9;margin:0;">💡 مزاجِ شما مثلِ اثرِ انگشت است: فیزیکِ بدن، خلق‌وخو، خواب و گوارش‌تان را شکل می‌دهد. شناختنش یعنی دانستنِ اینکه چه غذایی، چه خوابی و چه سبکِ زندگی‌ای با شما سازگار است. این آزمون‌ها <b>تشخیصِ پزشکی نیستند</b> — ابزارِ خودشناسیِ سنتی‌اند.</p>' +
         '</div>' +
         '<div id="mizaj-test-list">' + renderMizajTestList() + '</div>' +
         '<div id="mizaj-questions-area" style="display:none;"></div>' +
@@ -258,18 +270,69 @@ function renderMizajQuestions(test) {
     html += '<span class="mizaj-q-count">' + test.questionCount + ' سوال · ' + test.duration + '</span>';
     html += '</div>';
 
+    // نوار پیشرفت
+    html += '<div style="background:rgba(255,255,255,0.05);border-radius:8px;height:6px;overflow:hidden;margin:10px 0 16px;">' +
+        '<div id="mizajProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#a29bfe,#fdcb6e);transition:width .3s;"></div></div>';
+
     html += '<div class="mizaj-q-block">';
     test.questions.forEach(function(q, i) {
-        html += '<div class="form-group mizaj-q">';
-        html += '<label>' + (i + 1) + '. ' + q + '</label>';
-        html += '<select id="' + test.id + '_q' + (i + 1) + '" class="abjad-input">' + test.options() + '</select>';
-        html += '</div>';
+        html += '<div class="mizaj-q-card" id="mizaj-qcard-' + (i + 1) + '" style="background:rgba(0,0,0,0.2);border-radius:12px;padding:14px 16px;margin:10px 0;border:1px solid rgba(255,255,255,0.04);">';
+        html += '<div style="color:#fdcb6e;font-size:0.85rem;font-weight:700;margin-bottom:10px;">' + (i + 1) + '. ' + q + '</div>';
+        html += '<div class="mizaj-q-options" data-q="' + (i + 1) + '" style="display:flex;flex-wrap:wrap;gap:8px;">';
+        // گزینه‌های دکمه‌ای بر اساس نوع آزمون
+        var opts = test.id === 'smq' ? ['بسیار کم', 'کم', 'متوسط', 'زیاد', 'بسیار زیاد'] : null;
+        if (test.id === 'mmq') opts = ['کم/سرد', 'متوسط', 'زیاد/گرم'];
+        else if (test.id === 'quick') opts = ['گزینه ۱', 'گزینه ۲', 'گزینه ۳'];
+        else if (test.id === 'dosha') opts = ['گزینه ۱', 'گزینه ۲', 'گزینه ۳'];
+        (opts || ['۱','۲','۳','۴','۵']).forEach(function(label, oi) {
+            var val = oi + 1;
+            var sel = (test.id === 'smq' && val === 3) || (test.id !== 'smq' && val === 2);
+            html += '<button type="button" class="mizaj-opt' + (sel ? ' mizaj-opt-sel' : '') + '" data-q="' + (i + 1) + '" data-val="' + val + '"' +
+                ' onclick="mizajPickOpt(this)"' +
+                ' style="flex:1;min-width:72px;padding:9px 6px;border-radius:10px;border:1px solid rgba(162,155,254,0.25);background:' + (sel ? 'rgba(253,203,110,0.15)' : 'rgba(255,255,255,0.03)') + ';color:' + (sel ? '#fdcb6e' : '#bbb') + ';font-size:0.78rem;cursor:pointer;transition:all .15s;font-family:inherit;">' + label + '</button>';
+        });
+        html += '</div></div>';
     });
     html += '</div>';
 
-    html += '<button class="btn-primary" onclick="submitMizaj()">🧬 محاسبه مزاج</button>';
+    // مقدارهای مخفی برای submit
+    test.questions.forEach(function(q, i) {
+        var defaultVal = test.id === 'smq' ? 3 : 2;
+        html += '<input type="hidden" id="' + test.id + '_q' + (i + 1) + '" value="' + defaultVal + '">';
+    });
+
+    html += '<button class="btn-primary" onclick="submitMizaj()" style="margin-top:16px;">🧬 محاسبه مزاج</button>';
     return html;
 }
+
+// انتخاب گزینه‌ی دکمه‌ای
+function mizajPickOpt(btn) {
+    var q = btn.getAttribute('data-q');
+    var val = btn.getAttribute('data-val');
+    var test = mizajState.activeTest;
+    if (!test) return;
+    // مقدار مخفی
+    var hidden = document.getElementById(test.id + '_q' + q);
+    if (hidden) hidden.value = val;
+    // ظاهرِ دکمه‌ها
+    document.querySelectorAll('.mizaj-q-options[data-q="' + q + '"] .mizaj-opt').forEach(function (b) {
+        var sel = b === btn;
+        b.classList.toggle('mizaj-opt-sel', sel);
+        b.style.background = sel ? 'rgba(253,203,110,0.15)' : 'rgba(255,255,255,0.03)';
+        b.style.color = sel ? '#fdcb6e' : '#bbb';
+        b.style.borderColor = sel ? '#fdcb6e' : 'rgba(162,155,254,0.25)';
+    });
+    // نوار پیشرفت (بر اساس تعدادِ تغییر یافته از پیش‌فرض)
+    var answered = 0;
+    for (var i = 1; i <= test.questionCount; i++) {
+        var h = document.getElementById(test.id + '_q' + i);
+        var def = test.id === 'smq' ? 3 : 2;
+        if (h && parseInt(h.value, 10) !== def) answered++;
+    }
+    var bar = document.getElementById('mizajProgressBar');
+    if (bar) bar.style.width = Math.round((answered / test.questionCount) * 100) + '%';
+}
+window.mizajPickOpt = mizajPickOpt;
 
 function backToMizajTests() {
     mizajState.activeTest = null;
@@ -358,34 +421,84 @@ function renderMizajGauge(id, percent, colorFrom, colorTo, label, valueText) {
 }
 
 function displayMizajResult(data) {
-    var recs = (data.recommendations || [])
-        .map(function(r) { return '<li class="mizaj-rec">✅ ' + _mizajEsc(r) + '</li>'; }).join('');
-
-    var axes = mizajAxesFromTemperament(data.temperament);
+    var profile = data.profile || {};
+    var advice = data.advice || {};
+    var scores = data.scores || {};
 
     var test = mizajState.activeTest;
     var testInfo = test ? '<span class="mizaj-result-test-info">' + _mizajEsc(test.categoryEmoji + ' ' + test.name) + ' (' + test.questionCount + ' سوال)</span>' : '';
 
-    document.getElementById('mizaj-result').innerHTML =
+    // محورها از scores دقیق (نه حدسِ اسم)
+    var hotPct = scores.hot_percent != null ? scores.hot_percent : mizajAxesFromTemperament(data.temperament).hot;
+    var coldPct = 100 - hotPct;
+    var wetPct, dryPct;
+    if (data.humidity_status === 'تر') { wetPct = 75; dryPct = 25; }
+    else if (data.humidity_status === 'خشک') { wetPct = 25; dryPct = 75; }
+    else { wetPct = 50; dryPct = 50; }
+
+    function adviceBox(icon, title, items, color) {
+        if (!items || !items.length) return '';
+        return '<div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,0.03);border-radius:10px;border-right:3px solid ' + color + ';">' +
+            '<b style="color:' + color + ';font-size:0.85rem;">' + icon + ' ' + title + '</b>' +
+            '<ul style="margin:6px 0 0;padding-right:18px;color:#ccc;font-size:0.82rem;line-height:2;">' +
+            items.map(function (i) { return '<li>' + _mizajEsc(i) + '</li>'; }).join('') + '</ul></div>';
+    }
+
+    var html =
         '<div class="mizaj-result-card">' +
             '<div class="mizaj-result-head">' +
                 '<button class="mizaj-back-btn" onclick="backToMizajTests()">→ آزمون‌های دیگر</button>' +
-                '<h4 class="mizaj-result-title">🧬 مزاج: ' + _mizajEsc(data.temperament) + '</h4>' +
+                '<h4 class="mizaj-result-title">' + (profile.name || ('مزاج: ' + _mizajEsc(data.temperament))) + '</h4>' +
                 testInfo +
                 '<span class="mizaj-questionnaire-tag">' + _mizajEsc(data.questionnaire) + '</span>' +
             '</div>' +
+
+            // شناسنامه مزاج
+            (profile.element ?
+                '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:14px 0;">' +
+                    '<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:0.68rem;color:#888;">عنصر</div><b style="color:#fdcb6e;font-size:0.85rem;">' + _mizajEsc(profile.element) + '</b></div>' +
+                    '<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:0.68rem;color:#888;">فصل</div><b style="color:#fdcb6e;font-size:0.85rem;">' + _mizajEsc(profile.season) + '</b></div>' +
+                    '<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:0.68rem;color:#888;">اخلاط</div><b style="color:#fdcb6e;font-size:0.85rem;">' + _mizajEsc(profile.humor) + '</b></div>' +
+                    '<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:0.68rem;color:#888;">مزاج سنتی</div><b style="color:#fdcb6e;font-size:0.85rem;">' + _mizajEsc(data.temperament) + '</b></div>' +
+                '</div>' : '') +
+
+            // گیج‌ها
             '<div class="mizaj-gauges">' +
-                renderMizajGauge('hot', axes.hot, '#ffcf5c', '#ff6b4a', 'گرمی', axes.hot + '٪') +
-                renderMizajGauge('cold', axes.cold, '#5cc9ff', '#3fa7ff', 'سردی', axes.cold + '٪') +
-                renderMizajGauge('wet', axes.wet, '#00d2a0', '#3fa7ff', 'تَری', axes.wet + '٪') +
-                renderMizajGauge('dry', axes.dry, '#ffb454', '#ff5f6d', 'خشکی', axes.dry + '٪') +
+                renderMizajGauge('hot', hotPct, '#ffcf5c', '#ff6b4a', 'گرمی', hotPct + '٪') +
+                renderMizajGauge('cold', coldPct, '#5cc9ff', '#3fa7ff', 'سردی', coldPct + '٪') +
+                renderMizajGauge('wet', wetPct, '#00d2a0', '#3fa7ff', 'تَری', wetPct + '٪') +
+                renderMizajGauge('dry', dryPct, '#ffb454', '#ff5f6d', 'خشکی', dryPct + '٪') +
             '</div>' +
-            '<p class="mizaj-desc">' + _mizajEsc(data.description) + '</p>' +
-            '<div class="mizaj-recs-box">' +
-                '<h5 class="mizaj-recs-title">💡 توصیه‌ها:</h5>' +
-                '<ul class="mizaj-recs-list">' + recs + '</ul>' +
+
+            // شخصیت
+            (profile.personality ?
+                '<div style="margin-top:14px;padding:14px 16px;background:rgba(253,203,110,0.05);border-right:3px solid rgba(253,203,110,0.45);border-radius:10px;line-height:2;color:#ddd;font-size:0.88rem;">' +
+                '<b style="color:#fdcb6e;">🌟 خلق‌وخو:</b> ' + _mizajEsc(profile.personality) + '</div>' : '') +
+
+            // بدن
+            (profile.body ?
+                '<div style="margin-top:10px;padding:12px 16px;background:rgba(255,255,255,0.03);border-right:3px solid rgba(116,185,255,0.4);border-radius:10px;line-height:2;color:#ccc;font-size:0.85rem;">' +
+                '<b style="color:#74b9ff;">🫀 ویژگی‌های جسمی:</b> ' + _mizajEsc(profile.body) + '</div>' : '') +
+
+            // ریسک‌ها
+            (profile.risks ?
+                '<div style="margin-top:10px;padding:12px 16px;background:rgba(231,76,60,0.05);border-right:3px solid rgba(231,76,60,0.4);border-radius:10px;line-height:2;color:#ccc;font-size:0.85rem;">' +
+                '<b style="color:#e17055;">⚠️ آمادگی‌های مزاجی (نه تشخیص پزشکی):</b> ' + _mizajEsc(profile.risks) + '</div>' : '') +
+
+            '<p class="mizaj-desc" style="margin-top:12px;">' + _mizajEsc(data.description) + '</p>' +
+
+            // توصیه‌ها با تفکیک
+            '<div class="mizaj-recs-box" style="margin-top:14px;">' +
+                '<h5 class="mizaj-recs-title">💡 برنامه‌ی تعادل مزاج شما</h5>' +
+                adviceBox('🍽️', 'تغذیه', advice.diet, '#2ecc71') +
+                adviceBox('🌅', 'سبک زندگی', advice.lifestyle, '#74b9ff') +
+                adviceBox('🧠', 'رفتار و ذهن', advice.behavioral, '#a29bfe') +
+                (advice.seasonal ? '<div style="margin-top:10px;padding:12px 14px;background:rgba(243,156,18,0.06);border-right:3px solid rgba(243,156,18,0.4);border-radius:10px;line-height:2;color:#ccc;font-size:0.82rem;"><b style="color:#f39c12;">🍂 نکته‌ی فصلی:</b> ' + _mizajEsc(advice.seasonal) + '</div>' : '') +
+                (profile.balance_note ? '<div style="margin-top:10px;padding:12px 14px;background:rgba(46,204,113,0.06);border-right:3px solid rgba(46,204,113,0.4);border-radius:10px;line-height:2;color:#ccc;font-size:0.85rem;"><b style="color:#2ecc71;">⚖️ کلیدِ تعادل شما:</b> ' + _mizajEsc(profile.balance_note) + '</div>' : '') +
             '</div>' +
         '</div>';
+
+    document.getElementById('mizaj-result').innerHTML = html;
 
     // انیمیشن پر شدن گیج‌ها
     requestAnimationFrame(function() {

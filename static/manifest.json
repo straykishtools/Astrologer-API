@@ -1,0 +1,21 @@
+{
+    "name": "Cosmic Oracle — رصدخانه‌ی کیهانی",
+    "short_name": "Cosmic Oracle",
+    "description": "چارت تولد حرفه‌ای، فال حافظ و تاروت، بیوریتم، مزاج‌شناسی و وضعیت زنده‌ی آسمان و زمین",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#070c1f",
+    "theme_color": "#0c1430",
+    "lang": "fa",
+    "dir": "rtl",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/static/images/ui/logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "categories": ["lifestyle", "health", "entertainment"]
+}

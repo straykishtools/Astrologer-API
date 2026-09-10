@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>یوگای جیبی — Cosmic</title>
+<!--
+  ══════════════════════════════════════════════════════════════
+  POCKET YOGA — WEB REBUILD (faithful port, Persian UI)
+  Source: static/yoga-data/resources/  (assets/*.xml + res/*)
+    - res/layout/*.xml      → screen structures & metrics
+    - res/values/*.xml      → colors, styles, strings, dimens
+    - assets/*.session      → practice sequence data (v2 format)
+    - res/raw/*.ogg         → voice cues (moves/poses/numbers/general)
+    - res/drawable-*        → backgrounds, pose art, buttons, icons
+  Texts:  فارسی — حرکات از static/yoga.txt (name_fa/description_fa/
+          benefits_fa) و رابط کاربری RTL با فونت Vazirmatn.
+  Layout: desktop-first player (stage + info panel + timeline),
+          responsive down to mobile.
+  ══════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --colorPrimary:#1f70a1;
+  --colorPrimaryDark:#1b5f89;
+  --colorAccent:#fe9400;
+  --colorAccentOnWhite:#5caddd;
+  --listBackground:#edf8fd;
+  --history-bg:#cae9fc;
+  --history-divider:#b2d0e9;
+  --history-label:#666666;
+  --history-label-light:#999999;
+  --history-value:#333333;
+  --segmented:#5caddd;
+  --bar-black:#000000;
+  --store-grey:#666666;
+  --panel-dark:rgba(0,0,0,.62);
+  --panel-radius:24px;
+  --glass:rgba(10,14,26,.42);
+  --glass-line:rgba(255,255,255,.14);
+  --gold:#f9d976;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  background:#000;color:#fff;
+  font-family:'Vazirmatn',system-ui,sans-serif;
+  font-size:15px;line-height:1.7;
+  overflow:hidden;user-select:none;
+}
+img{-webkit-user-drag:none;}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
+code,digits{font-variant-numeric:tabular-nums;}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;overflow:hidden;}
+.screen.show{display:flex;}
+
+/* ── BackgroundView ── */
+.bgview{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;}
+.bgview::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(120% 90% at 50% 42%, transparent 52%, rgba(0,0,0,.4));
+}
+
+/* ── SplitToolbar (home.xml) ── */
+.split-toolbar{
+  position:relative;z-index:5;
+  display:flex;align-items:stretch;justify-content:space-around;
+  background:var(--colorPrimary);min-height:58px;
+}
+.split-toolbar .st-btn{
+  flex:1;max-width:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;color:#fff;font-size:11px;opacity:.93;padding:7px 0;transition:.15s;
+}
+.split-toolbar .st-btn img{width:25px;height:25px;object-fit:contain;}
+.split-toolbar .st-btn:hover{background:rgba(255,255,255,.1);}
+
+/* ── Home — three-column: info | practice (real-size pose) | details ── */
+#scr-home .home-top{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;overflow:hidden;}
+#homeLogo{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:min(30%,300px);opacity:.95;z-index:2;pointer-events:none;}
+#pager{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;touch-action:pan-y;}
+#pagerTrack{display:flex;height:100%;width:100%;will-change:transform;transition:transform .45s cubic-bezier(.25,.8,.3,1);}
+#pagerTrack.no-anim{transition:none;}
+.practice-card{
+  flex:0 0 100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding:0 0 60px;cursor:pointer;position:relative;
+}
+/* real-size pose — transparent PNG standing on the mat.
+   Measured from bg_l1_studio.jpg: mat surface spans 71.3%–75% of the
+   image height. Lift reduced again so the feet land on the mat. */
+.practice-card{
+  padding-bottom:12vh;
+}
+.practice-card .pc-img{
+  height:min(48vh,460px);width:auto;max-width:88vw;
+  object-fit:contain;object-position:bottom;margin-top:12px;
+  filter:drop-shadow(0 10px 22px rgba(0,0,0,.35));
+  transition:transform .3s;
+}
+.practice-card .pc-row{
+  display:flex;align-items:flex-end;justify-content:center;gap:1.5vw;width:100%;
+}
+/* subtle slide/fade when the name box re-renders on practice change */
+@keyframes pcIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.practice-card .pc-name.swap{animation:pcIn .38s ease both;}
+.practice-card .pc-sub.swap{animation:pcIn .38s ease .05s both;}
+.practice-card:hover .pc-img{transform:translateY(-4px);}
+/* name pill — dark translucent, stacked ABOVE the pose image */
+.practice-card .pc-name{
+  position:relative;z-index:2;
+  background:rgba(12,20,34,.62);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.22);border-radius:16px;
+  padding:7px 26px;white-space:nowrap;
+  font-size:24px;font-weight:900;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5);
+}
+.practice-card .pc-sub{
+  position:relative;z-index:2;margin-top:6px;
+  background:rgba(12,20,34,.5);backdrop-filter:blur(8px);
+  border-radius:12px;padding:3px 16px;white-space:nowrap;
+  font-size:12.5px;color:rgba(255,255,255,.95);text-shadow:0 1px 6px rgba(0,0,0,.6);
+}
+/* side info — welcome (left) and practice details (right) */
+.home-side{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:min(300px,26vw);
+}
+.home-side.left{right:calc(50% + min(29vw,320px));}
+.home-side.right{left:calc(50% + min(29vw,320px));}
+.side-card{
+  background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(14px);
+  border-radius:18px;padding:18px 20px;color:#fff;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.side-card h2{font-size:19px;font-weight:900;margin-bottom:6px;}
+.side-card p{font-size:13px;line-height:2;color:rgba(255,255,255,.88);}
+.side-card .hint{margin-top:10px;font-size:11.5px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:6px;}
+.side-card .hint img{width:14px;height:14px;filter:invert(1);opacity:.7;}
+/* details card rows */
+.side-card .d-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.1);}
+.side-card .d-row:last-of-type{border-bottom:none;}
+.side-card .d-row .k{color:rgba(255,255,255,.65);}
+.side-card .d-row .v{font-weight:800;}
+.side-card .d-row .v .chipv{
+  display:inline-block;background:rgba(255,255,255,.14);border-radius:12px;padding:1px 12px;font-size:12px;
+}
+/* nav buttons — neighbor-name pills, 17% lower (bottom-relative).
+   RTL: right pill = previous practice (arrow →right),
+        left pill  = next practice (arrow →left).
+   Hidden entirely when there is no neighbor. */
+.home-nav{
+  position:absolute;bottom:7%;z-index:4;
+  display:none;                       /* shown by JS when a neighbor exists */
+  align-items:center;gap:10px;
+  background:linear-gradient(135deg, rgba(31,112,161,.88), rgba(27,95,137,.78));
+  border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(14px);
+  border-radius:28px;padding:12px 22px;
+  color:#fff;font-size:14.5px;font-weight:800;
+  box-shadow:0 10px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.25);
+  transition:.18s;cursor:pointer;white-space:nowrap;
+  text-shadow:0 1px 4px rgba(0,0,0,.35);
+}
+.home-nav.show{display:inline-flex;}
+.home-nav:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.25);}
+.home-nav:active{transform:translateY(0) scale(.97);}
+.home-nav .dir{font-size:11px;font-weight:700;opacity:.75;display:block;line-height:1;}
+.home-nav .lbl{display:flex;flex-direction:column;align-items:center;line-height:1.3;}
+.home-nav img{width:20px;height:20px;filter:invert(1) drop-shadow(0 1px 3px rgba(0,0,0,.4));}
+.home-nav.prev{right:calc(50% - min(34vw,400px));}
+.home-nav.next{left:calc(50% - min(34vw,400px));}
+.home-nav.prev img{transform:scaleX(-1);}  /* mirror: point right */
+#indicator{position:absolute;bottom:16px;left:0;right:0;height:20px;display:flex;align-items:center;justify-content:center;gap:9px;z-index:3;}
+#indicator .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.45);transition:.25s;cursor:pointer;}
+#indicator .dot.on{background:#fff;transform:scale(1.3);}
+
+/* inline options form — popover from the details card, scene stays visible */
+#optionsPop{
+  position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);
+  width:min(400px,92vw);opacity:0;pointer-events:none;transition:.25s;
+  background:var(--panel-dark);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:20px 22px 18px;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+}
+#optionsPop.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
+#optionsPop h3{font-size:17px;font-weight:900;margin-bottom:2px;}
+#optionsPop .op-desc{font-size:12px;color:rgba(255,255,255,.8);line-height:1.9;max-height:84px;overflow-y:auto;margin-bottom:8px;}
+#optionsPop .opt-label{font-size:12.5px;margin-top:10px;color:rgba(255,255,255,.85);font-weight:700;}
+#optionsPop .spinner{margin-top:4px;background:rgba(28,32,44,.85);}
+#optionsPop .spinner select{padding:9px 12px;font-size:13.5px;}
+#optionsPop .spinner select.unselected{color:rgba(255,255,255,.45);}
+#optionsPop .spinner select option{background:#1e2430;color:#fff;} /* dropdown items readable */
+#optionsPop .op-actions{display:flex;gap:10px;margin-top:16px;}
+#optionsPop .btn-start{
+  flex:1;padding:11px;border-radius:10px;font-size:15px;font-weight:900;
+  background:linear-gradient(135deg,var(--colorAccent),#ffc46a);color:#241300;
+}
+#optionsPop .btn-cancel{
+  padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:700;
+  background:rgba(255,255,255,.12);border:1px solid var(--glass-line);
+}
+
+/* ── Options ── */
+.options-scroll{position:relative;z-index:2;flex:1;overflow-y:auto;padding:8px;display:flex;justify-content:center;}
+.opt-panel{
+  background:var(--panel-dark);backdrop-filter:blur(10px);
+  border-radius:var(--panel-radius);padding:10px 20px 20px;
+  width:min(560px,100%);height:fit-content;margin:12px auto;
+}
+.opt-panel h1{font-size:24px;font-weight:900;padding:10px 0 4px;}
+.opt-panel .desc{font-size:13.5px;color:rgba(255,255,255,.94);white-space:pre-line;}
+.opt-label{font-size:14px;margin-top:16px;color:#fff;font-weight:700;}
+.spinner{position:relative;margin-top:6px;background:rgba(28,32,44,.9);border-radius:8px;border:1px solid rgba(255,255,255,.22);}
+.spinner select{
+  appearance:none;-webkit-appearance:none;width:100%;background:transparent;color:#fff;
+  border:none;padding:11px 14px;font-size:15px;font-family:inherit;outline:none;cursor:pointer;
+}
+.spinner::after{
+  content:'';position:absolute;left:14px;top:50%;
+  width:8px;height:8px;border-right:2px solid #fff;border-bottom:2px solid #fff;
+  transform:translateY(-70%) rotate(-45deg);pointer-events:none;
+}
+#optStart{
+  display:block;margin:24px auto 8px;padding:13px 52px;border-radius:10px;
+  background:linear-gradient(135deg,var(--colorAccent),#ffc46a);color:#241300;
+  font-size:17px;font-weight:900;box-shadow:0 4px 14px rgba(254,148,0,.35);transition:.15s;
+}
+#optStart:hover{filter:brightness(1.06);transform:translateY(-1px);}
+#optStart:active{transform:translateY(0);}
+.opt-karma-hint{margin-top:14px;text-align:center;font-size:12px;color:rgba(255,255,255,.6);}
+.back-btn{position:absolute;top:10px;right:10px;z-index:6;padding:8px;border-radius:50%;transition:.15s;}
+.back-btn:hover{background:rgba(0,0,0,.3);}
+.back-btn img{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7));}
+
+/* ── Preview ── */
+.appbar{position:relative;z-index:5;background:var(--colorPrimary);}
+.appbar .tb{display:flex;align-items:center;min-height:56px;padding:0 10px;}
+.appbar .tb .tb-title{flex:1;color:#fff;font-size:18px;font-weight:800;padding:0 10px;}
+.appbar .tb .tb-karma{display:flex;align-items:center;gap:5px;color:#fff;font-size:18px;font-weight:700;padding-left:12px;}
+.appbar .tb .tb-karma img{width:20px;height:20px;}
+.appbar .tb button img{width:28px;height:28px;object-fit:contain;filter:invert(1);}
+#previewWhite{position:relative;z-index:2;flex:1;overflow:hidden;display:flex;flex-direction:column;background:#fff;}
+#previewScroll{flex:1;overflow-y:auto;}
+#previewGrid{display:grid;grid-template-columns:repeat(auto-fill,75px);justify-content:center;padding-top:6px;}
+.pv-cell{width:75px;height:150px;position:relative;}
+.pv-cell .pv-duration{
+  position:absolute;top:20px;left:50%;transform:translateX(-50%);
+  min-width:27px;height:27px;line-height:27px;padding:0 10px;
+  background:url('static/yoga-data/resources/res/drawable-mdpi/timeline_property_border_print.png') center/100% 100% no-repeat;
+  font-size:12px;font-weight:700;color:#666;text-align:center;direction:ltr;
+}
+.pv-cell .pv-icon{position:absolute;top:34px;left:50%;transform:translateX(-50%);width:75px;height:75px;object-fit:contain;}
+.pv-cell .pv-count{position:absolute;top:2px;left:0;right:0;text-align:center;font-size:10px;color:#999;}
+.pv-key{max-width:360px;margin:16px auto;padding:0 16px 20px;}
+.pv-key .kv{display:flex;align-items:center;gap:12px;margin:6px 0;font-size:14px;color:#333;}
+.pv-key .kv img{width:40px;height:40px;object-fit:contain;}
+
+/* ════════════════════════════════════════════════════════════
+   PLAYER — faithful to Pocket Yoga Teacher reference:
+   blue gradient header w/ in-header timeline + duration bubbles,
+   caret marker, full-bleed environment, transparent pose art on
+   the mat, floating circular play button, sliding poses panel.
+   ════════════════════════════════════════════════════════════ */
+#scr-yoga{background:#000;}
+#yogaBackground{
+  position:absolute;inset:0;z-index:0;
+  background-size:cover;background-position:center bottom;
+}
+/* blue gradient header (full-width, like reference) */
+.yoga-header{
+  position:relative;z-index:7;
+  background:linear-gradient(180deg,#3d8fc4 0%,#2a6fa0 55%,#1f5c8b 100%);
+  box-shadow:0 2px 14px rgba(0,0,0,.35);
+}
+.yh-row{display:flex;align-items:center;height:46px;padding:0 10px;gap:4px;}
+.yh-row .spacer{flex:1;}
+.yh-btn{
+  width:38px;height:38px;display:grid;place-items:center;border-radius:10px;transition:.15s;
+}
+.yh-btn:hover{background:rgba(255,255,255,.14);}
+.yh-btn img{width:20px;height:20px;filter:invert(1);}
+.yh-title{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-size:16px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.3);
+  width:max-content;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.yh-clock{
+  position:absolute;left:12px;top:8px;display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:800;color:#fff;direction:ltr;font-variant-numeric:tabular-nums;
+  background:rgba(0,0,0,.22);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.2);
+  padding:3px 12px;border-radius:14px;
+}
+.yh-clock img{width:14px;height:14px;filter:invert(1);}
+
+/* in-header timeline — inner strip is LTR space (dir=ltr on the node);
+   cards are appended in REVERSE so the first pose starts at the right
+   edge, giving an RTL feel with clean LTR transform math. */
+.yh-strip{
+  position:relative;height:64px;overflow:hidden;user-select:none;direction:ltr;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
+}
+.yh-strip-inner{
+  position:absolute;top:0;bottom:0;left:0;display:flex;align-items:flex-end;gap:2px;padding:0 10px;
+  transition:transform .45s cubic-bezier(.3,.8,.3,1);will-change:transform;touch-action:pan-y;
+}
+.yh-strip.dragging .yh-strip-inner{transition:none;}
+.tl-card{
+  flex:0 0 auto;width:58px;height:64px;cursor:pointer;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  opacity:.62;transition:opacity .25s, transform .25s;
+}
+.tl-card img{width:46px;height:52px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));}
+.tl-card .tl-bubble{
+  position:absolute;top:2px;left:50%;transform:translateX(-50%);
+  min-width:22px;height:16px;line-height:16px;padding:0 6px;border-radius:9px;
+  background:rgba(255,255,255,.92);color:#1c4d70;font-size:9.5px;font-weight:800;
+  text-align:center;direction:ltr;box-shadow:0 1px 3px rgba(0,0,0,.3);white-space:nowrap;
+}
+.tl-card .tl-bubble.loop{
+  width:20px;height:20px;line-height:17px;min-width:20px;border-radius:50%;
+  background:rgba(255,255,255,.95);border:2px solid #1c4d70;color:#1c4d70;font-size:10px;padding:0;
+}
+.tl-card .tl-idx{
+  position:absolute;top:1px;right:4px;min-width:15px;height:15px;line-height:15px;
+  padding:0 3px;border-radius:8px;background:rgba(20,60,90,.85);color:#fff;
+  font-size:9px;font-weight:800;text-align:center;direction:ltr;
+}
+.tl-card .tl-half{position:absolute;top:22px;left:5px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);}
+.tl-card.past{opacity:.28;}
+.tl-card.cur{opacity:1;transform:scale(1.12);z-index:2;}
+.tl-card.cur::before{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-bottom:9px solid rgba(255,255,255,.95);
+  filter:drop-shadow(0 -1px 2px rgba(0,0,0,.2));
+}
+.tl-card:hover{opacity:1;}
+/* wave divider between header and environment */
+.yoga-header::after{
+  content:'';position:absolute;left:0;right:0;bottom:-1px;height:14px;
+  background:var(--env-wave, transparent);
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 14" preserveAspectRatio="none"><path d="M0 14 C 240 0 480 0 720 7 C 960 14 1200 14 1440 4 L 1440 14 Z" fill="black"/></svg>') center/cover no-repeat;
+  mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 14" preserveAspectRatio="none"><path d="M0 14 C 240 0 480 0 720 7 C 960 14 1200 14 1440 4 L 1440 14 Z" fill="black"/></svg>') center/cover no-repeat;
+  opacity:.35;
+}
+
+/* stage — full-bleed; carousel centered. Cover-crop aware: the 2048×1212
+   bg is width-constrained on desktop (image height > viewport), so the
+   mat surface (71.3%–75% of image) lands ~74–79% down the section.
+   Feet must sit there → padding-bottom ≈ 24vh (2vh was way too low). */
+.yoga-stage{
+  position:relative;z-index:2;flex:1;min-height:0;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:24vh;
+}
+/* prev → current → next carousel */
+.pose-carousel{
+  position:relative;display:flex;align-items:flex-end;justify-content:center;gap:1.5vw;
+  width:100%;
+}
+.pc-side{
+  position:relative;flex:0 0 auto;width:15vw;max-width:190px;min-width:96px;
+  height:min(38vh,360px);display:flex;align-items:flex-end;justify-content:center;
+  opacity:.38;filter:grayscale(.35) brightness(.92);
+  transition:opacity .3s, filter .3s;cursor:pointer;
+}
+.pc-side:hover{opacity:.6;filter:none;}
+.pc-side img{max-width:100%;max-height:100%;object-fit:contain;object-position:bottom center;}
+.pc-side .pc-tag{
+  position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+  font-size:10.5px;font-weight:800;color:#fff;white-space:nowrap;
+  background:rgba(12,20,34,.5);backdrop-filter:blur(8px);
+  border-radius:10px;padding:2px 12px;
+}
+.pc-side.empty{opacity:0;pointer-events:none;}
+.pc-center{
+  position:relative;flex:0 0 auto;
+  height:min(56vh,520px);display:flex;align-items:flex-end;justify-content:center;
+}
+#yogaPose{
+  max-height:100%;width:auto;max-width:44vw;
+  object-fit:contain;object-position:bottom center;
+  animation:poseFade .4s ease both;
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,.32));
+}
+@keyframes poseFade{0%{opacity:0;transform:scale(.985) translateY(8px);}100%{opacity:1;transform:none;}}
+/* pose name pill — sits directly on top of the pose image (inside
+   pc-center, anchored to its top edge) */
+.pose-pill{
+  position:absolute;bottom:60%;right:calc(100% + 40px);
+  margin-bottom:6px;z-index:6;
+  background:rgba(12,20,34,.62);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.22);border-radius:16px;
+  padding:8px 22px;text-align:left;max-width:40vw;white-space:nowrap;
+}
+.pose-pill .nm{font-size:17px;font-weight:900;text-shadow:0 1px 6px rgba(0,0,0,.6);}
+.pose-pill .sk{font-size:11.5px;color:rgba(255,255,255,.85);font-style:italic;}
+.pose-pill .en{font-size:10.5px;color:rgba(255,255,255,.6);direction:ltr;}
+
+/* single centered transport dock: prev | play | next | volume */
+.transport-cluster{
+  position:absolute;left:50%;bottom:22px;transform:translateX(-50%);
+  z-index:6;
+  display:flex;align-items:center;gap:14px;
+  background:rgba(12,20,34,.55);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.24);border-radius:36px;
+  padding:9px 20px;
+  box-shadow:0 12px 34px rgba(0,0,0,.45);
+}
+#uiPlay{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--colorAccent),var(--gold));
+  border:none;display:grid;place-items:center;transition:.18s;
+  box-shadow:0 6px 18px rgba(243,156,18,.4);
+}
+#uiPlay:hover{transform:scale(1.06);}
+#uiPlay img{width:24px;height:24px;filter:brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,.25));}
+.tbtn-labeled{
+  width:46px;height:46px;padding:0;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  transition:.15s;
+}
+.tbtn-labeled:hover{background:rgba(255,255,255,.28);}
+.tbtn-labeled img{width:19px;height:19px;filter:invert(1);}
+/* volume inside the same bar — separated by a subtle divider */
+.vol-divider{width:1px;height:30px;background:rgba(255,255,255,.18);}
+.vol-inline{display:flex;align-items:center;gap:7px;}
+.vol-inline img{width:16px;height:16px;filter:invert(1);opacity:.85;}
+#uiVolume{
+  width:92px;appearance:none;-webkit-appearance:none;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.35);outline:none;
+}
+#uiVolume::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.6);cursor:pointer;}
+
+/* seek bar — timer flanks equal (3% side padding), thumb tooltip
+   (current pose) snaps to the scrub head; LTR time pair. */
+.seek-wrap{
+  position:absolute;left:3%;right:3%;bottom:104px;z-index:5;
+  display:flex;align-items:center;gap:14px;
+}
+.seek-wrap .t-time{
+  font-size:15px;font-weight:800;color:#fff;min-width:64px;
+  text-align:center;direction:ltr;font-variant-numeric:tabular-nums;
+  background:rgba(12,20,34,.55);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:5px 12px;
+  flex:0 0 auto;
+}
+#uiProgress{
+  flex:1;height:9px;background:rgba(0,0,0,.38);border-radius:6px;
+  cursor:pointer;position:relative;
+}
+#uiProgressFill{height:100%;width:0;background:linear-gradient(-90deg,var(--colorAccent),var(--gold));border-radius:6px;position:relative;}
+/* scrub head + attached pose tooltip, rides the fill edge */
+#uiProgressFill::after{
+  content:'';position:absolute;left:auto;right:-7px;top:50%;transform:translate(50%,-50%);
+  width:16px;height:16px;border-radius:50%;background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.55);
+}
+.pose-tip{
+  position:absolute;bottom:20px;right:0;transform:translateX(50%);
+  background:rgba(12,20,34,.85);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.25);border-radius:12px;
+  padding:5px 14px;font-size:12px;font-weight:800;color:#fff;white-space:nowrap;
+  text-align:center;line-height:1.5;
+}
+.pose-tip::after{ /* caret attaching the tip to the head */
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:rgba(12,20,34,.85);
+}
+.pose-tip .pt-en{font-size:9px;font-weight:600;color:rgba(255,255,255,.6);display:block;direction:ltr;}
+.seek-wrap .pct{font-size:12px;font-weight:800;color:rgba(255,255,255,.9);min-width:44px;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.7);}
+
+/* big breath control — top-RIGHT under the stat chips, clear of the
+   central pose and the windows */
+.breath-ctrl{
+  position:absolute;right:20px;top:70px;z-index:6;
+  display:flex;align-items:center;gap:16px;
+  background:rgba(12,20,34,.62);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.28);border-radius:22px;
+  padding:14px 24px;min-width:250px;min-height:92px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+.breath-ctrl .yoga-circle{
+  width:68px;height:68px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.45);
+  transition:transform 4s ease-in-out, border-color .9s, box-shadow 1.2s;flex:0 0 auto;
+}
+.breath-ctrl .yoga-circle.inhale{transform:scale(1.2);border-color:#9fe8ff;box-shadow:0 0 30px rgba(159,232,255,.55);}
+.breath-ctrl .yoga-circle.exhale{transform:scale(.82);border-color:rgba(255,255,255,.3);}
+.breath-ctrl .yoga-circle .yp-breath-text{font-size:14px;font-weight:900;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.4);}
+.breath-ctrl .bc-txt{display:flex;flex-direction:column;line-height:1.7;gap:2px;}
+.breath-ctrl .bc-h{font-size:11px;font-weight:800;color:rgba(255,255,255,.65);letter-spacing:.3px;}
+.breath-ctrl #yogaCue{font-size:16px;font-weight:800;color:#fff;opacity:0;transition:opacity .3s;min-height:1.3em;}
+.breath-ctrl #yogaCue.show{opacity:1;}
+.breath-ctrl .yp-count{font-size:12.5px;font-weight:700;color:rgba(255,255,255,.85);}
+
+/* ── sliding poses panel (right, desktop) ── */
+.poses-panel{
+  position:absolute;top:0;bottom:0;right:0;z-index:8;width:min(340px,88vw);
+  background:linear-gradient(180deg, rgba(96,166,208,.94), rgba(63,128,175,.96));
+  backdrop-filter:blur(14px);
+  border-left:1px solid rgba(255,255,255,.25);
+  transform:translateX(100%);transition:transform .35s cubic-bezier(.3,.8,.3,1);
+  display:flex;flex-direction:column;
+  box-shadow:-8px 0 30px rgba(0,0,0,.3);
+}
+.poses-panel.open{transform:translateX(0);}
+.poses-panel .pp-toolbar{display:flex;align-items:center;gap:6px;padding:10px 12px 6px;justify-content:flex-start;}
+.poses-panel .pp-toolbar .spacer{flex:1;}
+.poses-panel .pp-toolbar .yh-btn{width:34px;height:34px;}
+.poses-panel .pp-toolbar .yh-btn img{width:18px;height:18px;}
+#poseSearch{
+  flex:1;max-width:180px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);
+  border-radius:10px;padding:6px 12px;color:#fff;font-family:inherit;font-size:12.5px;outline:none;
+}
+#poseSearch::placeholder{color:rgba(255,255,255,.6);}
+.pp-info{
+  max-height:36%;overflow-y:auto;margin:0 12px 6px;padding:10px 12px;border-radius:12px;
+  background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.18);
+  font-size:12.5px;line-height:1.9;color:rgba(255,255,255,.95);
+}
+.pp-info .pp-info-name{font-weight:800;font-size:14px;margin-bottom:4px;color:#ffe9a8;}
+.pp-info .pd-desc-h{font-size:12px;font-weight:800;color:var(--gold,#ffd76a);padding-top:8px;}
+.pp-info[hidden]{display:none;}
+#posePanelGrid{
+  flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:8px;padding:10px 12px;align-content:start;
+}
+#posePanelGrid .pp-cell{
+  aspect-ratio:1/1;background:rgba(255,255,255,.16);border-radius:12px;
+  display:grid;place-items:center;cursor:pointer;transition:.15s;border:1px solid transparent;
+}
+#posePanelGrid .pp-cell:hover{background:rgba(255,255,255,.3);transform:translateY(-2px);}
+#posePanelGrid .pp-cell img{width:82%;height:82%;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25));}
+.poses-panel .pp-tabs{
+  display:flex;align-items:center;justify-content:space-around;
+  padding:8px 10px calc(10px + env(safe-area-inset-bottom));
+  border-top:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font-size:12px;font-weight:700;
+}
+.poses-panel .pp-tabs .tab{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:10px;cursor:pointer;opacity:.7;transition:.15s;}
+.poses-panel .pp-tabs .tab:hover{opacity:1;}
+.poses-panel .pp-tabs .tab.on{opacity:1;background:rgba(255,255,255,.18);}
+.poses-panel .pp-tabs .tab img{width:16px;height:16px;filter:invert(1);}
+/* panel toggle arrow — mid-right edge */
+#panelToggle{
+  position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:9;
+  width:26px;height:56px;border-radius:10px 0 0 10px;
+  background:rgba(63,128,175,.9);border:1px solid rgba(255,255,255,.3);border-right:none;
+  display:grid;place-items:center;transition:.2s;
+}
+#panelToggle img{width:14px;height:14px;filter:invert(1);transition:transform .3s;}
+#panelToggle:hover{background:rgba(63,128,175,1);}
+body.panel-open #panelToggle{right:min(340px,88vw);border-radius:0 10px 10px 0;}
+body.panel-open #panelToggle img{transform:rotate(180deg);}
+
+/* calories & karma chips — top-right under header */
+/* top-right metadata group — one neat glass capsule, consistent gaps */
+.stat-chips{
+  position:absolute;right:20px;top:16px;z-index:5;
+  display:flex;align-items:stretch;gap:0;
+  background:rgba(12,20,34,.55);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.24);border-radius:18px;
+  padding:6px 6px;box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.chip-stat{
+  background:transparent;border:none;box-shadow:none;
+  padding:2px 14px;gap:6px;
+}
+.chip-stat + .chip-stat{border-right:1px solid rgba(255,255,255,.14);}
+.chip-stat{
+  padding:2px 14px;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;
+}
+.chip-stat img{width:15px;height:15px;filter:brightness(0) invert(1);}
+.chip-stat small{font-size:10px;font-weight:400;color:rgba(255,255,255,.7);}
+
+/* audio preload strip (home bottom) */
+.audio-strip{
+  position:relative;z-index:5;background:var(--colorPrimaryDark);
+  display:flex;align-items:center;gap:12px;padding:8px 16px;
+}
+.audio-strip .as-label{font-size:12px;color:rgba(255,255,255,.9);font-weight:700;min-width:170px;}
+.audio-strip .as-bar{flex:1;height:6px;background:rgba(0,0,0,.3);border-radius:3px;overflow:hidden;}
+.audio-strip .as-fill{height:100%;width:0;background:var(--gold);border-radius:3px;transition:width .3s;}
+.audio-strip .as-test{
+  padding:6px 16px;border-radius:12px;font-size:12.5px;font-weight:800;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;transition:.15s;
+}
+.audio-strip .as-test:hover{background:rgba(255,255,255,.28);}
+
+/* ════════════════════════════════════════════════════════════
+   POST SESSION
+   ════════════════════════════════════════════════════════════ */
+#postScroll{position:relative;z-index:2;flex:1;overflow-y:auto;padding:16px 12px 24px;}
+.post-stats{
+  background:rgba(30,30,30,.55);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.15);border-radius:20px;
+  max-width:440px;margin:8vh auto 0;padding:18px 22px;text-align:center;
+}
+.post-stats .msg{font-size:16px;font-weight:800;}
+.post-big{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:22px;}
+.post-big .n{font-size:38px;font-weight:900;direction:ltr;}
+.post-big img{width:22px;height:22px;object-fit:contain;}
+.post-label{font-size:12px;color:rgba(255,255,255,.75);}
+.post-actions{display:flex;flex-direction:column;gap:10px;max-width:440px;margin:16px auto;}
+.btn-android{
+  padding:13px 18px;border-radius:10px;background:#fff;color:#222;
+  font-size:14px;font-weight:700;text-align:center;transition:.15s;
+}
+.btn-android:hover{background:#f0f0f0;}
+
+/* ════════════════════════════════════════════════════════════
+   STORE / HISTORY / POSES / SETTINGS / ABOUT
+   ════════════════════════════════════════════════════════════ */
+.tabbar{display:flex;background:var(--colorPrimaryDark);}
+.tabbar button{
+  flex:1;padding:11px 4px 9px;color:rgba(255,255,255,.65);
+  display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;
+  border-bottom:3px solid transparent;transition:.15s;
+}
+.tabbar button img{width:22px;height:22px;object-fit:contain;opacity:.8;}
+.tabbar button.on{color:#fff;border-bottom-color:var(--colorAccent);}
+.tabbar button.on img{opacity:1;}
+#storePages{position:relative;z-index:2;flex:1;overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.store-page{flex:1;overflow-y:auto;display:none;}
+.store-page.show{display:block;}
+#bgGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:4px;padding:12px;justify-content:center;}
+.bg-item{padding:8px;display:flex;justify-content:center;}
+.bg-item .card{position:relative;background:#fff;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.25);padding:6px;cursor:pointer;transition:.15s;}
+.bg-item .card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.2);}
+.bg-item img.tn{display:block;width:150px;height:auto;border-radius:4px;}
+.bg-item .lockrow{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.bg-item .lockrow img.lock{width:20px;height:20px;object-fit:contain;}
+.bg-item .lockrow .nm{font-size:13px;font-weight:800;color:var(--store-grey);}
+.bg-item .lockrow .cost{font-size:12px;color:var(--colorAccentOnWhite);font-weight:800;margin-right:auto;display:flex;align-items:center;gap:3px;}
+.bg-item .lockrow .cost img{width:13px;height:13px;}
+.bg-item.owned .lockrow img.lock{display:none;}
+.karma-page{max-width:340px;margin:0 auto;padding-bottom:24px;}
+.karma-page .kh{font-size:13px;color:var(--history-label);padding:26px 0 7px 0;font-weight:700;}
+.karma-page .kbar{height:1px;background:var(--history-divider);}
+.karma-page .kval{background:var(--listBackground);padding:26px 0;display:flex;align-items:center;justify-content:center;gap:8px;}
+.karma-page .kval .n{font-size:56px;font-weight:900;color:#000;}
+.karma-page .kval img{width:42px;height:42px;object-fit:contain;}
+.karma-page .kdesc{font-size:13.5px;color:var(--history-label);padding:22px;text-align:center;line-height:2;}
+#bgDetail{
+  position:fixed;inset:0;z-index:40;background:#fff;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:8px;
+}
+#bgDetail.show{display:flex;}
+#bgDetail img.big{max-width:min(84vw,560px);width:100%;border-radius:8px;box-shadow:0 3px 14px rgba(0,0,0,.3);}
+#bgDetail .dnm{font-size:20px;font-weight:900;color:var(--store-grey);}
+#bgDetail .dstate{font-size:13px;color:var(--colorAccentOnWhite);font-weight:700;}
+.store-btn{
+  display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:800;
+  color:var(--colorAccentOnWhite);background:#fff;border:1px solid var(--colorAccentOnWhite);
+  border-radius:6px;padding:6px 16px;transition:.15s;
+}
+.store-btn:hover{background:#f4fafe;}
+.store-btn:active{background:var(--colorAccentOnWhite);color:#fff;}
+.store-btn:disabled{border-color:#bbb;color:#bbb;background:#fff;}
+
+#scr-history{background:var(--history-bg);}
+#historyScroll{position:relative;z-index:2;flex:1;overflow-y:auto;}
+.h-section{font-size:13px;color:var(--history-label);padding:24px 16px 7px;font-weight:800;}
+.h-divider{height:1px;background:var(--history-divider);}
+.stats-block{background:var(--listBackground);padding:3px 16px 14px;}
+.segmented{display:flex;background:var(--segmented);padding:1px;margin:8px 0 14px;border-radius:4px;overflow:hidden;}
+.segmented button{flex:1;padding:7px 0;font-size:13px;background:var(--listBackground);color:var(--segmented);transition:.15s;}
+.segmented button + button{border-right:1px solid var(--segmented);border-left:none;}
+.segmented button.on{background:var(--segmented);color:#fff;font-weight:800;}
+.stat-row{display:flex;font-size:15px;padding-bottom:3px;}
+.stat-row .k{flex:1;color:var(--history-label-light);}
+.stat-row .v{flex:1;color:var(--history-value);font-weight:700;text-align:left;direction:ltr;}
+#historyList{display:flex;flex-direction:column;padding-bottom:12px;}
+.history-row{
+  display:flex;align-items:center;min-height:50px;margin:0 10px 2px;padding:8px 14px;
+  background:var(--listBackground);border-radius:8px;cursor:pointer;transition:.12s;
+}
+.history-row:hover{background:#dcf2fd;}
+.history-row .t1{flex:1;font-size:15px;font-weight:700;color:#000;}
+.history-row .t2{font-size:13px;color:#777;}
+.hdetail-card{border:1px solid var(--history-divider);max-width:560px;margin:24px auto;border-radius:6px;overflow:hidden;}
+.hdetail-card .inner{background:var(--listBackground);padding:18px;}
+.hdetail-row{display:flex;font-size:14px;padding:0 0 8px;}
+.hdetail-row .k{width:90px;color:var(--history-label-light);}
+.hdetail-row .v{flex:1;color:var(--history-value);font-weight:600;}
+
+#posesPages{position:relative;z-index:2;flex:1;overflow:hidden;display:flex;flex-direction:column;}
+#poseGridPage{flex:1;overflow-y:auto;background:#fff;}
+#poseDetailPage{flex:1;overflow-y:auto;display:none;}
+#poseGridPage:not(.show) ~ #poseDetailPage{display:block;}
+a.pose-ref{color:var(--colorAccent,#2b9bd4);text-decoration:underline;cursor:pointer;}
+a.pose-ref:hover{color:#1a6d94;}
+#faCoverageBanner{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;gap:10px;
+  padding:8px 14px;background:#b3261e;color:#fff;font-size:13px;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+#faCoverageBanner[hidden]{display:none;}
+#faCoverageText{flex:1;}
+#faCoverageClose{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;padding:2px 6px;}
+#poseGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));}
+#poseGrid .cell{aspect-ratio:1/1;overflow:hidden;cursor:pointer;position:relative;}
+#poseGrid .cell img{width:100%;height:100%;object-fit:contain;background:var(--listBackground);transition:.15s;}
+#poseGrid .cell:hover img{background:#d9f0fc;transform:scale(1.04);}
+#poseGrid.list-mode{display:flex;flex-direction:column;max-width:680px;margin:0 auto;padding:10px;}
+#poseGrid.list-mode .cell{aspect-ratio:auto;}
+#poseGrid.list-mode .cell{display:flex;align-items:center;gap:12px;padding:6px;border-radius:8px;}
+#poseGrid.list-mode .cell:hover{background:#eef8fd;}
+#poseGrid.list-mode .cell img{width:72px;height:48px;background:transparent;transform:none;}
+#poseGrid.list-mode .cell .row-txt{flex:1;text-align:right;}
+#poseGrid.list-mode .cell .row-txt .nm{font-size:15px;font-weight:700;color:#222;}
+#poseGrid.list-mode .cell .row-txt .sk{font-size:12px;color:#999;}
+.pd-panel{
+  background:var(--panel-dark);backdrop-filter:blur(10px);
+  border-radius:var(--panel-radius);padding:12px;width:min(640px,94%);margin:12px auto;
+}
+.pd-inner{padding:6px;}
+.pd-name{font-size:24px;font-weight:900;}
+.pd-sanskrit{font-size:15px;padding-bottom:8px;color:rgba(255,255,255,.9);}
+.pd-imgwrap{width:284px;height:284px;margin:0 auto;}
+.pd-imgwrap img{width:284px;height:284px;object-fit:contain;background:var(--listBackground);border-radius:8px;}
+#pdAltBtn{display:grid;place-items:center;margin:-16px auto 0;position:relative;z-index:2;}
+#pdAltBtn img{width:40px;height:40px;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.5);background:#fff;object-fit:cover;transition:.15s;}
+#pdAltBtn img:hover{transform:rotate(180deg);}
+.pd-rows{margin-top:10px;}
+.pd-row{display:flex;font-size:15px;}
+.pd-row .k{width:92px;flex:0 0 auto;color:rgba(255,255,255,.75);}
+.pd-row .v{color:#fff;font-weight:600;}
+.pd-desc-h{font-size:15px;font-weight:800;padding-top:14px;color:var(--gold);}
+.pd-desc{font-size:13.5px;white-space:pre-line;color:rgba(255,255,255,.95);}
+.pd-ben-h{font-size:15px;font-weight:800;padding-top:12px;color:var(--gold);}
+.pd-ben{font-size:13.5px;white-space:pre-line;color:rgba(255,255,255,.95);}
+
+.set-panel{
+  background:var(--panel-dark);backdrop-filter:blur(10px);border-radius:var(--panel-radius);
+  padding:8px 18px;width:min(480px,94%);margin:10vh auto 0;
+}
+.set-row{display:flex;align-items:center;gap:14px;padding:15px 2px;border-bottom:1px solid rgba(255,255,255,.12);}
+.set-row:last-child{border-bottom:none;}
+.set-row .txt{flex:1;font-size:15px;font-weight:700;}
+.set-row .txt small{display:block;font-size:11.5px;font-weight:400;opacity:.7;}
+.cb{width:21px;height:21px;flex:0 0 auto;border:2px solid #fff;border-radius:4px;position:relative;cursor:pointer;transition:.15s;}
+.cb.on::after{content:'';position:absolute;right:4px;top:1px;width:5px;height:10px;border-right:2px solid var(--colorAccent);border-bottom:2px solid var(--colorAccent);transform:rotate(-45deg);}
+
+.about-scroll{position:relative;z-index:2;flex:1;overflow-y:auto;padding:10px;}
+.about-card{
+  background:#fff;border-radius:22px;color:#222;width:min(560px,96%);
+  margin:8vh auto 16px;padding:18px 22px;
+}
+.about-card h2{font-size:15px;color:#111;padding:10px 0 4px;font-weight:900;}
+.about-card p{font-size:13.5px;color:#333;white-space:pre-line;line-height:2;}
+.about-card .ver{font-size:10.5px;text-align:center;color:#888;margin-top:16px;}
+.about-card .wlogo{display:block;width:110px;margin:2px auto 8px;}
+
+#scr-splash{background:#000;}
+#scr-splash .foot{position:absolute;bottom:26px;left:0;right:0;text-align:center;z-index:2;}
+#scr-splash .foot img{width:min(60%,280px);opacity:.9;}
+
+.hidden{display:none !important;}
+#toast{
+  position:fixed;left:50%;bottom:90px;transform:translateX(-50%);
+  background:rgba(20,20,20,.94);color:#fff;font-size:13px;
+  padding:10px 20px;border-radius:22px;z-index:99;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+#toast.show{opacity:1;}
+
+/* ── responsive: mobile collapses the poses panel + smaller header ── */
+@media (max-width:880px){
+  .poses-panel{width:min(300px,92vw);}
+  body.panel-open #panelToggle{right:min(300px,92vw);}
+  #yogaPose{max-width:72vw;}
+  .pc-center{height:min(46vh,420px);}
+  .pc-side{width:20vw;min-width:70px;height:min(30vh,260px);}
+  .pc-side .pc-tag{font-size:9px;}
+  .yh-title{font-size:14px;}
+  .pose-pill{top:auto;bottom:55%;right:calc(100% + 24px);padding:6px 16px;}
+  .pose-pill .nm{font-size:14px;}
+  .breath-ctrl{right:12px;top:58px;min-width:190px;min-height:70px;padding:9px 16px;gap:12px;}
+  .stat-chips{top:12px;}
+  .breath-ctrl .yoga-circle{width:52px;height:52px;}
+  .breath-ctrl .yoga-circle .yp-breath-text{font-size:11.5px;}
+  .breath-ctrl #yogaCue{font-size:13.5px;}
+  .breath-ctrl .yp-count{font-size:11px;}
+  .stat-chips{right:12px;top:12px;padding:4px 4px;}
+  .chip-stat{padding:2px 10px;}
+  .seek-wrap{left:3%;right:3%;bottom:96px;gap:9px;}
+  .seek-wrap .t-time{font-size:12px;min-width:50px;padding:4px 8px;}
+  .pose-tip{font-size:10.5px;padding:4px 10px;}
+  .transport-cluster{gap:9px;padding:7px 13px;bottom:16px;}
+  #uiPlay{width:50px;height:50px;}
+  .tbtn-labeled{width:42px;height:42px;}
+  .vol-inline{display:none;}   /* mobile: volume lives in the panel */
+  .vol-divider{display:none;}
+  .yh-clock{font-size:10.5px;left:8px;top:6px;}
+}
+@media (max-width:560px){
+  .tl-card{width:46px;height:56px;}
+  .tl-card img{width:36px;height:40px;}
+  .yh-strip{height:54px;}
+  .yh-btn{width:34px;height:34px;}
+  .yh-btn img{width:17px;height:17px;}
+  .chip-stat small{display:none;}
+  #uiPlay{width:44px;height:44px;}
+  .pc-side{display:none;}      /* tiny screens: carousel collapses to center only */
+  .home-side{display:none;}
+  .practice-card .pc-img{height:min(42vh,380px);}
+}
+
+/* home responsive: narrow screens hide side cards, keep pose + toolbar */
+@media (max-width:1150px){
+  .home-side{width:min(240px,24vw);}
+  .home-side.left{right:calc(50% + min(24vw,270px));}
+  .home-side.right{left:calc(50% + min(24vw,270px));}
+  .home-nav.prev{right:calc(50% - min(30vw,340px));}
+  .home-nav.next{left:calc(50% - min(30vw,340px));}
+}
+@media (max-width:940px){
+  .home-side{display:none;}
+  /* mobile nav: pinned at the sides, bottom-relative, compact */
+  .home-nav{bottom:9%;padding:9px 14px;font-size:12.5px;gap:7px;border-radius:22px;}
+  .home-nav img{width:16px;height:16px;}
+  .home-nav .dir{font-size:10px;}
+  .pc-side{display:none;}      /* narrow: no room for neighbor previews */
+  .home-nav.prev{right:10px;}
+  .home-nav.next{left:10px;}
+  /* mobile mat: lower again so feet reach the mat */
+  .practice-card{padding-bottom:13vh;}
+  .practice-card .pc-img{height:min(46vh,420px);}
+  .practice-card .pc-name{font-size:19px;}
+  .practice-card .pc-sub{margin-top:5px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ FA COVERAGE WARNING (shown only when a pose lacks Persian data) ═══════════ -->
+<div id="faCoverageBanner" role="alert" hidden>
+  <span id="faCoverageText"></span>
+  <button id="faCoverageClose" aria-label="بستن">✕</button>
+</div>
+
+<!-- ═══════════ SPLASH ═══════════ -->
+<section class="screen show" id="scr-splash">
+  <div class="bgview" id="splashBg"></div>
+  <div class="foot"><img src="static/yoga-data/resources/res/drawable-xhdpi/splash_footnote.png" alt=""></div>
+</section>
+
+<!-- ═══════════ HOME ═══════════ -->
+<section class="screen" id="scr-home">
+  <div class="bgview" id="homeBg"></div>
+  <div class="home-top">
+    <img id="homeLogo" src="static/yoga-data/resources/res/drawable-large-xhdpi/pocket_yoga_wm.png" alt="Pocket Yoga">
+
+    <!-- left side: welcome -->
+    <div class="home-side left">
+      <div class="side-card">
+        <h2>سلام 👋 به باشگاه یوگا خوش آمدی</h2>
+        <p>تمرین آماده رو انتخاب کن، درجه سختی و مدت جلسه رو بچین و با راهنمای صوتی و موسیقی محیطی تمرین کن. هر ۱۵ دقیقه تمرین ۱ امتیاز کارما بهت می‌ده که باهاش محیط‌های جدید باز می‌کنی.</p>
+        <div class="hint"><img src="static/yoga-data/resources/res/drawable-mdpi/ui_karmabutton.png" alt="">امتیاز فعلی: <b id="homeKarma">۰</b> کارما</div>
+      </div>
+    </div>
+
+    <!-- nav pills: filled by JS with neighbor names; hidden when absent -->
+    <button class="home-nav prev" id="homePrev" title="تمرین قبلی"></button>
+    <button class="home-nav next" id="homeNext" title="تمرین بعدی"></button>
+
+    <!-- practice pager (real-size pose art) -->
+    <div id="pager"><div id="pagerTrack"></div></div>
+    <div id="indicator"></div>
+
+    <!-- right side: current practice details -->
+    <div class="home-side right">
+      <div class="side-card" id="practiceDetailCard">
+        <h2 id="pd2Title">—</h2>
+        <div class="d-row"><span class="k">سبک</span><span class="v" id="pd2Style">—</span></div>
+        <div class="d-row"><span class="k">درجه سختی</span><span class="v" id="pd2Diff">—</span></div>
+        <div class="d-row"><span class="k">مدت‌ها</span><span class="v" id="pd2Durs">—</span></div>
+        <div class="d-row"><span class="k">تعداد گام</span><span class="v" id="pd2Steps">—</span></div>
+        <p id="pd2Desc" style="margin-top:8px;"></p>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button id="btnQuickStart" style="flex:1;padding:10px;border-radius:10px;font-weight:900;font-size:14px;background:linear-gradient(135deg,var(--colorAccent),#ffc46a);color:#241300;">شروع سریع</button>
+          <button id="btnMoreOptions" style="padding:10px 16px;border-radius:10px;font-weight:800;font-size:13px;background:rgba(255,255,255,.14);border:1px solid var(--glass-line);">تنظیمات جلسه…</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- inline options popover (doesn't clear the scene) -->
+    <div id="optionsPop">
+      <h3 id="opTitle">—</h3>
+      <div class="op-desc" id="opDesc"></div>
+      <div class="opt-label">مدت جلسه:</div>
+      <div class="spinner"><select id="opDuration" class="unselected"></select></div>
+      <div class="opt-label">درجه سختی:</div>
+      <div class="spinner"><select id="opDifficulty" class="unselected"></select></div>
+      <div class="opt-label">محیط:</div>
+      <div class="spinner"><select id="opEnvironment" class="unselected"></select></div>
+      <div class="op-actions">
+        <button class="btn-cancel" id="opCancel">انصراف</button>
+        <button class="btn-start" id="opStart">شروع تمرین</button>
+      </div>
+    </div>
+  </div>
+  <div class="split-toolbar" id="homeToolbar"></div>
+  <!-- audio preload strip: shows cue buffering + self-test button -->
+  <div class="audio-strip" id="audioStrip">
+    <span class="as-label" id="asLabel">🎧 آماده‌سازی صداها…</span>
+    <div class="as-bar"><div class="as-fill" id="asFill"></div></div>
+    <button class="as-test" id="asTest" title="یک نمونه صدا پخش کن">🔊 تست صدا</button>
+  </div>
+</section>
+
+<!-- ═══════════ PREVIEW ═══════════ -->
+<section class="screen" id="scr-preview">
+  <div class="appbar">
+    <div class="tb">
+      <button id="pvBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" alt="بازگشت"></button>
+      <div class="tb-title" id="pvTitle">پیش‌نمایش</div>
+    </div>
+  </div>
+  <div id="previewWhite">
+    <div id="previewScroll">
+      <div id="previewGrid"></div>
+      <div class="pv-key">
+        <div class="kv"><img src="static/yoga-data/resources/res/drawable-mdpi/timeline_property_tempo_print.png" alt=""><span>مدت نگه‌داشتن (نفس یا زمان)</span></div>
+        <div class="kv"><img src="static/yoga-data/resources/res/drawable-mdpi/timeline_repeat_border_print.png" alt=""><span>تکرار توالی</span></div>
+        <div class="kv"><span style="width:27px;height:27px;border:2px solid #bbb;border-radius:0 50% 50% 0;display:grid;place-items:center;font-size:12px;font-weight:700;color:#666;margin-left:17px;">۲</span><span>تعداد تکرار توالی</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ YOGA PLAYER (reference layout) ═══════════ -->
+<section class="screen" id="scr-yoga">
+  <div id="yogaBackground"></div>
+
+  <header class="yoga-header">
+    <div class="yh-row">
+      <button class="yh-btn" id="uiQuit" title="پایان و خروج از تمرین"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" alt="پایان"></button>
+      <button class="yh-btn" id="btnRestart" title="شروع دوباره از ابتدا"><img src="static/yoga-data/resources/res/drawable-mdpi/uibuttonbarstop.png" alt="شروع دوباره"></button>
+      <div class="yh-title" id="ytTitle">تمرین</div>
+      <div class="spacer"></div>
+      <button class="yh-btn" id="ytMusic" title="موسیقی محیطی: روشن/خاموش"><img src="static/yoga-data/resources/res/drawable-mdpi/airplay_icon.png" alt="موسیقی"></button>
+      <button class="yh-btn" id="ytSound" title="راهنمای صوتی: روشن/خاموش"><img src="static/yoga-data/resources/res/drawable-mdpi/volume_on.png" alt="صدا"></button>
+      <button class="yh-btn" id="btnPosePanel" title="پنل حرکات (فهرست و پرش)"><img src="static/yoga-data/resources/res/drawable-mdpi/ic_view_module_white_24dp.png" alt="حرکات"></button>
+    </div>
+    <div class="yh-strip" id="stripWrap"><div class="yh-strip-inner" id="strip"></div></div>
+    <div class="yh-clock">
+      <img src="static/yoga-data/resources/res/drawable-mdpi/ui_historybutton.png" alt="">
+      <span id="hdrCurTime">۰:۰۰</span> · <span id="hdrRemTime">-۰:۰۰</span>
+    </div>
+  </header>
+
+  <div class="yoga-stage">
+    <!-- prev → current → next carousel -->
+    <div class="pose-carousel">
+      <div class="pc-side" id="carPrev"><img alt=""><span class="pc-tag">حرکت قبلی</span></div>
+      <div class="pc-center">
+        <div class="pose-pill">
+          <div class="nm" id="yogaPoseName">—</div>
+          <div class="sk" id="yogaPoseSanskrit"></div>
+          <div class="en" id="yogaPoseEn"></div>
+        </div>
+        <img id="yogaPose" alt="">
+      </div>
+      <div class="pc-side" id="carNext"><img alt=""><span class="pc-tag">حرکت بعدی</span></div>
+    </div>
+    <!-- big breath control — top-left -->
+    <div class="breath-ctrl">
+      <div class="yoga-circle" id="breathCircle"><span class="yp-breath-text" id="breathText">—</span></div>
+      <div class="bc-txt">
+        <div class="bc-h">تنفس</div>
+        <div id="yogaCue"></div>
+        <div class="yp-count" id="breathCount"></div>
+      </div>
+    </div>
+    <div class="stat-chips">
+      <div class="chip-stat" title="کالری سوزانده‌شده"><img src="static/yoga-data/resources/res/drawable-mdpi/scene_overlay_calorie_icon.png" alt=""><span id="calValue">۰</span><small>کالری</small></div>
+      <div class="chip-stat" title="امتیاز کارما"><img src="static/yoga-data/resources/res/drawable-mdpi/karma_symbol_small.png" alt=""><span id="ytKarma">۰</span><small>کارما</small></div>
+    </div>
+    <!-- seek bar: timer pair + pose tooltip riding the scrub head -->
+    <div class="seek-wrap">
+      <span class="t-time" id="uiCurTime">۰:۰۰</span>
+      <div id="uiProgress" title="برای جابه‌جایی کلیک کن">
+        <div id="uiProgressFill"><span class="pose-tip" id="poseTip"><span id="poseTipFa">—</span><span class="pt-en" id="poseTipEn"></span></span></div>
+      </div>
+      <span class="t-time" id="uiRemTime">-۰:۰۰</span>
+      <span class="pct" id="seekPct">۰٪</span>
+    </div>
+    <!-- centered transport dock: prev | play | next | volume -->
+    <div class="transport-cluster">
+      <button class="tbtn-labeled" id="uiPrev" title="حرکت قبلی (→)"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_next_button.png" style="transform:scaleX(-1);" alt="قبلی"></button>
+      <button id="uiPlay" title="پخش / توقف (Space)"><img id="uiPlayImg" src="static/yoga-data/resources/res/drawable-mdpi/pvc_play_button.png" alt="پخش"></button>
+      <button class="tbtn-labeled" id="uiNext" title="حرکت بعدی (←)"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_next_button.png" alt="بعدی"></button>
+      <div class="vol-divider"></div>
+      <div class="vol-inline" title="بلندی صدا">
+        <img src="static/yoga-data/resources/res/drawable-mdpi/sound_controls_icon.png" alt="">
+        <input type="range" id="uiVolume" min="0" max="100" value="100">
+      </div>
+    </div>
+  </div>
+
+  <!-- sliding poses panel (right) -->
+  <aside class="poses-panel" id="posePanel">
+    <div class="pp-toolbar">
+      <input id="poseSearch" type="text" placeholder="جستجوی حرکت…">
+      <div class="spacer"></div>
+      <button class="yh-btn" id="ppLayout" title="چیدمان"><img src="static/yoga-data/resources/res/drawable-mdpi/ic_view_module_white_24dp.png" alt=""></button>
+      <button class="yh-btn" id="ppClose" title="بستن"><img src="static/yoga-data/resources/res/drawable-mdpi/uiblackclosebutton.png" alt="بستن"></button>
+    </div>
+    <!-- pose info pane: description/benefits with clickable //Pose// refs -->
+    <div class="pp-info" id="ppInfo" hidden>
+      <div class="pp-info-name" id="ppInfoName"></div>
+      <div class="pd-desc" id="ppInfoDesc"></div>
+      <div class="pd-desc-h">مزایا:</div>
+      <div class="pd-desc" id="ppInfoBenefits"></div>
+    </div>
+    <div id="posePanelGrid"></div>
+    <div class="pp-tabs">
+      <div class="tab on" id="ppTabAll">همه</div>
+      <div class="tab" id="ppTabSession">این تمرین</div>
+      <div class="tab" id="ppVol"><img src="static/yoga-data/resources/res/drawable-mdpi/sound_controls_icon.png" alt=""><input type="range" id="uiVolume" min="0" max="100" value="100" style="width:90px;"></div>
+    </div>
+  </aside>
+  <button id="panelToggle" title="پنل حرکات"><img src="static/yoga-data/resources/res/drawable-mdpi/left_arrow.png" alt=""></button>
+</section>
+
+<!-- ═══════════ POST SESSION ═══════════ -->
+<section class="screen" id="scr-post">
+  <div class="bgview" id="postBg"></div>
+  <div id="postScroll">
+    <div class="post-stats">
+      <div class="msg" id="postMsg">—</div>
+      <div class="post-big"><span class="n" id="postCal">۰</span><img src="static/yoga-data/resources/res/drawable-mdpi/scene_overlay_calorie_icon.png" style="filter:brightness(0) invert(1);" alt=""></div>
+      <div class="post-label" id="lblCalBurned">کالری سوزانده‌شده</div>
+      <div class="post-big"><span class="n" id="postKarma">۰</span><img class="karma-ic" src="static/yoga-data/resources/res/drawable-mdpi/karma_symbol_small.png" style="width:26px;" alt=""></div>
+      <div class="post-label" id="lblKarmaEarned">امتیاز کارما کسب‌شده</div>
+      <div class="post-big"><span class="n" id="postKarmaTotal">۰</span><img class="karma-ic" src="static/yoga-data/resources/res/drawable-mdpi/karma_symbol_small.png" style="width:26px;" alt=""></div>
+      <div class="post-label" id="lblKarmaTotal">مجموع امتیاز کارما</div>
+    </div>
+    <div class="post-actions">
+      <button class="btn-android" id="postShare">همرسانی</button>
+      <button class="btn-android" id="postDone">پایان</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ STORE ═══════════ -->
+<section class="screen" id="scr-store">
+  <div class="appbar">
+    <div class="tb">
+      <button id="storeBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" alt="بازگشت"></button>
+      <div class="tb-title">فروشگاه</div>
+      <div class="tb-karma"><span id="storeKarmaVal">۰</span><img src="static/yoga-data/resources/res/drawable-mdpi/karma_symbol.png" alt=""></div>
+    </div>
+    <div class="tabbar" id="storeTabs">
+      <button data-tab="backgrounds" class="on"><img src="static/yoga-data/resources/res/drawable-mdpi/store_tab_bar_item_icon_backgrounds.png" alt="">پس‌زمینه‌ها</button>
+      <button data-tab="karma"><img src="static/yoga-data/resources/res/drawable-mdpi/store_tab_bar_item_icon_karma.png" alt="">کارما</button>
+    </div>
+  </div>
+  <div id="storePages">
+    <div class="store-page show" id="page-backgrounds"><div id="bgGrid"></div></div>
+    <div class="store-page" id="page-karma">
+      <div class="karma-page">
+        <div class="kh">مجموع امتیاز کارما</div>
+        <div class="kbar"></div>
+        <div class="kval"><span class="n" id="karmaBigVal">۰</span><img src="static/yoga-data/resources/res/drawable-mdpi/karma_symbol.png" alt=""></div>
+        <div class="kbar"></div>
+        <div class="kdesc">با تمرین یوگا امتیاز کارما می‌گیری. هر ۱۵ دقیقه تمرین ۱ امتیاز کارما است. می‌توانی امتیازها را در فروشگاه خرج باز کردن محیط‌های جدید کنی.</div>
+      </div>
+    </div>
+  </div>
+  <div id="bgDetail">
+    <img class="big" id="bgDetailImg" alt="">
+    <div class="dnm" id="bgDetailName">—</div>
+    <div class="dstate" id="bgDetailState"></div>
+    <button class="store-btn" id="bgDetailBtn">انتخاب</button>
+    <button class="btn-android" style="margin-top:8px;min-width:130px;" id="bgDetailBack">بازگشت</button>
+  </div>
+</section>
+
+<!-- ═══════════ HISTORY ═══════════ -->
+<section class="screen" id="scr-history">
+  <div class="appbar">
+    <div class="tb">
+      <button id="historyBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" alt="بازگشت"></button>
+      <div class="tb-title">تاریخچه</div>
+    </div>
+  </div>
+  <div id="historyScroll">
+    <div class="h-section">آمار</div>
+    <div class="h-divider"></div>
+    <div class="stats-block">
+      <div class="segmented" id="histTimeframe">
+        <button data-tf="all" class="on">همه</button><button data-tf="week">هفته گذشته</button><button data-tf="month">ماه گذشته</button>
+      </div>
+      <div class="stat-row"><span class="k">تعداد تمرین</span><span class="v" id="hsPractices">۰</span></div>
+      <div class="stat-row"><span class="k">زمان</span><span class="v" id="hsTime">۰:۰۰</span></div>
+    </div>
+    <div class="h-divider"></div>
+    <div class="h-section" id="histCompletedH">تمرین‌های انجام‌شده</div>
+    <div id="historyList"></div>
+  </div>
+</section>
+
+<!-- ═══════════ HISTORY DETAIL ═══════════ -->
+<section class="screen" id="scr-history-detail">
+  <div class="appbar">
+    <div class="tb">
+      <button id="hdetailBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" alt="بازگشت"></button>
+      <div class="tb-title">تاریخچه</div>
+    </div>
+  </div>
+  <div style="position:relative;z-index:2;flex:1;overflow-y:auto;background:var(--history-bg);padding:0 12px;">
+    <div class="hdetail-card">
+      <div class="inner">
+        <div class="hdetail-row"><span class="k">تمرین</span><span class="v" id="hdPractice"></span></div>
+        <div class="hdetail-row"><span class="k">تاریخ</span><span class="v" id="hdDate"></span></div>
+        <div class="hdetail-row"><span class="k">مدت</span><span class="v" id="hdDuration"></span></div>
+        <div class="hdetail-row"><span class="k">درجه سختی</span><span class="v" id="hdDifficulty"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ POSES ═══════════ -->
+<section class="screen" id="scr-poses">
+  <div class="bgview" id="posesBg"></div>
+  <div class="appbar">
+    <div class="tb">
+      <button id="posesBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" alt="بازگشت"></button>
+      <div class="tb-title" id="posesTitle">حرکات</div>
+      <button id="posesLayout" style="padding:8px;"><img id="posesLayoutIcon" src="static/yoga-data/resources/res/drawable-mdpi/ic_view_module_white_24dp.png" style="width:24px;filter:invert(1);" alt="چیدمان"></button>
+    </div>
+  </div>
+  <div id="posesPages">
+    <div id="poseGridPage" class="show"><div id="poseGrid"></div></div>
+    <div id="poseDetailPage">
+      <div class="pd-panel">
+        <div class="pd-inner">
+          <div class="pd-name" id="pdName">—</div>
+          <div class="pd-sanskrit" id="pdSanskrit"></div>
+          <div class="pd-imgwrap"><img id="pdImg" alt=""></div>
+          <button id="pdAltBtn" title="تصویر دیگر"><img src="static/yoga-data/resources/res/drawable-mdpi/alternate_pose_image_button.png" alt="⇄"></button>
+          <div class="pd-rows">
+            <div class="pd-row" id="pdAltRow" style="display:none;"><span class="k">نام دیگر:</span><span class="v" id="pdAltName"></span></div>
+            <div class="pd-row"><span class="k">دسته:</span><span class="v" id="pdCategory"></span></div>
+            <div class="pd-row"><span class="k">درجه سختی:</span><span class="v" id="pdDifficulty"></span></div>
+          </div>
+          <div class="pd-desc-h">توضیحات:</div>
+          <div class="pd-desc" id="pdDesc"></div>
+          <div class="pd-ben-h">مزایا:</div>
+          <div class="pd-ben" id="pdBenefits"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SETTINGS ═══════════ -->
+<section class="screen" id="scr-settings">
+  <div class="bgview" id="settingsBg"></div>
+  <div class="appbar" style="background:transparent;position:absolute;top:0;left:0;right:0;">
+    <div class="tb">
+      <button id="settingsBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,.8));" alt="بازگشت"></button>
+      <div class="tb-title">تنظیمات</div>
+    </div>
+  </div>
+  <div style="position:relative;z-index:2;flex:1;overflow-y:auto;padding:70px 8px 8px;">
+    <div class="set-panel">
+      <div class="set-row">
+        <div class="txt">راهنمای صوتی<small>صدای راهنمای تمرین</small></div>
+        <div class="cb on" id="setVoice"></div>
+      </div>
+      <div class="set-row">
+        <div class="txt">موسیقی<small>موسیقی پس‌زمینه</small></div>
+        <div class="cb on" id="setMusic"></div>
+      </div>
+      <div class="set-row">
+        <div class="txt">نمایش کالری<small>نمایش کالری مصرفی حین تمرین</small></div>
+        <div class="cb on" id="setCalories"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ABOUT ═══════════ -->
+<section class="screen" id="scr-about">
+  <div class="bgview" id="aboutBg"></div>
+  <div class="appbar" style="background:transparent;position:absolute;top:0;left:0;right:0;">
+    <div class="tb">
+      <button id="aboutBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,.8));" alt="بازگشت"></button>
+      <div class="tb-title">درباره</div>
+    </div>
+  </div>
+  <div class="about-scroll">
+    <div class="about-card">
+      <img class="wlogo" src="static/yoga-data/resources/res/drawable-mdpi/applogo.png" alt="">
+      <h2>یوگای جیبی</h2>
+      <p>تمرین‌های یوگای جیبی از Gaia Flow Yoga ارائه شده‌اند. این سبک وینیاسای پرتوان، بدن و ذهن و احساسات را هم‌راستا می‌کند و با تمرکز، کار با تنفس و آساناهای قدرتمند، استقامت و انعطاف و آرامش درونی می‌سازد. این سبک سه تمرین هماهنگ دارد: اقیانوس (هوازی)، کوه (قدرتی)، کویر (سم‌زدایی/انعطاف).</p>
+      <div class="ver">بازسازی وب بر پایه منابع اصلی اپ — نسخه ۱</div>
+    </div>
+  </div>
+</section>
+
+<div id="toast"></div>
+
+<script src="static/yoga-classic/data.js?v=7"></script>
+<script src="static/yoga-classic/engine.js?v=6"></script>
+<script src="static/yoga-classic/audio.js?v=8"></script>
+<script src="static/yoga-classic/app.js?v=9"></script>
+</body>
+</html>
