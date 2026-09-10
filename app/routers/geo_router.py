@@ -69,15 +69,11 @@ async def get_local_weather(
 
 @router.get("/weather/debug")
 async def get_weather_debug(lat: float = 35.6892, lng: float = 51.3890):
-    """دیباگِ سرویس‌های آب‌وهوا — جزئیاتِ خطای هر کدام را نشان می‌دهد"""
-    import os
+    """دیباگِ سرویس آب‌وهوا — جزئیاتِ خطا"""
     w = await openmeteo_service._get_weather(lat, lng)
     a = await openmeteo_service._get_air(lat, lng)
     return {
-        "keys_configured": {
-            "openweather": bool(os.getenv("OPENWEATHER_API_KEY")),
-            "aqicn": bool(os.getenv("AQICN_API_KEY")),
-        },
+        "source": "Open-Meteo (بدون کلید)",
         "weather_result": w,
         "air_result": a,
     }

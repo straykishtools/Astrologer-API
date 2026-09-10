@@ -312,7 +312,30 @@ def _is_valid_analysis(content: str) -> bool:
 
 
 async def _call_model(client, api_key, prompt, model):
-    """Call a single model via the local proxy."""
+    """Call a single model. Prefers the direct AI provider configured via
+    env (AI_API_BASE + AI_API_KEY + AI_MODEL), falls back to the local
+    proxy when only DEEPSEEK_API_KEY is set."""
+    base = os.getenv("AI_API_BASE")
+    if base:
+        # direct provider (OpenAI-compatible)
+        return await client.post(
+            base.rstrip("/") + "/chat/completions",
+            headers={
+                "Authorization": f"Bearer {os.getenv('AI_API_KEY', api_key)}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": os.getenv("AI_MODEL", model["name"]),
+                "messages": [
+                    {"role": "system", "content": "You are a professional astrologer. Write detailed Persian astrological analysis using HTML."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.75,
+                "max_tokens": model["max_tokens"],
+                "stream": False,
+            }
+        )
+    # legacy local proxy path
     return await client.post(
         "http://localhost:20128/v1/chat/completions",
         headers={
@@ -335,9 +358,11 @@ async def _call_model(client, api_key, prompt, model):
 @router.post("/api/v5/deepseek-analysis")
 async def analyze_chart(request: AnalysisRequest):
     """
-    Sends chart context + Vedic summary to the local proxy and returns the AI analysis.
+    Sends chart context + Vedic summary to the AI provider and returns the AI analysis.
+    Uses AI_API_BASE/AI_API_KEY/AI_MODEL env when set (direct provider),
+    else falls back to DEEPSEEK_API_KEY + local proxy.
     """
-    api_key = os.getenv("DEEPSEEK_API_KEY")
+    api_key = os.getenv("AI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
     if not api_key:
         raise HTTPException(status_code=503, detail="سرویس تحلیل هوش مصنوعی پیکربندی نشده است")
 
@@ -378,11 +403,7 @@ Challenging planets and ways to turn challenges into opportunities
 """
 
     models = [
-        {"name": "openrouter/nvidia/nemotron-3.5-lightning:free", "max_tokens": 16384},
-        {"name": "openrouter/nvidia/nemotron-3-super-120b-a12b:free", "max_tokens": 16384},
-        {"name": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "max_tokens": 16384},
-        {"name": "openrouter/openrouter/free", "max_tokens": 16384},
-        {"name": "openrouter/cohere/north-mini-code:free", "max_tokens": 16384},
+        {"name": os.getenv("AI_MODEL", "bai/glm-5.3-flash"), "max_tokens": 16384},
     ]
 
     async with httpx.AsyncClient(timeout=180.0, follow_redirects=True) as client:

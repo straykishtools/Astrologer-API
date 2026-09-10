@@ -1300,19 +1300,17 @@ var _dpState = {};
 function makeDatePickerTrigger(triggerId, opts) {
     var displayId = triggerId + '_display';
     var hiddenId = triggerId + '_hidden';
-    var cal = opts.calendarType || 'shamsi';
-    var defaultVal = opts.defaultValue || { year: cal === 'shamsi' ? 1379 : 2000, month: 1, day: 1 };
-    /* guard: sharedInputs.birthDate can arrive with missing/NaN fields —
-       an invalid default made the wheel render nothing and stick at 1300 */
+    /* همیشه شمسی — میلادی فقط نمایش معادلِ داخل پیکر است */
+    var defaultVal = opts.defaultValue || { year: 1380, month: 1, day: 1 };
     if (!defaultVal.year || isNaN(defaultVal.year) || !defaultVal.month || !defaultVal.day) {
-        defaultVal = cal === 'shamsi' ? { year: 1379, month: 1, day: 1 } : { year: 2000, month: 1, day: 1 };
+        defaultVal = { year: 1380, month: 1, day: 1 };
     }
-    _dpState[triggerId] = { calType: cal, value: defaultVal };
+    _dpState[triggerId] = { calType: 'shamsi', value: defaultVal };
     return '<input type="hidden" id="' + hiddenId + '" value="' + defaultVal.year + '-' + String(defaultVal.month).padStart(2,'0') + '-' + String(defaultVal.day).padStart(2,'0') + '">' +
         '<button type="button" class="dp-trigger" id="' + triggerId + '">' +
         '<span class="dp-trigger-icon">📅</span>' +
         '<span><span class="dp-trigger-label">' + (opts.label || 'تاریخ تولد') + '</span><br>' +
-        '<span id="' + displayId + '">' + formatDpDisplay(defaultVal, cal, opts.digits) + '</span></span>' +
+        '<span id="' + displayId + '">' + formatDpDisplay(defaultVal, 'shamsi', opts.digits) + '</span></span>' +
         '</button>';
 }
 
@@ -1337,36 +1335,20 @@ function attachDatePicker(triggerId, opts) {
     var displayId = triggerId + '_display';
     btn.addEventListener('click', function () {
         var state = _dpState[triggerId] || {};
-        var openCal = opts.calendarType || state.calType || 'shamsi';
-        /* defaultValue is stored in ITS OWN calendar — convert it into the
-           calendar the picker will open with, otherwise shamsi/miladi
-           toggling compounds a wrong-date drift every cycle */
-        var defVal = state.value || opts.defaultValue;
-        if (defVal && state.calType && state.calType !== openCal && window.DateWheelPicker) {
-            try {
-                if (state.calType === 'shamsi' && openCal === 'miladi') {
-                    var g = window.DateWheelPicker.shamsiToMiladi(defVal.year, defVal.month, defVal.day);
-                    defVal = { year: g.year, month: g.month, day: g.day };
-                } else if (state.calType === 'miladi' && openCal === 'shamsi') {
-                    var j = window.DateWheelPicker.miladiToShamsi(defVal.year, defVal.month, defVal.day);
-                    defVal = { year: j.year, month: j.month, day: j.day };
-                }
-            } catch (e) {}
-        }
+        /* همیشه شمسی باز می‌شود؛ مقدار ذخیره‌شده شمسی است — بدون تبدیل */
+        var defVal = state.value || opts.defaultValue || { year: 1380, month: 1, day: 1 };
         DateWheelPicker.open({
-            calendarType: openCal,
+            calendarType: 'shamsi',
             defaultValue: defVal,
-            minYear: opts.minYear || (openCal === 'shamsi' ? 1300 : 1921),
-            maxYear: opts.maxYear || (openCal === 'shamsi' ? 1450 : 2071),
-            yearStep: opts.yearStep,
             digits: opts.digits || 'fa',
             loop: false,
             onSave: function (date) {
-                _dpState[triggerId] = { calType: date.calendarType, value: date };
+                /* ذخیره همیشه شمسی — date.calendarType نادیده گرفته می‌شود */
+                _dpState[triggerId] = { calType: 'shamsi', value: date };
                 var hidden = document.getElementById(hiddenId);
                 var display = document.getElementById(displayId);
                 if (hidden) hidden.value = date.year + '-' + String(date.month).padStart(2,'0') + '-' + String(date.day).padStart(2,'0');
-                if (display) display.textContent = formatDpDisplay(date, date.calendarType, opts.digits);
+                if (display) display.textContent = formatDpDisplay(date, 'shamsi', opts.digits);
             }
         });
     });
@@ -1412,7 +1394,26 @@ function buildBirthForm() {
 
 function attachDatePickerTriggers(tab) {
     var opts = { calendarType: 'shamsi', digits: 'fa' };
-    if (tab === 'birth') attachDatePicker('birthDatePicker', opts);
+    if (tab === 'birth') {
+        /* 🎯 پایلوت: تقویم شمسی گرافیکی (popover) فقط برای چارت تولد.
+           اگر ShamsiCalendar در دسترس نبود → چرخ قدیمی. */
+        if (window.ShamsiCalendar) {
+            ShamsiCalendar.attach('birthDatePicker', {
+                minJy: 1300,
+                onSave: function (iso) {
+                    var p = iso.split('-');
+                    if (p.length >= 3) {
+                        sharedInputs.birthDate = { year: parseInt(p[0]), month: parseInt(p[1]), day: parseInt(p[2]) };
+                        persistSharedInputsLocal();
+                        saveProfileToServer();
+                    }
+                }
+            });
+        } else {
+            attachDatePicker('birthDatePicker', opts);
+        }
+        return;
+    }
     if (tab === 'synastry' || tab === 'composite' || tab === 'transit') {
         attachDatePicker('p1_date', opts);
         attachDatePicker('p2_date', opts);
@@ -1428,6 +1429,17 @@ function attachDatePickerTriggers(tab) {
     }
     if (tab === 'numerology') {
         attachDatePicker('pyBirthDP', opts); // پیکر مجزای سال اختیاری
+    }
+    if (tab === 'nasa') {
+        // همهٔ date-pickerهای شمسیِ ناسا
+        attachDatePicker('nasaWeatherStartDP', opts);
+        attachDatePicker('nasaWeatherEndDP', opts);
+        attachDatePicker('nasaNeoStartDP', opts);
+        attachDatePicker('nasaNeoEndDP', opts);
+        attachDatePicker('nasaPlanetsDateDP', opts);
+        // فاز ماه
+        attachDatePicker('moonPhaseDate', opts);
+        attachDatePicker('moonPhaseDatePicker', opts);
     }
 }
 
@@ -3708,7 +3720,8 @@ function getNasaForm() {
         {id: 'images', icon: '\u{1f5bc}\ufe0f', label: 'تصاویر'},
         {id: 'space-weather', icon: '\u2600\ufe0f', label: 'آب و هوای فضا'},
         {id: 'asteroids', icon: '\u2604\ufe0f', label: 'سیارک\u200cها'},
-        {id: 'mars', icon: '\u{1f534}', label: 'مریخ'},
+        {id: 'mars', icon: '\u{1f534}'
+        {id: 'curiosity', icon: '\u{1f916}', label: 'Curiosity'},
         {id: 'planets', icon: '\ud83c\udf0f', label: 'موقعیت سیارات'}
     ];
     tabs.forEach(function(t, i) {
@@ -3729,18 +3742,43 @@ function getNasaForm() {
     var _nasaToday = new Date().toISOString().split('T')[0];
     var _nasa7Ago = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];
 
+    // میلادیِ ISO → شمسیِ آبجکت برای date-picker
+    // اولویت: DateWheelPicker.miladiToShamsi (تقویمِ دقیقِ جلالی) — Intl فقط fallback
+    function _gregToShamsi(iso) {
+        try {
+            var d = new Date(iso + 'T00:00:00');
+            if (window.DateWheelPicker && DateWheelPicker.miladiToShamsi) {
+                var j = DateWheelPicker.miladiToShamsi(d.getFullYear(), d.getMonth() + 1, d.getDate());
+                if (j && j.year > 1200) return { year: j.year, month: j.month, day: j.day };
+            }
+            var fmt = new Intl.DateTimeFormat('en-u-ca-persian', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            var parts = {};
+            fmt.formatToParts(d).forEach(function (p) { parts[p.type] = p.value; });
+            return { year: parseInt(parts.year), month: parseInt(parts.month), day: parseInt(parts.day) };
+        } catch (e) {
+            try {
+                if (window.DateWheelPicker && DateWheelPicker.miladiToShamsi) {
+                    var now = new Date();
+                    var j2 = DateWheelPicker.miladiToShamsi(now.getFullYear(), now.getMonth() + 1, now.getDate());
+                    return { year: j2.year, month: j2.month, day: j2.day };
+                }
+            } catch (e2) {}
+            return { year: 1404, month: 6, day: 17 };
+        }
+    }
+
     html += '<div id="nasaSpaceWeather" style="display:none;">';
     html += '<div class="form-grid">';
-    html += '<div class="form-group"><label>\u{1f4c5} از تاریخ</label><input type="date" id="nasaWeatherStart" value="' + _nasa7Ago + '"></div>';
-    html += '<div class="form-group"><label>\u{1f4c5} تا تاریخ</label><input type="date" id="nasaWeatherEnd" value="' + _nasaToday + '"></div>';
+    html += '<div class="form-group"><label>\u{1f4c5} از تاریخ (شمسی)</label>' + makeDatePickerTrigger('nasaWeatherStartDP', {label:'از تاریخ', calendarType:'shamsi', digits:'fa', defaultValue: _gregToShamsi(_nasa7Ago)}) + '</div>';
+    html += '<div class="form-group"><label>\u{1f4c5} تا تاریخ (شمسی)</label>' + makeDatePickerTrigger('nasaWeatherEndDP', {label:'تا تاریخ', calendarType:'shamsi', digits:'fa', defaultValue: _gregToShamsi(_nasaToday)}) + '</div>';
     html += '</div>';
     html += '<button class="btn-primary" onclick="fetchNasaSpaceWeather()" style="width:100%;margin-bottom:16px;">\u2600\ufe0f دریافت آب و هوای فضا</button>';
     html += '<div id="nasaWeatherResult"></div></div>';
 
     html += '<div id="nasaAsteroids" style="display:none;">';
     html += '<div class="form-grid">';
-    html += '<div class="form-group"><label>\u{1f4c5} از تاریخ</label><input type="date" id="nasaNeoStart" value="' + _nasa7Ago + '"></div>';
-    html += '<div class="form-group"><label>\u{1f4c5} تا تاریخ</label><input type="date" id="nasaNeoEnd" value="' + _nasaToday + '"></div>';
+    html += '<div class="form-group"><label>\u{1f4c5} از تاریخ (شمسی)</label>' + makeDatePickerTrigger('nasaNeoStartDP', {label:'از تاریخ', calendarType:'shamsi', digits:'fa', defaultValue: _gregToShamsi(_nasa7Ago)}) + '</div>';
+    html += '<div class="form-group"><label>\u{1f4c5} تا تاریخ (شمسی)</label>' + makeDatePickerTrigger('nasaNeoEndDP', {label:'تا تاریخ', calendarType:'shamsi', digits:'fa', defaultValue: _gregToShamsi(_nasaToday)}) + '</div>';
     html += '</div>';
     html += '<button class="btn-primary" onclick="fetchNasaAsteroids()" style="width:100%;margin-bottom:16px;">\u2604\ufe0f دریافت سیارک\u200cها</button>';
     html += '<div id="nasaNeoResult"></div></div>';
@@ -3748,13 +3786,18 @@ function getNasaForm() {
     
     var _nasaToday2 = new Date().toISOString().split('T')[0];
     html += '<div id="nasaPlanets" style="display:none;">';
-    html += '<div class="form-group"><label>\u{1f4c5} تاریخ</label><input type="date" id="nasaPlanetsDate" value="' + _nasaToday2 + '"></div>';
+    html += '<div class="form-group"><label>\u{1f4c5} تاریخ (شمسی)</label>' + makeDatePickerTrigger('nasaPlanetsDateDP', {label:'تاریخ', calendarType:'shamsi', digits:'fa', defaultValue: _gregToShamsi(_nasaToday2)}) + '</div>';
     html += '<button class="btn-primary" onclick="fetchNasaPlanets()" style="width:100%;margin-bottom:16px;">\ud83c\udf0f دریافت موقعیت سیارات</button>';
     html += '<div id="nasaPlanetsResult"></div></div>';
 
     html += '<div id="nasaMars" style="display:none;">';
     html += '<button class="btn-primary" onclick="fetchNasaMarsWeather()" style="width:100%;margin-bottom:16px;">\u{1f534} دریافت آب و هوای مریخ</button>';
     html += '<div id="nasaMarsResult"></div></div>';
+
+    html += '<div id="nasaCuriosity" style="display:none;">';
+    html += '<p style="color:#8a82a0;font-size:0.85rem;line-height:2;">🤖 <b>مریخ‌نورد کنجکاوی (Curiosity)</b> از ۲۰۱۲ در دهانه‌ی گیل فعال است و روزانه داده‌ی هواشناسیِ REMS می‌فرستد. این تب خروجیِ خامِ REMS را با دیباگ نشان می‌دهد.</p>';
+    html += '<button class="btn-primary" onclick="fetchCuriosityRaw()" style="width:100%;margin-bottom:16px;">\u{1f916} دریافت داده‌ی خام Curiosity</button>';
+    html += '<div id="nasaCuriosityResult"></div></div>';
 
     html += '</div></div>';
 
@@ -3768,15 +3811,60 @@ function getNasaForm() {
 }
 
 function switchNasaTab(tab) {
-    var panels = ['nasaApod','nasaImages','nasaSpaceWeather','nasaAsteroids','nasaMars'];
+    // هر ۷ پنل — شامل nasaPlanets (باگِ چسبیدنِ نتیجه اینجا بود!)
+    var panels = ['nasaApod','nasaImages','nasaSpaceWeather','nasaAsteroids','nasaMars','nasaPlanets','nasaCuriosity'];
     panels.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
     document.querySelectorAll('.nasa-tab').forEach(function(b) { b.classList.remove('active'); });
-    var tabMap = {'apod':'nasaApod','images':'nasaImages','space-weather':'nasaSpaceWeather','asteroids':'nasaAsteroids','mars':'nasaMars','planets':'nasaPlanets'};
+    var tabMap = {'apod':'nasaApod','images':'nasaImages','space-weather':'nasaSpaceWeather','asteroids':'nasaAsteroids','mars':'nasaMars','planets':'nasaPlanets','curiosity':'nasaCuriosity'};
     var target = document.getElementById(tabMap[tab]);
     if (target) target.style.display = 'block';
     var btn = document.querySelector('.nasa-tab[data-nasa-tab="' + tab + '"]');
     if (btn) btn.classList.add('active');
+    // ─── پاک‌سازی نتایجِ تب‌هایِ دیگر: هیچ نتیجه‌ای از تب قبلی نچسبد ───
+    var resultIds = { apod:'nasaApodResult', images:'nasaImagesResult', 'space-weather':'nasaWeatherResult',
+                      asteroids:'nasaNeoResult', mars:'nasaMarsResult', planets:'nasaPlanetsResult', curiosity:'nasaCuriosityResult' };
+    Object.keys(resultIds).forEach(function (k) {
+        if (k !== tab) { var el = document.getElementById(resultIds[k]); if (el) el.innerHTML = ''; }
+    });
 }
+
+// ═══ Curiosity — خروجیِ خامِ REMS (تبِ مجزا) ═══
+async function fetchCuriosityRaw() {
+    var div = document.getElementById('nasaCuriosityResult');
+    div.innerHTML = '<div class="nasa-loading">⏳ در حال دریافت داده از Curiosity...</div>';
+    try {
+        var res = await fetch('/api/v5/nasa/mars-weather');
+        var data = await res.json();
+        if (data.status !== 'success') {
+            div.innerHTML = '<div class="nasa-error">❌ ' + (data.detail || data.note_fa || 'خطا') + '</div>';
+            return;
+        }
+        var d = data.data;
+        var sols = d.sols || [];
+        var live = !d.historical;
+        var html = '<div style="background:rgba(0,184,148,0.06);border:1px solid rgba(0,184,148,0.25);border-radius:14px;padding:14px 16px;margin-bottom:14px;">';
+        html += '<b style="color:#00b894;">' + (live ? '🟢 دادهٔ زنده' : '⏳ دادهٔ تاریخی') + '</b> — ' + (d.source_fa || '') ;
+        html += '<div style="color:#888;font-size:0.78rem;margin-top:4px;line-height:1.8;">' + (d.note_fa || '') + '</div></div>';
+        html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;">';
+        sols.forEach(function (s) {
+            var t = s.temperature || {};
+            html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;">';
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><b style="color:#fdcb6e;">Sol ' + s.sol + '</b><span style="font-size:0.75rem;color:#a29bfe;">' + (s.season_fa || '') + '</span></div>';
+            html += '<div style="display:flex;justify-content:space-around;font-size:0.85rem;text-align:center;">';
+            html += '<div><div style="color:#888;font-size:0.7rem;">کمینه</div><b style="color:#85c1e9;">' + (t.min_c != null ? t.min_c + '°' : '—') + '</b></div>';
+            html += '<div><div style="color:#888;font-size:0.7rem;">میانگین</div><b style="color:#fdcb6e;">' + (t.avg_c != null ? t.avg_c + '°' : '—') + '</b></div>';
+            html += '<div><div style="color:#888;font-size:0.7rem;">بیشینه</div><b style="color:#ff6b6b;">' + (t.max_c != null ? t.max_c + '°' : '—') + '</b></div>';
+            html += '</div>';
+            if (s.interpretation_fa) html += '<div style="margin-top:8px;font-size:0.78rem;color:#ccc;line-height:1.9;">📜 ' + s.interpretation_fa + '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+        div.innerHTML = html;
+    } catch (e) {
+        div.innerHTML = '<div class="nasa-error">❌ خطا در ارتباط با سرور</div>';
+    }
+}
+window.fetchCuriosityRaw = fetchCuriosityRaw;
 
 async function fetchNasaApod() {
     var div = document.getElementById('nasaApodResult');
@@ -3859,9 +3947,12 @@ function displayNasaImages(data, container) {
 }
 
 async function fetchNasaSpaceWeather() {
-    var start = document.getElementById('nasaWeatherStart').value;
-    var end = document.getElementById('nasaWeatherEnd').value;
-    if (!start) return;
+    // از date-picker شمسی می‌خواند و به میلادیِ ISO تبدیل می‌کند
+    var sEl = document.getElementById('nasaWeatherStartDP_hidden');
+    var eEl = document.getElementById('nasaWeatherEndDP_hidden');
+    var start = sEl ? (window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(sEl.value) : sEl.value) : '';
+    var end = eEl ? (window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(eEl.value) : eEl.value) : '';
+    if (!start) { alert('تاریخ شروع را انتخاب کنید'); return; }
     var div = document.getElementById('nasaWeatherResult');
     div.innerHTML = '<div class="nasa-loading">\u23f3 در حال دریافت اطلاعات...</div>';
     try {
@@ -3905,9 +3996,11 @@ function displayNasaSpaceWeather(data, container) {
 }
 
 async function fetchNasaAsteroids() {
-    var start = document.getElementById('nasaNeoStart').value;
-    var end = document.getElementById('nasaNeoEnd').value;
-    if (!start) return;
+    var sEl = document.getElementById('nasaNeoStartDP_hidden');
+    var eEl = document.getElementById('nasaNeoEndDP_hidden');
+    var start = sEl ? (window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(sEl.value) : sEl.value) : '';
+    var end = eEl ? (window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(eEl.value) : eEl.value) : '';
+    if (!start) { alert('تاریخ شروع را انتخاب کنید'); return; }
     var div = document.getElementById('nasaNeoResult');
     div.innerHTML = '<div class="nasa-loading">\u23f3 در حال دریافت اطلاعات سیارک‌ها...</div>';
     try {
@@ -3993,9 +4086,15 @@ function displayNasaMarsWeather(data, container) {
         container.innerHTML = '<div class="nasa-card"><p style="color:#888;text-align:center;">' + (data.note_fa || 'داده‌ای موجود نیست') + '</p></div>';
         return;
     }
+    var liveBadge = data.historical
+        ? '<span style="background:rgba(225,112,85,0.2);padding:3px 12px;border-radius:20px;font-size:0.72rem;color:#e17055;">⏳ تاریخی</span>'
+        : '<span style="background:rgba(0,184,148,0.18);padding:3px 12px;border-radius:20px;font-size:0.72rem;color:#00b894;">🟢 زنده</span>';
     var html = '<div class="nasa-card">';
-    html += '<h4 class="nasa-card-title">🔴 ' + (data.source_fa || 'آب و هوای مریخ') + '</h4>';
-    html += '<p style="color:#888;font-size:0.85rem;margin-bottom:12px;">' + (data.note_fa || '') + '</p>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px;">';
+    html += '<h4 class="nasa-card-title" style="margin:0;">🔴 ' + (data.source_fa || 'آب و هوای مریخ') + '</h4>';
+    html += liveBadge;
+    html += '</div>';
+    html += '<p style="color:#888;font-size:0.8rem;margin-bottom:12px;line-height:1.9;">' + (data.note_fa || '') + '</p>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">';
     data.sols.forEach(function(sol) {
         var t = sol.temperature || {};
@@ -4003,21 +4102,25 @@ function displayNasaMarsWeather(data, container) {
         var p = sol.pressure || {};
         var firstDate = sol.first_utc ? new Date(sol.first_utc) : null;
         var lastDate = sol.last_utc ? new Date(sol.last_utc) : null;
-        var dateStr = firstDate && lastDate ? firstDate.toISOString().slice(0,10) + ' — ' + lastDate.toISOString().slice(0,10) : '';
+        var dateStr = firstDate && lastDate ? firstDate.toISOString().slice(0,10) + ' — ' + lastDate.toISOString().slice(0,10) : (sol.first_utc || '');
         html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;transition:transform 0.2s;">';
         html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
         html += '<span style="font-size:1.1rem;font-weight:700;color:#fdcb6e;">Sol ' + sol.sol + '</span>';
         html += '<span style="background:rgba(108,92,231,0.15);padding:3px 12px;border-radius:20px;font-size:0.8rem;color:#a29bfe;">' + (sol.season_fa || sol.season || '') + '</span>';
         html += '</div>';
         html += '<div style="display:flex;justify-content:space-around;text-align:center;margin:12px 0;">';
-        html += '<div><div style="font-size:0.8rem;color:#888;">🌡️ میانگین</div><div style="font-weight:700;font-size:1.1rem;">' + (t.avg_c !== null ? t.avg_c.toFixed(1) : 'N/A') + '°C</div></div>';
-        html += '<div><div style="font-size:0.8rem;color:#888;">❄️ حداقل</div><div style="font-weight:700;font-size:1.1rem;color:#85c1e9;">' + (t.min_c !== null ? t.min_c.toFixed(1) : 'N/A') + '°C</div></div>';
-        html += '<div><div style="font-size:0.8rem;color:#888;">🔥 حداکثر</div><div style="font-weight:700;font-size:1.1rem;color:#ff6b6b;">' + (t.max_c !== null ? t.max_c.toFixed(1) : 'N/A') + '°C</div></div>';
+        html += '<div><div style="font-size:0.8rem;color:#888;">🌡️ میانگین</div><div style="font-weight:700;font-size:1.1rem;">' + (t.avg_c !== null && t.avg_c !== undefined ? t.avg_c.toFixed(1) : 'N/A') + '°C</div></div>';
+        html += '<div><div style="font-size:0.8rem;color:#888;">❄️ حداقل</div><div style="font-weight:700;font-size:1.1rem;color:#85c1e9;">' + (t.min_c !== null && t.min_c !== undefined ? t.min_c.toFixed(1) : 'N/A') + '°C</div></div>';
+        html += '<div><div style="font-size:0.8rem;color:#888;">🔥 حداکثر</div><div style="font-weight:700;font-size:1.1rem;color:#ff6b6b;">' + (t.max_c !== null && t.max_c !== undefined ? t.max_c.toFixed(1) : 'N/A') + '°C</div></div>';
         html += '</div>';
         html += '<div style="display:flex;justify-content:space-around;border-top:1px solid rgba(255,255,255,0.04);padding-top:10px;margin-top:8px;font-size:0.9rem;">';
-        html += '<div><span style="color:#888;">🌬️ باد:</span> <strong>' + (w.speed_ms !== null ? w.speed_ms.toFixed(1) : 'N/A') + ' m/s</strong></div>';
-        html += '<div><span style="color:#888;">📊 فشار:</span> <strong>' + (p.avg_pa !== null ? p.avg_pa.toFixed(0) : 'N/A') + ' Pa</strong></div>';
+        html += '<div><span style="color:#888;">🌬️ باد:</span> <strong>' + (w.speed_ms !== null && w.speed_ms !== undefined ? w.speed_ms.toFixed(1) : 'N/A') + ' m/s</strong></div>';
+        html += '<div><span style="color:#888;">📊 فشار:</span> <strong>' + (p.avg_pa !== null && p.avg_pa !== undefined ? p.avg_pa.toFixed(0) : 'N/A') + ' Pa</strong></div>';
         html += '</div>';
+        // تفسیر فارسی
+        if (sol.interpretation_fa) {
+            html += '<div style="margin-top:10px;padding:8px 12px;background:rgba(253,203,110,0.06);border-right:2px solid rgba(253,203,110,0.4);border-radius:8px;color:#ccc;font-size:0.8rem;line-height:1.9;">📜 ' + sol.interpretation_fa + '</div>';
+        }
         if (dateStr) {
             html += '<div style="font-size:0.7rem;color:#555;margin-top:8px;text-align:left;direction:ltr;">' + dateStr + '</div>';
         }
@@ -4053,8 +4156,9 @@ var _nasaPlanetEmoji = {
 };
 
 async function fetchNasaPlanets() {
-    var date = document.getElementById('nasaPlanetsDate').value;
-    if (!date) return;
+    var dEl = document.getElementById('nasaPlanetsDateDP_hidden');
+    var date = dEl ? (window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(dEl.value) : dEl.value) : '';
+    if (!date) { alert('تاریخ را انتخاب کنید'); return; }
     var div = document.getElementById('nasaPlanetsResult');
     div.innerHTML = '<div class="nasa-loading">\u23f3 در حال دریافت موقعیت سیارات...</div>';
     try {

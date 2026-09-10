@@ -215,17 +215,26 @@ async def get_asteroids_today():
 
 
 # ============================================
-# 6. Mars Weather (InSight)
+# 6. Mars Weather (Curiosity — زنده) + fallback InSight
 # ============================================
 @router.get("/mars-weather")
 async def get_mars_weather():
-    """گزارش آب و هوای مریخ از مریخ‌نورد این‌سایت"""
+    """گزارش آب و هوای مریخ — Curiosity زنده، InSight تاریخی (fallback)"""
     try:
         result = await mars_svc.get_weather()
         if "error" in result and not result.get("sols"):
-            raise HTTPException(status_code=502, detail=result["error"])
+            return {"status": "error", "detail": result["error"], "note_fa": result.get("note_fa", "")}
         return {"status": "success", "data": result}
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/mars-weather/debug")
+async def get_mars_weather_debug():
+    """دیباگ: نتیجهٔ خام Curiosity + خطای دقیق"""
+    sols, err = await mars_svc._fetch_curiosity()
+    return {
+        "curiosity_ok": sols is not None,
+        "curiosity_error": err,
+        "curiosity_sample": sols[:2] if sols else None,
+    }

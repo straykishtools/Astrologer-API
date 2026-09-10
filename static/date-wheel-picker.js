@@ -69,7 +69,7 @@
     //  STATE
     // ================================================================
     var _opts = {}, _isOpen = false, _cal = 'shamsi';
-    var _sel = { year: 1403, month: 1, day: 1 };
+    var _sel = { year: 1380, month: 1, day: 1 };
     var _onSave = null;
     var _el = {}; // cached DOM references
     var _rendering = false; // guard against recursive renderAll
@@ -113,7 +113,6 @@
             '</div>' +
             '<div class="dp-toggle">' +
                 '<button class="dp-toggle-btn active" data-cal="shamsi" id="dpTogSh">شمسی</button>' +
-                '<button class="dp-toggle-btn" data-cal="miladi" id="dpTogMl">میلادی</button>' +
             '</div>' +
             '<div class="dp-wheels">' +
                 '<div class="dp-col" tabindex="0" data-wheel="year">' +
@@ -161,9 +160,8 @@
             closePicker();
         });
 
-        // Calendar toggle
+        // Calendar toggle (میلادی حذف شد — فقط شمسی)
         document.getElementById('dpTogSh').addEventListener('click', function () { switchCalendar('shamsi'); });
-        document.getElementById('dpTogMl').addEventListener('click', function () { switchCalendar('miladi'); });
 
         // Arrow buttons
         document.getElementById('dpYearUp').addEventListener('click', function () { wheelStep('year', -1); });
@@ -203,17 +201,15 @@
     //  WHEEL STEPS (arrow buttons)
     // ================================================================
     function wheelStep(type, dir) {
-        var mn = _opts.minYear || (_cal === 'shamsi' ? 1300 : 1921);
-        var mx = _opts.maxYear || (_cal === 'shamsi' ? 1450 : 2071);
+        /* محدودیت سال برداشته شد — فلش‌ها آزادند؛ بازه‌ی رندر خودش دنبال می‌کند */
         var st = _opts.yearStep || 1;
 
         if (type === 'year') {
-            var newY = _sel.year + dir * st;
-            if (newY >= mn && newY <= mx) _sel.year = newY;
+            _sel.year += dir * st;
         } else if (type === 'month') {
             var newM = _sel.month + dir;
-            if (newM > 12) { _sel.month = 1; if (_sel.year + st <= mx) _sel.year += st; }
-            else if (newM < 1) { _sel.month = 12; if (_sel.year - st >= mn) _sel.year -= st; }
+            if (newM > 12) { _sel.month = 1; _sel.year += st; }
+            else if (newM < 1) { _sel.month = 12; _sel.year -= st; }
             else { _sel.month = newM; }
         } else if (type === 'day') {
             var maxD = daysInMonth(_cal, _sel.year, _sel.month);
@@ -230,29 +226,8 @@
     //  CALENDAR SWITCH
     // ================================================================
     function switchCalendar(cal) {
-        if (cal === _cal) return;
-        document.getElementById('dpTogSh').classList.toggle('active', cal === 'shamsi');
-        document.getElementById('dpTogMl').classList.toggle('active', cal === 'miladi');
-        /* convert the selection, then clamp day into the new month length
-           (30 اسفند → 31 مارس fine; 30/31 → فوریه must clamp) */
-        if (_cal === 'shamsi' && cal === 'miladi') {
-            var g = ShamsiConv.j2g(_sel.year, _sel.month, _sel.day);
-            _sel = { year: g.year, month: g.month, day: g.day };
-        } else if (_cal === 'miladi' && cal === 'shamsi') {
-            var j = ShamsiConv.g2j(_sel.year, _sel.month, _sel.day);
-            _sel = { year: j.year, month: j.month, day: j.day };
-        }
-        _cal = cal;
-        /* keep caller-supplied min/max when valid for the new calendar;
-           otherwise fall back to per-calendar defaults (no stale bounds) */
-        var defMin = cal === 'shamsi' ? 1300 : 1921;
-        var defMax = cal === 'shamsi' ? 1450 : 2071;
-        if (_opts.minYear != null && (_opts.minYear < defMin - 200 || _opts.minYear > defMax)) delete _opts.minYear;
-        if (_opts.maxYear != null && (_opts.maxYear > defMax + 200 || _opts.maxYear < defMin)) delete _opts.maxYear;
-        var maxD = daysInMonth(_cal, _sel.year, _sel.month);
-        if (_sel.day > maxD) _sel.day = maxD;
-        if (_sel.day < 1) _sel.day = 1;
-        renderAll();
+        /* میلادی کلاً حذف شد — همیشه شمسی */
+        return;
     }
 
     // ================================================================
@@ -286,8 +261,15 @@
         if (_rendering) return;
         _rendering = true;
         var d = _opts.digits || 'fa';
-        var mn = _opts.minYear || (_cal === 'shamsi' ? 1300 : 1921);
-        var mx = _opts.maxYear || (_cal === 'shamsi' ? 1450 : 2071);
+        /* محدودیت سال برداشته شد تا سیستم جدید — بازه‌ی آزاد حول سال انتخابی */
+        /* سبکی: بازه‌ی سال محدود به ±۱۰۰ سالِ انتخابی (نه چند صد سال) —
+           رندر سبک می‌ماند و چرخ روان است. min/max صریحِ فراخوان همچنان
+           برنده است. */
+        var mn = _opts.minYear || (_sel.year - 100);
+        var mx = _opts.maxYear || (_sel.year + 100);
+        if (_sel.year < mn) { mn = _sel.year - 40; mx = _sel.year + 60; }
+        if (_sel.year > mx) { mx = _sel.year + 40; mn = _sel.year - 60; }
+        _curMn = mn; _curMx = mx;
         var st = _opts.yearStep || 1;
 
         // Years
@@ -334,6 +316,7 @@
     //  SCROLL DETECTION (once per open)
     // ================================================================
     var _scrollHandlers = [];
+    var _curMn = 0, _curMx = 0;   /* currently rendered year range */
     function detachScroll() {
         _scrollHandlers.forEach(function (h) { h.list.removeEventListener('scroll', h.fn); });
         _scrollHandlers = [];
@@ -384,8 +367,17 @@
             best.classList.add('selected');
             best.style.transform = 'scale(1)';
             best.style.opacity = '1';
-            _sel[key] = parseInt(best.dataset.value);
-            if (key !== 'day') renderAll(); // re-render day if year/month changed
+            var prev = _sel[key];
+            var val = parseInt(best.dataset.value);
+            if (prev === val) { updateDisplay(); return; }   /* no change → no re-render */
+            _sel[key] = val;
+            /* رندر مجدد فقط وقتی لازم است — سبکی:
+               ماه → طول روزها؛ سال → فقط اگر به لبه‌ی بازه رسیده باشد */
+            if (key === 'month') renderAll();
+            else if (key === 'year') {
+                if (val <= _curMn + 10 || val >= _curMx - 10) renderAll();
+                else updateDisplay();
+            }
             else updateDisplay();
         }
     }
@@ -397,7 +389,8 @@
         buildModal();
         _opts = opts || {};
         _onSave = opts.onSave || null;
-        _cal = opts.calendarType || 'shamsi';
+        /* همیشه در شمسی باز می‌شود — میلادی حذف شد */
+        _cal = 'shamsi';
 
         if (opts.defaultValue && !isNaN(parseInt(opts.defaultValue.year)) &&
             parseInt(opts.defaultValue.year) > 0 &&
@@ -413,20 +406,9 @@
                 ? ShamsiConv.g2j(now.getFullYear(), now.getMonth() + 1, now.getDate())
                 : { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
         }
-        /* clamp into the rendered year range so the wheel always has the
-           selection inside the list */
-        var mnY = _opts.minYear || (_cal === 'shamsi' ? 1300 : 1921);
-        var mxY = _opts.maxYear || (_cal === 'shamsi' ? 1450 : 2071);
-        if (_sel.year < mnY) _sel.year = mnY;
-        if (_sel.year > mxY) _sel.year = mxY;
-            var now = new Date();
-            _sel = _cal === 'shamsi'
-                ? ShamsiConv.g2j(now.getFullYear(), now.getMonth() + 1, now.getDate())
-                : { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
-        }
+        /* محدودیت برداشته شد — سال انتخابی آزاد است؛ بازه رندر حول آن می‌چرخد */
 
-        document.getElementById('dpTogSh').classList.toggle('active', _cal === 'shamsi');
-        document.getElementById('dpTogMl').classList.toggle('active', _cal === 'miladi');
+        document.getElementById('dpTogSh').classList.add('active');
 
         renderAll();
         attachScroll();

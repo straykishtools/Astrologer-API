@@ -487,7 +487,7 @@ function bindBirthEdit() {
             calendarType: 'shamsi',
             digits: 'fa',
             defaultValue: cur || { year: 1379, month: 1, day: 1 },
-            minYear: 1300, maxYear: 1450,
+            /* محدودیت سال برداشته شد */
             onSave: function (date) {
                 if (!window.sharedInputs) window.sharedInputs = {};
                 window.sharedInputs.birthDate = { year: date.year, month: date.month, day: date.day };
@@ -514,7 +514,7 @@ function bindBirthEdit() {
                 if (window.showToast) window.showToast('تاریخ تولد به‌روزرسانی شد ✅', 'success');
             }
         });
-    }
+    });
 }
 
 return { init: init, renderDashboard: renderDashboard, applyElementTheme: applyElementTheme, resetTheme: resetTheme };

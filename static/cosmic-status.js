@@ -347,12 +347,30 @@ function startEclipseCountdown(nextTs) {
     }, 60000); // update every minute
 }
 
+// ─── Open-Meteo cache (اشتراکی — یک fetch برای همه‌ی بخش‌ها) ───
+var _omCache = null;
+var _omAt = 0;
+function fetchOpenMeteo() {
+    if (_omCache && (Date.now() - _omAt) < 30 * 60 * 1000) return Promise.resolve(_omCache);
+    var lat = (window.sharedInputs && window.sharedInputs.latitude) || 35.6892;
+    var lng = (window.sharedInputs && window.sharedInputs.longitude) || 51.3890;
+    return fetch('/api/v5/weather?lat=' + lat + '&lng=' + lng)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+            if (d && (d.status === 'success' || d.status === 'partial') && d.data) {
+                _omCache = d.data; _omAt = Date.now();
+                return _omCache;
+            }
+            return null;
+        }).catch(function () { return null; });
+}
+
 // ─── Render ───
 function render() {
     if (!dom.panel) return;
 
     var moon = getMoonPhaseInfo();
-    var sun = getApproxSunTimes(35.6892);
+    var sun = getApproxSunTimes((window.sharedInputs && window.sharedInputs.latitude) || 35.6892);
     var dayLen = getDayLength(sun);
     var season = getSeason();
     var event = getNextSolarEvent(sun);
@@ -553,6 +571,50 @@ function render() {
             if (extra) {
                 var el = document.getElementById('csApiMoon');
                 if (el) el.innerHTML = extra;
+            }
+        });
+
+        // ─── Open-Meteo: طلوع/غروب دقیق + طلوع/غروبِ ماه + فاز دقیق ───
+        fetchOpenMeteo().then(function (m) {
+            if (!m || !m.weather) return;
+            var w = m.weather;
+
+            // جایگزینی طلوع/غروب تقریبی خورشید با دقیق
+            var sunEl = document.querySelector('.cs-section .cs-row-value');
+            if (sunEl && w.sunrise && w.sunset) sunEl.textContent = w.sunrise + ' — ' + w.sunset;
+
+            // طول روز دقیق
+            var dayLenEl = null;
+            document.querySelectorAll('.cs-row-sub').forEach(function (el) {
+                if (el.textContent.indexOf('مدت روز') === 0 && w.day_length) el.textContent = 'مدت روز: ' + w.day_length;
+            });
+
+            // فاز ماه دقیق + طلوع/غروبِ ماه — در بخش فاز ماه
+            if (m.moon && m.moon.phase_fa) {
+                var moonSection = document.querySelector('.cs-section .cs-row-value');
+                var moonVal = document.querySelectorAll('.cs-section .cs-row-value')[0];
+                if (moonVal) {
+                    moonVal.innerHTML = m.moon.emoji + ' ' + m.moon.phase_fa;
+                }
+                // moonrise/moonset به‌صورت زیرِ بخشِ ماه
+                var firstSection = document.querySelector('.cs-section');
+                if (firstSection && (w.moonrise || w.moonset)) {
+                    var mr = '';
+                    if (w.moonrise) mr += '🌙 طلوعِ ماه: ' + w.moonrise;
+                    if (w.moonset) mr += (mr ? ' · ' : '') + '🌙 غروبِ ماه: ' + w.moonset;
+                    if (mr) {
+                        var mrEl = document.createElement('div');
+                        mrEl.className = 'cs-row-sub';
+                        mrEl.textContent = mr;
+                        firstSection.appendChild(mrEl);
+                    }
+                }
+            }
+
+            // وضعیتِ هوایِ کوتاه در هدرِ پنل (اختیاری — فقط اگر آب‌وهوا روشن است)
+            if (w.condition_fa) {
+                var headerDate = document.querySelector('.cs-header-date');
+                if (headerDate) headerDate.innerHTML += ' · ' + w.condition_fa + ' ' + (w.temp != null ? Math.round(w.temp) + '°' : '');
             }
         });
 

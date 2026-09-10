@@ -1,0 +1,145 @@
+/* ═══════════ Preset Calendar — تقویم با انتخاب سریع (ناسا / فاز ماه) ═══════════ */
+.pc-root {
+    max-width: 640px;
+    margin: 0 auto;
+    font-family: 'Vazirmatn', sans-serif;
+}
+.pc-wrap {
+    display: flex;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+/* ─── ستون انتخاب سریع ─── */
+.pc-side {
+    width: 168px;
+    flex-shrink: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(7, 12, 31, 0.35);
+    display: flex;
+    flex-direction: column;
+}
+.pc-quick-toggle { display: none; }
+.pc-side-title {
+    margin: 0;
+    padding: 12px 12px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #8d93a8;
+}
+.pc-preset-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 8px 10px;
+    overflow-y: auto;
+}
+.pc-preset {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: #d6dcec;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 12px;
+    text-align: right;
+    padding: 8px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pc-preset:hover { background: rgba(249, 217, 118, 0.12); color: #f9d976; }
+.pc-preset.active {
+    background: linear-gradient(135deg, rgba(249, 217, 118, 0.22), rgba(249, 217, 118, 0.1));
+    color: #f9d976;
+    font-weight: 700;
+}
+
+/* ─── تقویم ─── */
+.pc-cal { flex: 1; padding: 12px; min-width: 0; }
+.pc-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 8px; }
+.pc-nav {
+    width: 30px; height: 30px; border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #d6dcec; font-size: 15px; cursor: pointer; transition: 0.15s;
+    flex-shrink: 0;
+}
+.pc-nav:hover { background: rgba(249, 217, 118, 0.15); color: #f9d976; }
+.pc-title { display: flex; gap: 6px; flex: 1; justify-content: center; }
+.pc-title select {
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 13px; font-weight: 700;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff; border-radius: 10px;
+    padding: 5px 8px; cursor: pointer; outline: none;
+    max-width: 110px;
+}
+.pc-title select option { background: #141a30; color: #fff; }
+
+.pc-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+.pc-weekdays span { text-align: center; font-size: 10.5px; color: #8d93a8; padding: 3px 0; }
+
+.pc-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.pc-day {
+    height: 32px; border-radius: 9px; border: none;
+    display: grid; place-items: center;
+    font-family: 'Vazirmatn', sans-serif; font-size: 12.5px;
+    background: transparent; color: #d6dcec; cursor: pointer;
+    transition: 0.12s;
+    padding: 0;
+}
+.pc-day:hover:not(.empty) { background: rgba(249, 217, 118, 0.14); color: #f9d976; }
+.pc-day.today { border: 1px solid rgba(249, 217, 118, 0.5); color: #f9d976; }
+.pc-day.in-range { background: rgba(249, 217, 118, 0.1); border-radius: 0; color: #f0e6b0; }
+.pc-day.edge {
+    background: linear-gradient(135deg, #fe9400, #f9d976);
+    color: #1a1204; font-weight: 800;
+    border-radius: 9px;
+}
+.pc-day.selected {
+    background: linear-gradient(135deg, #fe9400, #f9d976);
+    color: #1a1204; font-weight: 800;
+}
+.pc-day.empty { visibility: hidden; pointer-events: none; }
+
+.pc-summary {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(162, 155, 254, 0.08);
+    border: 1px solid rgba(162, 155, 254, 0.15);
+    color: #b0c4e0;
+    font-size: 12px;
+    text-align: center;
+}
+.pc-summary b { color: #f9d976; }
+
+/* ─── موبایل: انتخاب سریع جمع‌شونده ─── */
+@media (max-width: 640px) {
+    .pc-wrap { flex-direction: column; }
+    .pc-side { width: 100%; border-left: none; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+    .pc-quick-toggle {
+        display: block;
+        width: calc(100% - 16px);
+        margin: 10px 8px 0;
+        padding: 9px;
+        border-radius: 10px;
+        border: 1px solid rgba(249, 217, 118, 0.3);
+        background: rgba(249, 217, 118, 0.08);
+        color: #f9d976;
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .pc-presets { display: none; }
+    .pc-presets.open { display: block; }
+    .pc-preset-list { max-height: 180px; }
+    .pc-day { height: 34px; }
+}

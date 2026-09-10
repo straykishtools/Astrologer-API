@@ -1,0 +1,62 @@
+/* ═══════════ Shamsi Calendar Popover (birth date) ═══════════ */
+/* position:absolute + مختصات document → با اسکرول صفحه همیشه کنار دکمه می‌ماند (fixed جابجا می‌شد) */
+.sc-popover {
+    position: absolute; z-index: 9998;
+    width: 300px;
+    background: linear-gradient(170deg, rgba(18,24,48,.98), rgba(10,14,32,.98));
+    border: 1px solid rgba(221,192,112,.3);
+    border-radius: 18px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04) inset;
+    padding: 12px;
+    font-family: 'Vazirmatn', sans-serif;
+    user-select: none;
+    animation: scPop .18s ease both;
+}
+@keyframes scPop { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
+
+.sc-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 8px; }
+.sc-nav {
+    width: 30px; height: 30px; border-radius: 10px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    color: #d6dcec; font-size: 15px; cursor: pointer; transition: .15s;
+}
+.sc-nav:hover { background: rgba(249,217,118,.15); color: #f9d976; }
+.sc-title { display: flex; gap: 6px; flex: 1; justify-content: center; }
+.sc-title select {
+    font-family: 'Vazirmatn', sans-serif; font-size: 13px; font-weight: 700;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    color: #fff; border-radius: 10px; padding: 5px 8px; cursor: pointer; outline: none;
+}
+.sc-title select option { background: #141a30; color: #fff; }
+.sc-close {
+    width: 30px; height: 30px; border-radius: 10px; flex: 0 0 30px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    color: #d6dcec; font-size: 13px; line-height: 1; cursor: pointer; transition: .15s;
+}
+.sc-close:hover { background: rgba(255,90,90,.18); color: #ff8a8a; border-color: rgba(255,120,120,.4); }
+
+.sc-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+.sc-weekdays span { text-align: center; font-size: 10.5px; color: #8d93a8; padding: 3px 0; }
+
+.sc-grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.sc-day {
+    height: 32px; border-radius: 9px; border: none;
+    display: grid; place-items: center;
+    font-family: 'Vazirmatn', sans-serif; font-size: 12.5px;
+    background: transparent; color: #d6dcec; cursor: pointer;
+    transition: .12s;
+}
+.sc-day:hover:not(.empty):not(.disabled) { background: rgba(249,217,118,.14); color: #f9d976; }
+.sc-day.today { border: 1px solid rgba(249,217,118,.5); color: #f9d976; }
+.sc-day.selected { background: linear-gradient(135deg, #fe9400, #f9d976); color: #1a1204; font-weight: 800; }
+.sc-day.disabled { opacity: .25; cursor: default; }
+.sc-day.empty { visibility: hidden; }
+
+@media (max-width: 480px) {
+    .sc-popover { width: min(92vw, 320px); padding: 14px; }
+    .sc-day { height: 38px; font-size: 13.5px; border-radius: 10px; }
+    .sc-nav, .sc-close { width: 36px; height: 36px; flex-basis: 36px; font-size: 17px; }
+    /* جلوگیری از zoom خودکار iOS — فونت selectها <16px نباشد */
+    .sc-title select { font-size: 16px; padding: 6px 10px; }
+    .sc-weekdays span { font-size: 11px; padding: 5px 0; }
+}

@@ -115,32 +115,37 @@ function render() {
 
         var wData = m.weather || {};
         var extra = document.getElementById('esWeatherExtra');
-        if (extra && !wData.condition && !wData.condition_group_fa) {
-            // weather در پاسخ نیست — جزئیات خطا را نشان بده
+        if (extra && !wData.condition_fa && !wData.condition) {
             var errs = (m._errors && m._errors.weather) || 'نامشخص';
             extra.innerHTML = '<div style="font-size:10.5px;color:var(--ink-dim);">آب‌وهوا: سرویس پاسخ نداد (' + errs + ')</div>';
         }
-        if (extra && (wData.condition || wData.condition_group_fa)) {
+        if (extra && (wData.condition_fa || wData.condition)) {
             var wh = '<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:10px;">';
             wh += '<div style="flex:1;font-size:11.5px;">';
-            wh += '<span style="color:var(--gold-200);font-weight:700;">هوای امروز: </span>' + (wData.condition || wData.condition_group_fa);
+            wh += '<span style="color:var(--gold-200);font-weight:700;">هوای امروز: </span>' + (wData.condition_fa || wData.condition);
             if (wData.temp != null) wh += ' <span style="color:var(--ink-dim);">· ' + Math.round(wData.temp) + '°C</span>';
             if (wData.temp_min != null && wData.temp_max != null) wh += ' <span style="color:var(--ink-dim);">(' + Math.round(wData.temp_min) + '° تا ' + Math.round(wData.temp_max) + '°)</span>';
-            if (wData.humidity != null) wh += '<br><span style="font-size:10px;color:var(--ink-dim);">💧 رطوبت ' + Math.round(wData.humidity) + '٪' + (wData.wind_speed != null ? ' · 🌬️ باد ' + Math.round(wData.wind_speed * 3.6) + ' km/h' : '') + '</span>';
+            if (wData.feels_like != null) wh += '<br><span style="font-size:10px;color:var(--ink-dim);">🌡️ احساسِ واقعی ' + Math.round(wData.feels_like) + '°C';
+            if (wData.humidity != null) wh += ' · 💧 رطوبت ' + Math.round(wData.humidity) + '٪</span>';
+            if (wData.wind_speed != null) wh += '<br><span style="font-size:10px;color:var(--ink-dim);">🌬️ باد ' + Math.round(wData.wind_speed) + ' km/h' + (wData.wind_dir_fa ? ' ' + wData.wind_dir_fa : '') + (wData.wind_gusts != null ? ' (تندباز ' + Math.round(wData.wind_gusts) + ')' : '') + '</span>';
+            if (wData.uv_index_max != null) wh += '<br><span style="font-size:10px;color:var(--ink-dim);">☀️ UV امروز: ' + (Math.round(wData.uv_index_max * 10) / 10) + (wData.precip_prob_max != null ? ' · 🌧️ احتمالِ بارش ' + wData.precip_prob_max + '٪' : '') + '</span>';
+            // ماه از Open-Meteo
+            if (m.moon && m.moon.phase_fa) wh += '<br><span style="font-size:10px;color:var(--ink-dim);">' + m.moon.emoji + ' ' + m.moon.phase_fa + '</span>';
             wh += '</div></div>';
             extra.innerHTML = wh;
         }
 
-        // کیفیت هوا (AQICN)
+        // کیفیت هوا (Open-Meteo Air Quality)
         if (airEl) {
             var a = m.air || {};
             if (a.aqi_label) {
                 var ah = '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:10px;">';
                 ah += '<div style="flex:1;font-size:11.5px;">';
-                ah += '<span style="color:var(--gold-200);font-weight:700;">' + a.aqi_label + '</span> <span style="color:var(--ink-dim);font-size:10px;">(AQI ' + a.aqi + ')</span>';
+                ah += '<span style="color:var(--gold-200);font-weight:700;">' + a.aqi_label + '</span> <span style="color:var(--ink-dim);font-size:10px;">(AQI اروپا: ' + (a.aqi != null ? Math.round(a.aqi) : '—') + ')</span>';
                 if (a.pm25 != null) ah += ' <span style="color:var(--ink-dim);font-size:10px;">· PM2.5: ' + Math.round(a.pm25) + '</span>';
+                if (a.pm10 != null) ah += ' <span style="color:var(--ink-dim);font-size:10px;">· PM10: ' + Math.round(a.pm10) + '</span>';
                 if (a.advice_fa) ah += '<br><span style="font-size:10px;color:var(--ink-dim);">💡 ' + a.advice_fa + '</span>';
-                if (a.station) ah += '<br><span style="font-size:9px;color:var(--ink-dim);opacity:0.7;">ایستگاه: ' + a.station + (a.station_distance || '') + '</span>';
+                if (a.station) ah += '<br><span style="font-size:9px;color:var(--ink-dim);opacity:0.7;">منبع: ' + a.station + '</span>';
                 ah += '</div></div>';
                 airEl.innerHTML = ah;
             } else {

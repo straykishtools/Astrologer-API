@@ -184,6 +184,35 @@ function renderRitual() {
         var hint = document.getElementById('ritualSkyHint');
         if (hint && url) hint.innerHTML = '🛸 تصویر نجومی امروز از ناسا آماده است';
     });
+
+    // ─── تزریق Open-Meteo: گامِ «آسمان» و «یوگا» با هوای واقعی هوشمند می‌شود ───
+    fetchMeteo2().then(function (m) {
+        if (!m || !m.weather) return;
+        var w = m.weather;
+
+        // گامِ آسمان: با هوای واقعی
+        var skyHint = document.getElementById('ritualSkyHint');
+        if (skyHint && w.condition_fa) {
+            var skyLine = w.condition_fa + ' · ' + Math.round(w.temp) + '°C';
+            if (w.wind_speed != null) skyLine += ' · 🌬️ ' + Math.round(w.wind_speed) + 'km/h';
+            skyHint.innerHTML = skyLine;
+        }
+
+        // گامِ یوگا: توصیه‌ی هواشناسیانه — بیرون یا درون؟
+        var yogaHintEl = document.querySelector('.ritual-step:nth-child(2) .ritual-step-hint');
+        if (yogaHintEl) {
+            var outOk = true;
+            var outMsg = '';
+            if (w.precip_prob_max != null && w.precip_prob_max >= 60) { outOk = false; outMsg = '🌧️ احتمال بارش ' + w.precip_prob_max + '٪ — تمرینِ درون پیشنهاد می‌شود'; }
+            else if (w.wind_gusts != null && w.wind_gusts >= 40) { outOk = false; outMsg = '🌬️ تندبازِ ' + Math.round(w.wind_gusts) + 'km/h — بیرون سخت است'; }
+            else if (w.temp != null && (w.temp >= 38 || w.temp <= 2)) { outOk = false; outMsg = '🌡️ دمایِ ' + Math.round(w.temp) + '° — تمرین در فضای بسته'; }
+            else if (w.uv_index_max != null && w.uv_index_max >= 9) { outOk = false; outMsg = '☀️ UVِ ' + Math.round(w.uv_index_max) + ' — سایه یا درون'; }
+            if (!outOk && outMsg) yogaHintEl.innerHTML = outMsg;
+            else if (w.temp != null && w.temp >= 18 && w.temp <= 30 && (w.precip_prob_max == null || w.precip_prob_max < 30)) {
+                yogaHintEl.innerHTML = '🌤️ هوایِ عالی برایِ تمرینِ بیرون — ' + Math.round(w.temp) + '°C';
+            }
+        }
+    });
 }
 
 function bindRitualStart() {
@@ -527,39 +556,46 @@ function renderEarthTab() {
     if (!weatherCard && !airCard && !astCard) return;
 
     fetchMeteo2().then(function (m) {
-        // آب‌وهوا
+        // آب‌وهوا (Open-Meteo)
         if (weatherCard) {
             if (m && m.weather) {
                 var w = m.weather;
                 var html = '<div class="mdu-card-title">🌤️ آب‌وهوا</div>';
                 html += '<div class="mdu-grid">';
-                html += '<div class="mdu-item"><div class="mdu-item-label">وضعیت</div><div class="mdu-item-value">' + (w.condition || w.condition_group_fa || '—') + '</div></div>';
+                html += '<div class="mdu-item"><div class="mdu-item-label">وضعیت</div><div class="mdu-item-value">' + (w.condition_fa || '—') + '</div></div>';
                 if (w.temp != null) html += '<div class="mdu-item"><div class="mdu-item-label">دما</div><div class="mdu-item-value">' + Math.round(w.temp) + '°C</div></div>';
+                if (w.feels_like != null) html += '<div class="mdu-item"><div class="mdu-item-label">احساسِ واقعی</div><div class="mdu-item-value">' + Math.round(w.feels_like) + '°C</div></div>';
                 if (w.temp_min != null) html += '<div class="mdu-item"><div class="mdu-item-label">کمینه / بیشینه</div><div class="mdu-item-value">' + Math.round(w.temp_min) + '° / ' + Math.round(w.temp_max) + '°</div></div>';
                 if (w.humidity != null) html += '<div class="mdu-item"><div class="mdu-item-label">رطوبت</div><div class="mdu-item-value">' + Math.round(w.humidity) + '٪</div></div>';
-                if (w.wind_speed != null) html += '<div class="mdu-item"><div class="mdu-item-label">باد</div><div class="mdu-item-value">' + Math.round(w.wind_speed * 3.6) + ' km/h</div></div>';
+                if (w.wind_speed != null) html += '<div class="mdu-item"><div class="mdu-item-label">باد</div><div class="mdu-item-value">' + Math.round(w.wind_speed) + ' km/h' + (w.wind_dir_fa ? '<div style="font-size:0.65rem;color:#888;">' + w.wind_dir_fa + '</div>' : '') + '</div></div>';
+                if (w.uv_index_max != null) html += '<div class="mdu-item"><div class="mdu-item-label">UV بیشینه</div><div class="mdu-item-value">' + (Math.round(w.uv_index_max * 10) / 10) + '</div></div>';
+                if (w.precip_prob_max != null) html += '<div class="mdu-item"><div class="mdu-item-label">احتمال بارش</div><div class="mdu-item-value">' + w.precip_prob_max + '٪</div></div>';
                 if (m.sunrise) html += '<div class="mdu-item"><div class="mdu-item-label">طلوع / غروب</div><div class="mdu-item-value">' + m.sunrise + ' — ' + m.sunset + '</div></div>';
+                if (m.moon && m.moon.phase_fa) html += '<div class="mdu-item"><div class="mdu-item-label">فاز ماه</div><div class="mdu-item-value">' + m.moon.emoji + ' ' + m.moon.phase_fa + '</div></div>';
                 html += '</div>';
                 weatherCard.innerHTML = html;
             } else {
-                weatherCard.innerHTML = '<div class="mdu-card-title">🌤️ آب‌وهوا</div><div class="mdb-empty">سرویس هنوز فعال نشده — بعداً چک کن.</div>';
+                var wErr = (m && m._errors && m._errors.weather) || 'نامشخص';
+                weatherCard.innerHTML = '<div class="mdu-card-title">🌤️ آب‌وهوا</div><div class="mdb-empty">سرویس پاسخ نداد (' + wErr + ').</div>';
             }
         }
-        // کیفیت هوا
+        // کیفیت هوا (Open-Meteo Air)
         if (airCard) {
             if (m && m.air && m.air.aqi_label) {
                 var a = m.air;
                 var ah = '<div class="mdu-card-title">🍃 کیفیت هوا</div>';
                 ah += '<div class="mdu-grid">';
-                ah += '<div class="mdu-item"><div class="mdu-item-label">شاخص AQI</div><div class="mdu-item-value">' + a.aqi + '</div></div>';
+                ah += '<div class="mdu-item"><div class="mdu-item-label">AQI اروپا</div><div class="mdu-item-value">' + (a.aqi != null ? Math.round(a.aqi) : '—') + '</div></div>';
                 ah += '<div class="mdu-item"><div class="mdu-item-label">وضعیت</div><div class="mdu-item-value">' + a.aqi_label + '</div></div>';
                 if (a.pm25 != null) ah += '<div class="mdu-item"><div class="mdu-item-label">PM2.5</div><div class="mdu-item-value">' + Math.round(a.pm25) + '</div></div>';
+                if (a.pm10 != null) ah += '<div class="mdu-item"><div class="mdu-item-label">PM10</div><div class="mdu-item-value">' + Math.round(a.pm10) + '</div></div>';
                 ah += '</div>';
                 if (a.advice_fa) ah += '<div class="mdu-line">💡 ' + a.advice_fa + '</div>';
-                if (a.station) ah += '<div class="mdu-line" style="font-size:10px;opacity:0.7;">ایستگاه: ' + a.station + (a.station_distance || '') + '</div>';
+                if (a.station) ah += '<div class="mdu-line" style="font-size:10px;opacity:0.7;">منبع: ' + a.station + '</div>';
                 airCard.innerHTML = ah;
             } else {
-                airCard.innerHTML = '<div class="mdu-card-title">🍃 کیفیت هوا</div><div class="mdb-empty">سرویس در دسترس نیست.</div>';
+                var aErr = (m && m._errors && m._errors.air) || 'نامشخص';
+                airCard.innerHTML = '<div class="mdu-card-title">🍃 کیفیت هوا</div><div class="mdb-empty">سرویس پاسخ نداد (' + aErr + ').</div>';
             }
         }
     });

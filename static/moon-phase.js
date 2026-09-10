@@ -97,15 +97,27 @@ function _signFromLongitude(lam) {
 }
 
 function getMoonPhaseForm() {
-    var today = new Date();
-    var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    // تاریخِ شمسیِ امروز — با تقویمِ دقیقِ جلالی (DateWheelPicker)
+    var todayShamsi = { year: 1404, month: 6, day: 17 };
+    try {
+        if (window.DateWheelPicker && DateWheelPicker.miladiToShamsi) {
+            var now = new Date();
+            var j = DateWheelPicker.miladiToShamsi(now.getFullYear(), now.getMonth() + 1, now.getDate());
+            if (j && j.year > 1200) todayShamsi = { year: j.year, month: j.month, day: j.day };
+        } else {
+            var fmt = new Intl.DateTimeFormat('en-u-ca-persian', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            var parts = {};
+            fmt.formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
+            todayShamsi = { year: parseInt(parts.year), month: parseInt(parts.month), day: parseInt(parts.day) };
+        }
+    } catch (e) {}
     var html = '<div style="max-width:900px;margin:0 auto;">';
     html += '<h3 style="color:#a29bfe;text-align:center;">🌙 فاز ماه و منازل قمر</h3>';
     html += '<p style="color:#8a82a0;text-align:center;font-size:13px;margin-bottom:16px;">فاز ماه و منزل قمری را بر اساس تاریخ انتخابی مشاهده کنید</p>';
     html += '<div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.05);">';
     html += '<div class="form-group" style="margin-bottom:12px;">';
-    html += '<label style="color:#b0c4e0;font-size:13px;display:block;margin-bottom:6px;">📅 تاریخ</label>';
-    html += '<input type="date" id="moonPhaseDate" value="' + todayStr + '" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid rgba(221,192,112,0.4);background:rgba(7,12,31,0.6);color:#ece6d6;font-family:Vazirmatn,sans-serif;font-size:14px;box-sizing:border-box;">';
+    html += '<label style="color:#b0c4e0;font-size:13px;display:block;margin-bottom:6px;">📅 تاریخ (شمسی)</label>';
+    html += makeDatePickerTrigger('moonPhaseDP', { label: 'تاریخ', calendarType: 'shamsi', digits: 'fa', defaultValue: todayShamsi });
     html += '</div>';
     html += '<div class="form-group" style="margin-bottom:12px;">';
     html += '<label style="color:#b0c4e0;font-size:13px;display:block;margin-bottom:6px;">📍 مکان (اختیاری)</label>';
@@ -122,34 +134,34 @@ function getMoonPhaseForm() {
 
 // ─── 28 Lunar Mansions (منازل قمری) ───
 var LUNAR_MANSIONS = [
-    { name: 'شرط', nameEn: 'Sharat', start: 0, emoji: '🌟', desc: 'Auspice of discernment — governed by the heart of the Scorpion, strengthens judgment and awareness.', suitable: ['شروع کارهای جدید', 'تصمیم‌گیری'], unsuitable: ['سفر طولانی'] },
-    { name: 'زبانه', nameEn: 'Zubana', start: 12.857, emoji: '🔥', desc: 'Auspice of balance and equilibrium — favors resolving disputes and making fair deals.', suitable: ['حل اختلاف', 'معامله'], unsuitable: ['عجله در کار'] },
-    { name: 'اکلیل', nameEn: 'Iklil', start: 25.714, emoji: '👑', desc: 'The Crown — celestial crest marking a peak of honor, favored for weddings and celebrations.', suitable: ['ازدواج', 'جشن'], unsuitable: ['تطعیل'] },
-    { name: 'قلب', nameEn: 'Qalb', start: 38.571, emoji: '❤️', desc: 'The Heart of the Scorpion — a powerful, intense mansion; ideal for major undertakings but risky for travel.', suitable: ['شروع پروژه بزرگ', 'تصمیمات مهم'], unsuitable: ['سفر', 'مذاکرات حساس'] },
-    { name: 'شوله', nameEn: 'Shawla', start: 51.429, emoji: '🦂', desc: 'The Scorpion\'s Tail — fierce and combative energy; suited for defense, competition, and vigorous sports.', suitable: ['جنگ و دفاع', 'ورزش'], unsuitable: ['ازدواج', 'معامله'] },
-    { name: 'نعائم', nameEn: 'Naaim', start: 64.286, emoji: '🌟', desc: 'The Pleiades — mansion of comfort, rest, and enjoyment; auspicious for leisure and pleasure.', suitable: ['استراحت', 'لذت'], unsuitable: ['کار سنگین'] },
-    { name: 'بقره', nameEn: 'Baqara', start: 77.143, emoji: '♉', desc: 'The Cow — Taurus mansion symbolizing fertility and abundance; favors agriculture and acquiring land.', suitable: ['کشاورزی', 'خرید ملک'], unsuitable: ['سفر دریایی'] },
-    { name: 'دبران', nameEn: 'Dabaran', start: 90, emoji: '⭐', desc: 'The Follower — Aldebaran mansion; favors continuing existing work and pursuing follow-through.', suitable: ['ادامه کار', 'پیگیری'], unsuitable: ['شروع جدید'] },
-    { name: 'هقعده', nameEn: 'Haqqa', start: 102.857, emoji: '🌀', desc: 'The Nature — mansion of certainty and truth; favors judgment, scholarship, and righteous knowledge.', suitable: ['قضاوت', 'دانش'], unsuitable: ['تفریح'] },
-    { name: 'نثرة', nameEn: 'Nathrah', start: 115.714, emoji: '💧', desc: 'The Drop — mansion of rain and water; favors sea travel, irrigation, and activities involving water.', suitable: ['سفر دریایی', 'آبیاری'], unsuitable: ['آتش‌بازی'] },
-    { name: 'طرف', nameEn: 'Tarf', start: 128.571, emoji: '👁️', desc: 'The Glance — mansion of vision and observation; favors watching, sightseeing, and observation.', suitable: ['نگاه کردن', 'مشاهده'], unsuitable: ['پنهان‌کاری'] },
-    { name: 'جَبه', nameEn: 'Jabhah', start: 141.429, emoji: '🎭', desc: 'The Forehead — mansion of beauty and adornment; favors grooming, cosmetic arts, and self-care.', suitable: ['زیبایی', 'آرایش'], unsuitable: ['جنگ'] },
-    { name: 'فرّ', nameEn: 'Farr', start: 154.286, emoji: '👑', desc: 'Dignity — mansion of honor and nobility; favors showing respect, bestowing honors, and formal ceremonies.', suitable: ['احترام', 'تکریم'], unsuitable: ['توهین'] },
-    { name: 'عَذَر', nameEn: 'Adhra', start: 167.143, emoji: '🛡️', desc: 'Purity — mansion of cleanliness and virtue; favors spiritual purification and righteous deeds.', suitable: ['پاکی', 'طهارت'], unsuitable: ['گناه'] },
-    { name: 'غُفر', nameEn: 'Ghufr', start: 180, emoji: '🙏', desc: 'Forgiveness — mansion of mercy and pardon; favors reconciliation, repentance, and letting go.', suitable: ['بخشش', 'توبه'], unsuitable: ['انتقام'] },
-    { name: 'زَبَانَه', nameEn: 'Zabanah', start: 192.857, emoji: '🗣️', desc: 'The Tongue — mansion of eloquence and speech; favors oratory, debate, and negotiation.', suitable: ['سخنرانی', 'مذاکره'], unsuitable: ['دروغ'] },
-    { name: 'اَکۡرَب', nameEn: 'Akrab', start: 205.714, emoji: '🦂', desc: 'The Claw — second scorpion mansion; fierce martial energy suited for warfare and self-defense.', suitable: ['جنگ', 'دفاع'], unsuitable: ['ازدواج'] },
-    { name: 'اَلدَّبَرَان', nameEn: 'Ad-Dabaran', start: 218.571, emoji: '⭐', desc: 'The Reoccurring Star — mansion of persistence; favors continuing ongoing projects and follow-through.', suitable: ['پیگیری', 'ادامه'], unsuitable: ['شروع جدید'] },
-    { name: 'الرَّاکِعَه', nameEn: 'Ar-Raki\'ah', start: 231.429, emoji: '🌙', desc: 'The Bowing — mansion of reverence and worship; favors prayer, devotion, and spiritual practice.', suitable: ['نماز', 'عبادت'], unsuitable: ['گناه'] },
-    { name: 'الثُّرَیَّا', nameEn: 'Ath-Thurayya', start: 244.286, emoji: '✨', desc: 'The Stars — Pleiades mansion of celestial knowledge; favors astronomy, astrology, and seeking cosmic insight.', suitable: ['ستاره‌شناسی', 'طالع‌بینی'], unsuitable: ['ظلم'] },
-    { name: 'الدَّبَرَة', nameEn: 'Ad-Dabarah', start: 257.143, emoji: '🌀', desc: 'The Back — mansion of support and backing; favors offering help and standing behind others.', suitable: ['پشتیبانی', 'کمک'], unsuitable: ['خیانت'] },
-    { name: 'النَّعَام', nameEn: 'An-Na\'am', start: 270, emoji: '🐪', desc: 'The Ostrich — mansion of wandering and travel; favors journeys, trade, and exploration.', suitable: ['سفر', 'تجارت'], unsuitable: ['تنهایی'] },
-    { name: 'البَطَن', nameEn: 'Al-Batan', start: 282.857, emoji: '🤰', desc: 'The Belly — mansion of nourishment and sustenance; favors diet, health, and wholesome living.', suitable: ['تغذیه', 'سالم‌زیستی'], unsuitable: ['گرسنگی'] },
-    { name: 'اَلصَّفِر', nameEn: 'As-Safar', start: 295.714, emoji: '🌍', desc: 'The Journey — mansion of departure and travel; favors setting out on trips and beginning voyages.', suitable: ['سفر', 'حرکت'], unsuitable: ['ماندن در خانه'] },
-    { name: 'اَلْاَخْبَرَة', nameEn: 'Al-Akhbarah', start: 308.571, emoji: '📰', desc: 'The Tidings — mansion of news and information; favors spreading knowledge and communication.', suitable: ['اخبار', 'اطلاع‌رسانی'], unsuitable: ['پنهان‌کاری'] },
-    { name: 'اَلْمُقَدَّم', nameEn: 'Al-Muqaddam', start: 321.429, emoji: '🚀', desc: 'The Vanguard — mansion of leadership and initiative; favors leading, guiding, and taking charge.', suitable: ['رهبری', 'هدایت'], unsuitable: ['پیروی کورکورانه'] },
-    { name: 'اَلْمُؤَخَّر', nameEn: 'Al-Mu\'akhkhar', start: 334.286, emoji: '⏳', desc: 'The Rear — mansion of patience and delay; favors waiting, resting, and deferred action.', suitable: ['صبر', 'تأخر'], unsuitable: ['عجله'] },
-    { name: 'الرَّس', nameEn: 'Ar-Ram', start: 347.143, emoji: '🐏', desc: 'The Head — mansion of beginnings and leadership; favors starting new ventures and taking initiative.', suitable: ['سرآغاز', 'شروع'], unsuitable: ['پایان'] }
+    { name: 'شَرطان', nameEn: 'Al-Sharatain', start: 0, emoji: '🌟', desc: 'منزلِ آغازها — دو داسِ نخستینِ برجِ حمل؛ به کشف و آگاهی نیرو می‌دهد. برای کاشتنِ بذرِ هر کارِ جدید خوب است؛ برای سفرِ طولانی نامیمون.', suitable: ['شروع کارهای جدید', 'تصمیم‌گیری'], unsuitable: ['سفر طولانی'] },
+    { name: 'بُطَین', nameEn: 'Al-Butain', start: 12.857, emoji: '🔥', desc: 'منزلِ شکم — تعادل و انصاف؛ برای حلِ اختلاف و معامله‌ی عادلانه نیکوست. در عجله، خطا می‌دهد.', suitable: ['حل اختلاف', 'معامله'], unsuitable: ['عجله در کار'] },
+    { name: 'ثُرَیّا', nameEn: 'Ath-Thurayya', start: 25.714, emoji: '✨', desc: 'منزلِ پروین — خوشه‌ی ستاره‌ی خوش‌یمن؛ برای ازدواج و جشن و هر آغازِ پرنور مبارک است. برای تطعیل (شروعِ دشمنی) نه.', suitable: ['ازدواج', 'جشن'], unsuitable: ['تطعیل'] },
+    { name: 'دَبَران', nameEn: 'Ad-Dabaran', start: 38.571, emoji: '❤️', desc: 'منزلِ قلبِ عقرب — قوی و پرشور؛ برای پروژه‌های بزرگ و تصمیم‌های سرنوشت‌ساز عالی، اما سفر و مذاکره‌ی حساس را به بعد بسپار.', suitable: ['شروع پروژه بزرگ', 'تصمیمات مهم'], unsuitable: ['سفر', 'مذاکرات حساس'] },
+    { name: 'شَوله', nameEn: 'Ash-Shawla', start: 51.429, emoji: '🦂', desc: 'منزلِ نیشِ عقرب — انرژیِ جنگیِ تیز؛ برای دفاع، رقابت و ورزشِ پُرتلاش. برای ازدواج و معامله نامیمون.', suitable: ['جنگ و دفاع', 'ورزش'], unsuitable: ['ازدواج', 'معامله'] },
+    { name: 'نَعائم', nameEn: 'An-Naaim', start: 64.286, emoji: '🌟', desc: 'منزلِ نعمت‌ها — آسایش و لذت؛ برای استراحت و بهره‌مندی از زندگی نیکوست. برای کارِ سنگین نه.', suitable: ['استراحت', 'لذت'], unsuitable: ['کار سنگین'] },
+    { name: 'بَطح', nameEn: 'Al-Batayn', start: 77.143, emoji: '♉', desc: 'منزلِ باروری — برکت و فراوانیِ زمین؛ برای کشاورزی و خریدِ ملک نیکوست. سفرِ دریایی در آن خطر دارد.', suitable: ['کشاورزی', 'خرید ملک'], unsuitable: ['سفر دریایی'] },
+    { name: 'دَبَرانِ پیرو', nameEn: 'Ad-Dabaran II', start: 90, emoji: '⭐', desc: 'منزلِ پیروی — ادامه‌ی راه؛ برای پیگیریِ کارهایِ در جریان و ثمررساندنِ بذرهایِ کاشته‌شده خوب است، نه شروعِ تازه.', suitable: ['ادامه کار', 'پیگیری'], unsuitable: ['شروع جدید'] },
+    { name: 'هَقعه', nameEn: 'Al-Haqaa', start: 102.857, emoji: '🌀', desc: 'منزلِ حقیقت — یقین و دانایی؛ برای قضاوتِ عادلانه و دانشِ راستین نیکوست. برای تفریحِ بی‌دغدغه نه.', suitable: ['قضاوت', 'دانش'], unsuitable: ['تفریح'] },
+    { name: 'نَثره', nameEn: 'An-Nathra', start: 115.714, emoji: '💧', desc: 'منزلِ قطره‌ی باران — آب و سفرِ دریایی؛ برای آبیاری و کارهایِ آبی نیکوست. آتش‌بازی و جرقه در آن خطر دارد.', suitable: ['سفر دریایی', 'آبیاری'], unsuitable: ['آتش‌بازی'] },
+    { name: 'طَرف', nameEn: 'At-Tarf', start: 128.571, emoji: '👁️', desc: 'منزلِ نگاه — چشمِ بینا؛ برای مشاهده، سیاحت و دیدنِ زیبایی‌ها خوب است. برای پنهان‌کاری نامناسب.', suitable: ['نگاه کردن', 'مشاهده'], unsuitable: ['پنهان‌کاری'] },
+    { name: 'جَبهه', nameEn: 'Al-Jabhah', start: 141.429, emoji: '🎭', desc: 'منزلِ پیشانی — زیبایی و آراستگی؛ برای پرستاری از خود، آرایش و هنرِ زیبا ساختن نیکوست. برای جنگ نه.', suitable: ['زیبایی', 'آرایش'], unsuitable: ['جنگ'] },
+    { name: 'فَرّ', nameEn: 'Al-Farr', start: 154.286, emoji: '👑', desc: 'منزلِ عزت — شکوه و بزرگ‌منشی؛ برای احترام‌گذاری، تکریم و مراسمِ رسمی نیکوست. توهین در آن گران تمام می‌شود.', suitable: ['احترام', 'تکریم'], unsuitable: ['توهین'] },
+    { name: 'عَذراء', nameEn: 'Al-Adhraa', start: 167.143, emoji: '🛡️', desc: 'منزلِ پاکی — طهارت و فضیلت؛ برای پاک‌سازیِ روح و کارهایِ نیک عالی است. گناه در آن سنگینی می‌کند.', suitable: ['پاکی', 'طهارت'], unsuitable: ['گناه'] },
+    { name: 'غَفر', nameEn: 'Al-Ghafr', start: 180, emoji: '🙏', desc: 'منزلِ مغفرت — آمرزش و گذشت؛ برای آشتی، توبه و رهاکردنِ کینه‌ها نیکوست. انتقام در آن لعنت است.', suitable: ['بخشش', 'توبه'], unsuitable: ['انتقام'] },
+    { name: 'زُبانا', nameEn: 'Az-Zubana', start: 192.857, emoji: '🗣️', desc: 'منزلِ زبان — بلاغت و سخنوری؛ برای سخنرانی، مناظره و مذاکره عالی است. دروغ در آن فوراً لو می‌رود.', suitable: ['سخنرانی', 'مذاکره'], unsuitable: ['دروغ'] },
+    { name: 'اِکلیلِ عقرب', nameEn: 'Al-Iklil al-Aqrab', start: 205.714, emoji: '🦂', desc: 'منزلِ چنگالِ عقرب — انرژیِ نبردِ دوم؛ برای دفاعِ از خود و جنگِ حق عالی است. برای ازدواج نامیمون.', suitable: ['جنگ', 'دفاع'], unsuitable: ['ازدواج'] },
+    { name: 'دَبَرانِ ستاره', nameEn: 'Ad-Dabaran al-Najm', start: 218.571, emoji: '⭐', desc: 'منزلِ ستاره‌ی بازگشتی — استقامت؛ برای ادامه‌ی پروژه‌ها و پیگیری تا نتیجه نیکوست، نه شروعِ تازه.', suitable: ['پیگیری', 'ادامه'], unsuitable: ['شروع جدید'] },
+    { name: 'راکعه', nameEn: 'Ar-Rakiah', start: 231.429, emoji: '🌙', desc: 'منزلِ سجده — خشوع و عبادت؛ برای نماز، دعا و تمرینِ معنوی نیکوست. گناه در آن آشکار می‌شود.', suitable: ['نماز', 'عبادت'], unsuitable: ['گناه'] },
+    { name: 'ثُرَیّایِ کبیر', nameEn: 'Ath-Thurayya al-Kabir', start: 244.286, emoji: '✨', desc: 'منزلِ داناییِ آسمانی — ستاره‌شناسی و طالع‌بینی؛ برای جست‌وجویِ حکمتِ کیهانی نیکوست. ظلم در آن بازگشتِ فوری دارد.', suitable: ['ستاره‌شناسی', 'طالع‌بینی'], unsuitable: ['ظلم'] },
+    { name: 'دَبره', nameEn: 'Ad-Dabrah', start: 257.143, emoji: '🌀', desc: 'منزلِ پشت و پناه — حمایت و یاری؛ برای کمک‌کردن و پشتِ دیگران ایستادن نیکوست. خیانت در آن بی‌بازگشت است.', suitable: ['پشتیبانی', 'کمک'], unsuitable: ['خیانت'] },
+    { name: 'نَعام', nameEn: 'An-Naam', start: 270, emoji: '🐪', desc: 'منزلِ شترمرغ — سیاحت و سفر؛ برای مسافرت، تجارت و کشفِ جاهایِ تازه عالی است. تنهایی در آن سنگینی می‌کند.', suitable: ['سفر', 'تجارت'], unsuitable: ['تنهایی'] },
+    { name: 'بَطَن', nameEn: 'Al-Batan', start: 282.857, emoji: '🤰', desc: 'منزلِ پروردن — تغذیه و سلامت؛ برای اصلاحِ رژیم و زندگیِ سالم نیکوست. گرسنگی در آن به بدن آسیب می‌زند.', suitable: ['تغذیه', 'سالم‌زیستی'], unsuitable: ['گرسنگی'] },
+    { name: 'صَفر', nameEn: 'As-Safar', start: 295.714, emoji: '🌍', desc: 'منزلِ سفرِ آغازین — حرکت و کوچ؛ برای بستنِ کوله و راه‌افتادن عالی است. خانه‌نشینی در آن رکود می‌آورد.', suitable: ['سفر', 'حرکت'], unsuitable: ['ماندن در خانه'] },
+    { name: 'اَخبَره', nameEn: 'Al-Akhbarah', start: 308.571, emoji: '📰', desc: 'منزلِ خبرها — رساندنِ پیام و دانش؛ برای اطلاع‌رسانی، آموزش و گفت‌وگو نیکوست. پنهان‌کاری در آن نشت می‌کند.', suitable: ['اخبار', 'اطلاع‌رسانی'], unsuitable: ['پنهان‌کاری'] },
+    { name: 'مُقدَّم', nameEn: 'Al-Muqaddam', start: 321.429, emoji: '🚀', desc: 'منزلِ پیشگام — رهبری و ابتکار؛ برای هدایتِ دیگران و به‌دست‌گرفتنِ فرمان عالی است. پیرویِ کورکورانه در آن خطاست.', suitable: ['رهبری', 'هدایت'], unsuitable: ['پیروی کورکورانه'] },
+    { name: 'مُؤَخَّر', nameEn: 'Al-Muakhkhar', start: 334.286, emoji: '⏳', desc: 'منزلِ صبر — تعویقِ آگاهانه؛ برای انتظار، استراحت و کارهایِ به‌تعویق‌افتاده نیکوست. عجله در آن خطا می‌دهد.', suitable: ['صبر', 'تأخر'], unsuitable: ['عجله'] },
+    { name: 'رِشاء', nameEn: 'Ar-Risha', start: 347.143, emoji: '🐏', desc: 'منزلِ سرِ گله — سرآغاز و رهبریِ دوباره؛ برای شروعِ ماجراهایِ تازه و پیشاهنگی عالی است. پایان‌دادن در آن سخت است.', suitable: ['سرآغاز', 'شروع'], unsuitable: ['پایان'] }
 ];
 
 function getLunarMansion(degree) {
@@ -171,7 +183,14 @@ var MOON_PHASE_FA = {
 };
 
 function submitMoonPhase() {
-    var dateVal = document.getElementById('moonPhaseDate').value;
+    // از date-picker شمسی می‌خواند و به میلادی تبدیل می‌کند (پیکرِ خودِ سایت، fallback: input قدیمی)
+    var dEl = document.getElementById('moonPhaseDP_hidden');
+    var dateVal;
+    if (dEl && dEl.value) {
+        dateVal = window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(dEl.value) : dEl.value;
+    } else {
+        dateVal = (document.getElementById('moonPhaseDate') || {}).value || '';
+    }
     var lat = parseFloat(document.getElementById('moonPhaseLat').value) || 35.6892;
     var lng = parseFloat(document.getElementById('moonPhaseLng').value) || 51.3890;
     var tz = 'Asia/Tehran'; // API rejects numeric offsets; must be a valid IANA timezone
@@ -180,6 +199,7 @@ function submitMoonPhase() {
     var year = parseInt(parts[0]);
     var month = parseInt(parts[1]);
     var day = parseInt(parts[2]);
+    if (!year || !month || !day) { alert('تاریخ را انتخاب کنید'); return; }
 
     var resultDiv = document.getElementById('moonPhaseResult');
     resultDiv.innerHTML = '<div style="text-align:center;padding:30px;color:#b0c4e0;">⏳ در حال محاسبه فاز ماه...</div>';

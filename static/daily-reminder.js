@@ -212,10 +212,20 @@ var DailyReminder = (function () {
                 url = '/#/app/hafez';
             }
 
-            // هوا
+            // هوا (Open-Meteo) — خلاصه: وضعیت + دما + بارش؛ کامل: + UV + باد + ماه
             if (weather && weather.weather) {
                 var w = weather.weather;
-                parts.push('🌤️ ' + (w.condition || w.condition_group_fa || '') + (w.temp != null ? ' · ' + Math.round(w.temp) + '°C' : ''));
+                var wMoon = weather.moon || {};
+                var wLine = '🌤️ ' + (w.condition_fa || '') + (w.temp != null ? ' · ' + Math.round(w.temp) + '°C' : '');
+                if (w.precip_prob_max != null && w.precip_prob_max >= 30) wLine += ' · 🌧️ بارش ' + w.precip_prob_max + '٪';
+                if (f.weather.full) {
+                    if (w.uv_index_max != null) wLine += '\n☀️ UV: ' + (Math.round(w.uv_index_max * 10) / 10);
+                    if (w.wind_speed != null) wLine += ' · 🌬️ ' + Math.round(w.wind_speed) + 'km/h' + (w.wind_dir_fa ? ' ' + w.wind_dir_fa : '');
+                    if (w.feels_like != null) wLine += '\n🌡️ احساسِ واقعی: ' + Math.round(w.feels_like) + '°C';
+                    if (wMoon.phase_fa) wLine += '\n' + wMoon.emoji + ' ' + wMoon.phase_fa;
+                    if (w.temp_max != null) wLine += '\n📈 بیشینهٔ امروز: ' + Math.round(w.temp_max) + '°';
+                }
+                parts.push(wLine);
             }
 
             if (!parts.length) parts.push('امروز روزِ تازه‌ای است — نیت کن و به بدنت گوش بده.');
