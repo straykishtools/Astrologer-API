@@ -19,11 +19,13 @@ function fetchMeteo() {
     return fetch('/api/v5/weather?lat=' + lat + '&lng=' + lng)
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
-            if (data && data.status === 'success' && data.data) {
+            // status === 'partial' هم قبول است (یکی از دو سرویس کار کرده)
+            if (data && (data.status === 'success' || data.status === 'partial') && data.data) {
                 _meteo = data.data;
                 _meteoAt = Date.now();
                 return _meteo;
             }
+            if (data && data.detail) console.warn('[EarthStatus] weather errors:', data.detail);
             return null;
         })
         .catch(function () { return null; });
@@ -113,6 +115,11 @@ function render() {
 
         var wData = m.weather || {};
         var extra = document.getElementById('esWeatherExtra');
+        if (extra && !wData.condition && !wData.condition_group_fa) {
+            // weather در پاسخ نیست — جزئیات خطا را نشان بده
+            var errs = (m._errors && m._errors.weather) || 'نامشخص';
+            extra.innerHTML = '<div style="font-size:10.5px;color:var(--ink-dim);">آب‌وهوا: سرویس پاسخ نداد (' + errs + ')</div>';
+        }
         if (extra && (wData.condition || wData.condition_group_fa)) {
             var wh = '<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:10px;">';
             wh += '<div style="flex:1;font-size:11.5px;">';
@@ -137,7 +144,8 @@ function render() {
                 ah += '</div></div>';
                 airEl.innerHTML = ah;
             } else {
-                airEl.innerHTML = '<div style="font-size:10.5px;color:var(--ink-dim);">سرویس کیفیت هوا در دسترس نیست' + (a.error ? ' (' + a.error + ')' : '') + '.</div>';
+                var airErr = a.error || (m._errors && m._errors.air) || 'نامشخص';
+                airEl.innerHTML = '<div style="font-size:10.5px;color:var(--ink-dim);">کیفیت هوا: سرویس پاسخ نداد (' + airErr + ')</div>';
             }
         }
     });

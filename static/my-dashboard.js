@@ -505,7 +505,8 @@ function fetchMeteo2() {
     return fetch('/api/v5/weather?lat=' + lat + '&lng=' + lng)
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) {
-            if (d && d.status === 'success' && d.data) { _meteoCache2 = { at: Date.now(), data: d.data }; return _meteoCache2.data; }
+            if (d && (d.status === 'success' || d.status === 'partial') && d.data) { _meteoCache2 = { at: Date.now(), data: d.data }; return _meteoCache2.data; }
+            if (d && d.detail) console.warn('[MyDash] weather errors:', d.detail);
             return null;
         }).catch(function () { return null; });
 }

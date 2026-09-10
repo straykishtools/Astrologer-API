@@ -164,7 +164,10 @@ var DailyReminder = (function () {
         var f = _settings.features;
         var promises = [];
         if (f.biorhythm.on) promises.push(fetchBio());
-        if (f.hafez.on) promises.push(fetchJSON('/api/v5/hafez', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(function (d) { return (d && d.status === 'success') ? d.data : null; }));
+        if (f.hafez.on) {
+            promises.push(fetchJSON('/api/v5/hafez', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+                .then(function (d) { return (d && d.status === 'success') ? d.data : null; }));
+        }
         if (f.weather.on) {
             var lat = (window.sharedInputs && window.sharedInputs.latitude) || 35.6892;
             var lng = (window.sharedInputs && window.sharedInputs.longitude) || 51.3890;
@@ -200,7 +203,11 @@ var DailyReminder = (function () {
             // حافظ
             if (hafez && hafez.faal) {
                 var hz = hafez.faal;
-                parts.push('📜 ' + (hz.theme_title || 'فالِ حافظ') + (hz.omen ? ' — ' + (f.hafez.full ? hz.omen.slice(0, 150) : hz.advice ? hz.advice.slice(0, 90) : '')) : '');
+                var hafezTxt = '📜 ' + (hz.theme_title || 'فالِ حافظ');
+                if (hz.omen) {
+                    hafezTxt += ' — ' + (f.hafez.full ? hz.omen.slice(0, 150) : (hz.advice || '').slice(0, 90));
+                }
+                parts.push(hafezTxt);
                 actions.push({ action: 'open-tarot', title: '📜 فالِ کامل' });
                 url = '/#/app/hafez';
             }
@@ -592,7 +599,16 @@ var DailyReminder = (function () {
 
     /* ─── init ─── */
     function init() {
-        loadSettings();
+        try {
+            console.log('[DailyReminder] init started, v5');
+            loadSettings();
+            _initInner();
+        } catch (e) {
+            console.error('[DailyReminder] init FAILED:', e);
+        }
+    }
+
+    function _initInner() {
 
         // دکمهٔ نوار بالا — درجِ مطمئن بعد از earth-status (با retry)
         function insertTopbarBtn(tries) {
@@ -646,13 +662,15 @@ var DailyReminder = (function () {
 
         // رندرِ بخشِ داشبورد (اگر صفحهٔ داشبورد باز است)
         renderDashboardSection();
+        console.log('[DailyReminder] init complete — topbar btn:', !!document.getElementById('dailyReminderBtn'));
 
-        // وقتی داشبورد باز می‌شود هم رندر شود
-        var origShowPage = window.showPage;
-        window.showPage = function (name) {
-            if (origShowPage) origShowPage(name);
-            if (name === 'dashboard') setTimeout(renderDashboardSection, 100);
-        };
+        // وقتی داشبورد باز می‌شود هم رندر شود (بدون wrapper — با polling سبک)
+        var _dashPoll = setInterval(function () {
+            var host = document.getElementById('notifDashboardSection');
+            if (host && host.offsetParent !== null && !host.innerHTML.trim()) {
+                renderDashboardSection();
+            }
+        }, 1500);
     }
 
     if (document.readyState === 'loading') {

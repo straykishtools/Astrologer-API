@@ -471,13 +471,17 @@ function init() {
     setInterval(function () { renderDashboard('dailyDashboard'); }, 5000);
 }
 
-/* ⚙️ ویرایش تاریخ تولد از داشبورد — DateWheelPicker + ذخیره محلی/سرور */
+/* ⚙️ ویرایش تاریخ تولد از داشبورد — event delegation روی کانتینر:
+   renderDashboard هر ۵ ثانیه innerHTML را بازسازی می‌کند و دکمه‌ی
+   re-bound از بین می‌رفت («قفل»). delegation مقاوم به re-render است. */
 function bindBirthEdit() {
-    var btn = document.getElementById('ddBirthEditBtn');
-    if (!btn || btn._ddBound) return;
-    btn._ddBound = true;
-    btn.addEventListener('click', function () {
-        if (!window.DateWheelPicker) return;
+    var el = document.getElementById('dailyDashboard');
+    if (!el || el._ddBirthBound) return;
+    el._ddBirthBound = true;
+    el.addEventListener('click', function (e) {
+        var btn = e.target.closest('#ddBirthEditBtn');
+        if (!btn) return;
+        if (!window.DateWheelPicker) { if (window.showToast) window.showToast('انتخابگر تاریخ آماده نیست', 'error'); return; }
         var cur = (window.sharedInputs && window.sharedInputs.birthDate) || null;
         DateWheelPicker.open({
             calendarType: 'shamsi',
@@ -510,7 +514,7 @@ function bindBirthEdit() {
                 if (window.showToast) window.showToast('تاریخ تولد به‌روزرسانی شد ✅', 'success');
             }
         });
-    });
+    }
 }
 
 return { init: init, renderDashboard: renderDashboard, applyElementTheme: applyElementTheme, resetTheme: resetTheme };

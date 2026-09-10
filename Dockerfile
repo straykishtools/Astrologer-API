@@ -29,9 +29,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install prebuilt wheels — no compilation, no gcc needed here
+COPY requirements.txt .
 COPY --from=builder /wheels /wheels
 RUN pip install --no-cache-dir --no-index --find-links /wheels -r requirements.txt \
-    && rm -rf /wheels
+    && rm -rf /wheels requirements.txt
 
 COPY . .
 
