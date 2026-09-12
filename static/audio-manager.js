@@ -11,6 +11,9 @@ var masterGain = null;
 var bgmGain = null;
 var sfxGain = null;
 var bgmOscillators = []; // currently playing bgm nodes
+var bgmAudioEl = null;   // HTMLAudioElement when an uploaded file plays
+var bgmAudioNode = null; // MediaElementSourceNode connected to bgmGain
+var AUDIO_FILES_KEY = 'cosmic_admin_audio_files'; // آینه‌ی {fileKey: url} برای ستون «فایل»
 var bgmPlaying = false;
 var bgmPaused = false;
 var bgmTimer = null;
@@ -290,6 +293,7 @@ function stopBgm() {
         try { n.disconnect(); } catch (_) {}
     });
     bgmOscillators = [];
+    if (bgmAudioEl) { try { bgmAudioEl.pause(); } catch (_) {} }
     bgmPlaying = false;
     bgmPaused = false;
     if (bgmTimer) { clearInterval(bgmTimer); bgmTimer = null; }
@@ -297,39 +301,121 @@ function stopBgm() {
     updatePlayerUI();
 }
 
+/* ─── مدلِ واحدِ ترک‌ها برای پلیر ───
+   سنتزهای داخلی (TRACKS) + ورودی‌های دیتابیسِ ادمین. اگر روی یک ترک فایل
+   آپلود شده باشد (fileUrl)، همان فایل پخش می‌شود؛ وگرنه سنتز. ترک‌های
+   تازه‌ی ادمین (بدون سنتز) فقط اگر فایلشان موجود باشد در پلی‌لیست می‌آیند. */
+function fileUrlFor(trackId) {
+    var db = getAudioDb();
+    var m = db.find(function (a) { return (a.trackId || ('custom-' + a.id)) === trackId; });
+    return (m && m.fileUrl) || '';
+}
+function getPlayableTracks() {
+    var db = getAudioDb();
+    var byTrack = {};
+    db.forEach(function (a) { if (a.trackId) byTrack[a.trackId] = a; });
+    var list = [];
+    TRACKS.forEach(function (t) {
+        var meta = byTrack[t.id];
+        if (db.length && meta && meta.active === false) return; // ادمین غیرفعال کرده
+        list.push({
+            id: t.id,
+            name: (meta && meta.name) || t.name,
+            icon: (meta && meta.icon) || t.icon,
+            category: (meta && meta.type) || t.category,
+            gen: t.gen, dur: t.dur,
+            fileUrl: (meta && meta.fileUrl) || '',
+            procedural: true
+        });
+    });
+    db.forEach(function (a) {
+        var isProcedural = a.trackId && TRACKS.some(function (t) { return t.id === a.trackId; });
+        if (isProcedural) return;
+        if (!a.active) return;
+        var url = a.fileUrl || '';
+        if (!url) return; // صدای تازه بدون فایل = پخش‌پذیر نیست
+        list.push({
+            id: a.trackId || ('custom-' + a.id),
+            name: a.name || 'صدای تازه',
+            icon: a.icon || '🎵',
+            category: a.type || 'custom',
+            gen: null, dur: 0,
+            fileUrl: url,
+            procedural: false
+        });
+    });
+    return list;
+}
+
+/* فایل صوتی را روی همان bgmGain وصل می‌کنیم تا ولوم/میوت/ویژوالایزر کار کند */
+function startFilePlayback(url) {
+    if (!ensureCtx()) return false;
+    if (!bgmAudioEl) {
+        bgmAudioEl = new window.Audio();
+        bgmAudioEl.preload = 'auto';
+        bgmAudioEl.loop = true;
+        bgmAudioEl.volume = 1; // ولوم از طریق bgmGain کنترل می‌شود
+        try {
+            bgmAudioNode = ctx.createMediaElementSource(bgmAudioEl);
+            bgmAudioNode.connect(bgmGain);
+        } catch (_) {
+            // اگر createMediaElementSource نشد (مثلاً CORS) → پخش مستقیم بدون گین
+            bgmAudioNode = null;
+        }
+    }
+    bgmAudioEl.src = url;
+    try { bgmAudioEl.load(); } catch (_) {}
+    var p = bgmAudioEl.play();
+    if (p && p.catch) p.catch(function () {});
+    return true;
+}
+
 function playBgm(trackId) {
     if (!ensureCtx()) return;
     resumeCtx();
     stopBgm();
 
-    var track = TRACKS.find(function(t) { return t.id === trackId; }) || TRACKS[0];
-    var nodes = track.gen(ctx, bgmGain, ctx.currentTime);
-    bgmOscillators = nodes;
+    var list = getPlayableTracks();
+    var track = list.find(function (t) { return t.id === trackId; }) || list[0] || TRACKS[0];
     bgmPlaying = true;
     bgmPaused = false;
     bgmElapsed = 0;
     prefs.currentTrack = track.id;
     savePrefs(prefs);
-    updatePlayerUI();
+    // اطمینان از اینکه گین روی ولوم فعلی است (بعد از pause/fade قبلی صفر نماند)
+    try { bgmGain.gain.cancelScheduledValues(ctx.currentTime); bgmGain.gain.value = prefs.bgmVolume || 0.5; } catch (_) {}
 
-    // Auto-loop: restart after duration
-    if (bgmTimer) clearInterval(bgmTimer);
-    bgmTimer = setInterval(function() {
-        if (bgmPaused) return;
-        bgmElapsed++;
-        if (bgmElapsed >= track.dur) {
-            // Fade out and restart
-            bgmGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2);
-            setTimeout(function() {
-                if (bgmPlaying && !bgmPaused) {
-                    bgmGain.gain.value = prefs.bgmVolume || 0.5;
-                    stopBgm();
-                    playBgm(track.id);
-                }
-            }, 2200);
-        }
-        updatePlayerTime();
-    }, 1000);
+    if (track.fileUrl) {
+        // پخش فایل آپلودی (حلقه‌ای) — زمان از خودِ المنت خوانده می‌شود
+        startFilePlayback(track.fileUrl);
+        if (bgmTimer) clearInterval(bgmTimer);
+        bgmTimer = setInterval(function () {
+            if (!bgmAudioEl) return;
+            bgmElapsed = Math.floor(bgmAudioEl.currentTime || 0);
+            updatePlayerTime();
+        }, 1000);
+    } else {
+        var nodes = (track.gen || genCosmicDrone)(ctx, bgmGain, ctx.currentTime);
+        bgmOscillators = nodes;
+        var dur = track.dur || 180;
+        if (bgmTimer) clearInterval(bgmTimer);
+        bgmTimer = setInterval(function () {
+            if (bgmPaused) return;
+            bgmElapsed++;
+            if (bgmElapsed >= dur) {
+                bgmGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2);
+                setTimeout(function () {
+                    if (bgmPlaying && !bgmPaused) {
+                        bgmGain.gain.value = prefs.bgmVolume || 0.5;
+                        stopBgm();
+                        playBgm(track.id);
+                    }
+                }, 2200);
+            }
+            updatePlayerTime();
+        }, 1000);
+    }
+    updatePlayerUI();
 }
 
 function pauseBgm() {
@@ -339,6 +425,7 @@ function pauseBgm() {
     if (ctx && bgmGain) {
         bgmGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
     }
+    if (bgmAudioEl) { try { bgmAudioEl.pause(); } catch (_) {} }
     stopVizLoop();
     updatePlayerUI();
 }
@@ -349,6 +436,8 @@ function resumeBgm() {
     if (ctx && bgmGain) {
         bgmGain.gain.linearRampToValueAtTime(prefs.bgmVolume || 0.5, ctx.currentTime + 0.5);
     }
+    if (bgmAudioEl && bgmAudioEl.src) { try { bgmAudioEl.play().catch(function(){}); } catch (_) {} }
+    startVizLoop();
     updatePlayerUI();
 }
 
@@ -373,15 +462,19 @@ function toggleBgm() {
 }
 
 function nextTrack() {
-    var currentIdx = TRACKS.findIndex(function(t) { return t.id === prefs.currentTrack; });
-    var nextIdx = (currentIdx + 1) % TRACKS.length;
-    playBgm(TRACKS[nextIdx].id);
+    var list = getPlayableTracks();
+    if (!list.length) return;
+    var currentIdx = list.findIndex(function(t) { return t.id === prefs.currentTrack; });
+    var nextIdx = (currentIdx + 1) % list.length;
+    playBgm(list[nextIdx].id);
 }
 
 function prevTrack() {
-    var currentIdx = TRACKS.findIndex(function(t) { return t.id === prefs.currentTrack; });
-    var prevIdx = (currentIdx - 1 + TRACKS.length) % TRACKS.length;
-    playBgm(TRACKS[prevIdx].id);
+    var list = getPlayableTracks();
+    if (!list.length) return;
+    var currentIdx = list.findIndex(function(t) { return t.id === prefs.currentTrack; });
+    var prevIdx = (currentIdx - 1 + list.length) % list.length;
+    playBgm(list[prevIdx].id);
 }
 
 /* ═══════════════════════════════════════
@@ -548,12 +641,12 @@ function renderPlaylist() {
     var container = document.getElementById('apwPlaylistItems');
     if (!container) return;
     var html = '';
-    TRACKS.forEach(function(t) {
+    getPlayableTracks().forEach(function(t) {
         var isActive = prefs.currentTrack === t.id;
         html += '<div class="apw-playlist-item' + (isActive ? ' active' : '') + '" data-track="' + t.id + '">';
         html += '<span class="apw-pl-icon">' + t.icon + '</span>';
         html += '<span class="apw-pl-name">' + t.name + '</span>';
-        html += '<span class="apw-pl-cat">' + t.category + '</span>';
+        html += '<span class="apw-pl-cat">' + t.category + (t.fileUrl ? ' · فایل' : '') + '</span>';
         if (isActive && bgmPlaying && !bgmPaused) html += '<span class="apw-pl-playing">♪</span>';
         html += '</div>';
     });
@@ -586,20 +679,31 @@ function updatePlayerUI() {
     var widget = document.getElementById('audioPlayerWidget');
     if (widget) widget.classList.toggle('apw-playing', isPlaying);
 
-    var track = TRACKS.find(function(t) { return t.id === prefs.currentTrack; });
+    var track = getPlayableTracks().find(function(t) { return t.id === prefs.currentTrack; });
     if (trackName) trackName.textContent = track ? track.icon + ' ' + track.name : 'انتخاب موسیقی';
 
     renderPlaylist();
 }
 
+function _fmtMMSS(sec) {
+    sec = Math.max(0, Math.floor(sec || 0));
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
 function updatePlayerTime() {
     var timeEl = document.getElementById('apwTime');
     if (!timeEl) return;
-    var track = TRACKS.find(function(t) { return t.id === prefs.currentTrack; });
+    if (bgmAudioEl && bgmAudioEl.src) {
+        // پخش فایل: زمان فعلی از خود المنت؛ طول ممکن است هنوز لود نشده باشد
+        var total = (isFinite(bgmAudioEl.duration) && bgmAudioEl.duration > 0) ? _fmtMMSS(bgmAudioEl.duration) : '∞';
+        timeEl.textContent = _fmtMMSS(bgmAudioEl.currentTime) + ' / ' + total;
+        return;
+    }
+    var track = getPlayableTracks().find(function(t) { return t.id === prefs.currentTrack; }) || TRACKS.find(function(t) { return t.id === prefs.currentTrack; });
     if (!track) { timeEl.textContent = ''; return; }
-    var m = Math.floor(bgmElapsed / 60);
-    var s = bgmElapsed % 60;
-    timeEl.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s + ' / ' + Math.floor(track.dur / 60) + ':' + (track.dur % 60 < 10 ? '0' : '') + (track.dur % 60);
+    var dur = track.dur || 0;
+    timeEl.textContent = _fmtMMSS(bgmElapsed) + ' / ' + (dur ? _fmtMMSS(dur) : '∞');
 }
 
 /* ═══════════════════════════════════════
@@ -724,6 +828,177 @@ function seedAudioDefaults() {
     }
 }
 
+/* ─── فایل‌کمک‌ها ───
+   هر آیتم audioDb با کلید trackId شناسایی می‌شود. فایل آپلودی روی سرور
+   در static/audio/bgm/{trackId}.ext نوشته می‌شود و از
+   /static/audio/bgm/{trackId}.ext سرو می‌گردد. item.fileUrl آینه‌ی آن URL. */
+function _adminToken() { try { return localStorage.getItem('cosmic_token') || ''; } catch (_) { return ''; } }
+function _fileKeyOf(item) {
+    if (!item) return '';
+    if (item.trackId) return item.trackId;
+    return 'custom-' + item.id; // صدای تازه‌ی بدون سنتز
+}
+function _audioAccept() { return '.mp3,.ogg,.wav,.m4a,audio/mpeg,audio/ogg,audio/wav,audio/mp4,audio/x-m4a'; }
+
+function refreshAudioFilesFromServer(cb) {
+    var token = _adminToken();
+    if (!token) { if (cb) cb(); return; }
+    fetch('/api/v5/audio/files', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+            if (d && d.files) {
+                try { localStorage.setItem(AUDIO_FILES_KEY, JSON.stringify(d.files)); } catch (_) {}
+                // همگام‌سازی fileUrl در دیتابیس ادمین
+                var db = getAudioDb();
+                var dirty = false;
+                db.forEach(function (a) {
+                    var k = _fileKeyOf(a);
+                    if (k && d.files[k] && a.fileUrl !== d.files[k]) { a.fileUrl = d.files[k]; dirty = true; }
+                });
+                if (dirty) {
+                    try { localStorage.setItem(AUDIO_DB_KEY, JSON.stringify(db)); } catch (_) {}
+                }
+            }
+            if (cb) cb();
+        }).catch(function () { if (cb) cb(); });
+}
+
+function uploadAudioFile(trackKey, file, done) {
+    var reader = new FileReader();
+    reader.onload = function () {
+        var dataUrl = String(reader.result || '');
+        var comma = dataUrl.indexOf(',');
+        var b64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+        var ext = (file.name.split('.').pop() || 'mp3').toLowerCase();
+        var token = _adminToken();
+        fetch('/api/v5/audio/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ track_id: trackKey, ext: ext, data: b64 })
+        }).then(function (r) {
+            return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+        }).then(function (res) {
+            if (!res.ok) {
+                if (window.showToast) showToast('❌ ' + (res.d.detail || 'خطا در آپلود'), 'error');
+                done && done(false, res.d); return;
+            }
+            done && done(true, res.d);
+        }).catch(function (e) {
+            if (window.showToast) showToast('❌ خطای شبکه: ' + e.message, 'error');
+            done && done(false, { error: String(e) });
+        });
+    };
+    reader.onerror = function () { if (window.showToast) showToast('❌ خطا در خواندن فایل', 'error'); done && done(false); };
+    reader.readAsDataURL(file);
+}
+
+function removeAudioFile(trackKey, done) {
+    var token = _adminToken();
+    fetch('/api/v5/audio/file/' + encodeURIComponent(trackKey), {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) { done && done(res.ok, res.d); })
+      .catch(function () { done && done(false); });
+}
+
+/* ─── مودال آپلود فایل صدا ─── */
+function openAudioFileModal(id, onSaved) {
+    var db = getAudioDb();
+    var item = db.find(function (a) { return a.id === id; });
+    if (!item) return;
+    var trackKey = _fileKeyOf(item);
+    var hasFile = !!item.fileUrl;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'admin-modal-overlay';
+    overlay.innerHTML =
+        '<div class="admin-modal">' +
+        '<div class="admin-modal-header"><h3>🎵 فایل صدا: ' + _esc(item.name) + '</h3><button class="admin-modal-close" id="audioFileClose">✕</button></div>' +
+        '<div class="admin-modal-body">' +
+        '<div style="background:rgba(18,22,46,0.85);border:1px dashed var(--line-strong);border-radius:12px;padding:22px;text-align:center;cursor:pointer;" id="audioDropZone">' +
+            '<div style="font-size:34px;margin-bottom:6px;">' + (hasFile ? '🎧' : '📤') + '</div>' +
+            '<div style="color:var(--gold-200);font-weight:600;margin-bottom:6px;">' + (hasFile ? 'فایل فعلی را عوض کن' : 'فایل صوتی را اینجا رها کن') + '</div>' +
+            '<div style="color:var(--ink-dim);font-size:11px;">mp3 / ogg / wav / m4a — حداکثر ۲۰ مگابایت</div>' +
+            '<input type="file" id="audioFileInput" accept="' + _audioAccept() + '" style="display:none;">' +
+            '<button class="admin-btn admin-btn-primary" id="audioPickBtn" style="margin-top:10px;">انتخاب فایل</button>' +
+        '</div>' +
+        (hasFile
+            ? '<div style="margin-top:14px;padding:10px 12px;background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.25);border-radius:10px;font-size:12px;color:#55efc4;">✅ فایل فعال: <code dir="ltr">' + _esc(item.fileUrl) + '</code>' +
+              '<div style="margin-top:6px;"><button class="admin-btn admin-btn-danger" id="audioRemoveBtn" style="font-size:11px;padding:4px 10px;">🗑 حذف فایل (بازگشت به سنتز)</button></div></div>'
+            : '<div style="margin-top:14px;color:var(--ink-dim);font-size:12px;">فایلی وجود ندارد' + (item.trackId && TRACKS.some(function(t){return t.id===item.trackId;}) ? ' — صدای سنتزی پخش می‌شود.' : ' — این ترک تا آپلود فایل، در پلی‌لیست ظاهر نمی‌شود.</div>') +
+        '<div id="audioFileStatus" style="margin-top:10px;color:var(--gold-200);font-size:12px;min-height:20px;"></div>' +
+        '</div>' +
+        '<div class="admin-modal-footer">' +
+        '<button class="admin-btn" id="audioFileCancel">بستن</button>' +
+        '</div></div>';
+    document.body.appendChild(overlay);
+    setTimeout(function () { overlay.classList.add('visible'); }, 10);
+
+    function closeModal() { overlay.classList.remove('visible'); setTimeout(function () { overlay.remove(); }, 300); }
+    document.getElementById('audioFileClose').addEventListener('click', closeModal);
+    document.getElementById('audioFileCancel').addEventListener('click', closeModal);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+
+    var input = document.getElementById('audioFileInput');
+    document.getElementById('audioPickBtn').addEventListener('click', function () { input.click(); });
+    var dz = document.getElementById('audioDropZone');
+    ['dragenter','dragover'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.style.borderColor = '#f39c12'; }); });
+    ['dragleave','drop'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.style.borderColor = 'var(--line-strong)'; }); });
+    dz.addEventListener('drop', function (e) {
+        var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f) handle(f);
+    });
+    input.addEventListener('change', function () {
+        var f = this.files && this.files[0];
+        if (f) handle(f);
+    });
+    var rmBtn = document.getElementById('audioRemoveBtn');
+    if (rmBtn) rmBtn.addEventListener('click', function () {
+        if (!confirm('فایل حذف شود و به سنتز قبلی برگردیم؟')) return;
+        var status = document.getElementById('audioFileStatus');
+        status.textContent = '⏳ در حال حذف...';
+        removeAudioFile(trackKey, function (ok) {
+            var db2 = getAudioDb();
+            var it2 = db2.find(function (a) { return a.id === id; });
+            if (it2) delete it2.fileUrl;
+            saveAudioDb(db2);
+            if (ok) { if (window.showToast) showToast('فایل حذف شد ✅', 'success'); closeModal(); onSaved && onSaved(); }
+            else { status.textContent = '❌ خطا در حذف فایل'; }
+        });
+    });
+
+    function handle(f) {
+        if (!f.type || (f.type.indexOf('audio/') !== 0 && !/\.(mp3|ogg|wav|m4a)$/i.test(f.name))) {
+            if (window.showToast) showToast('فرمت مجاز نیست — فقط mp3/ogg/wav/m4a', 'error'); return;
+        }
+        if (f.size > 20 * 1024 * 1024) {
+            if (window.showToast) showToast('حجم فایل بیش از ۲۰ مگابایت است ❌', 'error'); return;
+        }
+        var status = document.getElementById('audioFileStatus');
+        status.textContent = '⏳ در حال آپلود ' + _esc(f.name) + ' (' + Math.round(f.size / 1024) + 'KB)...';
+        uploadAudioFile(trackKey, f, function (ok, resp) {
+            if (!ok) { status.textContent = '❌ ' + ((resp && resp.detail) || 'خطا در آپلود'); return; }
+            var db2 = getAudioDb();
+            var it2 = db2.find(function (a) { return a.id === id; });
+            if (it2) {
+                // برای صداهای تازه‌ی بدون trackId، مقدارِ trackId را هم پایداری می‌کنیم
+                if (!it2.trackId) it2.trackId = trackKey;
+                it2.fileUrl = resp.url;
+            }
+            saveAudioDb(db2);
+            status.textContent = '✅ آپلود شد. در حال به‌روزرسانی...';
+            // به‌روزرسانی cache فایل‌ها
+            try {
+                var map = JSON.parse(localStorage.getItem(AUDIO_FILES_KEY) || '{}');
+                map[trackKey] = resp.url;
+                localStorage.setItem(AUDIO_FILES_KEY, JSON.stringify(map));
+            } catch (_) {}
+            setTimeout(function () { closeModal(); onSaved && onSaved(); }, 300);
+        });
+    }
+}
+
 function renderAdminAudio() {
     seedAudioDefaults();
     var audioDb = getAudioDb();
@@ -732,26 +1007,35 @@ function renderAdminAudio() {
 
     // Stats
     html += '<div class="admin-stats" style="margin-bottom:20px;">';
-    html += '<div class="admin-stat-card"><div class="admin-stat-icon">🎵</div><div class="admin-stat-value">' + audioDb.length + '</div><div class="admin-stat-label">فایل صوتی</div></div>';
-    html += '<div class="admin-stat-card"><div class="admin-stat-icon">🖼️</div><div class="admin-stat-value">' + bgDb.length + '</div><div class="admin-stat-label">تصویر پس‌زمینه</div></div>';
-    html += '<div class="admin-stat-card"><div class="admin-stat-icon">✅</div><div class="admin-stat-value">' + audioDb.filter(function(a) { return a.active; }).length + '</div><div class="admin-stat-label">فعال</div></div>';
+    html += '<div class="admin-stat-card"><div class="admin-stat-icon">🎵</div><div class="admin-stat-value">' + audioDb.length + '</div><div class="admin-stat-label">صدای ثبت‌شده</div></div>';
+    html += '<div class="admin-stat-card"><div class="admin-stat-icon">🎧</div><div class="admin-stat-value">' + audioDb.filter(function (a) { return a.fileUrl; }).length + '</div><div class="admin-stat-label">دارای فایل</div></div>';
+    html += '<div class="admin-stat-card"><div class="admin-stat-icon">✅</div><div class="admin-stat-value">' + audioDb.filter(function (a) { return a.active; }).length + '</div><div class="admin-stat-label">فعال</div></div>';
     html += '</div>';
+
+    html += '<div style="margin-bottom:10px;color:var(--ink-dim);font-size:12px;">💡 صداهای سنتزی داخلی به‌صورت پیش‌فرض فایل ندارند — با دکمه‌ی «فایل» روی هر ردیف، می‌توانید mp3/ogg/wav/m4a آپلود کنید تا به‌جای سنتز، همان فایل پخش شود.</div>';
 
     // Audio tracks table
     html += '<h3 style="color:var(--gold-200);margin-bottom:12px;">🎵 فایل‌های صوتی</h3>';
     html += '<div class="admin-table-wrap"><table class="admin-table"><thead><tr>';
-    html += '<th>آیکون</th><th>نام</th><th>دسته‌بندی</th><th>تخصیص</th><th>وضعیت</th><th>عملیات</th>';
+    html += '<th>آیکون</th><th>نام</th><th>دسته</th><th>تخصیص</th><th>وضعیت</th><th>منبع صدا</th><th>عملیات</th>';
     html += '</tr></thead><tbody>';
-    audioDb.forEach(function(a) {
+    audioDb.forEach(function (a) {
+        var src = a.fileUrl
+            ? '<span style="color:#55efc4;font-size:11px;">🎧 فایل آپلودی</span>'
+            : (a.trackId && TRACKS.some(function (t) { return t.id === a.trackId; })
+                ? '<span style="color:#a29bfe;font-size:11px;">⚡ سنتز داخلی</span>'
+                : '<span style="color:#ff7675;font-size:11px;">— بدون فایل (غیرفعال در پلی‌لیست)</span>');
         html += '<tr>';
         html += '<td style="font-size:20px">' + a.icon + '</td>';
         html += '<td>' + _esc(a.name) + '</td>';
         html += '<td><span style="background:rgba(162,155,254,0.15);color:#a29bfe;padding:2px 8px;border-radius:6px;font-size:11px;">' + _esc(a.type) + '</span></td>';
-        html += '<td>' + _esc(a.assignedTo) + '</td>';
+        html += '<td>' + _esc(a.assignedTo || 'all') + '</td>';
         html += '<td>' + (a.active ? '<span style="color:#55efc4">✅ فعال</span>' : '<span style="color:#ff7675">❌ غیرفعال</span>') + '</td>';
-        html += '<td>';
-        html += '<button class="admin-icon-btn" onclick="AudioManager.adminToggle(' + a.id + ')" title="toggle">' + (a.active ? '🔒' : '🔓') + '</button>';
+        html += '<td>' + src + '</td>';
+        html += '<td style="white-space:nowrap;">';
+        html += '<button class="admin-icon-btn" onclick="AudioManager.adminToggle(' + a.id + ')" title="فعال/غیرفعال">' + (a.active ? '🔒' : '🔓') + '</button>';
         html += '<button class="admin-icon-btn" onclick="AudioManager.adminPreview(' + a.id + ')" title="پیش‌نمایش">▶️</button>';
+        html += '<button class="admin-icon-btn" onclick="AudioManager.adminUploadFile(' + a.id + ')" title="آپلود/جایگزینی فایل صدا">🎧</button>';
         html += '<button class="admin-icon-btn" onclick="AudioManager.adminEdit(' + a.id + ')" title="ویرایش">✏️</button>';
         html += '<button class="admin-icon-btn admin-icon-btn-danger" onclick="AudioManager.adminDelete(' + a.id + ')" title="حذف">🗑️</button>';
         html += '</td></tr>';
@@ -760,13 +1044,17 @@ function renderAdminAudio() {
 
     // Add new audio
     html += '<div style="margin-top:16px;padding:16px;background:rgba(18,22,46,0.85);border:1px solid var(--line-strong);border-radius:12px;">';
-    html += '<h4 style="color:var(--gold-200);margin-bottom:12px;">➕ افزودن صدای جدید (ساخت مجازی)</h4>';
+    html += '<h4 style="color:var(--gold-200);margin-bottom:12px;">➕ افزودن صدای تازه</h4>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;">';
     html += '<div><label style="color:var(--ink-dim);font-size:11px;">نام</label><input type="text" class="admin-input" id="adminAudioName" placeholder="نام صدا" style="width:150px;"></div>';
+    html += '<div><label style="color:var(--ink-dim);font-size:11px;">آیکون</label><input type="text" class="admin-input" id="adminAudioIcon" placeholder="🎵" maxlength="4" style="width:60px;"></div>';
     html += '<div><label style="color:var(--ink-dim);font-size:11px;">دسته</label><select class="admin-input" id="adminAudioType"><option value="ambient">ambient</option><option value="nature">nature</option><option value="space">space</option><option value="meditation">meditation</option></select></div>';
     html += '<div><label style="color:var(--ink-dim);font-size:11px;">تخصیص</label><select class="admin-input" id="adminAudioAssign"><option value="all">همه</option><option value="yoga">یوگا</option><option value="meditation">مدیتیشن</option><option value="breathing">تنفس</option></select></div>';
+    html += '<label style="color:var(--ink-dim);font-size:11px;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="adminAudioBasedOnSynth" style="width:auto;"> بر پایه‌ی سنتز «دران کیهانی»</label>';
     html += '<button class="admin-btn admin-btn-primary" onclick="AudioManager.adminAdd()">➕ افزودن</button>';
-    html += '</div></div>';
+    html += '</div>';
+    html += '<div style="margin-top:8px;color:var(--ink-dim);font-size:11px;">💡 اگر تیک سنتز را نزنی، بعد از افزودن، با دکمه‌ی 🎧 روی همان ردیف فایل آپلود کن تا در پلی‌لیست ظاهر شود.</div>';
+    html += '</div>';
 
     // Background images
     html += '<h3 style="color:var(--gold-200);margin:24px 0 12px;">🖼️ تصاویر پس‌زمینه</h3>';
@@ -799,44 +1087,74 @@ function adminToggle(id) {
 function adminPreview(id) {
     var db = getAudioDb();
     var item = db.find(function(a) { return a.id === id; });
-    if (item && item.trackId) { playBgm(item.trackId); }
+    if (!item) return;
+    var key = _fileKeyOf(item) || 'cosmic-drone';
+    playBgm(key);
+}
+function adminUploadFile(id) {
+    openAudioFileModal(id, function () { refreshAudioFilesFromServer(function () { render(); }); });
 }
 function adminEdit(id) {
     var db = getAudioDb();
     var item = db.find(function(a) { return a.id === id; });
     if (!item) return;
     var newName = prompt('نام جدید:', item.name);
-    if (newName && newName.trim()) {
-        item.name = newName.trim();
-        var newAssign = prompt('تخصیص (all/yoga/meditation/breathing):', item.assignedTo);
-        if (newAssign) item.assignedTo = newAssign.trim();
-        saveAudioDb(db);
-        playSfx('success');
-        render();
-    }
-}
-function adminDelete(id) {
-    if (!confirm('آیا از حذف این فایل صوتی مطمئن هستید؟')) return;
-    var db = getAudioDb().filter(function(a) { return a.id !== id; });
+    if (!newName || !newName.trim()) return;
+    item.name = newName.trim();
+    var newIcon = prompt('آیکون (اموجی):', item.icon || '🎵');
+    if (newIcon) item.icon = newIcon.trim();
+    var newAssign = prompt('تخصیص (all/yoga/meditation/breathing):', item.assignedTo || 'all');
+    if (newAssign) item.assignedTo = newAssign.trim();
     saveAudioDb(db);
     playSfx('success');
     render();
+}
+function adminDelete(id) {
+    var db = getAudioDb();
+    var item = db.find(function (a) { return a.id === id; });
+    if (!item) return;
+    var key = _fileKeyOf(item);
+    if (!confirm('این صدا حذف شود؟' + (item.fileUrl ? '\n(فایل آپلودی روی سرور هم پاک خواهد شد)' : ''))) return;
+    function apply() {
+        var db2 = getAudioDb().filter(function (a) { return a.id !== id; });
+        saveAudioDb(db2);
+        playSfx('success');
+        render();
+    }
+    if (item.fileUrl && key) {
+        removeAudioFile(key, function () { apply(); });
+    } else {
+        apply();
+    }
 }
 function adminAdd() {
     var name = document.getElementById('adminAudioName');
     var type = document.getElementById('adminAudioType');
     var assign = document.getElementById('adminAudioAssign');
+    var icon = document.getElementById('adminAudioIcon');
+    var based = document.getElementById('adminAudioBasedOnSynth');
     if (!name || !name.value.trim()) { playSfx('error'); return; }
     var db = getAudioDb();
     var newId = db.length > 0 ? Math.max.apply(null, db.map(function(a) { return a.id; })) + 1 : 1;
-    db.push({
-        id: newId, name: name.value.trim(), type: type.value, icon: '🎵',
-        trackId: 'cosmic-drone', active: true, assignedTo: assign.value, tags: type.value
-    });
+    var entry = {
+        id: newId,
+        name: name.value.trim(),
+        type: type.value,
+        icon: (icon && icon.value.trim()) || '🎵',
+        active: true,
+        assignedTo: assign.value,
+        tags: type.value
+    };
+    if (based && based.checked) entry.trackId = 'cosmic-drone';
+    db.push(entry);
     saveAudioDb(db);
     name.value = '';
+    if (icon) icon.value = '';
     playSfx('success');
     render();
+    if (!(based && based.checked) && window.showToast) {
+        showToast('صدای تازه ساخته شد — حالا روی همان ردیف 🎧 بزن و فایل صوتی‌اش را آپلود کن.', 'info');
+    }
 }
 function adminDeleteBg(id) {
     if (!confirm('آیا از حذف این تصویر مطمئن هستید؟')) return;
@@ -1288,7 +1606,8 @@ window.AudioManager = {
     // Init
     init: function() {
         createPlayerWidget();
-        hydrateSettingsFromServer('audio', AUDIO_DB_KEY);
+        // بعد از hydrate، پلی‌لیست/نام‌ها/فایل‌ها را بازتاب بده
+        hydrateSettingsFromServer('audio', AUDIO_DB_KEY, updatePlayerUI);
         hydrateSettingsFromServer('backgrounds', BG_DB_KEY);
         initAdminBackgrounds();
     },
@@ -1305,6 +1624,8 @@ window.AudioManager = {
     adminEdit: adminEdit,
     adminDelete: adminDelete,
     adminAdd: adminAdd,
+    adminUploadFile: adminUploadFile,
+    refreshAudioFiles: refreshAudioFilesFromServer,
     adminDeleteBg: adminDeleteBg,
     adminEditBg: adminEditBg,
     applyAdminBackgrounds: applyAdminBackgrounds,

@@ -249,6 +249,12 @@
             opacity: 0;
             padding: 0;
         }
+        /* آیتم مستقلِ بدون دسته (صفحهٔ اصلی / داشبورد کاربری) */
+        .sb-standalone {
+            padding: 0 4px;
+            margin: 2px 0 4px;
+            animation: sbSlideIn 0.35s ease both;
+        }
 
         /* ─── Nav Items ─── */
         .nav-item {
@@ -623,6 +629,9 @@
             min-width: 0;
             line-height: 1;
         }
+        /* برچسبِ کوتاه کنار آیکونِ نوار بالا */
+        .tb-label { font-size: 12px; font-weight: 700; margin-inline-start: 5px; line-height: 1; }
+        @media (max-width: 1024px) { .tb-label { display: none; } }
 
         /* ─── Top Bar Actions Dropdown ─── */
         .topbar-actions-dropdown { position: relative; }
@@ -1214,6 +1223,232 @@
         /* ============================================================
            صفحه اصلی — هیرو
         ============================================================ */
+        /* ════════════════════════════════════════════════════════
+           کانسپت جدید صفحهٔ خانه — «کنسولِ رصدخانه» (hm-*)
+           هیرو دوستونه (اسطرلاب + صفحهٔ ماه زنده) + سرویس‌های دسته‌بندی‌شده
+        ════════════════════════════════════════════════════════ */
+        .hm-wrap { position: relative; }
+
+        /* ── هیرو دوستونه ── */
+        .hm-hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1.12fr .88fr;
+            gap: clamp(20px, 4vw, 54px);
+            align-items: center;
+            padding: 44px 4px 6px;
+        }
+        .hm-hero-glow {
+            position: absolute;
+            inset: -30px -20px 10px;
+            z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(560px 260px at 82% 18%, rgba(159, 212, 224, 0.10), transparent 70%),
+                radial-gradient(620px 300px at 18% 0%, rgba(37, 53, 107, 0.55), transparent 68%);
+            border-radius: var(--co-r-xl);
+        }
+        .hm-hero-copy, .hm-dial { position: relative; z-index: 1; }
+        .hm-kicker {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 11.5px; font-weight: 700; letter-spacing: .05em;
+            color: var(--co-star);
+            padding: 5px 14px; border-radius: var(--co-r-pill);
+            border: 1px solid rgba(159, 212, 224, 0.32);
+            background: rgba(159, 212, 224, 0.07);
+        }
+        .hm-title {
+            margin: 16px 0 0;
+            font-family: "Cinzel", serif;
+            font-weight: 700;
+            font-size: clamp(36px, 5.6vw, 56px);
+            letter-spacing: .12em;
+            line-height: 1.1;
+            background: linear-gradient(180deg, var(--co-gold-200) 0%, var(--co-gold-400) 55%, var(--co-gold-600) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 46px rgba(201, 162, 39, 0.16);
+        }
+        .hm-lede {
+            margin: 14px 0 0;
+            max-width: 520px;
+            font-family: var(--co-font-display);
+            font-size: 15.5px;
+            line-height: 2.15;
+            color: var(--co-ink-dim);
+        }
+        .hm-lede b { color: var(--co-ink); font-weight: 700; }
+        .hm-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+        .hm-facts {
+            display: grid;
+            grid-template-columns: repeat(4, auto);
+            justify-content: start;
+            gap: 26px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--co-line);
+        }
+        .hm-fact-num {
+            font-family: "Cinzel", serif;
+            font-size: 27px; font-weight: 700; line-height: 1;
+            color: var(--co-gold-300);
+        }
+        .hm-fact-lb { font-size: 11.5px; color: var(--co-ink-faint); margin-top: 5px; }
+
+        /* ── صفحهٔ ماه: اسطرلاب + دیسکِ زنده ── */
+        .hm-dial { width: min(360px, 88%); margin-inline: auto; }
+        .hm-dial .astrolabe { width: 100%; }
+        .hm-dial-frame {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 42%, rgba(16, 26, 61, 0.85), rgba(7, 12, 31, 0.35) 70%, transparent 100%);
+        }
+        .hm-dial .astrolabe { position: absolute; inset: 0; margin: 0; }
+        .hm-dial-moon {
+            position: absolute; inset: 0;
+            display: grid; place-items: center;
+            pointer-events: none;
+        }
+        .hm-dial-moon svg {
+            width: 38%; height: 38%;
+            filter: drop-shadow(0 0 26px rgba(159, 212, 224, 0.35));
+            animation: hmFloat 7s ease-in-out infinite;
+        }
+        @keyframes hmFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50%      { transform: translateY(-7px) scale(1.03); }
+        }
+        .hm-dial-cap {
+            position: absolute; inset-inline: 0; bottom: -4px;
+            text-align: center;
+            font-size: 11px; color: var(--co-ink-faint);
+        }
+
+        /* ── گروه‌های سرویس ── */
+        .hm-group { margin-top: 48px; }
+        .hm-group-head {
+            display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--co-line);
+        }
+        .hm-group-title {
+            font-family: var(--co-font-display);
+            font-size: 21px; font-weight: 700;
+            color: var(--co-gold-200);
+        }
+        .hm-group-count {
+            font-family: "Cinzel", serif;
+            font-size: 10.5px; letter-spacing: .08em;
+            color: var(--co-gold-400);
+            border: 1px solid var(--co-line-strong);
+            border-radius: var(--co-r-pill);
+            padding: 2px 10px;
+        }
+        .hm-group-sub { font-size: 12.5px; color: var(--co-ink-faint); }
+        .hm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+        .hm-svc {
+            position: relative;
+            display: flex; flex-direction: column; gap: 9px;
+            background: var(--co-panel);
+            border: 1px solid var(--co-line);
+            border-radius: var(--co-r-lg);
+            padding: 18px 18px 15px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform .2s var(--co-ease), border-color .2s var(--co-ease), box-shadow .25s var(--co-ease);
+        }
+        .hm-svc::before {   /* خطِ نورانی بالا */
+            content: "";
+            position: absolute; inset: 0 0 auto 0; height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(236, 217, 160, 0.6), transparent);
+            opacity: 0; transition: opacity .2s;
+        }
+        .hm-svc:hover {
+            transform: translateY(-4px);
+            border-color: var(--co-line-strong);
+            box-shadow: var(--co-shadow-card), 0 0 0 1px rgba(221, 192, 112, 0.10);
+        }
+        .hm-svc:hover::before { opacity: 1; }
+        .hm-svc-no {
+            position: absolute; top: 12px; left: 14px;
+            font-family: "Cinzel", serif;
+            font-size: 11px; letter-spacing: .1em;
+            color: var(--co-ink-faint); opacity: .55;
+            direction: ltr;
+        }
+        .hm-svc-top { display: flex; align-items: center; gap: 11px; padding-inline-end: 34px; }
+        .hm-svc-icon {
+            width: 44px; height: 44px; flex-shrink: 0;
+            display: grid; place-items: center;
+            border-radius: 14px;
+            background: linear-gradient(160deg, rgba(221, 192, 112, 0.2), rgba(221, 192, 112, 0.045));
+            border: 1px solid var(--co-line);
+            transition: box-shadow .25s;
+        }
+        .hm-svc:hover .hm-svc-icon { box-shadow: var(--co-glow-gold); }
+        .hm-svc-icon img { width: 26px; height: 26px; }
+        .hm-svc-name {
+            font-family: var(--co-font-display);
+            font-size: 16.5px; font-weight: 700; color: var(--co-ink);
+        }
+        .hm-svc-desc { font-size: 12.5px; line-height: 2; color: var(--co-ink-dim); flex: 1; }
+        .hm-svc-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+        .hm-svc-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .hm-svc-go { color: var(--co-gold-400); font-size: 12.5px; font-weight: 700; transition: color .2s, transform .2s; }
+        .hm-svc:hover .hm-svc-go { color: var(--co-gold-200); transform: translateX(-4px); }
+
+        /* ── نوار اطمینان (جای about) ── */
+        .hm-band {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+            margin-top: 50px;
+        }
+        .hm-band-item {
+            display: flex; gap: 14px; align-items: flex-start;
+            background: rgba(9, 14, 34, 0.5);
+            border: 1px solid var(--co-line);
+            border-radius: var(--co-r-lg);
+            padding: 18px;
+        }
+        .hm-band-ic {
+            width: 42px; height: 42px; flex-shrink: 0;
+            display: grid; place-items: center;
+            font-size: 21px; border-radius: 12px;
+            background: rgba(221, 192, 112, 0.09);
+            border: 1px solid var(--co-line);
+            filter: drop-shadow(0 0 12px rgba(221, 192, 112, 0.25));
+        }
+        .hm-band-item h3 {
+            font-family: var(--co-font-display);
+            font-size: 15px; font-weight: 700; color: var(--co-gold-200);
+            margin: 2px 0 6px;
+        }
+        .hm-band-item p { font-size: 12.5px; line-height: 2; color: var(--co-ink-dim); margin: 0; }
+
+        @media (max-width: 980px) {
+            .hm-hero { grid-template-columns: 1fr; text-align: center; padding-top: 26px; }
+            .hm-lede { margin-inline: auto; }
+            .hm-cta, .hm-facts { justify-content: center; }
+            .hm-facts { grid-template-columns: repeat(2, auto); gap: 18px 30px; }
+            .hm-dial { width: min(280px, 76vw); }
+            .hm-band { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 560px) {
+            .hm-grid { grid-template-columns: 1fr; }
+            .hm-facts { grid-template-columns: repeat(2, auto); }
+            .hm-title { letter-spacing: .06em; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hm-dial-moon svg { animation: none; }
+        }
+
         .hero {
             position: relative;
             text-align: center;
@@ -2818,6 +3053,60 @@
             .site-footer .sf-bottom { padding: 12px 20px 16px; justify-content: center; }
         }
 
+    /* ============================================================
+       صفحه‌ی قالب بصری (pageTheme) — سواچ/تایپ/آیکون/گرید
+    ============================================================ */
+    .theme-page { max-width: 1080px; margin: 0 auto; }
+    .tp-hero { text-align: center; padding: 44px 0 6px; }
+    .tp-hero p { max-width: 620px; margin: 18px auto 0; color: var(--co-ink-dim); font-size: 15px; line-height: 2.1; }
+    .tp-hero-ctas { display: flex; gap: 10px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
+    .tp-hero-ctas a { text-decoration: none; }
+    .tp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .tp-box { padding: 22px; }
+    .tp-box h4 {
+        font-family: var(--co-font-display); font-size: 14px; color: var(--co-gold-300);
+        margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--co-line);
+    }
+    .tp-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .tp-row:last-child { margin-bottom: 0; }
+    .tp-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    @media (max-width: 640px) { .tp-stats { grid-template-columns: repeat(2, 1fr); } }
+    .tp-typelist { padding: 0; overflow: hidden; }
+    .type-row { display: flex; align-items: baseline; gap: 16px; padding: 14px 18px; border-bottom: 1px solid var(--co-line); }
+    .type-row:last-child { border-bottom: none; }
+    .type-sample { flex: 1; min-width: 0; }
+    .type-meta { font-size: 11px; color: var(--co-ink-faint); white-space: nowrap; font-family: var(--co-font-serif); }
+    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+    .swatch { border-radius: var(--co-r-md); overflow: hidden; border: 1px solid var(--co-line); background: rgba(9,14,34,.5); }
+    .swatch-color { height: 64px; }
+    .swatch-info { padding: 8px 10px; }
+    .swatch-name { font-size: 11.5px; font-weight: 700; color: var(--co-ink); }
+    .swatch-hex { font-family: var(--co-font-serif); font-size: 10px; color: var(--co-ink-faint); direction: ltr; text-align: left; }
+    .swatch-group { font-size: 12px; font-weight: 700; color: var(--co-gold-300); margin: 18px 0 8px; }
+    .swatch-group:first-child { margin-top: 0; }
+    .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
+    .moon-icon-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+    @media (max-width: 760px) { .moon-icon-row { grid-template-columns: repeat(4, 1fr); } }
+    .icon-cell {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        padding: 12px 6px; border: 1px solid var(--co-line); border-radius: var(--co-r-md);
+        background: rgba(9, 14, 34, 0.5);
+        transition: border-color .2s, transform .15s var(--co-ease);
+    }
+    .icon-cell:hover { border-color: var(--co-line-strong); transform: translateY(-2px); }
+    .icon-cell img { width: 34px; height: 34px; }
+    .icon-cell span { font-size: 10.5px; color: var(--co-ink-dim); text-align: center; }
+    .tp-moon2 { grid-template-columns: 1.2fr 1fr; align-items: start; }
+    @media (max-width: 860px) { .tp-moon2 { grid-template-columns: 1fr; } }
+    .moon-ring-demo { display: flex; align-items: center; gap: 22px; }
+    .moon-ring-demo .mr-text { flex: 1; }
+    .moon-ring-demo h4 { font-family: var(--co-font-display); color: var(--co-gold-200); font-size: 16px; margin: 0 0 8px; border: none; padding: 0; }
+    .moon-ring-demo p { font-size: 12.5px; color: var(--co-ink-dim); line-height: 2; margin: 0; }
+    .tp-foot {
+        margin-top: 50px; text-align: center; font-size: 12px; color: var(--co-ink-faint);
+        border-top: 1px solid var(--co-line); padding-top: 22px;
+    }
+
     </style>
     <!-- قالب بصری نسخه ۱ — سامانه‌ی طراحی واحد (توکن‌ها، اجزا، کیت ماه) -->
     <link rel="stylesheet" href="static/theme.css?v=1">
@@ -2842,18 +3131,9 @@
         </div>
 
         <nav class="sidebar-nav" id="sidebarNav">
-            <!-- 🏠 داشبورد -->
-            <div class="sb-section" data-section="dashboard">
-                <button class="sb-section-header" onclick="toggleSbSection(this)">
-                    <img class="sb-section-icon" src="static/images/ui/home.svg" alt="">
-                    <span class="sb-section-title">داشبورد</span>
-                    <span class="sb-badge">۲</span>
-                    <span class="sb-chevron">‹</span>
-                </button>
-                <div class="sb-section-items">
-                    <button class="nav-item" data-nav="home"><img class="nav-emoji" src="static/images/ui/home.svg" alt=""> صفحه اصلی</button>
-                    <button class="nav-item" data-nav="dashboard"><img class="nav-emoji" src="static/images/ui/dashboard.svg" alt=""> داشبورد کاربری</button>
-                </div>
+            <!-- 🏠 صفحه اصلی — آیتم مستقل، اولین گزینه -->
+            <div class="sb-standalone">
+                <button class="nav-item" data-nav="home"><img class="nav-emoji" src="static/images/ui/home.svg" alt=""> صفحه اصلی</button>
             </div>
 
             <!-- ⭐ ابزارهای کیهانی -->
@@ -2932,6 +3212,7 @@
                 <div class="sb-section-items">
                     <button class="nav-item" data-nav="yoga"><img class="nav-emoji" src="static/images/ui/yoga.svg" alt=""> کتابخانه یوگا</button>
                     <button class="nav-item" data-nav="breath"><img class="nav-emoji" src="static/images/ui/breath.svg" alt=""> تنفس و مدیتیشن</button>
+                    <button class="nav-item" data-nav="theme"><img class="nav-emoji" src="static/images/ui/logo.svg" alt=""> قالب بصری</button>
                 </div>
             </div>
 
@@ -2946,6 +3227,11 @@
                 <div class="sb-section-items">
                     <button class="nav-item" data-nav="admin"><img class="nav-emoji" src="static/images/ui/admin.svg" alt=""> مدیریت کاربران</button>
                 </div>
+            </div>
+
+            <!-- 📊 داشبورد کاربری — آیتم مستقل، آخرین گزینه -->
+            <div class="sb-standalone">
+                <button class="nav-item" data-nav="dashboard"><img class="nav-emoji" src="static/images/ui/dashboard.svg" alt=""> داشبورد کاربری</button>
             </div>
         </nav>
 
@@ -3027,7 +3313,7 @@
             <div class="topbar-spacer"></div>
             <div class="header-actions">
                 <div class="yoga-summary-dropdown" id="yogaSummaryDropdown">
-                    <button class="btn-action primary tb-icon-only" id="yogaEngineToggle" title="یوگا">🧘</button>
+                    <button class="btn-action primary tb-icon-only" id="yogaEngineToggle" title="یوگا">🧘<span class="tb-label">یوگا</span></button>
                     <div class="yoga-summary-panel" id="yogaSummaryPanel"></div>
                 </div>
                 <div class="zodiac-dropdown" id="zodiacDropdown">
@@ -3042,11 +3328,11 @@
                     <div class="zodiac-panel" id="zodiacPanel" role="menu" aria-label="اطلاعات زایچة چینی"></div>
                 </div>
                 <div class="cosmic-status-dropdown" id="cosmicStatusDropdown">
-                    <button class="btn-action tb-icon-only" id="cosmicStatusBtn" title="وضعیت نجومی">🌌</button>
+                    <button class="btn-action tb-icon-only" id="cosmicStatusBtn" title="وضعیت نجومی">🌌<span class="tb-label">آسمان</span></button>
                     <div class="cosmic-status-panel" id="cosmicStatusPanel"></div>
                 </div>
                 <div class="earth-status-dropdown" id="earthStatusDropdown">
-                    <button class="btn-action tb-icon-only" id="earthStatusBtn" title="وضعیت زمین — آب‌وهوا، کیفیت هوا، سیارک‌ها">🌍</button>
+                    <button class="btn-action tb-icon-only" id="earthStatusBtn" title="وضعیت زمین — آب‌وهوا، کیفیت هوا، سیارک‌ها">🌍<span class="tb-label">زمین</span></button>
                     <div class="earth-status-panel" id="earthStatusPanel"></div>
                 </div>
                 <div class="topbar-profile-dropdown" id="profileDropdown">
@@ -3106,7 +3392,7 @@
                     </div>
                 </div>
                 <div class="topbar-actions-dropdown">
-                    <button class="btn-action" id="actionsMenuBtn">⋯</button>
+                    <button class="btn-action tb-icon-only" id="actionsMenuBtn">⋯<span class="tb-label">بیشتر</span></button>
                     <div class="topbar-actions-menu" id="actionsMenu">
                         <button class="topbar-actions-item" id="shareBtn"><span class="topbar-actions-icon">📤</span> اشتراک‌گذاری</button>
                         <button class="topbar-actions-item" id="saveBtn"><span class="topbar-actions-icon">💾</span> ذخیره</button>
@@ -3198,8 +3484,35 @@
 
         <!-- ======================= صفحه اصلی ======================= -->
         <section class="page" id="pageHome">
-            <div class="hero">
-                <div class="hero-bg" aria-hidden="true"></div>
+            <div class="hm-wrap">
+            <div class="hm-hero">
+                <div class="hm-hero-glow" aria-hidden="true"></div>
+
+                <!-- ستون متن -->
+                <div class="hm-hero-copy">
+                    <span class="hm-kicker">🔭 رصدخانه‌ی کیهانی · شانزده ابزار در یک آسمان</span>
+                    <h1 class="hm-title">Cosmic Oracle</h1>
+                    <p class="hm-lede">
+                        <b>چارت تولد حرفه‌ای</b> با دقت اخترشناسی ودیک، کنارِ حکمت ایرانی و پیش‌بینی —
+                        همه در یک جایگاهِ واحد. آسمانِ امشب را زنده ببین و ابزارت را بردار.
+                    </p>
+                    <div class="hm-cta">
+                        <button class="co-btn co-btn--primary co-btn--lg" onclick="openService('birth')"><img src="static/images/ui/birth.svg" alt=""> چارت تولد</button>
+                        <button class="co-btn co-btn--moon co-btn--lg" onclick="openService('moon-phase')"><img src="static/images/ui/moon-phase.svg" alt=""> فاز ماه</button>
+                        <button class="co-btn co-btn--lg" onclick="openService('hafez')"><img src="static/images/ui/hafez.svg" alt=""> فال حافظ</button>
+                        <button class="co-btn co-btn--lg" onclick="openService('tarot')"><img src="static/images/ui/tarot.svg" alt=""> تاروت</button>
+                    </div>
+                    <div class="hm-facts">
+                        <div><div class="hm-fact-num">۱۶</div><div class="hm-fact-lb">موتور محاسباتی</div></div>
+                        <div><div class="hm-fact-num">۲۷</div><div class="hm-fact-lb">ناکشاترا ودیک</div></div>
+                        <div><div class="hm-fact-num">۱۲</div><div class="hm-fact-lb">برج فلکی</div></div>
+                        <div><div class="hm-fact-num">۹</div><div class="hm-fact-lb">سیاره‌ی کلاسیک</div></div>
+                    </div>
+                </div>
+
+                <!-- ستون صفحه‌ی ماه: اسطرلاب + دیسک زنده -->
+                <div class="hm-dial">
+                <div class="hm-dial-frame">
                 <div class="astrolabe" aria-hidden="true">
                     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="200" cy="200" r="196" fill="none" stroke="#c9a227" stroke-opacity="0.55" stroke-width="1.6"/>
@@ -3242,170 +3555,181 @@
                     </svg>
                 </div>
 
-                <h1>Cosmic Oracle</h1>
-                <p class="hero-sub">
-                    رصدخانه‌ی کیهانی · چارت تولد حرفه‌ای
-                    <br>
-                    شانزده ابزار نجومی، حکمت ایرانی و پیش‌بینی در یک جایگاه واحد
-                </p>
+                <!-- دیسکِ زندهٔ ماه — در مرکز اسطرلاب (theme.js پر می‌کند) -->
+                <div class="hm-dial-moon" id="hmDialMoon" aria-hidden="true"></div>
+                <div class="hm-dial-cap">آسمانِ امشب · محاسبهٔ محلی</div>
+                </div><!-- /hm-dial-frame -->
+                </div><!-- /hm-dial -->
+            </div><!-- /hm-hero -->
 
-                <div class="hero-cta">
-                    <button class="btn-action primary" onclick="openService('birth')"><img class="hero-cta-icon" src="static/images/ui/birth.svg" alt=""> چارت تولد</button>
-                    <button class="btn-action" onclick="openService('hafez')"><img class="hero-cta-icon" src="static/images/ui/hafez.svg" alt=""> فال حافظ</button>
-                    <button class="btn-action" onclick="openService('tarot')"><img class="hero-cta-icon" src="static/images/ui/tarot.svg" alt=""> تاروت</button>
-                    <button class="btn-action" onclick="openService('nasa')"><img class="hero-cta-icon" src="static/images/ui/nasa.svg" alt=""> ناسا</button>
-                </div>
-
-                <div class="hero-stats">
-                    <div class="hero-stat"><div class="stat-num">۱۶</div><div class="stat-label">موتور محاسباتی</div></div>
-                    <div class="hero-stat"><div class="stat-num">۲۷</div><div class="stat-label">ناکشاترا (ودیک)</div></div>
-                    <div class="hero-stat"><div class="stat-num">۱۲</div><div class="stat-label">برج فلکی</div></div>
-                    <div class="hero-stat"><div class="stat-num">۹</div><div class="stat-label">سیاره‌ی کلاسیک</div></div>
-                </div>
-            </div>
-
-            <!-- 🌙 ماهِ امروز — وِیجت زنده (محاسبه‌ی محلی، بدون API) -->
+            <!-- 🌙 ماهِ امروز — وِیجت زنده (محاسبهٔ محلی، بدون API) -->
             <div id="coMoonToday" hidden></div>
 
-            <!-- گرید سرویس‌ها -->
-            <h2 class="section-heading">خدمات رصدخانه
-                <small>هر ابزار را باز کنید تا در همان لحظه، تنها موتورِ همان ابزار بارگذاری شود</small>
-            </h2>
+            <!-- ═══ کنسول ابزارها — دسته‌بندی‌شده ═══ -->
+            <span class="co-ornament">✦ ✦ ✦</span>
 
-            <div class="services-grid">
-
-                <div class="service-card" onclick="openService('birth')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/birth.svg" alt=""><span class="svc-name">چارت تولد</span></div>
-                    <div class="svc-desc">چارت کامل نجومی با موقعیت دقیق سیارات، خانه‌ها، جنبه‌ها و تفسیر ودیک. پایه‌ی همه‌ی تحلیل‌ها.</div>
-                    <div class="svc-badges"><span class="svc-badge">نجومی</span><span class="svc-badge">ودیک</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+            <section class="hm-group">
+                <div class="hm-group-head">
+                    <span class="hm-group-title">🔮 تحلیلِ چارت</span>
+                    <span class="hm-group-count">۶ ابزار</span>
+                    <span class="hm-group-sub">مبتنی بر اخترشناسی ودیک — هر ابزار موتور خودش را همان لحظه بارگذاری می‌کند</span>
                 </div>
-
-                <div class="service-card" onclick="openService('synastry')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/synastry.svg" alt=""><span class="svc-name">سیناستری</span></div>
-                    <div class="svc-desc">دو چارت را کنار هم بگذارید و سازگاری عاطفی، کاری و دوستانه‌ی خود را با دیگری بسنجید.</div>
-                    <div class="svc-badges"><span class="svc-badge">سازگاری</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+                <div class="hm-grid">
+                    <div class="hm-svc" onclick="openService('birth')">
+                        <span class="hm-svc-no">۰۱</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/birth.svg" alt=""></span><span class="hm-svc-name">چارت تولد</span></div>
+                        <div class="hm-svc-desc">چارت کامل نجومی با موقعیت دقیق سیارات، خانه‌ها، جنبه‌ها و تفسیر ودیک — پایهٔ همهٔ تحلیل‌ها.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">نجومی</span><span class="co-chip">ودیک</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('synastry')">
+                        <span class="hm-svc-no">۰۲</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/synastry.svg" alt=""></span><span class="hm-svc-name">سیناستری</span></div>
+                        <div class="hm-svc-desc">دو چارت را کنار هم بگذارید و سازگاری عاطفی، کاری و دوستانهٔ خود را با دیگری بسنجید.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">سازگاری</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('composite')">
+                        <span class="hm-svc-no">۰۳</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/composite.svg" alt=""></span><span class="hm-svc-name">کامپوزیت</span></div>
+                        <div class="hm-svc-desc">چارت ترکیبی دو نفر تا هویتِ خودِ رابطه، قوی‌ترین جنبه و نقطهٔ ضعفش آشکار شود.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">رابطه</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('transit')">
+                        <span class="hm-svc-no">۰۴</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/transit.svg" alt=""></span><span class="hm-svc-name">ترانزیت</span></div>
+                        <div class="hm-svc-desc">تأثیر سیاراتِ در حال حرکت بر چارت تولد شما؛ پنجره‌های مناسبِ اقدام را پیدا کنید.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">زمان‌بندی</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('solar-return')">
+                        <span class="hm-svc-no">۰۵</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/solar-return.svg" alt=""></span><span class="hm-svc-name">بازگشت خورشیدی</span></div>
+                        <div class="hm-svc-desc">نقشهٔ سالانهٔ خود را بگیرید؛ ببینید سال آینده در کدام حوزه‌ها می‌درخشد.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">سالانه</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('lunar-return')">
+                        <span class="hm-svc-no">۰۶</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/lunar-return.svg" alt=""></span><span class="hm-svc-name">بازگشت ماهانه</span></div>
+                        <div class="hm-svc-desc">تمرکز عاطفی و موضوعات مهمِ ماهِ پیشِ رو را کشف کنید و آگاهانه‌تر برنامه بریزید.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">ماهانه</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
                 </div>
+            </section>
 
-                <div class="service-card" onclick="openService('composite')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/composite.svg" alt=""><span class="svc-name">کامپوزیت</span></div>
-                    <div class="svc-desc">چارت ترکیبی دو نفر را محاسبه کنید تا هویتِ خودِ رابطه، قوی‌ترین جنبه و نقطه ضعف آن را ببینید.</div>
-                    <div class="svc-badges"><span class="svc-badge">رابطه</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+            <section class="hm-group">
+                <div class="hm-group-head">
+                    <span class="hm-group-title">🏺 حکمت ایرانی</span>
+                    <span class="hm-group-count">۳ ابزار</span>
+                    <span class="hm-group-sub">کاملاً روی همین دستگاه اجرا می‌شوند — بدون اینترنت و بدون ارسال داده</span>
                 </div>
-
-                <div class="service-card" onclick="openService('transit')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/transit.svg" alt=""><span class="svc-name">ترانزیت</span></div>
-                    <div class="svc-desc">تأثیر سیارات در حال حرکت بر چارت تولد شما؛ زمان‌های مناسب برای اقدام را پیدا کنید.</div>
-                    <div class="svc-badges"><span class="svc-badge">زمان‌بندی</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+                <div class="hm-grid">
+                    <div class="hm-svc" onclick="openService('hafez')">
+                        <span class="hm-svc-no">۰۷</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/hafez.svg" alt=""></span><span class="hm-svc-name">فال حافظ</span></div>
+                        <div class="hm-svc-desc">غزلِ تصادفیِ دیوانِ حافظ با تفسیر؛ نیت کن و پاسخ را از لسان‌الغیب بگیر.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip co-chip--good">آفلاین</span><span class="co-chip">ادبی</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('abjad')">
+                        <span class="hm-svc-no">۰۸</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/abjad.svg" alt=""></span><span class="hm-svc-name">ابجد</span></div>
+                        <div class="hm-svc-desc">ارزشِ عددیِ کلمات و نام‌ها را بسنج؛ حروفِ جملات، اسماء‌الحسنی و سازگاریِ دو نام.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip co-chip--good">آفلاین</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('mizaj')">
+                        <span class="hm-svc-no">۰۹</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/mizaj.svg" alt=""></span><span class="hm-svc-name">مزاج‌شناسی</span></div>
+                        <div class="hm-svc-desc">طبعِ خود را در طب سنتی ایرانی بشناس و توصیه‌های غذایی و سبکِ زندگیِ متناسب بگیر.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">طب سنتی</span><span class="co-chip co-chip--good">آفلاین</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
                 </div>
+            </section>
 
-                <div class="service-card" onclick="openService('solar-return')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/solar-return.svg" alt=""><span class="svc-name">بازگشت خورشیدی</span></div>
-                    <div class="svc-desc">نقشه‌ی سالانه‌ی خود را بگیرید و ببینید سال آینده در کدام حوزه‌ها می‌درخشید.</div>
-                    <div class="svc-badges"><span class="svc-badge">سالانه</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+            <section class="hm-group">
+                <div class="hm-group-head">
+                    <span class="hm-group-title">🌌 آسمانِ زنده</span>
+                    <span class="hm-group-count">۳ ابزار</span>
+                    <span class="hm-group-sub">پلِ میانِ اخترشناسی و زندگی — داده‌های زندهٔ آسمان و فضا</span>
                 </div>
-
-                <div class="service-card" onclick="openService('lunar-return')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/lunar-return.svg" alt=""><span class="svc-name">بازگشت ماهانه</span></div>
-                    <div class="svc-desc">تمرکز عاطفی و موضوعات مهم ماه پیش رو را کشف کنید و بهتر برنامه‌ریزی کنید.</div>
-                    <div class="svc-badges"><span class="svc-badge">ماهانه</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+                <div class="hm-grid">
+                    <div class="hm-svc" onclick="openService('moon-phase')">
+                        <span class="hm-svc-no">۱۰</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/moon-phase.svg" alt=""></span><span class="hm-svc-name">فاز ماه</span></div>
+                        <div class="hm-svc-desc">فازِ کنونی، درصدِ روشنایی، سنِ ماه و ۲۸ منزلِ قمری برای هر تاریخ و مکان — با برجِ قمر و رویدادهای پیشِ رو.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip co-chip--moon">قمری</span><span class="co-chip">برخط</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('nasa')">
+                        <span class="hm-svc-no">۱۱</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/nasa.svg" alt=""></span><span class="hm-svc-name">ناسا</span></div>
+                        <div class="hm-svc-desc">تصویرِ نجومیِ روز، آب‌وهوای فضا، سیارک‌های نزدیک و پروندهٔ مریخ از آرشیوِ ناسا.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">برخط</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('yoga')">
+                        <span class="hm-svc-no">۱۲</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/yoga.svg" alt=""></span><span class="hm-svc-name">یوگا</span></div>
+                        <div class="hm-svc-desc">کتابخانهٔ ۵۴۲ حرکت، تمرینِ هدایت‌شده و استودیوی کلاسیکِ «یوگای جیبی» با راهنمای صوتی فارسی.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip co-chip--violet">بدن و ذهن</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
                 </div>
+            </section>
 
-                <div class="service-card" onclick="openService('mizaj')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/mizaj.svg" alt=""><span class="svc-name">مزاج‌شناسی</span></div>
-                    <div class="svc-desc">طبع خود را بر اساس طب سنتی ایرانی شناسایی کنید؛ توصیه‌های غذایی و سبک زندگی متناسب بگیرید.</div>
-                    <div class="svc-badges"><span class="svc-badge">طب سنتی</span><span class="svc-badge">آفلاین</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+            <section class="hm-group">
+                <div class="hm-group-head">
+                    <span class="hm-group-title">🎴 پیش‌بینی و شخصیت</span>
+                    <span class="hm-group-count">۴ ابزار</span>
+                    <span class="hm-group-sub">پاسخ‌های امروز و نقشه‌های عددیِ شخصیت</span>
                 </div>
-
-                <div class="service-card" onclick="openService('abjad')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/abjad.svg" alt=""><span class="svc-name">ابجد</span></div>
-                    <div class="svc-desc">ارزش عددی کلمات و نام‌ها را محاسبه کنید و سازگاری دو نام را بررسی کنید.</div>
-                    <div class="svc-badges"><span class="svc-badge">آفلاین</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+                <div class="hm-grid">
+                    <div class="hm-svc" onclick="openService('tarot')">
+                        <span class="hm-svc-no">۱۳</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/tarot.svg" alt=""></span><span class="hm-svc-name">تاروت</span></div>
+                        <div class="hm-svc-desc">کارتِ روزانه، کشیدنِ تک‌کارت و چیدمانِ سه‌کارته — پیام‌های راهنما برای دوراهی‌ها.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">کارت روزانه</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('numerology')">
+                        <span class="hm-svc-no">۱۴</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/numerology.svg" alt=""></span><span class="hm-svc-name">عددشناسی</span></div>
+                        <div class="hm-svc-desc">مسیرِ زندگی، سالِ شخصی، عددِ بیان و درونی — نقشهٔ عددیِ شخصیتِ تو.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">شخصیت</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('biorhythm')">
+                        <span class="hm-svc-no">۱۵</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/biorhythm.svg" alt=""></span><span class="hm-svc-name">بیوریتم</span></div>
+                        <div class="hm-svc-desc">چرخه‌های ۲۳، ۲۸ و ۳۳ روزهٔ فیزیکی، عاطفی و ذهنی را روزبه‌روز ببین.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">سلامت</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
+                    <div class="hm-svc" onclick="openService('zodiac')">
+                        <span class="hm-svc-no">۱۶</span>
+                        <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/zodiac.svg" alt=""></span><span class="hm-svc-name">سال حیوانی</span></div>
+                        <div class="hm-svc-desc">حیوان و عنصرِ سالِ تولدت را بشناس؛ شخصیت و سازگاری‌های تقویم چینی.</div>
+                        <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">چینی</span></div><span class="hm-svc-go">باز کردن ←</span></div>
+                    </div>
                 </div>
+            </section>
 
-                <div class="service-card" onclick="openService('tarot')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/tarot.svg" alt=""><span class="svc-name">تاروت</span></div>
-                    <div class="svc-desc">کارت روزانه، کشیدن کارت و پخش سه‌کارته؛ پیام‌های راهنما برای تصمیم‌های زندگی.</div>
-                    <div class="svc-badges"><span class="svc-badge">کارت روزانه</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+            <!-- نوار اطمینان -->
+            <div class="hm-band">
+                <div class="hm-band-item">
+                    <span class="hm-band-ic">🧭</span>
+                    <div>
+                        <h3>موتور ودیک</h3>
+                        <p>ناکشاترا، شرف و هبوط، طبیعتِ کارکردیِ سیارات و جنبه‌های دقیق — همه بر پایهٔ اخترشناسی ودیک.</p>
+                    </div>
                 </div>
-
-                <div class="service-card" onclick="openService('numerology')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/numerology.svg" alt=""><span class="svc-name">عددشناسی</span></div>
-                    <div class="svc-desc">اعداد مسیر زندگی، سال شخصی، عدد بیان و درونی؛ نقشه‌ی عددی شخصیت شما.</div>
-                    <div class="svc-badges"><span class="svc-badge">شخصیت</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+                <div class="hm-band-item">
+                    <span class="hm-band-ic">🔒</span>
+                    <div>
+                        <h3>خصوصیِ واقعی</h3>
+                        <p>فالِ حافظ، ابجد و مزاج‌شناسی کامل روی دستگاهِ تو اجرا می‌شوند؛ صفرِ ارسالِ داده به سرور.</p>
+                    </div>
                 </div>
-
-                <div class="service-card" onclick="openService('biorhythm')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/biorhythm.svg" alt=""><span class="svc-name">بیوریتم</span></div>
-                    <div class="svc-desc">چرخه‌های ۲۳، ۲۸ و ۳۳ روزه‌ی فیزیکی، عاطفی و ذهنی را روزبه‌روز ببینید.</div>
-                    <div class="svc-badges"><span class="svc-badge">سلامت</span></div>
-                    <span class="svc-open">باز کردن ←</span>
+                <div class="hm-band-item">
+                    <span class="hm-band-ic">🕰️</span>
+                    <div>
+                        <h3>همیشه بیدار</h3>
+                        <p>از چارتِ تولد تا تصویرِ نجومیِ روزِ ناسا — هر لحظه که بخواهی، آسمان این‌جا باز است.</p>
+                    </div>
                 </div>
-
-                <div class="service-card" onclick="openService('zodiac')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/zodiac.svg" alt=""><span class="svc-name">سال حیوانی</span></div>
-                    <div class="svc-desc">حیوان و عنصر سال تولدتان را پیدا کنید؛ شخصیت و سازگاری‌های چینی را بشناسید.</div>
-                    <div class="svc-badges"><span class="svc-badge">چینی</span></div>
-                    <span class="svc-open">باز کردن ←</span>
-                </div>
-
-                <div class="service-card" onclick="openService('daily-question')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/daily-question.svg" alt=""><span class="svc-name">پرسش روزانه</span></div>
-                    <div class="svc-desc">سوال بپرسید و پاسخ ترکیبی از بیوریتم، سال حیوانی و تاروت بگیرید.</div>
-                    <div class="svc-badges"><span class="svc-badge">ترکیبی</span></div>
-                    <span class="svc-open">باز کردن ←</span>
-                </div>
-
-                <div class="service-card" onclick="openService('hafez')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/hafez.svg" alt=""><span class="svc-name">فال حافظ</span></div>
-                    <div class="svc-desc">غزل تصادفی دیوان حافظ با تفسیر؛ کاملاً آفلاین و بدون نیاز به اینترنت.</div>
-                    <div class="svc-badges"><span class="svc-badge">آفلاین</span><span class="svc-badge">ادبی</span></div>
-                    <span class="svc-open">باز کردن ←</span>
-                </div>
-
-                <div class="service-card" onclick="openService('nasa')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/nasa.svg" alt=""><span class="svc-name">ناسا</span></div>
-                    <div class="svc-desc">تصویر نجومی روز، آب‌وهوای فضا، سیارک‌ها و اطلاعات مریخ را از آرشیو ناسا ببینید.</div>
-                    <div class="svc-badges"><span class="svc-badge">برخط</span></div>
-                    <span class="svc-open">باز کردن ←</span>
-                </div>
-
-                <div class="service-card" onclick="openService('moon-phase')">
-                    <div class="svc-top"><img class="svc-emoji" src="static/images/services/moon-phase.svg" alt=""><span class="svc-name">فاز ماه</span></div>
-                    <div class="svc-desc">فاز کنونی ماه، درصد روشنایی، سن ماه و ۲۸ منزل قمری را برای هر تاریخ و مکان ببینید؛ همراه با برج قمر و رویدادهای پیش‌رو.</div>
-                    <div class="svc-badges"><span class="svc-badge">قمری</span><span class="svc-badge">برخط</span></div>
-                    <span class="svc-open">باز کردن ←</span>
-                </div>
-
             </div>
 
-            <!-- درباره -->
-            <div class="about-row">
-                <div class="about-card">
-                    <div class="ab-icon">🧭</div>
-                    <h3>موتور ودیک</h3>
-                    <p>محاسبات بر پایه‌ی اخترشناسی ودیک انجام می‌شود: ناکشاترا، شرف و هبوط، طبیعت کارکردی سیارات و جنبه‌های دقیق.</p>
-                </div>
-                <div class="about-card">
-                    <div class="ab-icon">🔒</div>
-                    <h3>آفلاین و خصوصی</h3>
-                    <p>فال حافظ، ابجد و مزاج‌شناسی کاملاً روی دستگاه شما اجرا می‌شوند؛ بدون ارسال داده به هیچ سروری.</p>
-                </div>
-                <div class="about-card">
-                    <div class="ab-icon">🕰️</div>
-                    <h3>رصدخانه‌ی همیشه بیدار</h3>
-                    <p>از چارت تولد تا تصویر نجومی روز ناسا، هر لحظه که بخواهید، آسمان این‌جا باز است.</p>
-                </div>
-            </div>
+            </div><!-- /hm-wrap -->
 
             <div class="footer-premium" data-cosmic-footer-slot></div>
         </section>
@@ -3588,6 +3912,303 @@
                 <h2 class="admin-page-title">⚙️ پنل مدیریت</h2>
                 <p class="admin-page-sub">مدیریت کاربران، اشتراک‌ها و تنظیمات سیستم</p>
                 <div id="adminPanel"></div>
+            </div>
+        </section>
+
+        <!-- ======================= قالب بصری (سامانهٔ طراحی) ======================= -->
+        <section class="page" id="pageTheme" hidden>
+            <div class="theme-page">
+                <div class="tp-hero">
+                    <div class="co-brand co-brand--stack">
+                        <img class="co-brand-mark" src="static/images/ui/logo.svg" alt="">
+                        <div class="co-brand-text">
+                            <div class="co-brand-name">Cosmic Oracle</div>
+                            <div class="co-brand-sub">رصدخانه‌ی کیهانی</div>
+                        </div>
+                    </div>
+                    <p>
+                        سامانه‌ی طراحیِ واحدِ کاسمیک اوراکل: پالتِ لاجوردِ شب و زرِّ ستارگان، تایپوگرافیِ فارسی،
+                        مجموعه‌ی آیکون‌های خطی، لاک‌آپ‌های لوگو و <b style="color:var(--co-star)">کیتِ کاملِ ماه</b> —
+                        از هلالِ نو تا ماهِ کامل، با دایره‌ای که دقیقاً مثلِ آسمان روشن می‌شود.
+                    </p>
+                    <div class="tp-hero-ctas">
+                        <a class="co-btn co-btn--primary" href="#tp-palette" onclick="tpScroll(event,'tp-palette')">🎨 پالت رنگ</a>
+                        <a class="co-btn co-btn--moon" href="#tp-moon" onclick="tpScroll(event,'tp-moon')">🌙 کیت ماه</a>
+                        <a class="co-btn" href="#tp-components" onclick="tpScroll(event,'tp-components')">🧩 اجزا</a>
+                    </div>
+                </div>
+
+                <!-- ۱ — هویت برند -->
+                <section class="co-section" id="tp-brand">
+                    <div class="co-section-head">
+                        <div class="co-section-title">هویت برند</div>
+                        <div class="co-section-sub">لوگو، لاک‌آپ‌ها و ترکیبِ فونت‌ها — در هر مقیاس و جایگاهی</div>
+                    </div>
+                    <span class="co-ornament">✦ ✦ ✦</span>
+                    <div class="tp-grid">
+                        <div class="co-card tp-box">
+                            <h4>نشانِ اصلی (Logo Mark)</h4>
+                            <div style="display:flex;gap:18px;align-items:center;justify-content:center;padding:18px 0;">
+                                <img src="static/images/ui/logo.svg" alt="" style="width:72px;height:72px;filter:drop-shadow(0 0 18px rgba(221,192,112,.5));">
+                                <img src="static/images/ui/logo.svg" alt="" style="width:48px;height:48px;">
+                                <img src="static/images/ui/logo.svg" alt="" style="width:28px;height:28px;">
+                            </div>
+                            <div style="font-size:12px;color:var(--co-ink-dim);text-align:center;">اسطرلابِ خطی با گرادیانِ زرّ — ۷۲ / ۴۸ / ۲۸ پیکسل</div>
+                        </div>
+                        <div class="co-card tp-box">
+                            <h4>لاک‌آپ افقی (هدر و سایدبار)</h4>
+                            <div style="display:flex;flex-direction:column;gap:16px;padding:10px 0;">
+                                <div class="co-brand">
+                                    <img class="co-brand-mark" src="static/images/ui/logo.svg" alt="">
+                                    <div class="co-brand-text">
+                                        <div class="co-brand-name">Cosmic Oracle</div>
+                                        <div class="co-brand-sub">رصدخانه‌ی کیهانی</div>
+                                    </div>
+                                </div>
+                                <div class="co-brand co-brand--sm">
+                                    <img class="co-brand-mark" src="static/images/ui/logo.svg" alt="">
+                                    <div class="co-brand-text">
+                                        <div class="co-brand-name">Cosmic Oracle</div>
+                                        <div class="co-brand-sub">رصدخانه‌ی کیهانی</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size:12px;color:var(--co-ink-dim);">فونتِ لاتین: <b>Cinzel</b> · فونتِ فارسی: <b>Reem Kufi</b></div>
+                        </div>
+                        <div class="co-card co-card--moon tp-box">
+                            <h4 style="color:var(--co-star)">کلماتِ کلیدی برند</h4>
+                            <div class="tp-row" style="justify-content:center;">
+                                <span class="co-chip co-chip--moon">دقتِ نجومی</span>
+                                <span class="co-chip co-chip--moon">آرامش</span>
+                                <span class="co-chip co-chip--moon">حکمتِ ایرانی</span>
+                                <span class="co-chip co-chip--moon">شب و ستاره</span>
+                            </div>
+                            <div style="font-size:12.5px;color:var(--co-ink-dim);line-height:2.2;text-align:center;margin-top:10px;">
+                                «زیرِ همین آسمان» — یک آسمان برای همه؛
+                                <br>شیک، جدی و در عین حال صمیمی.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ۲ — پالت رنگ -->
+                <section class="co-section" id="tp-palette">
+                    <div class="co-section-head">
+                        <div class="co-section-title">پالت رنگ</div>
+                        <div class="co-section-sub">لاجرودِ شب برای زمینه، زرّ برای برند، فیروزه‌ی مهتابی برای ماه</div>
+                    </div>
+                    <div class="co-card tp-box">
+                        <div class="swatch-group">🌌 لاجورد — زمینه‌ها</div>
+                        <div class="swatches">
+                            <div class="swatch"><div class="swatch-color" style="background:#070c1f"></div><div class="swatch-info"><div class="swatch-name">Lapis 950</div><div class="swatch-hex">#070C1F</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#0c1430"></div><div class="swatch-info"><div class="swatch-name">Lapis 900 · theme</div><div class="swatch-hex">#0C1430</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#101a3d"></div><div class="swatch-info"><div class="swatch-name">Lapis 850</div><div class="swatch-hex">#101A3D</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#16224d"></div><div class="swatch-info"><div class="swatch-name">Lapis 800</div><div class="swatch-hex">#16224D</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#22305f"></div><div class="swatch-info"><div class="swatch-name">Lapis 700</div><div class="swatch-hex">#22305F</div></div></div>
+                        </div>
+                        <div class="swatch-group">✨ زرّ — برند و تأکید</div>
+                        <div class="swatches">
+                            <div class="swatch"><div class="swatch-color" style="background:#f3e5b8"></div><div class="swatch-info"><div class="swatch-name">Gold 200 · متن روشن</div><div class="swatch-hex">#F3E5B8</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#ecd9a0"></div><div class="swatch-info"><div class="swatch-name">Gold 300 · عناوین</div><div class="swatch-hex">#ECD9A0</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#ddc070"></div><div class="swatch-info"><div class="swatch-name">Gold 400 · hover</div><div class="swatch-hex">#DDC070</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#c9a227"></div><div class="swatch-info"><div class="swatch-name">Gold 500 · اصلی</div><div class="swatch-hex">#C9A227</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#a8812a"></div><div class="swatch-info"><div class="swatch-name">Gold 600 · سایه</div><div class="swatch-hex">#A8812A</div></div></div>
+                        </div>
+                        <div class="swatch-group">🌙 مهتابی و بنفش — بخش‌های قمری</div>
+                        <div class="swatches">
+                            <div class="swatch"><div class="swatch-color" style="background:#9fd4e0"></div><div class="swatch-info"><div class="swatch-name">Star · مهتاب</div><div class="swatch-hex">#9FD4E0</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#a29bfe"></div><div class="swatch-info"><div class="swatch-name">Violet · یوگا</div><div class="swatch-hex">#A29BFE</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#ece6d6"></div><div class="swatch-info"><div class="swatch-name">Ink · متن</div><div class="swatch-hex">#ECE6D6</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#aab2cd"></div><div class="swatch-info"><div class="swatch-name">Ink dim · توضیح</div><div class="swatch-hex">#AAB2CD</div></div></div>
+                        </div>
+                        <div class="swatch-group">🚦 معنایی — وضعیت‌ها</div>
+                        <div class="swatches">
+                            <div class="swatch"><div class="swatch-color" style="background:#2ecc71"></div><div class="swatch-info"><div class="swatch-name">Success · مناسب</div><div class="swatch-hex">#2ECC71</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#f39c12"></div><div class="swatch-info"><div class="swatch-name">Warning</div><div class="swatch-hex">#F39C12</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#ff7675"></div><div class="swatch-info"><div class="swatch-name">Danger · نامناسب</div><div class="swatch-hex">#FF7675</div></div></div>
+                            <div class="swatch"><div class="swatch-color" style="background:#74b9ff"></div><div class="swatch-info"><div class="swatch-name">Info</div><div class="swatch-hex">#74B9FF</div></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ۳ — تایپوگرافی -->
+                <section class="co-section" id="tp-type">
+                    <div class="co-section-head">
+                        <div class="co-section-title">تایپوگرافی</div>
+                        <div class="co-section-sub">Vazirmatn برای متن، Reem Kufi برای عناوین، Cinzel برای لاتین و اعداد بزرگ</div>
+                    </div>
+                    <div class="co-card tp-box tp-typelist">
+                        <div class="type-row">
+                            <div class="type-sample" style="font-family:var(--co-font-display);font-size:32px;font-weight:700;color:var(--co-gold-200);">رصدخانه‌ی کیهانی</div>
+                            <div class="type-meta">Reem Kufi · ۳۲</div>
+                        </div>
+                        <div class="type-row">
+                            <div class="type-sample" style="font-family:var(--co-font-body);font-size:15px;line-height:2;color:var(--co-ink);">متنِ اصلی با فونت وزیرمتن؛ خوانا در حجم بالا و در پس‌زمینه‌ی تیره، با فاصله‌ی خطِ فراوان و اعداد فارسی.</div>
+                            <div class="type-meta">Vazirmatn · ۱۵/۲.۰</div>
+                        </div>
+                        <div class="type-row">
+                            <div class="type-sample" style="font-family:var(--co-font-serif);font-size:22px;letter-spacing:.12em;background:linear-gradient(180deg,var(--co-gold-200),var(--co-gold-500));-webkit-background-clip:text;background-clip:text;color:transparent;">COSMIC ORACLE</div>
+                            <div class="type-meta">Cinzel · ۲۲</div>
+                        </div>
+                        <div class="type-row">
+                            <div class="type-sample" style="font-size:11px;color:var(--co-ink-faint);">سایز ۱۱ — یادداشت‌های کوچک، برچسب‌های فرم، فوتر</div>
+                            <div class="type-meta">۱۱</div>
+                        </div>
+                        <div class="type-row">
+                            <div class="type-sample" style="font-size:13px;color:var(--co-ink-dim);">سایز ۱۳ — بدنه‌ی فرم‌ها، لیست‌ها، توست‌ها</div>
+                            <div class="type-meta">۱۳</div>
+                        </div>
+                        <div class="type-row">
+                            <div class="type-sample" style="font-size:15px;color:var(--co-ink);">سایز ۱۵ — متنِ پیش‌فرضِ محتوا</div>
+                            <div class="type-meta">۱۵</div>
+                        </div>
+                        <div class="type-row">
+                            <div class="type-sample" style="font-family:var(--co-font-display);font-size:24px;font-weight:700;color:var(--co-ink);">عنوانِ سکشن</div>
+                            <div class="type-meta">Display · ۲۴</div>
+                        </div>
+                        <div class="type-row">
+                            <div class="type-sample" style="font-family:var(--co-font-serif);font-size:40px;font-weight:700;color:var(--co-gold-300);line-height:1.1;">۱۴۰۵</div>
+                            <div class="type-meta">Serif · ۴۰ · اعداد آمار</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ۴ — اجزا -->
+                <section class="co-section" id="tp-components">
+                    <div class="co-section-head">
+                        <div class="co-section-title">اجزای مشترک</div>
+                        <div class="co-section-sub">دکمه‌ها، چیپ‌ها، کارت‌ها و ورودی‌ها — با پیشوند co- در theme.css</div>
+                    </div>
+                    <div class="tp-grid">
+                        <div class="co-card tp-box">
+                            <h4>دکمه‌ها</h4>
+                            <div class="tp-row">
+                                <button class="co-btn co-btn--primary">🔮 دریافت چارت</button>
+                                <button class="co-btn co-btn--moon">🌙 ماهِ امروز</button>
+                                <button class="co-btn">📅 تاریخ</button>
+                                <button class="co-btn co-btn--ghost">لغو</button>
+                                <button class="co-btn co-btn--icon" title="نقشه">📍</button>
+                            </div>
+                            <div class="tp-row">
+                                <button class="co-btn co-btn--primary co-btn--lg">باز کردن رصدخانه</button>
+                            </div>
+                        </div>
+                        <div class="co-card tp-box">
+                            <h4>چیپ و بج</h4>
+                            <div class="tp-row">
+                                <span class="co-chip">نجومی</span>
+                                <span class="co-chip">ودیک</span>
+                                <span class="co-chip co-chip--moon">قمری</span>
+                                <span class="co-chip co-chip--violet">یوگا</span>
+                                <span class="co-chip co-chip--good">✅ مناسب</span>
+                                <span class="co-chip co-chip--bad">❌ نامناسب</span>
+                            </div>
+                            <div class="tp-row">
+                                <span class="co-badge">PRO</span>
+                                <span class="co-badge co-badge--ghost">جدید</span>
+                                <span style="font-size:12px;color:var(--co-ink-dim);">برای ابزارهای ویژه و پرمیوم</span>
+                            </div>
+                        </div>
+                        <div class="co-card tp-box">
+                            <h4>کارت آمار</h4>
+                            <div class="tp-stats">
+                                <div class="co-stat"><div class="co-stat-icon">🔮</div><div class="co-stat-num">۱۶</div><div class="co-stat-label">موتور</div></div>
+                                <div class="co-stat"><div class="co-stat-icon">🌟</div><div class="co-stat-num">۲۷</div><div class="co-stat-label">ناکشاترا</div></div>
+                                <div class="co-stat"><div class="co-stat-icon">♈</div><div class="co-stat-num">۱۲</div><div class="co-stat-label">برج</div></div>
+                                <div class="co-stat"><div class="co-stat-icon">🪐</div><div class="co-stat-num">۹</div><div class="co-stat-label">سیاره</div></div>
+                            </div>
+                        </div>
+                        <div class="co-card tp-box">
+                            <h4>ورودی‌ها</h4>
+                            <div style="display:flex;flex-direction:column;gap:12px;">
+                                <div>
+                                    <label class="co-label">📍 شهر تولد</label>
+                                    <input class="co-input" type="text" placeholder="مثلاً: اصفهان" value="تهران">
+                                </div>
+                                <div>
+                                    <label class="co-label">🕐 ساعت تولد</label>
+                                    <select class="co-select">
+                                        <option>۱۲:۰۰ ظهر</option>
+                                        <option>۰۸:۳۰ صبح</option>
+                                        <option>۲۱:۰۰ شب</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="co-card tp-box">
+                            <h4>کارت سرویس</h4>
+                            <div style="display:flex;flex-direction:column;gap:8px;">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <img src="static/images/services/birth.svg" alt="" style="width:42px;height:42px;padding:5px;background:linear-gradient(160deg,rgba(221,192,112,.18),rgba(221,192,112,.04));border:1px solid var(--co-line);border-radius:12px;">
+                                    <span style="font-family:var(--co-font-display);font-size:15px;font-weight:600;">چارت تولد</span>
+                                </div>
+                                <div style="font-size:12.5px;line-height:1.9;color:var(--co-ink-dim);">چارت کامل نجومی با موقعیت دقیق سیارات، خانه‌ها، جنبه‌ها و تفسیر ودیک.</div>
+                                <div style="display:flex;gap:6px;"><span class="co-chip">نجومی</span><span class="co-chip">ودیک</span></div>
+                                <div style="color:var(--co-gold-400);font-size:13px;font-weight:700;margin-top:2px;">باز کردن ←</div>
+                            </div>
+                        </div>
+                        <div class="co-card co-card--moon tp-box">
+                            <h4 style="color:var(--co-star)">کارت قمری</h4>
+                            <div style="display:flex;align-items:center;gap:14px;">
+                                <div id="tpDemoMoonDisc" style="flex-shrink:0;"></div>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-family:var(--co-font-display);font-size:15px;color:var(--co-gold-200);">منزل قمر</div>
+                                    <div style="font-size:12px;color:var(--co-ink-dim);line-height:1.9;margin-top:4px;">هر ۲۸ منزل، ویژگی و کارِ مناسب و نامناسب — با رنگِ مهتابیِ یکدست.</div>
+                                    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+                                        <span class="co-chip co-chip--good">ازدواج</span>
+                                        <span class="co-chip co-chip--bad">سفر دریایی</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ۵ — آیکون‌ها -->
+                <section class="co-section" id="tp-icons">
+                    <div class="co-section-head">
+                        <div class="co-section-title">آیکون‌ها</div>
+                        <div class="co-section-sub">استایلِ خطیِ زرّ — هشت آیکونِ فازِ ماه هم به همین زبان افزوده شد</div>
+                    </div>
+                    <div class="co-card tp-box">
+                        <h4>🌙 مجموعه‌ی فازهای ماه</h4>
+                        <div class="moon-icon-row" id="tpMoonIconRow"></div>
+                        <h4 style="margin-top:22px;">🛠️ آیکون‌های ابزارها</h4>
+                        <div class="icon-grid" id="tpUiIconGrid"></div>
+                    </div>
+                </section>
+
+                <!-- ۶ — کیت ماه -->
+                <section class="co-section" id="tp-moon">
+                    <div class="co-section-head">
+                        <div class="co-section-title">کیت ماه</div>
+                        <div class="co-section-sub">دایره‌ی ماه با خطِ تقسیمِ دقیق — وِیجت زنده با محاسبه‌ی محلی (بدون API)</div>
+                    </div>
+                    <div class="co-card tp-box" style="margin-bottom:14px;">
+                        <h4>📐 هشت فاز — ناحیه‌ی روشن دقیقاً برابرِ درصدِ واقعیِ روشنایی</h4>
+                        <div id="tpMoonGrid"></div>
+                    </div>
+                    <div class="tp-grid tp-moon2">
+                        <div class="co-card co-card--moon tp-box">
+                            <h4 style="color:var(--co-star)">⚡ وِیجت زنده — همین الان، همین آسمان</h4>
+                            <div id="tpMoonLive"></div>
+                        </div>
+                        <div class="co-card tp-box">
+                            <div class="moon-ring-demo">
+                                <div id="tpMoonRingDemo" style="flex-shrink:0;"></div>
+                                <div class="mr-text">
+                                    <h4>حلقه‌ی پیشرفت</h4>
+                                    <p>برای «نمودار فاز ماه»: دایره‌ی ماه + حلقه‌ای که درصدِ روشنایی را نشان می‌دهد — همان خروجیِ ابزارِ فازِ ماه، حالا با پوسته‌ی واحد.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <footer class="tp-foot">
+                    <span class="co-ornament" style="margin-bottom:10px;">✦ ✦ ✦</span>
+                    قالب بصری Cosmic Oracle · نسخه ۱ — theme.css + theme.js + ۸ آیکون ماه
+                </footer>
             </div>
         </section>
 
@@ -3948,7 +4569,7 @@
     <script src="static/preset-calendar.js?v=5"></script>
     <script src="static/city-selector.js?v=9"></script>
     <script src="static/spa-router.js?v=8"></script>
-    <script src="static/script.js?v=43"></script>
+    <script src="static/script.js?v=44"></script>
     <script src="static/yoga-data-loader.js?v=1"></script>
     <script src="static/yoga-core.js?v=3"></script>
     <script src="static/yoga-library.js?v=15"></script>
@@ -3956,18 +4577,19 @@
     <script src="static/yoga-practice.js?v=6"></script>
     <script src="static/yoga-player.js?v=25"></script>
     <script src="static/yoga-karma-store.js?v=5"></script>
-    <script src="static/admin-panel.js?v=3"></script>
+    <script src="static/admin-panel.js?v=4"></script>
     <script src="static/breath-module.js?v=1"></script>
     <script src="static/quality-of-life.js?v=1"></script>
     <script src="static/moon-phase.js?v=8"></script>
-    <script src="static/theme.js?v=1"></script>
+    <script src="static/theme.js?v=2"></script>
+    <script src="static/theme-showcase.js?v=1"></script>
     <script src="static/zodiac-display.js?v=8"></script>
     <script src="static/cosmic-status.js?v=14"></script>
     <script src="static/earth-status.js?v=4"></script>
     <script src="static/yoga-summary.js?v=2"></script>
     <script src="static/yoga-test.js?v=3"></script>
     <script src="static/daily-dashboard.js?v=9"></script>
-    <script src="static/audio-manager.js?v=5"></script>
+    <script src="static/audio-manager.js?v=6"></script>
     <script src="static/my-dashboard.js?v=12"></script>
     <script src="static/daily-reminder.js?v=7"></script>
 
@@ -4116,6 +4738,7 @@
             var dashboard = document.getElementById('pageDashboard');
             var landing = document.getElementById('pageLanding');
             var admin = document.getElementById('pageAdmin');
+            var theme = document.getElementById('pageTheme');
             if (!home || !tools) return;
             // Hide all
             home.hidden = true;
@@ -4126,6 +4749,7 @@
             if (dashboard) dashboard.hidden = true;
             if (landing) landing.hidden = true;
             if (admin) admin.hidden = true;
+            if (theme) theme.hidden = true;
             // Show target
             if (name === 'home') {
                 home.hidden = false;
@@ -4146,6 +4770,9 @@
             } else if (name === 'admin') {
                 if (admin) admin.hidden = false;
                 if (window.AdminPanel) window.AdminPanel.init();
+            } else if (name === 'theme') {
+                if (theme) theme.hidden = false;
+                if (window.CoThemeShowcase) window.CoThemeShowcase.render();
             } else {
                 tools.hidden = false;
             }
@@ -4153,6 +4780,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         window.showPage = showPage;
+
+        /* اسکرول نرم داخل صفحهٔ قالب بصری */
+        window.tpScroll = function (e, id) {
+            e.preventDefault();
+            var el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
 
         /* ---------- باز کردن یک سرویس: برو به ابزارها + فعال‌سازی تب ---------- */
         window.openService = function (tab) {
@@ -4296,6 +4930,7 @@
                 else if (target === 'breath') { showPage('breath'); if (window.BreathModule) window.BreathModule.init(); }
                 else if (target === 'qol') showPage('qol');
                 else if (target === 'admin') showPage('admin');
+                else if (target === 'theme') showPage('theme');
                 else window.openService(target);
             });
         });

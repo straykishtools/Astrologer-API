@@ -295,6 +295,12 @@
             mount.innerHTML = todayWidget();
             mount.hidden = false;
         }
+        /* دیسکِ زندهٔ ماه در مرکز اسطرلاب (کنسول صفحهٔ خانه) */
+        var dial = document.getElementById('hmDialMoon');
+        if (dial && !dial.dataset.coFilled) {
+            dial.dataset.coFilled = '1';
+            dial.innerHTML = discSVG(phaseFromNow(Date.now()), { size: 150, glow: true });
+        }
     }
 
     var CoMoon = {

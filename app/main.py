@@ -22,7 +22,7 @@ from .routers import (
     numerology_router, biorhythm_router, chinese_zodiac_router,
     daily_question_router, hafez_router, geo_router,
     nasa_router, auth_router, settings_router,
-    user as user_router, yoga as yoga_router
+    user as user_router, yoga as yoga_router, audio_router
 )
 from .config.settings import settings
 from .middleware.secret_key_checker_middleware import SecretKeyCheckerMiddleware
@@ -94,6 +94,7 @@ app.include_router(auth_router.router, tags=["Auth"])
 app.include_router(user_router.router, tags=["User"])
 app.include_router(yoga_router.router, tags=["Yoga"])
 app.include_router(settings_router.router, tags=["Settings"])
+app.include_router(audio_router.router, tags=["Audio"])
 
 # ============================================
 # سرویس فایل‌های استاتیک (فرانت‌اند)

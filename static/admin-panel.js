@@ -355,7 +355,16 @@
         if (target === 'users') document.getElementById('adminTabUsers').style.display = '';
         else if (target === 'subscriptions') document.getElementById('adminTabSubscriptions').style.display = '';
         else if (target === 'settings') document.getElementById('adminTabSettings').style.display = '';
-        else if (target === 'audio') document.getElementById('adminTabAudio').style.display = '';
+        else if (target === 'audio') {
+          document.getElementById('adminTabAudio').style.display = '';
+          /* همگام‌سازی وضعیت فایل‌ها از سرور، بعد از آن رندر دوباره */
+          if (window.AudioManager && AudioManager.refreshAudioFiles) {
+            AudioManager.refreshAudioFiles(function () {
+              var c = document.getElementById('adminTabAudioContent');
+              if (c && AudioManager.renderAdminAudio) c.innerHTML = AudioManager.renderAdminAudio();
+            });
+          }
+        }
       });
     });
 

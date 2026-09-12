@@ -40,7 +40,7 @@ function navigate(route) {
 
 // Map a sidebar data-nav target to a hash route and navigate there.
 window.navigateToNav = function (target) {
-    var direct = ['home', 'landing', 'dashboard', 'yoga', 'breath', 'qol', 'admin'];
+    var direct = ['home', 'landing', 'dashboard', 'yoga', 'breath', 'qol', 'admin', 'theme'];
     var route = (direct.indexOf(target) !== -1) ? target : ('app/' + target);
     navigate(route);
 };
@@ -582,6 +582,8 @@ function handleRoute() {
         if (window.openService) { openService(route); } else { showApp(); }
     } else if (route === 'qol') {
         if (window.showPage) { showPage('qol'); } else { showApp(); }
+    } else if (route === 'theme') {
+        if (window.showPage) { showPage('theme'); } else { showApp(); }
     } else {
         showLanding();
     }
