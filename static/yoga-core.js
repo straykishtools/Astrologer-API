@@ -579,6 +579,38 @@ function recordPractice(durationMinutes, meta) {
     return { minutes: minutes, daily: d };
 }
 
+/** ثبت دقیقه‌های تمرین نیمه‌کاره — فقط زمان؛ شمارش جلسه/استریک افزایش نمی‌یابد */
+function recordPartialPractice(durationMinutes, meta) {
+    meta = meta || {};
+    var minutes = Math.max(1, Math.round(durationMinutes || 1));
+    // 1) daily tab data — فقط دقیقه، نه totalSessions
+    var d = getPracticeData();
+    d.history.push({ date: todayStr(), duration: minutes, type: meta.type || 'yoga', at: Date.now(), partial: true });
+    d.totalMinutes = (d.totalMinutes || 0) + minutes;
+    var byDate = {};
+    d.history.forEach(function (h) { byDate[h.date] = true; });
+    d.streak = computeStreak(Object.keys(byDate));
+    savePracticeData(d);
+    // 2) top-bar yoga summary log — فقط دقیقه
+    var log = getSummaryLog();
+    log.sessions.push({ type: meta.type || 'yoga', date: new Date().toISOString(), duration: minutes, partial: true });
+    log.totalMinutes = (log.totalMinutes || 0) + minutes;
+    saveSummaryLog(log);
+    // 3) server — completed=false تا شمارش جلسه/استریک دست نخورد
+    var catMap = { yoga: 'asanas', breath: 'breathing', breathing: 'breathing', meditation: 'meditation' };
+    _apiJson('POST', '/api/v5/yoga/session', {
+        pose_id: null,
+        pose_name: meta.poseName || null,
+        category: catMap[meta.type] || 'asanas',
+        duration_seconds: minutes * 60,
+        completed: false
+    });
+    if (window.YogaSummary) {
+        try { if (YogaSummary.refresh) YogaSummary.refresh(); } catch (e) {}
+    }
+    return { minutes: minutes, daily: d };
+}
+
 // ─── Flow building (relation-aware practice sequence) ───
 function isFlowEligible(p) {
     if (!p) return false;
@@ -741,7 +773,7 @@ return {
     getSession: getSession, saveSession: saveSession, setSession: setSession,
     addToSession: addToSession, removeFromSession: removeFromSession, moveInSession: moveInSession,
     getPracticeData: getPracticeData, practicedToday: practicedToday,
-    recordPractice: recordPractice, poseId: poseId,
+    recordPractice: recordPractice, recordPartialPractice: recordPartialPractice, poseId: poseId,
     // access
     canAccess: canAccess, accessLevel: accessLevel,
     // flow

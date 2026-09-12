@@ -1,0 +1,626 @@
+/* ================================================================
+   COSMIC ORACLE — قالب بصری نسخه ۱ (theme.css)
+   ================================================================
+   سامانه‌ی طراحی (Design System) واحدِ کلِ سایت:
+   • توکن‌های رنگ/فونت/فاصله/سایه (Design Tokens)
+   • اجزای مشترک: کارت، دکمه، چیپ، بج، آمار، سکشن‌ها
+   • کیت ماه: وِیجت «ماهِ امروز»، نوار ۷ روزه، دایره‌ی فاز
+   • یکدست‌سازی رنگ‌های صفحه‌ی نتیجه‌ی فاز ماه (.moon-*)
+   • لاک‌آپ لوگو (Brand lockup)
+
+   این فایل AFTER style.css بارگذاری می‌شود؛ کلاس‌های .co-* جدیدند و
+   هیچ کلاس موجودی را نمی‌شکنند. همه‌چیز RTL-first است.
+   ================================================================ */
+
+:root {
+    /* ── لاجورد (زمینه‌ها) ─────────────────────────────── */
+    --co-lapis-950: #070c1f;
+    --co-lapis-900: #0c1430;
+    --co-lapis-850: #101a3d;
+    --co-lapis-800: #16224d;
+    --co-lapis-700: #22305f;
+    --co-lapis-600: #2d3d78;
+
+    /* ── زر (هویت برند) ────────────────────────────────── */
+    --co-gold-100: #faf0d3;
+    --co-gold-200: #f3e5b8;
+    --co-gold-300: #ecd9a0;
+    --co-gold-400: #ddc070;
+    --co-gold-500: #c9a227;
+    --co-gold-600: #a8812a;
+    --co-gold-700: #8a691f;
+
+    /* ── متن ──────────────────────────────────────────── */
+    --co-ink: #ece6d6;
+    --co-ink-dim: #aab2cd;
+    --co-ink-faint: #7c86a6;
+
+    /* ── رنگ‌های معنایی ───────────────────────────────── */
+    --co-violet: #a29bfe;
+    --co-star: #9fd4e0;
+    --co-success: #2ecc71;
+    --co-danger: #ff7675;
+    --co-warning: #f39c12;
+    --co-info: #74b9ff;
+
+    /* ── خطوط و سطوح ──────────────────────────────────── */
+    --co-line: rgba(221, 192, 112, 0.16);
+    --co-line-strong: rgba(221, 192, 112, 0.42);
+    --co-panel: rgba(16, 26, 61, 0.72);
+    --co-panel-solid: #101a3d;
+    --co-veil: rgba(7, 12, 31, 0.6);
+
+    /* ── سایه‌ها ───────────────────────────────────────── */
+    --co-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.85);
+    --co-shadow-card: 0 16px 40px -18px rgba(0, 0, 0, 0.8);
+    --co-glow-gold: 0 0 24px rgba(201, 162, 39, 0.35);
+    --co-glow-moon: 0 0 34px rgba(159, 212, 224, 0.28);
+
+    /* ── شعاع و فاصله ─────────────────────────────────── */
+    --co-r-sm: 10px;
+    --co-r-md: 14px;
+    --co-r-lg: 18px;
+    --co-r-xl: 26px;
+    --co-r-pill: 999px;
+    --co-sp-1: 4px;
+    --co-sp-2: 8px;
+    --co-sp-3: 12px;
+    --co-sp-4: 16px;
+    --co-sp-5: 22px;
+    --co-sp-6: 30px;
+    --co-sp-7: 42px;
+
+    /* ── تایپوگرافی ───────────────────────────────────── */
+    --co-font-body: "Vazirmatn", system-ui, sans-serif;
+    --co-font-display: "Reem Kufi", "Vazirmatn", sans-serif;
+    --co-font-serif: "Cinzel", "Reem Kufi", serif;
+
+    /* ── حرکت ─────────────────────────────────────────── */
+    --co-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --co-dur: 0.22s;
+}
+
+/* ================================================================
+   ۱ — اجزای پایه
+   ================================================================ */
+
+/* ── کارت ─────────────────────────────────────────────── */
+.co-card {
+    position: relative;
+    background: var(--co-panel);
+    border: 1px solid var(--co-line);
+    border-radius: var(--co-r-lg);
+    padding: var(--co-sp-5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform var(--co-dur) var(--co-ease),
+                border-color var(--co-dur) var(--co-ease),
+                box-shadow var(--co-dur) var(--co-ease);
+}
+.co-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--co-line-strong);
+    box-shadow: var(--co-shadow-card), 0 0 0 1px rgba(221, 192, 112, 0.12);
+}
+.co-card--flat { background: rgba(9, 14, 34, 0.5); }
+.co-card--gold {
+    background: linear-gradient(160deg, rgba(37, 53, 107, 0.35), rgba(10, 15, 35, 0.85));
+    border-color: var(--co-line-strong);
+}
+.co-card--moon {
+    background:
+        radial-gradient(420px 200px at 85% -20%, rgba(159, 212, 224, 0.12), transparent 70%),
+        linear-gradient(160deg, rgba(16, 26, 61, 0.7), rgba(7, 12, 31, 0.85));
+}
+/* نقشِ دکوریِ طلایی بالای کارت */
+.co-card::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    border-radius: var(--co-r-lg) var(--co-r-lg) 0 0;
+    background: linear-gradient(90deg, transparent, rgba(236, 217, 160, 0.55), transparent);
+    opacity: 0;
+    transition: opacity var(--co-dur);
+    pointer-events: none;
+}
+.co-card:hover::after { opacity: 1; }
+
+/* ── عنوان سکشن ───────────────────────────────────────── */
+.co-section { margin-top: var(--co-sp-7); }
+.co-section-head {
+    text-align: center;
+    margin-bottom: var(--co-sp-5);
+}
+.co-section-title {
+    font-family: var(--co-font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--co-gold-200);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+.co-section-title::before,
+.co-section-title::after {
+    content: "";
+    width: 34px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--co-gold-500));
+}
+.co-section-title::after { background: linear-gradient(90deg, var(--co-gold-500), transparent); }
+.co-section-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--co-ink-dim);
+    line-height: 1.9;
+}
+/* زینتِ ستاره‌ای */
+.co-ornament {
+    display: block;
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 8px;
+    color: var(--co-gold-500);
+    opacity: 0.5;
+    margin: var(--co-sp-4) 0;
+}
+
+/* ── دکمه‌ها ───────────────────────────────────────────── */
+.co-btn {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--co-line-strong);
+    background: rgba(22, 34, 77, 0.55);
+    color: var(--co-ink);
+    font-family: var(--co-font-body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: var(--co-r-pill);
+    cursor: pointer;
+    transition: border-color var(--co-dur), background var(--co-dur),
+                color var(--co-dur), box-shadow var(--co-dur),
+                transform 0.15s var(--co-ease);
+    white-space: nowrap;
+}
+.co-btn:hover {
+    border-color: var(--co-gold-400);
+    color: var(--co-gold-200);
+    background: rgba(37, 53, 107, 0.65);
+    transform: translateY(-1px);
+}
+.co-btn:active { transform: scale(0.97); }
+.co-btn--primary {
+    background: linear-gradient(180deg, var(--co-gold-300), var(--co-gold-500) 60%, var(--co-gold-600));
+    border-color: transparent;
+    color: var(--co-lapis-950);
+    font-weight: 800;
+    box-shadow: 0 6px 22px -6px rgba(201, 162, 39, 0.55);
+}
+.co-btn--primary:hover {
+    color: var(--co-lapis-950);
+    background: linear-gradient(180deg, var(--co-gold-200), var(--co-gold-400) 60%, var(--co-gold-500));
+    box-shadow: 0 8px 28px -6px rgba(201, 162, 39, 0.7);
+}
+.co-btn--moon {
+    background: linear-gradient(160deg, rgba(159, 212, 224, 0.14), rgba(162, 155, 254, 0.1));
+    border-color: rgba(159, 212, 224, 0.35);
+    color: var(--co-star);
+}
+.co-btn--moon:hover {
+    border-color: var(--co-star);
+    color: #d6f1f8;
+    background: linear-gradient(160deg, rgba(159, 212, 224, 0.22), rgba(162, 155, 254, 0.16));
+}
+.co-btn--ghost { background: transparent; border-color: transparent; color: var(--co-ink-dim); }
+.co-btn--ghost:hover { color: var(--co-gold-200); background: rgba(221, 192, 112, 0.08); border-color: transparent; }
+.co-btn--icon { padding: 8px 10px; min-width: 38px; font-size: 16px; line-height: 1; }
+.co-btn img, .co-btn svg { width: 16px; height: 16px; }
+.co-btn--lg { padding: 13px 26px; font-size: 15px; }
+
+/* ── چیپ / بج ─────────────────────────────────────────── */
+.co-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: var(--co-r-pill);
+    border: 1px solid var(--co-line-strong);
+    color: var(--co-gold-300);
+    background: rgba(221, 192, 112, 0.06);
+    white-space: nowrap;
+}
+.co-chip--moon {
+    color: var(--co-star);
+    border-color: rgba(159, 212, 224, 0.35);
+    background: rgba(159, 212, 224, 0.07);
+}
+.co-chip--violet {
+    color: var(--co-violet);
+    border-color: rgba(162, 155, 254, 0.35);
+    background: rgba(162, 155, 254, 0.08);
+}
+.co-chip--good { color: var(--co-success); border-color: rgba(46, 204, 113, 0.3); background: rgba(46, 204, 113, 0.1); }
+.co-chip--bad  { color: var(--co-danger);  border-color: rgba(231, 76, 60, 0.3);  background: rgba(231, 76, 60, 0.1); }
+
+.co-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 9px;
+    border-radius: var(--co-r-pill);
+    background: var(--co-gold-500);
+    color: var(--co-lapis-950);
+    letter-spacing: 0.03em;
+}
+.co-badge--ghost {
+    background: rgba(162, 155, 254, 0.2);
+    color: var(--co-violet);
+}
+
+/* ── کارت آمار ────────────────────────────────────────── */
+.co-stat {
+    text-align: center;
+    padding: var(--co-sp-4) var(--co-sp-3);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: var(--co-r-lg);
+    transition: transform var(--co-dur), border-color var(--co-dur), box-shadow var(--co-dur);
+}
+.co-stat:hover {
+    transform: translateY(-4px);
+    border-color: rgba(221, 192, 112, 0.35);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+}
+.co-stat-icon { font-size: 26px; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4)); }
+.co-stat-num {
+    font-family: var(--co-font-serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--co-gold-300);
+    margin-top: 8px;
+    line-height: 1.1;
+}
+.co-stat-label { font-size: 12px; color: var(--co-ink-dim); margin-top: 4px; }
+
+/* ── ورودی‌ها ──────────────────────────────────────────── */
+.co-input, .co-select {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--co-r-md);
+    border: 1px solid var(--co-line-strong);
+    background: rgba(7, 12, 31, 0.6);
+    color: var(--co-ink);
+    font-family: var(--co-font-body);
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.3s;
+    direction: rtl;
+}
+.co-input:focus, .co-select:focus {
+    border-color: var(--co-gold-400);
+    box-shadow: 0 0 16px rgba(201, 162, 39, 0.15);
+}
+.co-input::placeholder { color: var(--co-ink-faint); }
+.co-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--co-ink);
+    margin-bottom: 6px;
+}
+
+/* ── جداساز ───────────────────────────────────────────── */
+.co-divider {
+    height: 1px;
+    border: none;
+    background: var(--co-line);
+    margin: var(--co-sp-5) 0;
+}
+.co-divider--ornament {
+    position: relative;
+    height: 12px;
+    background: none;
+}
+.co-divider--ornament::before {
+    content: "";
+    position: absolute;
+    inset: 5px 15%;
+    height: 1px;
+    background: var(--co-line);
+}
+.co-divider--ornament::after {
+    content: "✦";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--co-gold-500);
+    background: transparent;
+}
+
+/* ================================================================
+   ۲ — برند: لاک‌آپ‌های لوگو
+   ================================================================ */
+
+/* لاک‌آپ افقی (سایدبار / هدر) */
+.co-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    cursor: pointer;
+}
+.co-brand-mark {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 14px rgba(221, 192, 112, 0.45));
+    transition: transform 0.4s var(--co-ease);
+}
+.co-brand:hover .co-brand-mark { transform: rotate(24deg); }
+.co-brand-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.co-brand-name {
+    font-family: var(--co-font-serif);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    background: linear-gradient(180deg, var(--co-gold-200), var(--co-gold-500));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.co-brand-sub {
+    font-family: var(--co-font-display);
+    font-size: 12px;
+    color: var(--co-ink-dim);
+    margin-top: 2px;
+}
+/* لاک‌آپ کوچک (پاورقی) */
+.co-brand--sm .co-brand-mark { width: 28px; height: 28px; }
+.co-brand--sm .co-brand-name { font-size: 14px; }
+.co-brand--sm .co-brand-sub { font-size: 10.5px; }
+/* لاک‌آپ عمودی (هیرو) */
+.co-brand--stack {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+}
+.co-brand--stack .co-brand-mark { width: 72px; height: 72px; }
+.co-brand--stack .co-brand-name { font-size: 30px; }
+.co-brand--stack .co-brand-sub { font-size: 15px; }
+
+/* ================================================================
+   ۳ — کیت ماه (Moon Kit)
+   ================================================================ */
+
+/* ── وِیجت «ماهِ امروز» (هیرو صفحه‌ی اصلی) ───────────── */
+.co-moon-today {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--co-sp-5);
+    max-width: 900px;
+    margin: var(--co-sp-6) auto 0;
+    padding: var(--co-sp-5) var(--co-sp-6);
+    background:
+        radial-gradient(480px 220px at 12% 0%, rgba(159, 212, 224, 0.14), transparent 65%),
+        radial-gradient(420px 220px at 95% 100%, rgba(162, 155, 254, 0.1), transparent 60%),
+        linear-gradient(160deg, rgba(16, 26, 61, 0.78), rgba(7, 12, 31, 0.9));
+    border: 1px solid var(--co-line-strong);
+    border-radius: var(--co-r-xl);
+    box-shadow: var(--co-shadow-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+}
+.co-moon-today::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(159, 212, 224, 0.6), rgba(236, 217, 160, 0.5), transparent);
+    opacity: 0.7;
+}
+.co-moon-today-disc {
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+    filter: drop-shadow(0 0 22px rgba(159, 212, 224, 0.35));
+}
+.co-moon-today-disc svg { display: block; width: 100%; height: 100%; }
+.co-moon-today-body { flex: 1; min-width: 0; }
+.co-moon-today-kicker {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--co-star);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+.co-moon-today-name {
+    font-family: var(--co-font-display);
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--co-gold-200);
+    line-height: 1.3;
+}
+.co-moon-today-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--co-ink-dim);
+}
+.co-moon-today-meta b { color: var(--co-ink); font-weight: 700; }
+.co-moon-today-next {
+    flex-shrink: 0;
+    text-align: center;
+    padding: var(--co-sp-3) var(--co-sp-4);
+    border: 1px solid rgba(159, 212, 224, 0.3);
+    border-radius: var(--co-r-lg);
+    background: rgba(159, 212, 224, 0.06);
+    min-width: 128px;
+}
+.co-moon-today-next-label {
+    font-size: 10.5px;
+    color: var(--co-ink-dim);
+    margin-bottom: 4px;
+}
+.co-moon-today-next-val {
+    font-family: var(--co-font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--co-star);
+    line-height: 1.4;
+}
+.co-moon-today-next-dur {
+    font-size: 11px;
+    color: var(--co-gold-300);
+    margin-top: 3px;
+}
+
+/* ── نوار هفت‌روز ماه ─────────────────────────────────── */
+.co-moon-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    max-width: 560px;
+    margin: var(--co-sp-3) auto 0;
+}
+.co-moon-week-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 2px;
+    border-radius: var(--co-r-md);
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.02);
+    transition: background 0.2s, border-color 0.2s, transform 0.15s var(--co-ease);
+}
+.co-moon-week-cell:hover {
+    background: rgba(159, 212, 224, 0.06);
+    border-color: rgba(159, 212, 224, 0.2);
+    transform: translateY(-2px);
+}
+.co-moon-week-cell--today {
+    background: rgba(201, 162, 39, 0.1);
+    border-color: rgba(201, 162, 39, 0.3);
+}
+.co-moon-week-cell svg { width: 24px; height: 24px; display: block; }
+.co-moon-week-day { font-size: 9.5px; color: var(--co-ink-dim); }
+.co-moon-week-cell--today .co-moon-week-day { color: var(--co-gold-200); font-weight: 700; }
+.co-moon-week-name { font-size: 9px; color: var(--co-ink-faint); line-height: 1.4; text-align: center; }
+
+/* ── شبکه‌ی نمایش ۸ فاز (پیش‌نمایش قالب) ─────────────── */
+.co-moon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--co-sp-3);
+}
+.co-moon-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: var(--co-sp-4) var(--co-sp-2);
+    background: rgba(9, 14, 34, 0.5);
+    border: 1px solid var(--co-line);
+    border-radius: var(--co-r-lg);
+    transition: border-color 0.2s, transform 0.15s var(--co-ease), box-shadow 0.2s;
+}
+.co-moon-cell:hover {
+    border-color: var(--co-line-strong);
+    transform: translateY(-3px);
+    box-shadow: var(--co-glow-moon);
+}
+.co-moon-cell svg { width: 56px; height: 56px; }
+.co-moon-cell-name { font-size: 12.5px; font-weight: 700; color: var(--co-ink); }
+.co-moon-cell-en { font-family: var(--co-font-serif); font-size: 9.5px; color: var(--co-ink-faint); letter-spacing: 0.06em; }
+.co-moon-cell-illum { font-size: 10.5px; color: var(--co-star); }
+
+/* ── دایره‌های ماه (خروجی SVG) ────────────────────────── */
+.co-moon-disc { display: block; }
+.co-moon-disc--glow { filter: drop-shadow(0 0 26px rgba(159, 212, 224, 0.3)); }
+
+/* ================================================================
+   ۴ — یکدست‌سازی نتیجه‌ی «فاز ماه» (override رنگ‌های سرد)
+   ================================================================ */
+.cosmic .moon-phase-main {
+    background:
+        radial-gradient(320px 160px at 50% -20%, rgba(159, 212, 224, 0.1), transparent 70%),
+        linear-gradient(160deg, rgba(16, 26, 61, 0.75), rgba(7, 12, 31, 0.85));
+    border-color: var(--co-line-strong);
+    border-radius: var(--co-r-xl);
+}
+.cosmic .moon-phase-name {
+    color: var(--co-gold-200);
+    font-family: var(--co-font-display);
+    letter-spacing: 0;
+}
+.cosmic .moon-illumination,
+.cosmic .moon-date,
+.cosmic .moon-age,
+.cosmic .moon-stage,
+.cosmic .moon-sign {
+    color: var(--co-ink-dim);
+}
+.cosmic .moon-mansion {
+    background: linear-gradient(160deg, rgba(37, 53, 107, 0.3), rgba(10, 15, 35, 0.7));
+    border-color: var(--co-line);
+    border-radius: var(--co-r-lg);
+}
+.cosmic .moon-mansion-name { color: var(--co-gold-200); font-family: var(--co-font-display); }
+.cosmic .moon-mansion-desc { color: var(--co-ink-dim); }
+.cosmic .moon-act-label { color: var(--co-ink-dim); }
+.cosmic .moon-time-item { color: var(--co-ink-dim); }
+.cosmic .moon-times {
+    background: rgba(159, 212, 224, 0.05);
+    border: 1px solid rgba(159, 212, 224, 0.15);
+    border-radius: var(--co-r-md);
+}
+.cosmic .moon-phase-visual {
+    background: rgba(9, 14, 34, 0.55);
+    border-color: var(--co-line);
+    border-radius: var(--co-r-lg);
+}
+.cosmic .moon-phase-visual h4 {
+    color: var(--co-gold-300);
+    font-family: var(--co-font-display);
+}
+/* هایلایت SVG دایره‌ی ماه */
+.cosmic .moon-phase-visual .co-moon-disc { margin: 6px auto; }
+
+/* ================================================================
+   ۵ — ری‌اسپانسیو و کاهش حرکت
+   ================================================================ */
+@media (max-width: 860px) {
+    .co-moon-today { flex-direction: column; text-align: center; padding: var(--co-sp-5) var(--co-sp-4); }
+    .co-moon-today-kicker { justify-content: center; }
+    .co-moon-today-meta { justify-content: center; }
+    .co-moon-grid { grid-template-columns: repeat(2, 1fr); }
+    .co-moon-week { max-width: 100%; }
+}
+@media (max-width: 480px) {
+    .co-moon-week { grid-template-columns: repeat(7, 1fr); gap: 3px; }
+    .co-moon-week-cell { padding: 6px 1px; }
+    .co-moon-week-name { display: none; }
+    .co-moon-cell svg { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .co-card, .co-btn, .co-stat, .co-moon-week-cell, .co-moon-cell, .co-brand-mark {
+        transition: none !important;
+        transform: none !important;
+    }
+}

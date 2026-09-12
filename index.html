@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="static/date-wheel-picker.css?v=2">
     <link rel="stylesheet" href="static/shamsi-calendar.css?v=3">
     <link rel="stylesheet" href="static/preset-calendar.css?v=1">
-    <link rel="stylesheet" href="static/yoga-v3.css?v=10">
+    <link rel="stylesheet" href="static/yoga-v3.css?v=13">
 
     <style>
         /* ============================================================
@@ -2818,7 +2818,9 @@
             .site-footer .sf-bottom { padding: 12px 20px 16px; justify-content: center; }
         }
 
-</style>
+    </style>
+    <!-- قالب بصری نسخه ۱ — سامانه‌ی طراحی واحد (توکن‌ها، اجزا، کیت ماه) -->
+    <link rel="stylesheet" href="static/theme.css?v=1">
 </head>
 <body class="cosmic">
 
@@ -3261,6 +3263,9 @@
                     <div class="hero-stat"><div class="stat-num">۹</div><div class="stat-label">سیاره‌ی کلاسیک</div></div>
                 </div>
             </div>
+
+            <!-- 🌙 ماهِ امروز — وِیجت زنده (محاسبه‌ی محلی، بدون API) -->
+            <div id="coMoonToday" hidden></div>
 
             <!-- گرید سرویس‌ها -->
             <h2 class="section-heading">خدمات رصدخانه
@@ -3937,29 +3942,31 @@
 
     <!-- ===== اسکریپت‌های ضروری (کوچک) — موتورهای سنگین lazy هستند ===== -->
     <script src="static/persian-provinces.js?v=1"></script>
+    <script src="static/jalali-date.js?v=1"></script>
     <script src="static/date-wheel-picker.js?v=21"></script>
-    <script src="static/shamsi-calendar.js?v=3"></script>
-    <script src="static/preset-calendar.js?v=1"></script>
+    <script src="static/shamsi-calendar.js?v=6"></script>
+    <script src="static/preset-calendar.js?v=5"></script>
     <script src="static/city-selector.js?v=9"></script>
     <script src="static/spa-router.js?v=8"></script>
-    <script src="static/script.js?v=41"></script>
+    <script src="static/script.js?v=43"></script>
     <script src="static/yoga-data-loader.js?v=1"></script>
-    <script src="static/yoga-core.js?v=2"></script>
-    <script src="static/yoga-library.js?v=14"></script>
+    <script src="static/yoga-core.js?v=3"></script>
+    <script src="static/yoga-library.js?v=15"></script>
     <script src="static/yoga-engine.js?v=2"></script>
-    <script src="static/yoga-practice.js?v=5"></script>
-    <script src="static/yoga-player.js?v=21"></script>
-    <script src="static/yoga-karma-store.js?v=1"></script>
+    <script src="static/yoga-practice.js?v=6"></script>
+    <script src="static/yoga-player.js?v=25"></script>
+    <script src="static/yoga-karma-store.js?v=5"></script>
     <script src="static/admin-panel.js?v=3"></script>
     <script src="static/breath-module.js?v=1"></script>
     <script src="static/quality-of-life.js?v=1"></script>
-    <script src="static/moon-phase.js?v=7"></script>
-    <script src="static/zodiac-display.js?v=7"></script>
+    <script src="static/moon-phase.js?v=8"></script>
+    <script src="static/theme.js?v=1"></script>
+    <script src="static/zodiac-display.js?v=8"></script>
     <script src="static/cosmic-status.js?v=14"></script>
     <script src="static/earth-status.js?v=4"></script>
-    <script src="static/yoga-summary.js?v=1"></script>
+    <script src="static/yoga-summary.js?v=2"></script>
     <script src="static/yoga-test.js?v=3"></script>
-    <script src="static/daily-dashboard.js?v=8"></script>
+    <script src="static/daily-dashboard.js?v=9"></script>
     <script src="static/audio-manager.js?v=5"></script>
     <script src="static/my-dashboard.js?v=12"></script>
     <script src="static/daily-reminder.js?v=7"></script>
@@ -4782,7 +4789,7 @@
                 '<span class="sf-ornament">✦ ✦ ✦</span>' +
                 '<div class="sf-grid">' +
                     '<div class="sf-brand">' +
-                        '<div class="sf-logo"><img src="static/images/ui/oracle-logo.png" alt="" onerror="this.style.display=\'none\'">کاسمیک اوراکل</div>' +
+                        '<div class="sf-logo"><img src="static/images/ui/logo.svg" alt="">کاسمیک اوراکل</div>' +
                         '<p>پیشگوی کهکشانی شما — چارت ودیک، تاروت، بیوریتم و یوگا در یک آسمان. دقت نجومی، زیبایی کهکشانی.</p>' +
                     '</div>' +
                     '<div class="sf-col">' +

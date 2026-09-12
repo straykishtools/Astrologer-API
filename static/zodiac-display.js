@@ -134,6 +134,27 @@ function getZodiacData(animal) {
     return ZODIAC_DATA[animal] || null;
 }
 
+/* ─── تبدیل میلادی→شمسی — مرجع واحد: window.JalaliDate (static/jalali-date.js)
+   ⚠️ سابقه‌ی باگ ۲۶۴۷/۳۸۹۰. fallback محلی فقط اگر ترتیب لود بهم بخورد. ── */
+function gregorianToJalali(gy, gm, gd) {
+    if (window.JalaliDate) return JalaliDate.gregorianToJalali(gy, gm, gd);
+    var g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    var jy = (gy > 1600) ? 979 : 0;
+    gy -= (gy > 1600) ? 1600 : 621;
+    var gy2 = (gm > 2) ? (gy + 1) : gy;
+    var days = (365 * gy) + ~~((gy2 + 3) / 4) - ~~((gy2 + 99) / 100) + ~~((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+    jy += 33 * ~~(days / 12053);
+    days %= 12053;
+    jy += 4 * ~~(days / 1461);
+    days %= 1461;
+    if (days > 365) { jy += ~~((days - 1) / 365); days = (days - 1) % 365; }
+    var jm, jd;
+    if (days < 186) { jm = 1 + ~~(days / 31); jd = 1 + (days % 31); }
+    else { jm = 7 + ~~((days - 186) / 30); jd = 1 + ((days - 186) % 30); }
+    return { jy: jy, jm: jm, jd: jd };
+}
+window.gregorianToJalali = gregorianToJalali;
+
 /* ─── تبدیل تاریخ شمسی (جلالی) به میلادی — الگوریتم jdf استاندارد (تست‌شده) ─── */
 function jalaliToGregorian(jy, jm, jd) {
     jy += 1595;

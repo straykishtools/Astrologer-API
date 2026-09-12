@@ -13,11 +13,79 @@ var D = window.YOGA_DATA;
 
 var LEVEL_FA = { beginner: 'مبتدی', intermediate: 'متوسط', expert: 'پیشرفته', advanced: 'پیشرفته' };
 var LEVEL_KEYS = ['beginner', 'intermediate', 'expert'];
-var STYLE_FA = { yin: 'یین', hatha: 'هاتا', vinyasa: 'وینیاسا', flow: 'جریان', power: 'پاور', restorative: 'ترمیمی', ashtanga: 'آشتانگا' };
+var STYLE_FA = { yin: 'یین', hatha: 'هاتا', vinyasa: 'وینیاسا', flow: 'جریان', power: 'پاور', restorative: 'ترمیمی', ashtanga: 'آشتانگا', classic: 'کلاسیک' };
 var TIER_FA = { free: 'رایگان', gold: 'طلایی', diamond: 'الماسی' };
 var PHRASE_FA = { none: '', soften: 'نرم‌شو', relax: 'آرامش', breathe: 'نفس' };
 var SIDE_FA = { L: 'سمت چپ', R: 'سمت راست' };
 var FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+/* ترجمه فارسی معتبر تمرین‌ها — جلوی «سالوم خروشید» و نام‌های خام انگلیسی را می‌گیرد.
+   اگر name_fa دیتابیس معتبر نبود (نام فینگلیش/ماشینی)، این عنوان استفاده می‌شود. */
+var PRACTICE_NAME_FA = {
+    ocean: 'اقیانوس',
+    desert: 'کویر',
+    mountain: 'کوه',
+    sun_salutation_a: 'سلام خورشید A',
+    sun_salutation_b: 'سلام خورشید B',
+};
+/* هر displayName حاوی این تکه‌ها، ترجمه ماشینی ناقص از Sun Salutation است */
+var BAD_NAME_RX = /خروش|سالوم|Surya|Namaskar|Sun Salutation|Salute/i;
+function practiceTitle(p) {
+    if (!p) return '';
+    /* برای تمرین‌های اصلی، نام فارسی استاندارد همیشه ملاک است —
+       name_fa دیتابیس ممکن است غلط تایپی («اقائوس») یا ماشینی («سالوم خروشید») باشد */
+    if (PRACTICE_NAME_FA[p.name]) return PRACTICE_NAME_FA[p.name];
+    if (!p.displayName || BAD_NAME_RX.test(p.displayName)) return p.name;
+    return p.displayName;
+}
+/* محیط‌های کلاسیک به فارسی — نمایش در کارت‌ها و صفحات تمرین */
+var BG_FA = {
+    Home: 'خانه', Studio: 'استودیو', Office: 'دفتر', Ocean: 'اقیانوس', Desert: 'کویر',
+    Mountain: 'کوه', Dojo: 'دوجو', Temple: 'معبد', Palace: 'کاخ',
+    Shiva: 'شیوا', Vishnu: 'ویشنو', Buddha: 'بودا', 'Samādhi': 'سماادی',
+};
+function bgFa(name) { return BG_FA[name] || name || ''; }
+
+/* ── تصاویر تمرین‌ها ──
+   پس‌زمینه‌ی محیط هر تمرین از drawable-large-xhdpi (همان تصاویر استودیو کلاسیک)؛
+   سلام خورشید A/B تصویر «سما» (ایستاده، pose_mountain) را می‌گیرند. */
+var CLASSIC_RES = 'static/yoga-data/resources/res/';
+function practiceBgImage(p) {
+    var bg = bgForPractice(p);
+    var map = {
+        Home: 'bg_l1_home.jpg', Studio: 'bg_l1_studio.jpg', Office: 'bg_l1_office.jpg',
+        Ocean: 'bg_l2_ocean.jpg', Desert: 'bg_l2_desert.jpg', Mountain: 'bg_l2_mountain.jpg',
+        Dojo: 'bg_l3_dojo.jpg', Temple: 'bg_l3_temple.jpg', Palace: 'bg_l3_palace.jpg',
+        Shiva: 'bg_l4_shiva.jpg', Vishnu: 'bg_l4_vishnu.jpg', Buddha: 'bg_l4_buddha.jpg',
+        'Samādhi': 'bg_l5_samadhi.jpg',
+    };
+    var file = map[bg];
+    return file ? (CLASSIC_RES + 'drawable-large-xhdpi/' + file) : '';
+}
+/* تصویر نماینده‌ی تمرین: اول محیط، برای سلام خورشیدها «سما» (ایستاده) */
+function practiceImage(p, size) {
+    var dir = size === 'full' ? 'drawable-large-xhdpi/' : 'drawable-mdpi/';
+    if (p && (p.name === 'sun_salutation_a' || p.name === 'sun_salutation_b')) {
+        return CLASSIC_RES + dir + 'pose_mountain.png';
+    }
+    return practiceBgImage(p);
+}
+/* توضیحات فارسی کامل و وفادار تمرین‌های اصلی — معادل کامل متن انگلیسی XML
+   (منبع: static/yoga-classic/data.js PRACTICE_FA که ترجمه کامل این توضیحات است) */
+var PRACTICE_DESC_FA = {
+    ocean: 'تمرین اقیانوس تمرینی با شدت بالا و تناوبی (HIIT) است که بین موج‌های جریان وینیاسا، وضعیت‌های نگه‌داشتن قدرتی و حالت‌های بازکننده در رفت‌وبرگشت است.\n\n«موجی را پیدا کن، موج خودت، موج پرانیک شخصی خودت را — و سوارش شو تا به رهایی ذهن، بدن و روح برسی…»',
+    desert: 'تمرین کویر تمرکز ویژه‌ای بر آرام کردن ذهن، باز کردن پیچ‌وتاب‌های بدن و مهم‌تر از همه گشودن قلب دارد. مسیر رهایی در تمرین کویر از انعطاف‌پذیری و پاک‌سازی می‌گذرد. وقتی بدن گشوده می‌شود و انعطاف‌پذیری بهبود می‌یابد، انرژی پرانیک مسدودشده پاک‌سازی و فرآیندهای شفا را شعله‌ور می‌کند.\n\n«در کویر فضای آن را داری که آرام شوی، گشوده شوی، روی زمین پهن کویر گسترده شوی و شفا بگیری.»',
+    mountain: 'کوه تمرینی قدرت‌محور است که با القای حس خودانضباطی، استقامت و تمرکز یک‌نقطه‌ای، بدن و ذهن را تقویت می‌کند. در تمرین کوه آهسته‌تر حرکت می‌کنیم، با جریان وینیاسای کمتر میان وضعیت‌ها. افزون بر این، وضعیت‌ها را به‌طور چشمگیری طولانی‌تر نگه می‌داریم؛ تعادل‌های دستی بیشتری انجام می‌دهیم و وضعیت‌های قدرتی دیگری تمرین می‌کنیم.\n\n«تمرین تو آنجا آغاز می‌شود که می‌خواهی از وضعیت بیایی بیرون.»',
+    sun_salutation_a: 'سلام خورشید A — گونه‌ی جریان گایا از سوریا ناماسکارا کا — توالی‌ای از وضعیت‌هاست که در جریانی موزون و رفت‌وبرگشتی از حرکت و تنفس اجرا می‌شود؛ قدرت را می‌سازد، انعطاف‌پذیری را افزایش می‌دهد و حسی از تندرستی ایجاد می‌کند. این توالیِ کند و آرام، تمرینی درونی و مراقبه‌گونه از شفا و گسترش در سطوحی چندگانه را تشویق می‌کند.',
+    sun_salutation_b: 'سلام خورشید B — گونه‌ی جریان گایا از سوریا ناماسکارا کها — توالی‌ای از وضعیت‌هاست که در جریانی سخت‌گیرانه‌ی وینیاسا با تمرکز تنفس آتشین اجرا می‌شود؛ سوخت‌وساز را برمی‌انگیزد و انرژی راکد را به حرکت درمی‌آورد. این توالیِ تند، آمادگی قلبی‌عروقی، پاک‌سازی و رهاسازی استرس را تقویت می‌کند.',
+};
+function practiceDesc(p) {
+    if (!p) return '';
+    /* برای تمرین‌های اصلی، ترجمه کامل استاندارد همیشه ملاک است */
+    if (PRACTICE_DESC_FA[p.name]) return PRACTICE_DESC_FA[p.name];
+    /* اگر توضیح فارسی دیتابیس معتبر بود (فارسیِ واقعی، نه ترجمه ماشینی) از آن استفاده کن */
+    if (p.description && !BAD_NAME_RX.test(p.description) && /[؀-ۿ]/.test(p.description)) return p.description;
+    return p.description || '';
+}
 
 function esc(s) {
     return String(s == null ? '' : s)
@@ -551,8 +619,8 @@ function detailPageHTML(p, state) {
     var col = bgColor(bg);
     var accent = hexA(col, .16) || 'rgba(184,160,90,.1)';
     var style = STYLE_FA[p.style] ? '<span class="yp-chip">' + esc(STYLE_FA[p.style]) + '</span>' : '';
-    var lvls = (p.difficulties || []).map(function (d) {
-        return '<span class="yp-chip dim">' + esc(LEVEL_FA[LEVEL_KEYS[d]] || '') + '</span>';
+    var lvls = (p.difficulties || []).filter(function (d) { return LEVEL_FA[LEVEL_KEYS[d]]; }).map(function (d) {
+        return '<span class="yp-chip dim">' + esc(LEVEL_FA[LEVEL_KEYS[d]]) + '</span>';
     }).join('');
     var instr = p.instructor_name ? '<span class="yp-instructor">👤 ' + esc(p.instructor_name) + '</span>' : '';
     var durBtns = (p.durations || [30]).map(function (d) {
@@ -560,27 +628,33 @@ function detailPageHTML(p, state) {
     }).join('');
     var bgOpts = (D.backgrounds || []).map(function (b) {
         return '<option value="' + esc(b.name) + '"' + ((state.backgroundOverridden ? state.background : bg) === b.name ? ' selected' : '') + '>' +
-            esc(b.name) + (b.locked ? ' 🔒' : '') + '</option>';
+            esc(bgFa(b.name)) + (b.locked ? ' 🔒' : '') + '</option>';
     }).join('');
     var lock = p.locked
         ? '<span class="yp-lock">🔒 ' + esc(TIER_FA[p.tier] || p.tier) + '</span>'
         : '<span class="yp-lock free">رایگان</span>';
     var target = state.level === 'expert' ? 45 : state.level === 'intermediate' ? 30 : 20;
+    var heroImg = practiceImage(p, 'full');
     return '<div class="yp-detail" style="--yp-detail-accent:' + accent + ';--yp-detail-color:' + (col ? hexA(col, .55) : '') + '">' +
             '<div class="yp-detail-hero">' +
                 '<button class="yp-detail-back" data-yp-detail-back>→ بازگشت به فهرست</button>' +
-                '<div class="yp-detail-title">🧘 ' + esc(p.displayName || p.name) + '</div>' +
-                '<div class="yp-detail-meta">' + style + lvls + lock + instr + '</div>' +
-                '<div class="yp-detail-bg">🌄 محیط: ' + esc(bg) + '</div>' +
+                '<div class="yp-detail-hero-row">' +
+                    '<div class="yp-detail-hero-info">' +
+                        '<div class="yp-detail-title">🧘 ' + esc(practiceTitle(p)) + '</div>' +
+                        '<div class="yp-detail-meta">' + style + lvls + lock + instr + '</div>' +
+                        '<div class="yp-detail-bg">🌄 محیط: ' + esc(bgFa(bg)) + '</div>' +
+                    '</div>' +
+                    (heroImg ? '<img class="yp-detail-hero-img" src="' + esc(heroImg) + '" alt="' + esc(practiceTitle(p)) + '">' : '') +
+                '</div>' +
             '</div>' +
             '<div class="yp-detail-body">' +
-                '<p class="yp-detail-desc">' + esc(p.description || '') + '</p>' +
+                '<p class="yp-detail-desc">' + esc(practiceDesc(p)) + '</p>' +
                 '<div class="yp-detail-stats">' +
                     '<div class="yp-detail-stat"><b>' + faNum((p.durations || []).join('، ')) + '</b><span>دقیقه</span></div>' +
                     '<div class="yp-detail-stat"><b>' + faNum(p.poseCount || 0) + '</b><span>حرکت</span></div>' +
                     '<div class="yp-detail-stat"><b>' + faNum(target) + '</b><span>دقیقه پیشنهادی</span></div>' +
                 '</div>' +
-                '<div class="yp-settings">' +
+                '<div class="yp-opts">' +
                     '<div class="yp-set"><span class="yp-set-label">سطح دشواری</span>' +
                         '<div class="yp-levels">' +
                             '<button class="yp-level-btn' + (state.level === 'beginner' ? ' active' : '') + '" data-yp-level="beginner">مبتدی</button>' +
@@ -618,23 +692,39 @@ var PracticeUI = {
     init: function () {
         var el = document.getElementById(this.panelId);
         if (!el) return;
-        /* classic-studio stats strip (karma / sessions / minutes / week / last) */
+        this.refreshClassicStats();
+        var self = this;
+        self._detail = false;
+        D.whenReady(function () {
+            if (window.YogaClassicModal && YogaClassicModal._el) return;  /* استودیو کلاسیک باز است — پنل را خراب نکن */
+            self._loadApi().then(function () { self.renderSelector(el); })
+                .catch(function () { self.renderSelector(el); });
+        });
+    },
+
+    /** نوار آمار استودیو کلاسیک (کارما/جلسه/دقیقه/هفته/آخرین) — از localStorage؛
+        بعد از بستن مودال کلاسیک هم صدا زده می‌شود تا آمار بلافاصله تازه شود.
+        شمارش «جلسه» فقط تمرین‌های کامل‌شده است؛ «دقیقه» همیشه کل زمان تمرین. */
+    refreshClassicStats: function () {
         try {
             var k = JSON.parse(localStorage.getItem('py_karma') || '0') || 0;
             var hist = JSON.parse(localStorage.getItem('py_history') || '[]') || [];
-            var totalMin = 0, weekCount = 0, weekStart = new Date();
+            var totalMin = 0, sessions = 0, weekCount = 0, weekStart = new Date();
             weekStart.setDate(weekStart.getDate() - weekStart.getDay());
             weekStart.setHours(0, 0, 0, 0);
             var last = null;
             hist.forEach(function (h) {
                 totalMin += Math.round((h.seconds || 0) / 60);
-                if (h.date && new Date(h.date) >= weekStart) weekCount++;
+                /* رکوردهای قدیمی (بدون flag) کامل فرض می‌شوند تا آمار از دست نرود */
+                var done = (h.completed === undefined) ? true : !!h.completed;
+                if (done) sessions++;
+                if (done && h.date && new Date(h.date) >= weekStart) weekCount++;
                 if (!last || h.date > last.date) last = h;
             });
             var faD = function (n) { return String(n == null ? 0 : n).replace(/[0-9]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[+d]; }); };
             var set = function (id, v) { var e2 = document.getElementById(id); if (e2) e2.textContent = faNum(v); };
             set('pycKarma', k);
-            set('pycSessions', hist.length);
+            set('pycSessions', sessions);
             set('pycTime', totalMin);
             set('pycWeek', weekCount);
             var lw = document.getElementById('pycLastWrap');
@@ -646,13 +736,6 @@ var PracticeUI = {
                 if (le) le.textContent = title + ' (' + faD(mins) + '′)';
             }
         } catch (e) {}
-        var self = this;
-        self._detail = false;
-        D.whenReady(function () {
-            if (window.YogaClassicModal && YogaClassicModal._el) return;  /* استودیو کلاسیک باز است — پنل را خراب نکن */
-            self._loadApi().then(function () { self.renderSelector(el); })
-                .catch(function () { self.renderSelector(el); });
-        });
     },
 
     /** بارگذاری تمرین‌ها از API (فارسی + مربی + قفل)، با fallback به static */
@@ -708,20 +791,22 @@ var PracticeUI = {
         var cards = practices.map(function (p) {
             var sel = self.selected && self.selected.name === p.name ? ' active' : '';
             var style = STYLE_FA[p.style] ? '<span class="yp-chip">' + esc(STYLE_FA[p.style]) + '</span>' : '';
-            var lvls = (p.difficulties || []).map(function (d) {
-                return '<span class="yp-chip dim">' + esc(LEVEL_FA[LEVEL_KEYS[d]] || '') + '</span>';
+            var lvls = (p.difficulties || []).filter(function (d) { return LEVEL_FA[LEVEL_KEYS[d]]; }).map(function (d) {
+                return '<span class="yp-chip dim">' + esc(LEVEL_FA[LEVEL_KEYS[d]]) + '</span>';
             }).join('');
             var lock = p.locked
                 ? '<span class="yp-lock" title="این تمرین برای پلن ' + esc(TIER_FA[p.tier] || p.tier) + ' است">🔒 ' + esc(TIER_FA[p.tier] || p.tier) + '</span>'
                 : '';
             var instr = p.instructor_name ? '<span class="yp-instructor">👤 ' + esc(p.instructor_name) + '</span>' : '';
+            var thumb = practiceImage(p, 'thumb');
             return '<div class="yp-practice-card' + sel + '" data-yp-practice="' + esc(p.name) + '">' +
+                (thumb ? '<div class="yp-card-thumb" style="background-image:url(\'' + esc(thumb) + '\')"></div>' : '') +
                 '<div class="yp-card-top">' +
-                    '<span class="yp-card-name">🧘 ' + esc(p.displayName || p.name) + '</span>' +
+                    '<span class="yp-card-name">🧘 ' + esc(practiceTitle(p)) + '</span>' +
                     lock +
                 '</div>' +
                 '<div class="yp-card-meta">' + style + lvls + '</div>' +
-                '<div class="yp-card-desc">' + esc((p.description || '').slice(0, 110)) + (p.description && p.description.length > 110 ? '…' : '') + '</div>' +
+                '<div class="yp-card-desc">' + esc(practiceDesc(p).slice(0, 110)) + (practiceDesc(p).length > 110 ? '…' : '') + '</div>' +
                 '<div class="yp-card-foot">' +
                     '<span class="yp-card-dur">' + esc((p.durations || []).map(function (d) { return faNum(d); }).join('، ') + ' دقیقه') + '</span>' +
                     instr +
@@ -742,7 +827,7 @@ var PracticeUI = {
         });
         var bgOpts = (D.backgrounds || []).map(function (b) {
             return '<option value="' + esc(b.name) + '"' + (self.background === b.name ? ' selected' : '') + '>' +
-                esc(b.name) + (b.locked ? ' 🔒' : '') + '</option>';
+                esc(bgFa(b.name)) + (b.locked ? ' 🔒' : '') + '</option>';
         }).join('');
 
         el.innerHTML =
@@ -752,7 +837,7 @@ var PracticeUI = {
                     '<button class="yp-classic-btn" data-yp-classic title="بازسازی وفادار Pocket Yoga با صدای اصلی">🎧 استودیو کلاسیک</button>' +
                 '</div>' +
                 '<div class="yp-practice-grid">' + cards + '</div>' +
-                '<div class="yp-settings">' +
+                '<div class="yp-opts">' +
                     '<div class="yp-set"><span class="yp-set-label">سطح دشواری</span>' +
                         '<div class="yp-levels">' +
                             '<button class="yp-level-btn' + (self.level === 'beginner' ? ' active' : '') + '" data-yp-level="beginner">مبتدی</button>' +
@@ -784,19 +869,11 @@ var PracticeUI = {
         this._bound = true;
         el.addEventListener('click', function (e) {
             var t = e.target;
-            // 🎧 استودیو کلاسیک — بازکردن بازسازی Pocket Yoga در مودال تمام‌صفحه
+            // 🎧 استودیو کلاسیک — همیشه منوی اصلی (لابی) کلاسیک را باز می‌کند؛
+            // شروع تمرین فقط از دکمه‌های «شروع تمرین» انجام می‌شود
             var classicBtn = t.closest('[data-yp-classic]');
             if (classicBtn) {
-                var q = [];
-                if (self.selected) {
-                    q.push('practice=' + encodeURIComponent(self.selected.name));
-                    q.push('dur=' + (self.duration || 30));
-                    q.push('lvl=' + encodeURIComponent(self.level || 'beginner'));
-                    if (self.backgroundOverridden && self.background) {
-                        q.push('bg=' + encodeURIComponent(self.background));
-                    }
-                }
-                YogaClassicModal.open(q.length ? '?' + q.join('&') : '');
+                YogaClassicModal.open('');
                 return;
             }
             // دکمه‌ی پیش‌نمایشِ داخل هر کارت — قبل از انتخاب کارت بررسی شود
@@ -882,6 +959,63 @@ var PracticeUI = {
         });
     },
 
+    /** نوار تایم‌لاین پیش‌نمایش — الگوی .yh-strip استودیو کلاسیک:
+        کارت آدمک هر حرکت + حباب مدت؛ کلیک = پرش؛ کارت جاری با فلش زیرش دنبال می‌شود. */
+    buildPreviewStrip: function (overlay, player) {
+        var strip = overlay.querySelector('[data-yp-preview-strip]');
+        if (!strip) return;
+        var inner = strip.querySelector('.yh-strip-inner');
+        var cards = [];
+        player.steps.forEach(function (s, i) {
+            if (s.type !== 'move' && s.type !== 'pose' && s.type !== 'hold') return;
+            var png = '';
+            try {
+                if (window.YogaCore && window.YogaCore.getImage) {
+                    var poseName = s.toPose || s.name || s.pose || '';
+                    png = window.YogaCore.getImage(poseName, { size: 'thumb', side: s.side === 'R' ? 'R' : s.side === 'L' ? 'L' : 'N' });
+                }
+            } catch (e) { png = ''; }
+            if (!png && s.type === 'hold' && !s.pose && s.type !== 'move') return;
+            var bubble = s.type === 'hold' ? faNum(s.count) : Math.ceil(s.duration || 0) + 's';
+            var card = document.createElement('div');
+            card.className = 'tl-card';
+            card.dataset.i = i;
+            card.innerHTML =
+                (png ? '<img alt="" src="' + esc(png) + '">' : '<span class="tl-dot">•</span>') +
+                '<span class="tl-bubble">' + esc(bubble) + '</span>';
+            card.onclick = function () {
+                if (!player._running) return;
+                player._idx = Math.min(i, player.steps.length - 1);
+                player._advance();
+            };
+            cards.push({ i: i, el: card });
+        });
+        /* reverse-insert: گام اول در لبه راست (حس RTL) */
+        for (var j = cards.length - 1; j >= 0; j--) inner.appendChild(cards[j].el);
+        function sync() {
+            var cur = Math.max(0, player._idx - 1);
+            var curCard = null;
+            cards.forEach(function (c) {
+                var isPast = c.i < cur, isCur = c.i === cur;
+                c.el.classList.toggle('past', isPast);
+                c.el.classList.toggle('cur', isCur);
+                if (isCur) curCard = c.el;
+            });
+            /* کارت جاری وسط نوار */
+            if (curCard) {
+                var wrapW = strip.clientWidth || 600;
+                var r = curCard.offsetLeft + curCard.offsetWidth / 2 - wrapW / 2;
+                r = Math.max(0, r);
+                inner.style.transform = 'translateX(' + (-r) + 'px)';
+            }
+        }
+        sync();
+        strip._syncTimer = setInterval(function () {
+            if (!player || !player._running || !document.body.contains(strip)) { clearInterval(strip._syncTimer); return; }
+            sync();
+        }, 400);
+    },
+
     /** پیش‌نمایش سریع تمرین — همان پلیر واقعی با گام‌های فشرده، بدون ذخیره در سوابق.
         اگر p خودش body.steps داشت (جریان دست‌ساز playFlow) بدون fetch استفاده می‌شود. */
     previewPractice: function (p) {
@@ -905,10 +1039,12 @@ var PracticeUI = {
             overlay.innerHTML =
                 '<div class="yp-preview-shell">' +
                     '<div class="yp-preview-head">' +
-                        '<h3>🧘 پیش‌نمایش: ' + esc(p.displayName || p.name) + '</h3>' +
+                        '<h3>🧘 پیش‌نمایش: ' + esc(practiceTitle(p)) + '</h3>' +
                         '<span class="yp-preview-note">فشرده‌شده — با ✖ پایان یا ⏭ بگذرید</span>' +
                         '<button class="yp-preview-x" data-yp-preview-x>✕</button>' +
                     '</div>' +
+                    /* نوار تایم‌لاین حرکات — همان الگوی استودیو کلاسیک */
+                    '<div class="yh-strip yq-strip" data-yp-preview-strip><div class="yh-strip-inner"></div></div>' +
                     '<div class="yp-player yp-preview-host" data-yp-preview-host></div>' +
                 '</div>';
             document.body.appendChild(overlay);
@@ -917,11 +1053,16 @@ var PracticeUI = {
             var player = null;
             host.innerHTML = '<p class="yp-note">در حال بارگذاری پیش‌نمایش…</p>';
 
+            function onKey(e) {
+                if (e.key === 'Escape') { e.stopPropagation(); closePreview(); }
+            }
             function closePreview() {
                 if (player) { try { player.stop(false); } catch (e) {} player = null; }
+                document.removeEventListener('keydown', onKey, true);
                 overlay.remove();
                 document.body.style.overflow = '';
             }
+            document.addEventListener('keydown', onKey, true);
             function showDone(completed, elapsed, done, total) {
                 host.innerHTML = '<div class="yp-done-modal"><div class="yp-done-card">' +
                     '<div class="yp-done-icon">' + (completed ? '🎉' : '⏹') + '</div>' +
@@ -955,12 +1096,13 @@ var PracticeUI = {
                 duration: 1,
                 background: bg,
                 instructorName: p.instructor_name || '',
-                title: (p.displayName || p.name) + ' (پیش‌نمایش)',
+                title: practiceTitle(p) + ' (پیش‌نمایش)',
                 container: host,
                 onComplete: showDone,
             });
             player._record = function () { return; };  // پیش‌نمایش در سوابق ثبت نمی‌شود
             player.start();
+            buildPreviewStrip(overlay, player);
         }).catch(function (err) {
             try { window.showToast && showToast('⚠ بارگذاری پیش‌نمایش ناموفق بود: ' + (err.message || err), 'error'); } catch (e) {}
         });
@@ -1135,13 +1277,15 @@ var CoachUI = {
         if (this._detail && this._selected) { this.renderDetail(el, this._selected); return; }
         var practices = this.apiPractices || D.practices || [];
         var cards = practices.map(function (p) {
-            var lvls = (p.difficulties || []).map(function (d) {
-                return '<span class="yp-chip">' + esc(LEVEL_FA[LEVEL_KEYS[d]] || '') + '</span>';
+            var lvls = (p.difficulties || []).filter(function (d) { return LEVEL_FA[LEVEL_KEYS[d]]; }).map(function (d) {
+                return '<span class="yp-chip">' + esc(LEVEL_FA[LEVEL_KEYS[d]]) + '</span>';
             }).join('');
             var instr = p.instructor_name ? '<span class="yp-instructor">👤 ' + esc(p.instructor_name) + '</span>' : '';
+            var thumb = practiceImage(p, 'thumb');
             return '<div class="yp-coach-card" data-yp-coach-card="' + esc(p.name) + '">' +
-                '<div class="yp-card-name">🧘 ' + esc(p.displayName || p.name) + '</div>' +
-                '<div class="yp-card-desc">' + esc((p.description || '').slice(0, 110)) + (p.description && p.description.length > 110 ? '…' : '') + '</div>' +
+                (thumb ? '<div class="yp-card-thumb" style="background-image:url(\'' + esc(thumb) + '\')"></div>' : '') +
+                '<div class="yp-card-name">🧘 ' + esc(practiceTitle(p)) + '</div>' +
+                '<div class="yp-card-desc">' + esc(practiceDesc(p).slice(0, 110)) + (practiceDesc(p).length > 110 ? '…' : '') + '</div>' +
                 '<div class="yp-card-meta">' +
                     (STYLE_FA[p.style] ? '<span class="yp-chip">' + esc(STYLE_FA[p.style]) + '</span>' : '') +
                     '<span class="yp-chip">' + esc((p.durations || []).map(faNum).join('/')) + ' دقیقه</span>' +
@@ -1277,12 +1421,14 @@ var CoachUI = {
             var est = (c.holdSec || 0) + (c.moveSec || 0);
             return '<div class="yp-analyze-row"><span class="yp-chip">' + esc(LEVEL_FA[key]) + '</span>' +
                 '<span>' + faNum(c.move || 0) + ' انتقال</span>' +
-                '<span>' + faNum(c.hold || 0) + ' نگه‌داره</span>' +
+                '<span>' + faNum(c.hold || 0) + ' نگه‌داشت</span>' +
                 '<span>' + faNum(c.pose || 0) + ' حالت</span>' +
                 '<span>' + faNum(Math.round(est / 60)) + ' دقیقه تخمینی</span></div>';
         }).join('');
-        var head = practice.head || {};
-        return '<div class="yp-analyze"><div class="yp-analyze-desc">' + esc(head.description || '') + '</div>' + rows + '</div>';
+        /* توضیح فارسی معتبر — از کارت catalog اگر پیدا شد، وگرنه head.description */
+        var card = (this.apiPractices || D.practices || []).filter(function (x) { return x.name === practice.name; })[0];
+        var desc = card ? practiceDesc(card) : (practice.head && practice.head.description) || '';
+        return '<div class="yp-analyze"><div class="yp-analyze-desc">' + esc(desc) + '</div>' + rows + '</div>';
     },
 
     _flattenAnalyze: function (steps, levels, ctx, out, counts) {
@@ -1373,8 +1519,9 @@ var YogaClassicModal = {
             var d = ev.data || {};
             if (d.source !== 'yoga-classic') return;
             if (d.type === 'close') { self.close(); return; }
-            if (d.type === 'session-end' && d.seconds >= 30) {
-                /* record via the same session API the XML player uses */
+            if (d.type === 'session-end' && d.seconds >= 10) {
+                /* ثبت از همان API جلسات؛ completed فقط برای تمرین کامل —
+                   دقیقه سپری‌شده همیشه ثبت می‌شود، شمارش جلسه/استریک سمت سرور با completed کنترل می‌شود */
                 try {
                     var token = localStorage.getItem('cosmic_token') || '';
                     fetch('/api/v5/yoga/session', {
@@ -1401,5 +1548,8 @@ var YogaClassicModal = {
         this._el.remove();
         this._el = null;
         document.body.style.overflow = '';
+        /* آمار (کارما/جلسات/دقیقه) بلافاصله بعد از پایان جلسه کلاسیک تازه شود */
+        try { if (window.YogaPracticeUI && YogaPracticeUI.refreshClassicStats) YogaPracticeUI.refreshClassicStats(); } catch (e) {}
+        try { if (window.YogaCoachUI && YogaCoachUI.refreshStats) YogaCoachUI.refreshStats(); } catch (e) {}
     }
 };

@@ -12,24 +12,28 @@
 var PresetCalendar = (function () {
     'use strict';
 
-    /* ── تبدیل میلادی↔جلالی (jdf استاندارد — همان shamsi-calendar.js) ── */
+    /* ── تبدیل — مرجع واحد: window.JalaliDate (static/jalali-date.js)
+       ⚠️ سابقه‌ی باگ ۲۶۴۷/۳۸۹۰: کپیِ محلیِ معکوس بود. دیگر کپی محلی ممنوع. ── */
     function toJalali(gy, gm, gd) {
-        gy += 1595;
-        var days = -355668 + (365 * gy) + (~~(gy / 33) * 8) + ~~(((gy % 33) + 3) / 4) + gd
-            + ((gm < 7) ? (gm - 1) * 31 : ((gm - 7) * 30) + 186);
-        var jy = 400 * ~~(days / 146097);
-        days %= 146097;
-        if (days > 36524) { jy += 100 * ~~(--days / 36524); days %= 36524; if (days >= 365) days++; }
+        if (window.JalaliDate) return JalaliDate.gregorianToJalali(gy, gm, gd);
+        /* fallback فوری اگر ترتیب لود بهم بخورد — همان jdf رسمی */
+        var g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        var jy = (gy > 1600) ? 979 : 0;
+        gy -= (gy > 1600) ? 1600 : 621;
+        var gy2 = (gm > 2) ? (gy + 1) : gy;
+        var days = (365 * gy) + ~~((gy2 + 3) / 4) - ~~((gy2 + 99) / 100) + ~~((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+        jy += 33 * ~~(days / 12053);
+        days %= 12053;
         jy += 4 * ~~(days / 1461);
         days %= 1461;
         if (days > 365) { jy += ~~((days - 1) / 365); days = (days - 1) % 365; }
-        var jd = days + 1;
-        var sal_a = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        var jm;
-        for (jm = 0; jm < 13 && jd > sal_a[jm]; jm++) jd -= sal_a[jm];
+        var jm, jd;
+        if (days < 186) { jm = 1 + ~~(days / 31); jd = 1 + (days % 31); }
+        else { jm = 7 + ~~((days - 186) / 30); jd = 1 + ((days - 186) % 30); }
         return { jy: jy, jm: jm, jd: jd };
     }
     function toGregorian(jy, jm, jd) {
+        if (window.JalaliDate) return JalaliDate.jalaliToGregorian(jy, jm, jd);
         jy += 1595;
         var days = -355668 + (365 * jy) + (~~(jy / 33) * 8) + ~~(((jy % 33) + 3) / 4) + jd
             + ((jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186);
@@ -76,9 +80,13 @@ var PresetCalendar = (function () {
     /* ── موتورِ مدت — پورتِ applyDuration از نمونه‌ی React ──
        "1d" / "-1d" / "1w" / "1m" / "1y" یا ترکیبی مثل "1y 1m 1w" */
     function addDays(j, n) {
+        /* ⚠️ بدون وابستگی به تبدیل — با Date.UTC مستقیم روی روزِ شمسی کار می‌کنیم.
+           ( نسخه‌ی قبلی از toGregorian/toJalali عبور می‌کرد؛ الان هر دو درست‌اند
+           ولی این مسیر سرراست‌تر و بی‌خطاتر است ) */
         var g = toGregorian(j.jy, j.jm, j.jd);
-        var d = new Date(g.gy, g.gm - 1, g.gd + n);
-        return toJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+        var ms = Date.UTC(g.gy, g.gm - 1, g.gd + n);
+        var d = new Date(ms);
+        return toJalali(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
     }
     function addWeeks(j, n) { return addDays(j, 7 * n); }
     function addMonths(j, n) {
@@ -138,7 +146,9 @@ var PresetCalendar = (function () {
     function mount(opts) {
         var root = document.getElementById(opts.mountId);
         if (!root) return null;
-        if (_mounted[opts.mountId]) return _mounted[opts.mountId]; // idempotent
+        /* اگر DOM از نو ساخته شده (سوییچ تب) باید از نو mount شود — نه کشِ قدیمی */
+        var cached = _mounted[opts.mountId];
+        if (cached && cached._domRoot === root && root.querySelector('.pc-wrap')) return cached;
 
         var mode = opts.mode === 'range' ? 'range' : 'single';
         var today = todayJ();
@@ -150,50 +160,47 @@ var PresetCalendar = (function () {
             activePreset: -1
         };
 
-        /* پیش‌فرض‌ها — اگر hidden از قبل مقدار داشت (مثلاً امروز از سرور)، همان ملاک است */
-        var existingIso = null;
+        /* پیش‌فرض‌ها — فقط مقدارِ شمسیِ معتبر (۱۳۰۰–۱۵۰۰) از hidden پذیرفته می‌شود؛
+           هر چیز دیگر (میلادیِ نشت‌کرده، خالی، خراب) → امروز */
+        function _validJ(iso) {
+            var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+            if (!m) return null;
+            var jy = parseInt(m[1]), jm = parseInt(m[2]), jd = parseInt(m[3]);
+            if (jy < MIN_JY || jy > MAX_JY || jm < 1 || jm > 12 || jd < 1 || jd > 31) return null;
+            return { jy: jy, jm: jm, jd: jd };
+        }
         if (mode === 'range') {
             var sEl = document.getElementById(opts.startHiddenId);
             var eEl = document.getElementById(opts.endHiddenId);
-            if (sEl && sEl.value && /^\d{4}-\d{2}-\d{2}$/.test(sEl.value) && eEl && eEl.value && /^\d{4}-\d{2}-\d{2}$/.test(eEl.value)) {
-                existingIso = { s: sEl.value, e: eEl.value };
+            var sJ = _validJ(sEl && sEl.value), eJ = _validJ(eEl && eEl.value);
+            if (sJ && eJ) {
+                state.start = sJ; state.end = eJ;
+            } else {
+                state.start = applyDuration(today, opts.defaultFrom || '-7d');
+                state.end = applyDuration(today, opts.defaultTo || '0d');
             }
         } else {
             var hEl = document.getElementById(opts.hiddenId);
-            if (hEl && hEl.value && /^\d{4}-\d{2}-\d{2}$/.test(hEl.value)) existingIso = { h: hEl.value };
-        }
-        var existingJ = null;
-        if (existingIso) {
-            function _p(iso) {
-                var p = iso.split('-');
-                return { jy: parseInt(p[0]), jm: parseInt(p[1]), jd: parseInt(p[2]) };
-            }
-            existingJ = existingIso.s
-                ? { s: _p(existingIso.s), e: _p(existingIso.e) }
-                : { h: _p(existingIso.h) };
-        }
-        if (mode === 'range') {
-            state.start = existingJ && existingJ.s ? existingJ.s : applyDuration(today, opts.defaultFrom || '-7d');
-            state.end = existingJ && existingJ.e ? existingJ.e : applyDuration(today, opts.defaultTo || '0d');
-        } else {
-            state.single = existingJ && existingJ.h ? existingJ.h : applyDuration(today, opts.defaultDuration || '0d');
+            var hJ = _validJ(hEl && hEl.value);
+            state.single = hJ || applyDuration(today, opts.defaultDuration || '0d');
         }
         var anchor = (mode === 'range') ? state.start : state.single;
         state.view = { jy: anchor.jy, jm: anchor.jm };
 
-        /* hidden input ها — همان قرارداد makeDatePickerTrigger */
+        /* ⚠️ ترتیب حیاتی: اول buildDOM بعد ensureHidden — buildDOM با innerHTML
+           کل root را بازسازی می‌کند و اگر hiddenها قبلش داخل root ساخته شده
+           باشند پاک می‌شوند (دلیلِ «تاریخ شروع را انتخاب کنید» در ناسا) */
+        buildDOM(root, state);
         if (mode === 'range') {
             ensureHidden(root, opts.startHiddenId, state.start);
             ensureHidden(root, opts.endHiddenId, state.end);
         } else {
             ensureHidden(root, opts.hiddenId, state.single);
         }
-
-        buildDOM(root, state);
         syncHidden(state);
         renderAll(state);
 
-        var api = { state: state };
+        var api = { state: state, _domRoot: root };
         _mounted[opts.mountId] = api;
         return api;
     }

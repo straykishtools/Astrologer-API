@@ -481,39 +481,57 @@ function bindBirthEdit() {
     el.addEventListener('click', function (e) {
         var btn = e.target.closest('#ddBirthEditBtn');
         if (!btn) return;
-        if (!window.DateWheelPicker) { if (window.showToast) window.showToast('انتخابگر تاریخ آماده نیست', 'error'); return; }
-        var cur = (window.sharedInputs && window.sharedInputs.birthDate) || null;
-        DateWheelPicker.open({
-            calendarType: 'shamsi',
-            digits: 'fa',
-            defaultValue: cur || { year: 1379, month: 1, day: 1 },
-            /* محدودیت سال برداشته شد */
-            onSave: function (date) {
-                if (!window.sharedInputs) window.sharedInputs = {};
-                window.sharedInputs.birthDate = { year: date.year, month: date.month, day: date.day };
-                try { localStorage.setItem('cosmic_shared_inputs', JSON.stringify(window.sharedInputs)); } catch (e) {}
-                /* ثبت در پروفایل سرور (کاربر لاگین) */
-                var token = null;
-                try { token = localStorage.getItem('cosmic_token'); } catch (e) {}
-                if (token && window.isoShamsiToGregorianISO) {
-                    var iso = window.sharedInputs.birthDate.year + '-' +
-                        String(window.sharedInputs.birthDate.month).padStart(2, '0') + '-' +
-                        String(window.sharedInputs.birthDate.day).padStart(2, '0');
-                    var gIso = window.isoShamsiToGregorianISO(iso);
-                    var gp = gIso.split('-');
-                    fetch('/api/v5/user/profile', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                        body: JSON.stringify({
-                            birth_year: parseInt(gp[0]), birth_month: parseInt(gp[1]), birth_day: parseInt(gp[2])
-                        })
-                    }).catch(function () {});
-                }
-                /* هر ۵ ثانیه رندر می‌شود؛ برای فیدبک فوری یک‌بار همین حالا */
-                renderDashboard('dailyDashboard');
-                if (window.showToast) window.showToast('تاریخ تولد به‌روزرسانی شد ✅', 'success');
+        /* 🎯 تقویم گرافیکی popover (مثل تب‌های سایت) — چرخ فقط fallback */
+        if (!window.ShamsiCalendar && !window.DateWheelPicker) {
+            if (window.showToast) window.showToast('انتخابگر تاریخ آماده نیست', 'error');
+            return;
+        }
+        var cur = (window.sharedInputs && window.sharedInputs.birthDate) || { year: 1379, month: 1, day: 1 };
+        var _save = function (date) {
+            if (!window.sharedInputs) window.sharedInputs = {};
+            window.sharedInputs.birthDate = { year: date.year, month: date.month, day: date.day };
+            try { localStorage.setItem('cosmic_shared_inputs', JSON.stringify(window.sharedInputs)); } catch (e) {}
+            /* ثبت در پروفایل سرور (کاربر لاگین) */
+            var token = null;
+            try { token = localStorage.getItem('cosmic_token'); } catch (e) {}
+            if (token && window.isoShamsiToGregorianISO) {
+                var iso = window.sharedInputs.birthDate.year + '-' +
+                    String(window.sharedInputs.birthDate.month).padStart(2, '0') + '-' +
+                    String(window.sharedInputs.birthDate.day).padStart(2, '0');
+                var gIso = window.isoShamsiToGregorianISO(iso);
+                var gp = gIso.split('-');
+                fetch('/api/v5/user/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({
+                        birth_year: parseInt(gp[0]), birth_month: parseInt(gp[1]), birth_day: parseInt(gp[2])
+                    })
+                }).catch(function () {});
             }
-        });
+            /* هر ۵ ثانیه رندر می‌شود؛ برای فیدبک فوری یک‌بار همین حالا */
+            renderDashboard('dailyDashboard');
+            if (window.showToast) window.showToast('تاریخ تولد به‌روزرسانی شد ✅', 'success');
+        };
+        if (window.ShamsiCalendar) {
+            ShamsiCalendar.open({
+                anchor: btn,
+                defaultJalali: { jy: cur.year, jm: cur.month, jd: cur.day },
+                minJy: 1300,
+                onSave: function (iso) {
+                    var p = iso.split('-');
+                    if (p.length >= 3) {
+                        _save({ year: parseInt(p[0]), month: parseInt(p[1]), day: parseInt(p[2]) });
+                    }
+                }
+            });
+        } else {
+            DateWheelPicker.open({
+                calendarType: 'shamsi',
+                digits: 'fa',
+                defaultValue: cur,
+                onSave: function (date) { _save(date); }
+            });
+        }
     });
 }
 

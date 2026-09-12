@@ -111,7 +111,8 @@ async def get_stats(db: AsyncSession, user: User) -> dict:
     # sessions[0] is the most recent thanks to the ordering above.
     last = sessions[0] if sessions else None
     return {
-        "total_sessions": len(sessions),
+        # شمارش جلسه فقط تمرین‌های کامل‌شده؛ «دقیقه کل» شامل همه‌ی زمان تمرین است
+        "total_sessions": len(completed),
         "total_minutes": round(total_seconds / 60),
         "total_seconds": total_seconds,
         "streak": streak_row.current_streak or streak,

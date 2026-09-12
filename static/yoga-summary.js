@@ -70,7 +70,8 @@ function getThisWeekSessions() {
     startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
     startOfWeek.setHours(0, 0, 0, 0);
     return log.sessions.filter(function (s) {
-        return new Date(s.date) >= startOfWeek;
+        /* جلسات نیمه‌کاره (partial) در شمارش هفتگی جلسه حساب نمی‌شوند */
+        return s.partial !== true && new Date(s.date) >= startOfWeek;
     });
 }
 
@@ -79,6 +80,8 @@ function getStreak() {
     if (log.sessions.length === 0) return 0;
     var dates = {};
     log.sessions.forEach(function (s) {
+        /* نیمه‌کاره‌ها روز استریک نمی‌سازند — اما اگر همان روز جلسه کامل هم هست، روز شمرده می‌شود */
+        if (s.partial === true) return;
         var d = new Date(s.date);
         var key = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
         dates[key] = true;
@@ -144,13 +147,17 @@ function getTodayRecommendation() {
 
 // ─── Render Dropdown ───
 function classicStats() {
-    /* classic-studio (Pocket Yoga rebuild) karma + sessions + minutes */
+    /* classic-studio (Pocket Yoga rebuild) karma + sessions + minutes
+       جلسه = فقط تمرین‌های کامل‌شده؛ دقیقه = کل زمان تمرین */
     try {
         var k = JSON.parse(localStorage.getItem('py_karma') || '0') || 0;
         var hist = JSON.parse(localStorage.getItem('py_history') || '[]') || [];
-        var min = 0;
-        hist.forEach(function (h) { min += Math.round((h.seconds || 0) / 60); });
-        return { karma: k, sessions: hist.length, minutes: min };
+        var min = 0, sessions = 0;
+        hist.forEach(function (h) {
+            min += Math.round((h.seconds || 0) / 60);
+            if (h.completed === undefined ? true : !!h.completed) sessions++;
+        });
+        return { karma: k, sessions: sessions, minutes: min };
     } catch (e) { return { karma: 0, sessions: 0, minutes: 0 }; }
 }
 
@@ -158,7 +165,8 @@ function render() {
     if (!dom.panel) return;
 
     var weekSessions = getThisWeekSessions();
-    var totalSessions = getLog().sessions.length;
+    /* شمارش جلسه فقط کامل‌ها؛ دقیقه کل شامل نیمه‌کاره‌ها هم هست */
+    var totalSessions = getLog().sessions.filter(function (s) { return s.partial !== true; }).length;
     var totalMinutes = getLog().totalMinutes || 0;
     var streak = getStreak();
     var cs = classicStats();

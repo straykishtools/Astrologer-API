@@ -116,16 +116,16 @@ function getMoonPhaseForm() {
         }
     } catch (e) {}
     var html = '<div style="max-width:900px;margin:0 auto;">';
-    html += '<h3 style="color:#a29bfe;text-align:center;">🌙 فاز ماه و منازل قمر</h3>';
-    html += '<p style="color:#8a82a0;text-align:center;font-size:13px;margin-bottom:16px;">فاز ماه و منزل قمری را بر اساس تاریخ انتخابی مشاهده کنید</p>';
+    html += '<h3 style="color:var(--co-gold-300,#ecd9a0);text-align:center;font-family:var(--co-font-display,\'Reem Kufi\',sans-serif);">🌙 فاز ماه و منازل قمر</h3>';
+    html += '<p style="color:var(--co-ink-dim,#aab2cd);text-align:center;font-size:13px;margin-bottom:16px;">فاز ماه و منزل قمری را بر اساس تاریخ انتخابی مشاهده کنید</p>';
     html += '<div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.05);">';
     html += '<div class="form-group" style="margin-bottom:12px;">';
-    html += '<label style="color:#b0c4e0;font-size:13px;display:block;margin-bottom:6px;">📅 تاریخ (شمسی)</label>';
+    html += '<label style="color:var(--co-ink-dim,#aab2cd);font-size:13px;display:block;margin-bottom:6px;">📅 تاریخ (شمسی)</label>';
     html += '<div id="moonPhasePC"></div>';
     html += '<input type="hidden" id="moonPhaseDP_hidden" value="' + todayShamsi.year + '-' + String(todayShamsi.month).padStart(2,'0') + '-' + String(todayShamsi.day).padStart(2,'0') + '">';
     html += '</div>';
     html += '<div class="form-group" style="margin-bottom:12px;">';
-    html += '<label style="color:#b0c4e0;font-size:13px;display:block;margin-bottom:6px;">📍 مکان (اختیاری)</label>';
+    html += '<label style="color:var(--co-ink-dim,#aab2cd);font-size:13px;display:block;margin-bottom:6px;">📍 مکان (اختیاری)</label>';
     html += '<div style="display:flex;gap:8px;">';
     html += '<input type="text" id="moonPhaseLat" placeholder="عرض جغرافیایی" value="35.6892" style="flex:1;padding:8px 12px;border-radius:10px;border:1px solid rgba(221,192,112,0.3);background:rgba(7,12,31,0.5);color:#ece6d6;font-family:Vazirmatn,sans-serif;font-size:13px;box-sizing:border-box;">';
     html += '<input type="text" id="moonPhaseLng" placeholder="طول جغرافیایی" value="51.3890" style="flex:1;padding:8px 12px;border-radius:10px;border:1px solid rgba(221,192,112,0.3);background:rgba(7,12,31,0.5);color:#ece6d6;font-family:Vazirmatn,sans-serif;font-size:13px;box-sizing:border-box;">';
@@ -194,13 +194,35 @@ var MOON_PHASE_FA = {
 };
 
 function submitMoonPhase() {
-    // از date-picker شمسی می‌خواند و به میلادی تبدیل می‌کند (پیکرِ خودِ سایت، fallback: input قدیمی)
+    /* hidden همیشه شمسی است — فقط اگر بازه‌ی شمسی (۱۳۰۰–۱۵۰۰) بود تبدیل کن؛
+       میلادیِ نشت‌کرده یا هر مقدار خراب → خودترمیمی به امروز و بازنویسی hidden */
     var dEl = document.getElementById('moonPhaseDP_hidden');
+    var rawVal = (dEl && dEl.value) || '';
+    var mSh = /^(\d{4})-(\d{2})-(\d{2})$/.exec(rawVal);
+    var shamsiOK = mSh && parseInt(mSh[1]) >= 1300 && parseInt(mSh[1]) <= 1500;
     var dateVal;
-    if (dEl && dEl.value) {
-        dateVal = window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(dEl.value) : dEl.value;
+    if (shamsiOK) {
+        dateVal = window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(rawVal) : rawVal;
     } else {
-        dateVal = (document.getElementById('moonPhaseDate') || {}).value || '';
+        /* خودترمیمی: مقدار خراب/میلادی/خالی → امروز (شمسی) و رندر مجدد فرم */
+        var t = null;
+        try {
+            var now = new Date();
+            t = window.PresetCalendar && PresetCalendar.toJalali
+                ? PresetCalendar.toJalali(now.getFullYear(), now.getMonth() + 1, now.getDate())
+                : null;
+        } catch (e) {}
+        if (t) {
+            var iso = t.jy + '-' + String(t.jm).padStart(2, '0') + '-' + String(t.jd).padStart(2, '0');
+            if (dEl) dEl.value = iso;
+            var root = document.getElementById('moonPhasePC');
+            if (root && window.PresetCalendar) {
+                PresetCalendar.mount({ mountId: 'moonPhasePC', mode: 'single', hiddenId: 'moonPhaseDP_hidden', defaultDuration: '0d' });
+            }
+            dateVal = window.isoShamsiToGregorianISO ? window.isoShamsiToGregorianISO(iso) : iso;
+        } else {
+            dateVal = rawVal; /* آخرین fallback */
+        }
     }
     var lat = parseFloat(document.getElementById('moonPhaseLat').value) || 35.6892;
     var lng = parseFloat(document.getElementById('moonPhaseLng').value) || 51.3890;
@@ -213,7 +235,7 @@ function submitMoonPhase() {
     if (!year || !month || !day) { alert('تاریخ را انتخاب کنید'); return; }
 
     var resultDiv = document.getElementById('moonPhaseResult');
-    resultDiv.innerHTML = '<div style="text-align:center;padding:30px;color:#b0c4e0;">⏳ در حال محاسبه فاز ماه...</div>';
+    resultDiv.innerHTML = '<div style="text-align:center;padding:30px;color:var(--co-ink-dim,#aab2cd);">⏳ در حال محاسبه فاز ماه...</div>';
 
     fetch('/api/v5/moon-phase', {
         method: 'POST',
@@ -234,11 +256,11 @@ function submitMoonPhase() {
         if (data.status === 'OK' && data.moon_phase_overview) {
             displayMoonPhase(data.moon_phase_overview, dateVal, lat, lng);
         } else {
-            resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#e87474;">⚠️ خطا در دریافت اطلاعات</div>';
+            resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--co-danger,#ff7675);">⚠️ خطا در دریافت اطلاعات</div>';
         }
     })
     .catch(function(err) {
-        resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#e87474;">⚠️ خطا: ' + _moonEsc(err.message) + '</div>';
+        resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--co-danger,#ff7675);">⚠️ خطا: ' + _moonEsc(err.message) + '</div>';
     });
 }
 
@@ -333,6 +355,13 @@ function renderMoonPhaseSVG(phaseFrac, position) {
     var f = isFinite(phaseFrac) ? phaseFrac : 0;
     f = Math.max(0, Math.min(1, f));
     var L = (1 - Math.cos(2 * Math.PI * f)) / 2; // illuminated fraction 0..1
+    // قالبِ جدید (theme.js): دایره‌ی ماهِ واقعی با خطِ تقسیم دقیق + حلقه‌ی روشنایی
+    if (window.CoMoon && CoMoon.discSVG) {
+        return '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;">'
+            + CoMoon.discSVG(f, { size: 150, ring: true })
+            + '<div style="font-size:11px;color:var(--co-ink-dim,#aab2cd);">حلقه: ' + Math.round(L * 100) + '٪ روشنایی</div>'
+            + '</div>';
+    }
     var emoji = _phaseEmojiForF(f);
     var cx = 70, cy = 70, r = 54, stroke = 9;
     var circ = 2 * Math.PI * r;

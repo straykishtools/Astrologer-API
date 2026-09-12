@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قالب بصری · Cosmic Oracle — نسخه ۱</title>
+<link rel="icon" type="image/svg+xml" href="static/images/ui/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&family=Cinzel:wght@400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/theme.css?v=1">
+<style>
+/* فقط استایل‌های اختصاصی صفحه‌ی پیش‌نمایش — اجزای اصلی در theme.css است */
+:root { color-scheme: dark; }
+body {
+    margin: 0;
+    font-family: var(--co-font-body);
+    color: var(--co-ink);
+    background:
+        radial-gradient(1200px 700px at 50% -10%, rgba(37, 53, 107, 0.5), transparent 65%),
+        radial-gradient(900px 600px at 85% 15%, rgba(18, 34, 77, 0.85), transparent 60%),
+        radial-gradient(700px 500px at 8% 90%, rgba(20, 32, 74, 0.8), transparent 60%),
+        linear-gradient(180deg, var(--co-lapis-950) 0%, var(--co-lapis-900) 45%, var(--co-lapis-950) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .65;
+    background-image:
+        radial-gradient(1px 1px at 12% 22%, rgba(236,230,214,.5), transparent 100%),
+        radial-gradient(1px 1px at 28% 68%, rgba(159,212,224,.4), transparent 100%),
+        radial-gradient(1.5px 1.5px at 43% 12%, rgba(236,230,214,.35), transparent 100%),
+        radial-gradient(1px 1px at 61% 38%, rgba(236,230,214,.45), transparent 100%),
+        radial-gradient(1.5px 1.5px at 74% 82%, rgba(221,192,112,.4), transparent 100%),
+        radial-gradient(1px 1px at 88% 30%, rgba(236,230,214,.35), transparent 100%),
+        radial-gradient(1px 1px at 7% 55%, rgba(221,192,112,.35), transparent 100%),
+        radial-gradient(1px 1px at 55% 92%, rgba(236,230,214,.3), transparent 100%);
+}
+main { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 0 22px 80px; }
+
+/* ── هدر چسبان ── */
+.tp-head {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 22px;
+    background: rgba(7, 12, 31, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--co-line);
+    max-width: none;
+}
+.tp-head .co-brand { margin-left: auto; }
+.tp-head .tp-tag { font-size: 11px; color: var(--co-ink-dim); }
+
+/* ── هیرو ── */
+.tp-hero { text-align: center; padding: 56px 0 10px; }
+.tp-hero p { max-width: 620px; margin: 18px auto 0; color: var(--co-ink-dim); font-size: 15px; line-height: 2.1; }
+.tp-hero .tp-hero-ctas { display: flex; gap: 10px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+.tp-hero .tp-hero-ctas a { text-decoration: none; }
+
+/* ── پالت رنگ ── */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.swatch { border-radius: var(--co-r-md); overflow: hidden; border: 1px solid var(--co-line); background: rgba(9,14,34,.5); }
+.swatch-color { height: 64px; }
+.swatch-info { padding: 8px 10px; }
+.swatch-name { font-size: 11.5px; font-weight: 700; color: var(--co-ink); }
+.swatch-hex { font-family: var(--co-font-serif); font-size: 10px; color: var(--co-ink-faint); direction: ltr; text-align: left; }
+.swatch-group { font-size: 12px; font-weight: 700; color: var(--co-gold-300); margin: 18px 0 8px; }
+.swatch-group:first-child { margin-top: 0; }
+
+/* ── تایپوگرافی ── */
+.type-row {
+    display: flex; align-items: baseline; gap: 16px;
+    padding: 14px 18px; border-bottom: 1px solid var(--co-line);
+}
+.type-row:last-child { border-bottom: none; }
+.type-sample { flex: 1; min-width: 0; }
+.type-meta { font-size: 11px; color: var(--co-ink-faint); white-space: nowrap; font-family: var(--co-font-serif); }
+
+/* ── اجزا ── */
+.demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.demo-box { padding: var(--co-sp-5); }
+.demo-box h4 {
+    font-family: var(--co-font-display); font-size: 14px; color: var(--co-gold-300);
+    margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--co-line);
+}
+.demo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+.demo-row:last-child { margin-bottom: 0; }
+.demo-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 640px) { .demo-stats { grid-template-columns: repeat(2, 1fr); } }
+
+/* ── آیکون‌ها ── */
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
+.icon-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px 6px; border: 1px solid var(--co-line); border-radius: var(--co-r-md);
+    background: rgba(9, 14, 34, 0.5);
+    transition: border-color .2s, transform .15s var(--co-ease);
+}
+.icon-cell:hover { border-color: var(--co-line-strong); transform: translateY(-2px); }
+.icon-cell img { width: 34px; height: 34px; }
+.icon-cell span { font-size: 10.5px; color: var(--co-ink-dim); text-align: center; }
+.moon-icon-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+@media (max-width: 760px) { .moon-icon-row { grid-template-columns: repeat(4, 1fr); } }
+
+/* ── ماه ── */
+.moon-demo-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; align-items: start; }
+@media (max-width: 860px) { .moon-demo-grid { grid-template-columns: 1fr; } }
+.moon-ring-demo {
+    display: flex; align-items: center; gap: 22px; padding: var(--co-sp-5);
+}
+.moon-ring-demo .mr-text { flex: 1; }
+.moon-ring-demo h4 { font-family: var(--co-font-display); color: var(--co-gold-200); font-size: 16px; margin: 0 0 8px; }
+.moon-ring-demo p { font-size: 12.5px; color: var(--co-ink-dim); line-height: 2; margin: 0; }
+
+/* ── ماکاپ رابط ── */
+.appframe {
+    display: grid; grid-template-columns: 220px 1fr; gap: 0;
+    border: 1px solid var(--co-line-strong); border-radius: var(--co-r-xl);
+    overflow: hidden; background: rgba(7, 12, 31, 0.6);
+    box-shadow: var(--co-shadow);
+    min-height: 480px;
+}
+@media (max-width: 760px) { .appframe { grid-template-columns: 1fr; } .appframe-side { display: none; } }
+.appframe-side {
+    border-left: 1px solid var(--co-line);
+    padding: 18px 12px;
+    background: rgba(8, 13, 32, 0.9);
+    display: flex; flex-direction: column; gap: 4px;
+}
+.appframe-side .co-brand { padding: 0 8px 14px; border-bottom: 1px solid var(--co-line); margin-bottom: 10px; }
+.af-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 10px;
+    font-size: 12.5px; color: var(--co-ink-dim);
+    transition: background .2s, color .2s;
+}
+.af-nav-item img { width: 17px; height: 17px; }
+.af-nav-item:hover { background: rgba(221, 192, 112, 0.08); color: var(--co-gold-200); }
+.af-nav-item.active {
+    background: linear-gradient(135deg, rgba(221, 192, 112, 0.16), rgba(162, 155, 254, 0.08));
+    color: var(--co-gold-200); font-weight: 700;
+    box-shadow: inset 0 0 0 1px var(--co-line-strong);
+}
+.appframe-main { display: flex; flex-direction: column; min-width: 0; }
+.af-topbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px; border-bottom: 1px solid var(--co-line);
+    background: rgba(16, 26, 61, 0.5);
+}
+.af-topbar .af-orb { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: radial-gradient(circle at 35% 30%, #ecd9a0, #c9a227 55%, #8a691f);
+    box-shadow: 0 0 16px rgba(201, 162, 39, 0.5);
+    position: relative;
+}
+.af-topbar .af-orb::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.25); transform: scale(1.25); opacity: .5;
+}
+.af-topbar .af-title { font-size: 13px; font-weight: 700; color: var(--co-ink); }
+.af-topbar .af-actions { margin-right: auto; display: flex; gap: 6px; }
+.af-topbar .co-btn { padding: 6px 12px; font-size: 11.5px; }
+.af-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.af-hero-line { font-family: var(--co-font-display); font-size: 19px; color: var(--co-gold-200); }
+.af-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .af-cards { grid-template-columns: 1fr; } }
+.af-card-ic { font-size: 22px; margin-bottom: 8px; }
+.af-card-t { font-size: 13.5px; font-weight: 700; color: var(--co-ink); margin-bottom: 4px; }
+.af-card-d { font-size: 11.5px; color: var(--co-ink-dim); line-height: 1.9; }
+
+.tp-foot {
+    margin-top: 60px; text-align: center; font-size: 12px; color: var(--co-ink-faint);
+    border-top: 1px solid var(--co-line); padding-top: 22px;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ هدر ═══════════ -->
+<header class="tp-head">
+    <div class="co-brand co-brand--sm">
+        <img class="co-brand-mark" src="static/images/ui/logo.svg" alt="لوگوی کاسمیک اوراکل">
+        <div class="co-brand-text">
+            <div class="co-brand-name">Cosmic Oracle</div>
+            <div class="co-brand-sub">قالب بصری</div>
+        </div>
+    </div>
+    <span class="tp-tag">نسخه ۱ · سامانه‌ی طراحی</span>
+    <a class="co-btn co-btn--ghost" href="/index.html">⬅ بازگشت به سایت</a>
+</header>
+
+<main>
+
+<!-- ═══════════ هیرو ═══════════ -->
+<section class="tp-hero">
+    <div class="co-brand co-brand--stack">
+        <img class="co-brand-mark" src="static/images/ui/logo.svg" alt="">
+        <div class="co-brand-text">
+            <div class="co-brand-name">Cosmic Oracle</div>
+            <div class="co-brand-sub">رصدخانه‌ی کیهانی</div>
+        </div>
+    </div>
+    <p>
+        سامانه‌ی طراحیِ واحدِ کاسمیک اوراکل: پالتِ لاجوردِ شب و زرِّ ستارگان، تایپوگرافیِ فارسی،
+        مجموعه‌ی آیکون‌های خطی، لاک‌آپ‌های لوگو و <b style="color:var(--co-star)">کیتِ کاملِ ماه</b> —
+        از هلالِ نو تا ماهِ کامل، با دایره‌ای که دقیقاً مثلِ آسمان روشن می‌شود.
+    </p>
+    <div class="tp-hero-ctas">
+        <a class="co-btn co-btn--primary" href="#palette">🎨 پالت رنگ</a>
+        <a class="co-btn co-btn--moon" href="#moon-kit">🌙 کیت ماه</a>
+        <a class="co-btn" href="#components">🧩 اجزا</a>
+    </div>
+</section>
+
+<!-- ═══════════ ۱ — هویت برند ═══════════ -->
+<section class="co-section" id="brand">
+    <div class="co-section-head">
+        <div class="co-section-title">هویت برند</div>
+        <div class="co-section-sub">لوگو، لاک‌آپ‌ها و ترکیبِ فونت‌ها — در هر مقیاس و جایگاهی</div>
+    </div>
+    <span class="co-ornament">✦ ✦ ✦</span>
+    <div class="demo-grid">
+        <div class="co-card demo-box">
+            <h4>نشانِ اصلی (Logo Mark)</h4>
+            <div style="display:flex;gap:18px;align-items:center;justify-content:center;padding:18px 0;">
+                <img src="static/images/ui/logo.svg" alt="" style="width:72px;height:72px;filter:drop-shadow(0 0 18px rgba(221,192,112,.5));">
+                <img src="static/images/ui/logo.svg" alt="" style="width:48px;height:48px;">
+                <img src="static/images/ui/logo.svg" alt="" style="width:28px;height:28px;">
+            </div>
+            <div style="font-size:12px;color:var(--co-ink-dim);text-align:center;">اسطرلابِ خطی با گرادیانِ زرّ — ۷۲ / ۴۸ / ۲۸ پیکسل</div>
+        </div>
+        <div class="co-card demo-box">
+            <h4>لاک‌آپ افقی (هدر و سایدبار)</h4>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:10px 0;">
+                <div class="co-brand">
+                    <img class="co-brand-mark" src="static/images/ui/logo.svg" alt="">
+                    <div class="co-brand-text">
+                        <div class="co-brand-name">Cosmic Oracle</div>
+                        <div class="co-brand-sub">رصدخانه‌ی کیهانی</div>
+                    </div>
+                </div>
+                <div class="co-brand co-brand--sm">
+                    <img class="co-brand-mark" src="static/images/ui/logo.svg" alt="">
+                    <div class="co-brand-text">
+                        <div class="co-brand-name">Cosmic Oracle</div>
+                        <div class="co-brand-sub">رصدخانه‌ی کیهانی</div>
+                    </div>
+                </div>
+            </div>
+            <div style="font-size:12px;color:var(--co-ink-dim);">فونتِ لاتین: <b>Cinzel</b> · فونتِ فارسی: <b>Reem Kufi</b></div>
+        </div>
+        <div class="co-card co-card--moon demo-box">
+            <h4 style="color:var(--co-star)">کلماتِ کلیدی برند</h4>
+            <div class="demo-row" style="justify-content:center;">
+                <span class="co-chip co-chip--moon">دقتِ نجومی</span>
+                <span class="co-chip co-chip--moon">آرامش</span>
+                <span class="co-chip co-chip--moon">حکمتِ ایرانی</span>
+                <span class="co-chip co-chip--moon">شب و ستاره</span>
+            </div>
+            <div style="font-size:12.5px;color:var(--co-ink-dim);line-height:2.2;text-align:center;margin-top:10px;">
+                «زیرِ همین آسمان» — یک آسمان برای همه؛
+                <br>شیک، جدی و در عین حال صمیمی.
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ ۲ — پالت رنگ ═══════════ -->
+<section class="co-section" id="palette">
+    <div class="co-section-head">
+        <div class="co-section-title">پالت رنگ</div>
+        <div class="co-section-sub">لاجرودِ شب برای زمینه، زرّ برای برند، فیروزه‌ی مهتابی برای ماه</div>
+    </div>
+    <div class="co-card demo-box">
+        <div class="swatch-group">🌌 لاجورد — زمینه‌ها</div>
+        <div class="swatches">
+            <div class="swatch"><div class="swatch-color" style="background:#070c1f"></div><div class="swatch-info"><div class="swatch-name">Lapis 950</div><div class="swatch-hex">#070C1F</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#0c1430"></div><div class="swatch-info"><div class="swatch-name">Lapis 900 · theme</div><div class="swatch-hex">#0C1430</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#101a3d"></div><div class="swatch-info"><div class="swatch-name">Lapis 850</div><div class="swatch-hex">#101A3D</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#16224d"></div><div class="swatch-info"><div class="swatch-name">Lapis 800</div><div class="swatch-hex">#16224D</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#22305f"></div><div class="swatch-info"><div class="swatch-name">Lapis 700</div><div class="swatch-hex">#22305F</div></div></div>
+        </div>
+        <div class="swatch-group">✨ زرّ — برند و تأکید</div>
+        <div class="swatches">
+            <div class="swatch"><div class="swatch-color" style="background:#f3e5b8"></div><div class="swatch-info"><div class="swatch-name">Gold 200 · متن روشن</div><div class="swatch-hex">#F3E5B8</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#ecd9a0"></div><div class="swatch-info"><div class="swatch-name">Gold 300 · عناوین</div><div class="swatch-hex">#ECD9A0</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#ddc070"></div><div class="swatch-info"><div class="swatch-name">Gold 400 · hover</div><div class="swatch-hex">#DDC070</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#c9a227"></div><div class="swatch-info"><div class="swatch-name">Gold 500 · اصلی</div><div class="swatch-hex">#C9A227</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#a8812a"></div><div class="swatch-info"><div class="swatch-name">Gold 600 · سایه</div><div class="swatch-hex">#A8812A</div></div></div>
+        </div>
+        <div class="swatch-group">🌙 مهتابی و بنفش — بخش‌های قمری</div>
+        <div class="swatches">
+            <div class="swatch"><div class="swatch-color" style="background:#9fd4e0"></div><div class="swatch-info"><div class="swatch-name">Star · مهتاب</div><div class="swatch-hex">#9FD4E0</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#a29bfe"></div><div class="swatch-info"><div class="swatch-name">Violet · یوگا</div><div class="swatch-hex">#A29BFE</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#ece6d6"></div><div class="swatch-info"><div class="swatch-name">Ink · متن</div><div class="swatch-hex">#ECE6D6</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#aab2cd"></div><div class="swatch-info"><div class="swatch-name">Ink dim · توضیح</div><div class="swatch-hex">#AAB2CD</div></div></div>
+        </div>
+        <div class="swatch-group">🚦 معنایی — وضعیت‌ها</div>
+        <div class="swatches">
+            <div class="swatch"><div class="swatch-color" style="background:#2ecc71"></div><div class="swatch-info"><div class="swatch-name">Success · مناسب</div><div class="swatch-hex">#2ECC71</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#f39c12"></div><div class="swatch-info"><div class="swatch-name">Warning</div><div class="swatch-hex">#F39C12</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#ff7675"></div><div class="swatch-info"><div class="swatch-name">Danger · نامناسب</div><div class="swatch-hex">#FF7675</div></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#74b9ff"></div><div class="swatch-info"><div class="swatch-name">Info</div><div class="swatch-hex">#74B9FF</div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ ۳ — تایپوگرافی ═══════════ -->
+<section class="co-section" id="type">
+    <div class="co-section-head">
+        <div class="co-section-title">تایپوگرافی</div>
+        <div class="co-section-sub">Vazirmatn برای متن، Reem Kufi برای عناوین، Cinzel برای لاتین و اعداد بزرگ</div>
+    </div>
+    <div class="co-card demo-box" style="padding:0;overflow:hidden;">
+        <div class="type-row">
+            <div class="type-sample" style="font-family:var(--co-font-display);font-size:32px;font-weight:700;color:var(--co-gold-200);">رصدخانه‌ی کیهانی</div>
+            <div class="type-meta">Reem Kufi · ۳۲</div>
+        </div>
+        <div class="type-row">
+            <div class="type-sample" style="font-family:var(--co-font-body);font-size:15px;line-height:2;color:var(--co-ink);">متنِ اصلی با فونت وزیرمتن؛ خوانا در حجم بالا و در پس‌زمینه‌ی تیره، با فاصله‌ی خطِ فراوان و اعداد فارسی.</div>
+            <div class="type-meta">Vazirmatn · ۱۵/۲.۰</div>
+        </div>
+        <div class="type-row">
+            <div class="type-sample" style="font-family:var(--co-font-serif);font-size:22px;letter-spacing:.12em;background:linear-gradient(180deg,var(--co-gold-200),var(--co-gold-500));-webkit-background-clip:text;background-clip:text;color:transparent;">COSMIC ORACLE</div>
+            <div class="type-meta">Cinzel · ۲۲</div>
+        </div>
+        <div class="type-row">
+            <div class="type-sample" style="font-size:11px;color:var(--co-ink-faint);">سایز ۱۱ — یادداشت‌های کوچک، برچسب‌های فرم، فوتر</div>
+            <div class="type-meta">۱۱</div>
+        </div>
+        <div class="type-row">
+            <div class="type-sample" style="font-size:13px;color:var(--co-ink-dim);">سایز ۱۳ — بدنه‌ی فرم‌ها، لیست‌ها، توست‌ها</div>
+            <div class="type-meta">۱۳</div>
+        </div>
+        <div class="type-row">
+            <div class="type-sample" style="font-size:15px;color:var(--co-ink);">سایز ۱۵ — متنِ پیش‌فرضِ محتوا</div>
+            <div class="type-meta">۱۵</div>
+        </div>
+        <div class="type-row">
+            <div class="type-sample" style="font-family:var(--co-font-display);font-size:24px;font-weight:700;color:var(--co-ink);">عنوانِ سکشن</div>
+            <div class="type-meta">Display · ۲۴</div>
+        </div>
+        <div class="type-row">
+            <div class="type-sample" style="font-family:var(--co-font-serif);font-size:40px;font-weight:700;color:var(--co-gold-300);line-height:1.1;">۱۴۰۵</div>
+            <div class="type-meta">Serif · ۴۰ · اعداد آمار</div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ ۴ — اجزا ═══════════ -->
+<section class="co-section" id="components">
+    <div class="co-section-head">
+        <div class="co-section-title">اجزای مشترک</div>
+        <div class="co-section-sub">دکمه‌ها، چیپ‌ها، کارت‌ها و ورودی‌ها — با پیشوند co- در theme.css</div>
+    </div>
+    <div class="demo-grid">
+        <div class="co-card demo-box">
+            <h4>دکمه‌ها</h4>
+            <div class="demo-row">
+                <button class="co-btn co-btn--primary">🔮 دریافت چارت</button>
+                <button class="co-btn co-btn--moon">🌙 ماهِ امروز</button>
+                <button class="co-btn">📅 تاریخ</button>
+                <button class="co-btn co-btn--ghost">لغو</button>
+                <button class="co-btn co-btn--icon" title="نقشه">📍</button>
+            </div>
+            <div class="demo-row">
+                <button class="co-btn co-btn--primary co-btn--lg">باز کردن رصدخانه</button>
+            </div>
+        </div>
+        <div class="co-card demo-box">
+            <h4>چیپ و بج</h4>
+            <div class="demo-row">
+                <span class="co-chip">نجومی</span>
+                <span class="co-chip">ودیک</span>
+                <span class="co-chip co-chip--moon">قمری</span>
+                <span class="co-chip co-chip--violet">یوگا</span>
+                <span class="co-chip co-chip--good">✅ مناسب</span>
+                <span class="co-chip co-chip--bad">❌ نامناسب</span>
+            </div>
+            <div class="demo-row">
+                <span class="co-badge">PRO</span>
+                <span class="co-badge co-badge--ghost">جدید</span>
+                <span style="font-size:12px;color:var(--co-ink-dim);">برای ابزارهای ویژه و پرمیوم</span>
+            </div>
+        </div>
+        <div class="co-card demo-box">
+            <h4>کارت آمار</h4>
+            <div class="demo-stats">
+                <div class="co-stat"><div class="co-stat-icon">🔮</div><div class="co-stat-num">۱۶</div><div class="co-stat-label">موتور</div></div>
+                <div class="co-stat"><div class="co-stat-icon">🌟</div><div class="co-stat-num">۲۷</div><div class="co-stat-label">ناکشاترا</div></div>
+                <div class="co-stat"><div class="co-stat-icon">♈</div><div class="co-stat-num">۱۲</div><div class="co-stat-label">برج</div></div>
+                <div class="co-stat"><div class="co-stat-icon">🪐</div><div class="co-stat-num">۹</div><div class="co-stat-label">سیاره</div></div>
+            </div>
+        </div>
+        <div class="co-card demo-box">
+            <h4>ورودی‌ها</h4>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <div>
+                    <label class="co-label">📍 شهر تولد</label>
+                    <input class="co-input" type="text" placeholder="مثلاً: اصفهان" value="تهران">
+                </div>
+                <div>
+                    <label class="co-label">🕐 ساعت تولد</label>
+                    <select class="co-select">
+                        <option>۱۲:۰۰ ظهر</option>
+                        <option>۰۸:۳۰ صبح</option>
+                        <option>۲۱:۰۰ شب</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="co-card demo-box">
+            <h4>کارت سرویس</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <img src="static/images/services/birth.svg" alt="" style="width:42px;height:42px;padding:5px;background:linear-gradient(160deg,rgba(221,192,112,.18),rgba(221,192,112,.04));border:1px solid var(--co-line);border-radius:12px;">
+                    <span style="font-family:var(--co-font-display);font-size:15px;font-weight:600;">چارت تولد</span>
+                </div>
+                <div style="font-size:12.5px;line-height:1.9;color:var(--co-ink-dim);">چارت کامل نجومی با موقعیت دقیق سیارات، خانه‌ها، جنبه‌ها و تفسیر ودیک.</div>
+                <div style="display:flex;gap:6px;"><span class="co-chip">نجومی</span><span class="co-chip">ودیک</span></div>
+                <div style="color:var(--co-gold-400);font-size:13px;font-weight:700;margin-top:2px;">باز کردن ←</div>
+            </div>
+        </div>
+        <div class="co-card co-card--moon demo-box">
+            <h4 style="color:var(--co-star)">کارت قمری</h4>
+            <div style="display:flex;align-items:center;gap:14px;">
+                <div id="demoMoonDisc" style="flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-family:var(--co-font-display);font-size:15px;color:var(--co-gold-200);">منزل قمر</div>
+                    <div style="font-size:12px;color:var(--co-ink-dim);line-height:1.9;margin-top:4px;">هر ۲۸ منزل، ویژگی و کارِ مناسب و نامناسب — با رنگِ مهتابیِ یکدست.</div>
+                    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+                        <span class="co-chip co-chip--good">ازدواج</span>
+                        <span class="co-chip co-chip--bad">سفر دریایی</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ ۵ — آیکون‌ها ═══════════ -->
+<section class="co-section" id="icons">
+    <div class="co-section-head">
+        <div class="co-section-title">آیکون‌ها</div>
+        <div class="co-section-sub">استایلِ خطیِ زرّ — هشت آیکونِ فازِ ماه هم به همین زبان افزوده شد</div>
+    </div>
+    <div class="co-card demo-box">
+        <h4 style="font-family:var(--co-font-display);font-size:14px;color:var(--co-gold-300);margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--co-line);">🌙 مجموعه‌ی فازهای ماه (جدید)</h4>
+        <div class="moon-icon-row" id="moonIconRow"></div>
+        <h4 style="font-family:var(--co-font-display);font-size:14px;color:var(--co-gold-300);margin:22px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--co-line);">🛠️ آیکون‌های ابزارها (موجود)</h4>
+        <div class="icon-grid" id="uiIconGrid"></div>
+    </div>
+</section>
+
+<!-- ═══════════ ۶ — کیت ماه ═══════════ -->
+<section class="co-section" id="moon-kit">
+    <div class="co-section-head">
+        <div class="co-section-title">کیت ماه</div>
+        <div class="co-section-sub">دایره‌ی ماه با خطِ تقسیمِ دقیق — وِیجت زنده با محاسبه‌ی محلی (بدون API)</div>
+    </div>
+
+    <div class="co-card demo-box" style="margin-bottom:14px;">
+        <h4 style="font-family:var(--co-font-display);font-size:14px;color:var(--co-gold-300);margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--co-line);">📐 هشت فاز — ناحیه‌ی روشن دقیقاً برابرِ درصدِ واقعیِ روشنایی</h4>
+        <div id="moonGrid"></div>
+    </div>
+
+    <div class="moon-demo-grid" style="margin-bottom:14px;">
+        <div class="co-card co-card--moon demo-box">
+            <h4 style="font-family:var(--co-font-display);font-size:14px;color:var(--co-star);margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--co-line);">⚡ وِیجت زنده — همین الان، همین آسمان</h4>
+            <div id="moonLive"></div>
+        </div>
+        <div class="co-card demo-box">
+            <div class="moon-ring-demo" style="padding:0;">
+                <div id="moonRingDemo" style="flex-shrink:0;"></div>
+                <div class="mr-text">
+                    <h4>حلقه‌ی پیشرفت</h4>
+                    <p>برای «نمودار فاز ماه»: دایره‌ی ماه + حلقه‌ای که درصدِ روشنایی را نشان می‌دهد — همان خروجیِ ابزارِ فازِ ماه، حالا با پوسته‌ی واحد.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ ۷ — ماکاپ رابط ═══════════ -->
+<section class="co-section" id="mockup">
+    <div class="co-section-head">
+        <div class="co-section-title">نمونه در چارچوب واقعی</div>
+        <div class="co-section-sub">سایدبار + نوار بالا + محتوا — همان ساختارِ سایت با رنگ‌های یکدست</div>
+    </div>
+    <div class="appframe">
+        <div class="appframe-side">
+            <div class="co-brand co-brand--sm">
+                <img class="co-brand-mark" src="static/images/ui/logo.svg" alt="">
+                <div class="co-brand-text">
+                    <div class="co-brand-name">Cosmic Oracle</div>
+                    <div class="co-brand-sub">رصدخانه‌ی کیهانی</div>
+                </div>
+            </div>
+            <div class="af-nav-item active"><img src="static/images/ui/home.svg" alt=""> صفحه اصلی</div>
+            <div class="af-nav-item"><img src="static/images/ui/dashboard.svg" alt=""> داشبورد کاربری</div>
+            <div class="af-nav-item"><img src="static/images/ui/birth.svg" alt=""> چارت تولد</div>
+            <div class="af-nav-item"><img src="static/images/ui/synastry.svg" alt=""> سیناستری</div>
+            <div class="af-nav-item"><img src="static/images/ui/hafez.svg" alt=""> فال حافظ</div>
+            <div class="af-nav-item"><img src="static/images/ui/tarot.svg" alt=""> تاروت</div>
+            <div class="af-nav-item"><img src="static/images/ui/moon-phase.svg" alt=""> فاز ماه</div>
+            <div class="af-nav-item"><img src="static/images/ui/yoga.svg" alt=""> کتابخانه یوگا</div>
+        </div>
+        <div class="appframe-main">
+            <div class="af-topbar">
+                <div class="af-orb" aria-hidden="true"></div>
+                <div class="af-title">رصدخانه‌ی کیهانی</div>
+                <div class="af-actions">
+                    <button class="co-btn co-btn--icon" title="یوگا">🧘</button>
+                    <button class="co-btn co-btn--icon" title="وضعیت نجومی">🌌</button>
+                    <button class="co-btn co-btn--icon" title="حساب">🔑</button>
+                </div>
+            </div>
+            <div class="af-body">
+                <div class="af-hero-line">🌌 امروز در آسمان</div>
+                <div id="afMoonSlot" style="max-width:640px;"></div>
+                <div class="af-cards">
+                    <div class="co-card" style="cursor:default;">
+                        <div class="af-card-ic">🔮</div>
+                        <div class="af-card-t">چارت تولد</div>
+                        <div class="af-card-d">چارت کامل نجومی با تحلیل ودیک و جنبه‌های سیاره‌ای.</div>
+                        <div style="margin-top:10px;"><span class="co-btn co-btn--primary" style="padding:6px 16px;font-size:11.5px;">باز کردن</span></div>
+                    </div>
+                    <div class="co-card co-card--moon" style="cursor:default;">
+                        <div class="af-card-ic">🌙</div>
+                        <div class="af-card-t" style="color:var(--co-star);">فاز ماه</div>
+                        <div class="af-card-d">فاز کنونی، درصد روشنایی، سن ماه و ۲۸ منزل قمری — با دایره‌ی ماهِ واقعی.</div>
+                        <div style="margin-top:10px;"><span class="co-btn co-btn--moon" style="padding:6px 16px;font-size:11.5px;">باز کردن</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="tp-foot">
+    <span class="co-ornament" style="margin-bottom:10px;">✦ ✦ ✦</span>
+    قالب بصری Cosmic Oracle · نسخه ۱ — theme.css + theme.js + ۸ آیکون ماه
+    <br>
+    <a href="/index.html" style="color:var(--co-gold-300);text-decoration:none;">بازگشت به سایت ←</a>
+</footer>
+
+</main>
+
+<script src="static/theme.js?v=1"></script>
+<script>
+(function () {
+    'use strict';
+
+    function ready(fn) {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+        else fn();
+    }
+
+    ready(function () {
+        if (!window.CoMoon) return;
+
+        // ── شبکه‌ی ۸ فاز ──
+        var grid = document.getElementById('moonGrid');
+        if (grid) grid.innerHTML = CoMoon.phaseGrid();
+
+        // ── وِیجت زنده ──
+        var live = document.getElementById('moonLive');
+        if (live) live.innerHTML = CoMoon.todayWidget();
+
+        // ── نمونه‌ی دایره‌ی کوچک در کارت قمری ──
+        var demo = document.getElementById('demoMoonDisc');
+        if (demo) demo.innerHTML = CoMoon.discSVG(CoMoon.phaseFromNow(Date.now()), { size: 72, glow: true });
+
+        // ── حلقه‌ی پیشرفت ──
+        var ring = document.getElementById('moonRingDemo');
+        if (ring) {
+            var f = CoMoon.phaseFromNow(Date.now());
+            ring.innerHTML = CoMoon.discSVG(f, { size: 120, ring: true });
+        }
+
+        // ── وِیجتِ کوچک در ماکاپ (فقط نوار هفت‌روز + دایره) ──
+        var af = document.getElementById('afMoonSlot');
+        if (af) {
+            var f2 = CoMoon.phaseFromNow(Date.now());
+            var info = CoMoon.phaseInfo(f2);
+            af.innerHTML = '<div class="co-moon-today" style="max-width:none;margin:0;padding:14px 16px;">'
+                + '<div class="co-moon-today-disc" style="width:56px;height:56px;">' + CoMoon.discSVG(f2, { size: 56 }) + '</div>'
+                + '<div class="co-moon-today-body">'
+                + '<div class="co-moon-today-name" style="font-size:15px;">' + info.fa + ' ' + info.emoji + '</div>'
+                + '<div class="co-moon-today-meta" style="margin-top:4px;font-size:11.5px;">'
+                + '<span>روشنایی <b>' + CoMoon.fa(info.illuminationPct) + '٪</b></span>'
+                + '<span>سن <b>' + CoMoon.fa(Math.round(info.ageDays)) + ' روز</b></span>'
+                + '<span>' + info.stageFa + '</span></div>'
+                + '</div></div>'
+                + CoMoon.weekStrip(f2);
+        }
+
+        // ── آیکون‌های ماه ──
+        var moonRow = document.getElementById('moonIconRow');
+        if (moonRow) {
+            var moonIcons = [
+                ['new', 'ماه نو 🌑'], ['waxing-crescent', 'هلالِ رشد 🌒'], ['first-quarter', 'تربیع اول 🌓'],
+                ['waxing-gibbous', 'محدبِ رشد 🌔'], ['full', 'ماه کامل 🌕'], ['waning-gibbous', 'محدبِ زوال 🌖'],
+                ['last-quarter', 'تربیع آخر 🌗'], ['waning-crescent', 'هلالِ زوال 🌘']
+            ];
+            moonRow.innerHTML = moonIcons.map(function (m) {
+                return '<div class="icon-cell"><img src="static/images/ui/moon-' + m[0] + '.svg" alt=""><span>' + m[1] + '</span></div>';
+            }).join('');
+        }
+
+        // ── آیکون‌های موجود ──
+        var grid2 = document.getElementById('uiIconGrid');
+        if (grid2) {
+            var icons = [
+                ['home', 'خانه'], ['dashboard', 'داشبورد'], ['star', 'ابزارها'], ['wisdom', 'حکمت ایرانی'],
+                ['prediction', 'پیش‌بینی'], ['universe', 'جهان'], ['body', 'بدن و ذهن'], ['admin', 'مدیریت'],
+                ['birth', 'چارت تولد'], ['synastry', 'سیناستری'], ['composite', 'کامپوزیت'], ['transit', 'ترانزیت'],
+                ['solar-return', 'بازگشت خورشیدی'], ['lunar-return', 'بازگشت ماهانه'], ['mizaj', 'مزاج‌شناسی'],
+                ['abjad', 'ابجد'], ['hafez', 'فال حافظ'], ['tarot', 'تاروت'], ['numerology', 'عددشناسی'],
+                ['biorhythm', 'بیوریتم'], ['zodiac', 'سال حیوانی'], ['daily-question', 'پرسش روزانه'],
+                ['qol', 'کیفیت زندگی'], ['nasa', 'ناسا'], ['moon-phase', 'فاز ماه'], ['yoga', 'یوگا'], ['breath', 'تنفس']
+            ];
+            grid2.innerHTML = icons.map(function (ic) {
+                return '<div class="icon-cell"><img src="static/images/ui/' + ic[0] + '.svg" alt=""><span>' + ic[1] + '</span></div>';
+            }).join('');
+        }
+    });
+})();
+</script>
+</body>
+</html>

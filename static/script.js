@@ -844,7 +844,7 @@ function displayScoreInterpretation(chartData, title, chartType) {
             if (yearEl && yearEl.value) ctxParts.push('\u0633\u0627\u0644 ' + yearEl.value);
             if (monthEl && monthEl.value && monthEl.value !== '0') {
                 var monthNames = ['\u0641\u0631\u0648\u0631\u06cc\u0646','\u0627ردیبهشت','\u0627ردبهشت','\u062fرویزه','\u062aیر','\u0627ردیبهشت','\u062aیرمه','\u0645هر','\u0622بان','\u0622ذر','\u0622ذار','\u062fیسانبر'];
-                ctxParts.push(monthNames[parseInt(monthEl.value)-1] || '');
+                ctxParts.push(_jMonthName(parseInt(monthEl.value)));
             }
         } else {
             // Lunar return - show month
@@ -1006,11 +1006,14 @@ function syncSharedInputsFromForm() {
     // Update location bar
     updateLocationBar();
 
-    // Also capture from daily-question date picker
+    // Also capture from daily-question date picker — با همان گاردِ بیوریتم:
+    // اگر کاربر پروفایلِ ثبت‌شده دارد، dq picker تاریخِ تستی است و نباید پروفایل را بازنویسی کند
     var dqDate = document.getElementById('dqDatePicker_hidden');
     if (dqDate && dqDate.value) {
         var dqParts = dqDate.value.split('-');
-        if (dqParts.length >= 3) sharedInputs.birthDate = { year: parseInt(dqParts[0]), month: parseInt(dqParts[1]), day: parseInt(dqParts[2]) };
+        if (dqParts.length >= 3 && !getProfileBirthISO()) {
+            sharedInputs.birthDate = { year: parseInt(dqParts[0]), month: parseInt(dqParts[1]), day: parseInt(dqParts[2]) };
+        }
     }
     // Also capture from Numerology fields
     var numYear = document.getElementById('numYear');
@@ -1197,7 +1200,13 @@ function applySharedInputs() {
     // Apply shared birth date to all date picker hidden inputs and displays
     if (sharedInputs.birthDate) {
         var dateStr = sharedInputs.birthDate.year + '-' + String(sharedInputs.birthDate.month).padStart(2,'0') + '-' + String(sharedInputs.birthDate.day).padStart(2,'0');
+        /* فاز ماه و ناسا از PresetCalendar استفاده می‌کنند و تاریخِ مستقل دارند —
+           تاریخ تولد نباید آن‌ها را بازنویسی کند */
         document.querySelectorAll('[id$="_date_hidden"], #birthDatePicker_hidden').forEach(function(el) {
+            if (el.id === 'moonPhaseDP_hidden' ||
+                el.id === 'nasaWeatherStartDP_hidden' || el.id === 'nasaWeatherEndDP_hidden' ||
+                el.id === 'nasaNeoStartDP_hidden' || el.id === 'nasaNeoEndDP_hidden' ||
+                el.id === 'nasaPlanetsDateDP_hidden') return;
             el.value = dateStr;
         });
         // Update display text
@@ -1241,7 +1250,8 @@ function applySharedInputs() {
         var p2dDisplay = document.getElementById('p2_date_display');
         if (p2dHidden) p2dHidden.value = p2DateStr;
         if (p2dDisplay) p2dDisplay.textContent = formatDpDisplay(sharedInputs2.birthDate, 'shamsi', 'fa');
-        if (_dpState['p2_datePicker']) _dpState['p2_datePicker'].value = sharedInputs2.birthDate;
+        /* کلید صحیح در _dpState همان triggerId است: p2_date (نه p2_datePicker) */
+        if (_dpState['p2_date']) _dpState['p2_date'].value = sharedInputs2.birthDate;
     }
     var p2NameEl2 = document.getElementById('p2_name');
     var p2HourEl2 = document.getElementById('p2_hour');
@@ -1314,6 +1324,10 @@ function makeDatePickerTrigger(triggerId, opts) {
         '</button>';
 }
 
+/* نام ماه‌های شمسی — منبعِ واحد ( قبلاً دو آرایه‌ی خرابِ تکراری وجود داشت ) */
+var _J_MONTHS_FA = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+function _jMonthName(m) { return _J_MONTHS_FA[(parseInt(m, 10) || 1) - 1] || ''; }
+
 function toFaDigitsLocal(str) {
     var FA = ['\u06f0','\u06f1','\u06f2','\u06f3','\u06f4','\u06f5','\u06f6','\u06f7','\u06f8','\u06f9'];
     return String(str).replace(/[0-9]/g, function(d) { return FA[parseInt(d)]; });
@@ -1333,10 +1347,32 @@ function attachDatePicker(triggerId, opts) {
     if (!btn) return;
     var hiddenId = triggerId + '_hidden';
     var displayId = triggerId + '_display';
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
         var state = _dpState[triggerId] || {};
         /* همیشه شمسی باز می‌شود؛ مقدار ذخیره‌شده شمسی است — بدون تبدیل */
         var defVal = state.value || opts.defaultValue || { year: 1380, month: 1, day: 1 };
+        /* 🎯 تقویم گرافیکی popover (مثل چارت تولد) — چرخ فقط fallback است.
+           آینده: برای ترانزیت مجاز؛ برای تاریخ تولد نه. */
+        if (window.ShamsiCalendar) {
+            ShamsiCalendar.open({
+                anchor: btn,
+                defaultJalali: { jy: defVal.year, jm: defVal.month, jd: defVal.day },
+                minJy: 1300,
+                allowFuture: !!opts.allowFuture,
+                onSave: function (iso) {
+                    var p = iso.split('-');
+                    var date = { year: parseInt(p[0]), month: parseInt(p[1]), day: parseInt(p[2]) };
+                    _dpState[triggerId] = { calType: 'shamsi', value: date };
+                    var hidden = document.getElementById(hiddenId);
+                    var display = document.getElementById(displayId);
+                    if (hidden) hidden.value = date.year + '-' + String(date.month).padStart(2,'0') + '-' + String(date.day).padStart(2,'0');
+                    if (display) display.textContent = formatDpDisplay(date, 'shamsi', opts.digits);
+                }
+            });
+            return;
+        }
+        /* fallback: چرخ قدیمی */
         DateWheelPicker.open({
             calendarType: 'shamsi',
             defaultValue: defVal,
@@ -1395,7 +1431,7 @@ function buildBirthForm() {
 function attachDatePickerTriggers(tab) {
     var opts = { calendarType: 'shamsi', digits: 'fa' };
     if (tab === 'birth') {
-        /* 🎯 پایلوت: تقویم شمسی گرافیکی (popover) فقط برای چارت تولد.
+        /* 🎯 تقویم شمسی گرافیکی (popover) برای چارت تولد.
            اگر ShamsiCalendar در دسترس نبود → چرخ قدیمی. */
         if (window.ShamsiCalendar) {
             ShamsiCalendar.attach('birthDatePicker', {
@@ -1421,7 +1457,7 @@ function attachDatePickerTriggers(tab) {
     if (tab === 'solar-return' || tab === 'lunar-return') {
         attachDatePicker('p1_date', opts);
     }
-    if (tab === 'transit') attachDatePicker('transitDatePicker', opts);
+    if (tab === 'transit') attachDatePicker('transitDatePicker', { calendarType: 'shamsi', digits: 'fa', allowFuture: true });
     if (tab === 'daily-question') attachDatePicker('dqDatePicker', opts);
     if (tab === 'biorhythm') {
         attachDatePicker('bioBirthDP', opts);
@@ -1452,7 +1488,7 @@ var formBuilders = {
             '<div class="person-divider"><span>🌍</span></div>'+
             '<div class="person-label">🌍 لحظه ترانزیت</div>'+
             '<div class="form-section"><div class="form-grid">'+
-            '<div class="form-group"><label>📅 لحظه ترانزیت</label>'+makeDatePickerTrigger('transitDatePicker', {label:'تاریخ ترانزیت', calendarType:'shamsi', digits:'fa'})+'</div>'+
+            '<div class="form-group"><label>📅 لحظه ترانزیت</label>'+makeDatePickerTrigger('transitDatePicker', {label:'تاریخ ترانزیت', calendarType:'shamsi', digits:'fa', allowFuture:true})+'</div>'+
             '<div class="form-group"><label>⏰</label><select id="transit_hour">'+makeHourOptions()+'</select></div>'+
             '<div class="form-group"><label>⏱️</label><select id="transit_minute">'+makeMinOptions()+'</select></div>'+
             '</div></div>';
@@ -1485,7 +1521,7 @@ var formBuilders = {
         for (var y = currentYear; y <= currentYear + 1; y++) yearOpts += makeOption(y, y);
         var monthNames = ['\u0641\u0631\u0648\u0631\u06cc\u0646','\u0627\u0631\u062f\u06cc\u0628\u0647\u0634\u062a','\u0627\u0631\u062f\u0628\u0647\u0634\u062a','\u062f\u0631\u0648\u06cc\u0632\u0647','\u062a\u06cc\u0631','\u0627\u0631\u062f\u06cc\u0628\u0647\u0634\u062a','\u062a\u06cc\u0631\u0645\u0647','\u0645\u0647\u0631','\u0622\u0628\u0627\u0646','\u0622\u0630\u0631','\u0622\u0630\u0627\u0631','\u062f\u06cc\u0633\u0627\u0646\u0628\u0631'];
         var monthOpts = '';
-        for (var m = 1; m <= 12; m++) monthOpts += makeOption(m, monthNames[m-1]);
+        for (var m = 1; m <= 12; m++) monthOpts += makeOption(m, _jMonthName(m));
         return buildPersonForm('p1','چارت تولد','natal')+
             '<div class="form-section"><div class="form-grid">'+
             '<div class="form-group"><label>🌙 سال</label><select id="return_year">'+yearOpts+'</select></div>'+
@@ -1942,9 +1978,16 @@ async function handleTransit() {
     if (!natal) throw new Error('اطلاعات چارت تولد لازم است.');
     var tdHidden = document.getElementById('transitDatePicker_hidden');
     if (!tdHidden || !tdHidden.value) throw new Error('تاریخ ترانزیت را انتخاب کنید.');
-    var parts = tdHidden.value.split('-');
+    /* hidden همیشه شمسی ISO است — مثل buildSubject باید به میلادی تبدیل شود
+       (بک‌اند میلادی حساب می‌کند؛ بدون تبدیل، ترانزیتِ «سال ۱۴۰۴ میلادی» می‌گرفت) */
+    var tParts = tdHidden.value.split('-');
+    var tY = parseInt(tParts[0]), tM = parseInt(tParts[1]), tD = parseInt(tParts[2]);
+    if (tY >= 1300 && tY <= 1600 && window.shamsiToGregorianDate) {
+        var tg = window.shamsiToGregorianDate(tY, tM, tD);
+        if (tg) { tY = tg.gy; tM = tg.gm; tD = tg.gd; }
+    }
     var transitSubject = {
-        year: parseInt(parts[0]), month: parseInt(parts[1]), day: parseInt(parts[2]),
+        year: tY, month: tM, day: tD,
         hour: parseInt(document.getElementById('transit_hour').value) || 12,
         minute: parseInt(document.getElementById('transit_minute').value) || 0, second: 0,
         longitude: natal.longitude, latitude: natal.latitude, timezone: natal.timezone,
@@ -3782,7 +3825,7 @@ function getNasaForm() {
     }, 0);
     return html;
 }
-/* _deadNasaFragment_REMOVED: old NASA code (mars/curiosity tabs + old form + fetchCuriosityRaw) was deleted here
+/* DEADBLOCK-START (old NASA code, inert)
 function _deadNasaFragment_REMOVED() {
    deadcode: removed // KEEPMARK-START — DELETE-FROM-HERE
         {id: 'mars___REMOVEDT2___', icon: 'X', label: 'Curiosity'},
@@ -3935,7 +3978,7 @@ async function fetchCuriosityRaw() {
     }
 }
 window.fetchCuriosityRaw = fetchCuriosityRaw; // dc-end8
-*/ // KEEPMARK-END3 — DELETE-TO-HERE (block ends; content is commented out and inert)
+*/ // DEADBLOCK-END
 
 function switchNasaTab(tab) {
     // هر ۵ پنل — پس از حذفِ تب‌های مریخ و Curiosity
@@ -4477,7 +4520,8 @@ function getDailyQuestionForm() {
 async function submitDailyQuestion() {
     const question = document.getElementById('dqQuestion').value.trim();
     const dqHidden = document.getElementById('dqDatePicker_hidden');
-    const birthDate = dqHidden ? dqHidden.value : '';
+    /* hidden شمسی ISO است — بک‌اند میلادی می‌خواهد؛ مثل بقیه‌ی سرویس‌ها تبدیل شود */
+    const birthDate = dqHidden && dqHidden.value ? isoShamsiToGregorian(dqHidden.value) : '';
     const birthYear = birthDate ? parseInt(birthDate.split('-')[0]) : 0;
     const resultDiv = document.getElementById('dqResult');
     

@@ -184,6 +184,15 @@ function finishSession() {
     renderComplete(secs);
 }
 
+/** خروج وسط راه — دقیقه سپری‌شده ثبت می‌شود (فقط زمان، نه شمارش جلسه/استریک) */
+function recordPartial() {
+    if (state.recorded) return;
+    var secs = Math.round(state.sessionSeconds);
+    if (secs < 60) return;   /* کمتر از یک دقیقه ارزش ثبت ندارد */
+    state.recorded = true;
+    C.recordPartialPractice(Math.max(1, Math.round(secs / 60)), { type: 'yoga' });
+}
+
 function updateTimerDisplay() {
     var el = document.getElementById('ypTimerValue');
     if (el) el.textContent = fmt(state.timerRemaining);
@@ -598,6 +607,7 @@ function bindRunnerEvents() {
 function exitRunner() {
     stopTimerHard();
     stopAmbientSound();
+    recordPartial();
     state.guidedActive = false;
     state.sessionCompleted = false;
     if (window.YogaLibrary) window.YogaLibrary.setTab('library');

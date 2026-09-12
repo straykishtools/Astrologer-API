@@ -395,7 +395,8 @@ const Player = {
     showScreen('scr-yoga');
     this.current = this.steps[0];
     if (this.current) { this.remainingMs = (this.current.duration || 0) * 1000; this.render(); }
-    this.play();
+    /* جلسه همیشه در حالت pause باز می‌شود تا کاربر خودش شروع کند (دکمه پخش) */
+    this._setPlayIcon(false);
   },
 
   buildStrip() {
@@ -489,8 +490,8 @@ const Player = {
     Audio2.killAll();
     Audio2.silent();
     const elapsed = Math.round(this.elapsedMs / 1000);
-    if (completed && elapsed >= 30) this.record(elapsed);
-    else if (elapsed >= 60) this.record(elapsed);
+    /* دقیقه سپری‌شده همیشه ثبت می‌شود؛ کارما فقط برای تمرین کامل (پرش‌های تصادفی <10s ثبت نشوند) */
+    if (elapsed >= 10) this.record(elapsed, completed === true);
     reportSessionEnd(completed === true, elapsed);   /* → cosmic parent */
     if (inCosmicIframe()) return;                    /* parent shows the result */
     if (!this._quitToLobby) Post.open(completed === true, elapsed);
@@ -772,17 +773,22 @@ const Player = {
     }
   },
 
-  record(elapsedSec) {
+  /* ثبت دقیقه‌های سپری‌شده همیشه؛ امتیاز کارما فقط برای تمرین کامل‌شده.
+     completed=true → تاریخچه + کارما؛ false (ترک تمرین) → فقط تاریخچه‌ی دقیقه. */
+  record(elapsedSec, completed) {
     const p = this.practice || {};
     DB.history.push({
       practice: p.name,
       title: (PRACTICE_FA[p.name] || {}).title || p.title || p.name,
       date: Date.now(),
       seconds: elapsedSec,
+      completed: !!completed,
       level: [FA_UI.begin, FA_UI.intermediate, FA_UI.expert][this.level || 0],
     });
-    const earned = Math.floor(elapsedSec / 900);
-    DB.karma += earned;
+    if (completed) {
+      const earned = Math.floor(elapsedSec / 900);
+      DB.karma += Math.max(1, earned);
+    }
     DB.save();
   },
 };
@@ -978,7 +984,7 @@ const Post = {
   open(completed, elapsedSec) {
     $('postMsg').textContent = completed ? FA_UI.youCompleted : FA_UI.practiceEnded;
     $('postCal').textContent = faNum(caloriesFor(elapsedSec));
-    const earned = Math.floor(elapsedSec / 900);
+    const earned = completed ? Math.max(1, Math.floor(elapsedSec / 900)) : 0;
     $('postKarma').textContent = faNum(earned);
     $('postKarmaTotal').textContent = faNum(DB.karma);
     showScreen('scr-post');
