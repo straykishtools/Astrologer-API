@@ -170,6 +170,7 @@
     html += '<button class="admin-tab" data-tab="subscriptions">💎 اشتراک‌ها</button>';
     html += '<button class="admin-tab" data-tab="settings">⚙️ تنظیمات</button>';
     html += '<button class="admin-tab" data-tab="audio">🎵 صداها</button>';
+    html += '<button class="admin-tab" data-tab="backgrounds">🖼️ پس‌زمینه‌ها</button>';
     html += '</div>';
 
     /* Users tab */
@@ -213,12 +214,11 @@
     html += renderSettings(settings);
     html += '</div>';
 
-    /* Audio tab */
-    html += '<div class="admin-tab-content" id="adminTabAudio" style="display:none">';
-    html += '<div id="adminTabAudioContent">';
-    if (window.AudioManager) { html += AudioManager.renderAdminAudio(); }
-    else { html += '<p style="color:var(--ink-dim)">بارگذاری سیستم صدا...</p>'; }
-    html += '</div></div>';
+    /* Audio tab — محتوای واقعی با AudioAdmin بعداً پر می‌شود (فایل جدا، مقاوم در برابر خطا) */
+    html += '<div class="admin-tab-content" id="adminTabAudio" style="display:none"><div id="adminTabAudioContent"></div></div>';
+
+    /* Backgrounds tab — با BackgroundAdmin بعداً پر می‌شود (فایل جدا) */
+    html += '<div class="admin-tab-content" id="adminTabBackgrounds" style="display:none"><div id="adminTabBackgroundsContent"></div></div>';
 
     container.innerHTML = html;
     bindEvents();
@@ -356,13 +356,21 @@
         else if (target === 'subscriptions') document.getElementById('adminTabSubscriptions').style.display = '';
         else if (target === 'settings') document.getElementById('adminTabSettings').style.display = '';
         else if (target === 'audio') {
-          document.getElementById('adminTabAudio').style.display = '';
-          /* همگام‌سازی وضعیت فایل‌ها از سرور، بعد از آن رندر دوباره */
-          if (window.AudioManager && AudioManager.refreshAudioFiles) {
-            AudioManager.refreshAudioFiles(function () {
-              var c = document.getElementById('adminTabAudioContent');
-              if (c && AudioManager.renderAdminAudio) c.innerHTML = AudioManager.renderAdminAudio();
-            });
+          var pane = document.getElementById('adminTabAudio');
+          if (pane) pane.style.display = '';
+          var host = document.getElementById('adminTabAudioContent');
+          if (host && window.AudioAdmin && !host.dataset.ready) {
+            host.dataset.ready = '1';
+            try { AudioAdmin.render(host); } catch (e) { host.innerHTML = '<p style="color:#ff7675">سیستم صدا بالا نیامد: ' + (e && e.message || e) + '</p>'; }
+          }
+        }
+        else if (target === 'backgrounds') {
+          var bgPane = document.getElementById('adminTabBackgrounds');
+          if (bgPane) bgPane.style.display = '';
+          var bgHost = document.getElementById('adminTabBackgroundsContent');
+          if (bgHost && window.BackgroundAdmin && !bgHost.dataset.ready) {
+            bgHost.dataset.ready = '1';
+            try { BackgroundAdmin.render(bgHost); } catch (e) { bgHost.innerHTML = '<p style="color:#ff7675">مدیریت پس‌زمینه بالا نیامد: ' + (e && e.message || e) + '</p>'; }
           }
         }
       });

@@ -618,7 +618,12 @@ function startRecommendedPractice() {
     var chain = buildPracticeChain(recs, 8);
     if (!chain.length) chain = recs.slice(0, 8);
     closeOverlay();
-    if (window.YogaPractice && window.YogaPractice.launch) {
+    /* رانر هدایت‌شده قدیمی به پنل پنهان رندر می‌شد؛ مثل بقیهٔ جریان‌ها: playFlow در پیش‌نمایش */
+    if (window.YogaPracticeUI && typeof window.YogaPracticeUI.playFlow === 'function') {
+        try { C.setSession(chain); } catch (e) {}
+        if (window.YogaLibrary && window.YogaLibrary.switchTab) window.YogaLibrary.switchTab('practice');
+        window.YogaPracticeUI.playFlow(chain, 'حرکات پیشنهادی من');
+    } else if (window.YogaPractice && window.YogaPractice.launch) {
         try { C.setSession(chain); } catch (e) {}
         window.YogaPractice.launch(chain);
         if (window.YogaLibrary && window.YogaLibrary.setTab) {

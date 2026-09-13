@@ -488,7 +488,8 @@ const Player = {
     this.ticker = null;
     Ambient.stop();
     Audio2.killAll();
-    Audio2.silent();
+    /* «به حالت سکومیرود» فقط پایانِ طبیعیِ تمرین؛ نه با خروج/از‌نو */
+    if (completed === true) Audio2.silent();
     const elapsed = Math.round(this.elapsedMs / 1000);
     /* دقیقه سپری‌شده همیشه ثبت می‌شود؛ کارما فقط برای تمرین کامل (پرش‌های تصادفی <10s ثبت نشوند) */
     if (elapsed >= 10) this.record(elapsed, completed === true);
@@ -805,11 +806,16 @@ $('uiQuit').onclick = () => {
   showScreen('scr-home');
   Home.go(Home.idx, true);
 };
-$('uiVolume').oninput = e => {
+/* اسلایدر صدا — هم نوارِ پایین هم تبِ پنل حرکات (id تکراری داشت: uiVolumePanel) */
+function onVolInput(e) {
   const v = +e.target.value / 100;
   Audio2.setVolume(v);
   Ambient.setVolume(v);
-};
+  const other = (e.target.id === 'uiVolume') ? $('uiVolumePanel') : $('uiVolume');
+  if (other) other.value = e.target.value;   /* همگام دو اسلایدر */
+}
+$('uiVolume').oninput = onVolInput;
+if ($('uiVolumePanel')) $('uiVolumePanel').oninput = onVolInput;
 function syncSoundBtn() {
   const b = $('ytSound'); if (!b) return;
   b.classList.toggle('off', !DB.settings.voice);
@@ -840,6 +846,7 @@ $('ytMusic').onclick = () => {
 /* keyboard shortcuts — desktop */
 window.addEventListener('keydown', e => {
   if (!$('scr-yoga').classList.contains('show')) return;
+  if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;   /* حین تایپ، میان‌برها غیرفعال */
   if (e.code === 'Space') { e.preventDefault(); Player.toggle(); }
   else if (e.key === 'ArrowLeft') Player.next();   /* RTL: left = forward */
   else if (e.key === 'ArrowRight') Player.prev();

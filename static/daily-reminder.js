@@ -169,9 +169,8 @@ var DailyReminder = (function () {
                 .then(function (d) { return (d && d.status === 'success') ? d.data : null; }));
         }
         if (f.weather.on) {
-            var lat = (window.sharedInputs && window.sharedInputs.latitude) || 35.6892;
-            var lng = (window.sharedInputs && window.sharedInputs.longitude) || 51.3890;
-            promises.push(fetchJSON('/api/v5/weather?lat=' + lat + '&lng=' + lng));
+            var loc = (window.GeoLoc && GeoLoc.resolve()) || { lat: 35.6892, lng: 51.3890 };
+            promises.push(fetchJSON('/api/v5/weather?lat=' + loc.lat + '&lng=' + loc.lng));
         }
         if (!promises.length) promises.push(Promise.resolve(null));
 

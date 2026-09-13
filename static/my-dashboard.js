@@ -526,12 +526,12 @@ function renderSkyTab() {
    ═══════════════════════════════════════════ */
 var _meteoCache2 = { at: 0, data: null };
 var _astCache2 = { at: 0, data: null };
+window.addEventListener('geoloc:change', function () { _meteoCache2 = { at: 0, data: null }; });
 
 function fetchMeteo2() {
     if (_meteoCache2.data && (Date.now() - _meteoCache2.at) < 30 * 60 * 1000) return Promise.resolve(_meteoCache2.data);
-    var lat = (window.sharedInputs && window.sharedInputs.latitude) || 35.6892;
-    var lng = (window.sharedInputs && window.sharedInputs.longitude) || 51.3890;
-    return fetch('/api/v5/weather?lat=' + lat + '&lng=' + lng)
+    var loc = (window.GeoLoc && GeoLoc.resolve()) || { lat: 35.6892, lng: 51.3890 };
+    return fetch('/api/v5/weather?lat=' + loc.lat + '&lng=' + loc.lng)
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) {
             if (d && (d.status === 'success' || d.status === 'partial') && d.data) { _meteoCache2 = { at: Date.now(), data: d.data }; return _meteoCache2.data; }

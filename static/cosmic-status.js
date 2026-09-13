@@ -350,11 +350,11 @@ function startEclipseCountdown(nextTs) {
 // ─── Open-Meteo cache (اشتراکی — یک fetch برای همه‌ی بخش‌ها) ───
 var _omCache = null;
 var _omAt = 0;
+window.addEventListener('geoloc:change', function () { _omCache = null; _omAt = 0; });
 function fetchOpenMeteo() {
     if (_omCache && (Date.now() - _omAt) < 30 * 60 * 1000) return Promise.resolve(_omCache);
-    var lat = (window.sharedInputs && window.sharedInputs.latitude) || 35.6892;
-    var lng = (window.sharedInputs && window.sharedInputs.longitude) || 51.3890;
-    return fetch('/api/v5/weather?lat=' + lat + '&lng=' + lng)
+    var loc = (window.GeoLoc && GeoLoc.resolve()) || { lat: 35.6892, lng: 51.3890 };
+    return fetch('/api/v5/weather?lat=' + loc.lat + '&lng=' + loc.lng)
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) {
             if (d && (d.status === 'success' || d.status === 'partial') && d.data) {

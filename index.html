@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="static/date-wheel-picker.css?v=2">
     <link rel="stylesheet" href="static/shamsi-calendar.css?v=3">
     <link rel="stylesheet" href="static/preset-calendar.css?v=1">
+    <link rel="stylesheet" href="static/vinyl-player.css?v=5">
     <link rel="stylesheet" href="static/yoga-v3.css?v=13">
 
     <style>
@@ -503,6 +504,95 @@
             body.cosmic.sidebar-collapsed .cosmic-main { margin-right: 0; }
         }
 
+        /* ============================================================
+           KF — Kinetic Nav (Speed-Dial FAB، فیزیک از کتابخانهٔ Kinetics)
+           منوی شناور: یک orb پایین-چپ؛ با کلیک، هشت مقصد در یک کمان
+           با فنرِ تصاعدی (stagger spring) باز می‌شوند. بدون ease/linear.
+        ============================================================ */
+        .kf-dial {
+            --kf-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* overshoot(≈1.08) */
+            --kf-glide:  cubic-bezier(0.16, 1, 0.30, 1);       /* اصطکاک نرم */
+            position: fixed;
+            left: 26px; bottom: 26px;
+            width: 56px; height: 56px;
+            z-index: 3600;
+            font-family: "Vazirmatn", sans-serif;
+        }
+        /* ── دکمهٔ مادر (Squish) ── */
+        .kf-fab {
+            position: absolute; inset: 0;
+            display: grid; place-items: center;
+            width: 56px; height: 56px;
+            border: 1px solid rgba(221, 192, 112, 0.45);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 35% 28%, #ecd9a0, #c9a227 55%, #8a691f);
+            color: #0c1430;
+            font-size: 22px; line-height: 1;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 10px 26px -8px rgba(201, 162, 39, 0.55);
+            transition: transform 0.5s var(--kf-spring), box-shadow 0.4s var(--kf-glide);
+            will-change: transform;
+        }
+        .kf-fab:active { transform: scale(0.86); transition: transform 0.08s var(--kf-glide); }
+        .kf-dial.open .kf-fab { transform: rotate(135deg); }
+        .kf-dial.open .kf-fab:active { transform: rotate(135deg) scale(0.9); }
+        /* ── آیتم‌های کمان ── */
+        .kf-item {
+            position: absolute; left: 8px; bottom: 8px;
+            width: 40px; height: 40px;
+            display: grid; place-items: center;
+            border: 1px solid rgba(221, 192, 112, 0.28);
+            border-radius: 50%;
+            background: rgba(16, 26, 61, 0.92);
+            color: #ecd9a0; font-size: 17px; text-decoration: none;
+            opacity: 0;
+            transform: translate(0, 0) scale(0.35);
+            pointer-events: none;
+            transition:
+                transform 0.5s var(--kf-spring),
+                opacity 0.32s var(--kf-glide),
+                background 0.25s var(--kf-glide),
+                border-color 0.25s var(--kf-glide);
+            will-change: transform;
+        }
+        .kf-item:hover { background: rgba(37, 53, 107, 0.95); border-color: #ddc070; }
+        .kf-item .kf-lb {
+            position: absolute; left: 48px; white-space: nowrap;
+            font-size: 11.5px; font-weight: 700; color: #d6dcec;
+            background: rgba(7, 12, 31, 0.88);
+            border: 1px solid rgba(221, 192, 112, 0.25);
+            padding: 4px 10px; border-radius: 999px;
+            opacity: 0; transform: translateX(-8px);
+            transition: transform 0.4s var(--kf-spring), opacity 0.3s var(--kf-glide);
+            pointer-events: none;
+        }
+        .kf-item:hover .kf-lb { opacity: 1; transform: translateX(0); }
+        /* کمانِ باز — ۴ آیتم، ربع راست‌وبالا، شعاع ۹۲ در گام‌های ۳۰° */
+        .kf-dial.open .kf-item { opacity: 1; pointer-events: auto; }
+        .kf-dial.open .kf-item:nth-child(2) { transform: translate(0,  -92px) scale(1); transition-delay: 0.02s; }
+        .kf-dial.open .kf-item:nth-child(3) { transform: translate(46, -80px) scale(1); transition-delay: 0.08s; }
+        .kf-dial.open .kf-item:nth-child(4) { transform: translate(80, -46px) scale(1); transition-delay: 0.14s; }
+        .kf-dial.open .kf-item:nth-child(5) { transform: translate(92,   0)   scale(1); transition-delay: 0.20s; }
+        /* جمع‌شدنِ سریع (بدون استگرِ دیرکردی — ادای فنرِ برگشت) */
+        .kf-dial:not(.open) .kf-item { transition-delay: 0s; }
+        @media (max-width: 640px) { .kf-dial { left: 16px; bottom: 16px; } }
+        /* ── لنگر پنل‌ها — پنلِ بازشده از داک، بالای دکمه ✦ ظاهر می‌شود ──
+           anchor بدون اندازه است؛ پنل‌ها absolute از گوشهٔ پایین-چپ آن باز می‌شوند
+           تا پنلِ بسته (visibility:hidden) جایی را اشغال/کلیک‌گیر نکند. */
+        #kfPanelAnchor { position: fixed; left: 30px; bottom: 92px; width: 0; height: 0; z-index: 3650; }
+        #kfPanelAnchor > * {
+            position: absolute !important;
+            left: 0 !important; right: auto !important; top: auto !important; bottom: 0 !important;
+            margin: 0 !important; max-width: calc(100vw - 44px);
+        }
+        @media (max-width: 640px) { #kfPanelAnchor { left: 20px; bottom: 84px; } }
+        @media (prefers-reduced-motion: reduce) {
+            .kf-fab, .kf-item, .kf-item .kf-lb { transition: opacity 0.2s var(--kf-glide); }
+            .kf-dial.open .kf-item { transition-delay: 0s; }
+        }
+
         .sidebar-backdrop {
             position: fixed;
             inset: 0;
@@ -562,6 +652,33 @@
         }
 
         .menu-toggle:hover { border-color: var(--gold-400); }
+
+        /* ─── نام سایت در نوار بالا — هایلایتِ روان (shimmer) ───
+           گرادیان عریض (محو ← زرّ روشن ← محو) روی متن clip شده و
+           background-position بینهایت می‌لغزد. کی‌فریم shimmerِ موجود
+           (اسکلتون سایدبار) همین حرکت را دارد؛ فقط سرعت ۳ ثانیه. */
+        .topbar-brand {
+            font-family: "Cinzel", serif;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            white-space: nowrap;
+            flex-shrink: 0;
+            cursor: pointer;
+            background: linear-gradient(100deg,
+                rgba(184, 172, 142, 0.55) 30%, #ffd976 50%, rgba(184, 172, 142, 0.55) 70%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .topbar-brand { animation: none; }
+        }
+        @media (max-width: 640px) {
+            .topbar-brand { display: none; }   /* نوار شلوغ موبایل */
+        }
 
         .topbar-visualizer {
             height: 32px;
@@ -1295,26 +1412,30 @@
         }
         .hm-fact-lb { font-size: 11.5px; color: var(--co-ink-faint); margin-top: 5px; }
 
-        /* ── صفحهٔ ماه: اسطرلاب + دیسکِ زنده ── */
+        /* ── صفحهٔ ماه: دیسکِ زنده + حلقهٔ برچسب‌های تاریخ (بدون رینگ روی عکس) ── */
         .hm-dial { width: min(360px, 88%); margin-inline: auto; }
         .hm-dial .astrolabe { width: 100%; }
         .hm-dial-frame {
             position: relative;
             aspect-ratio: 1;
             border-radius: 50%;
-            background: radial-gradient(circle at 50% 42%, rgba(16, 26, 61, 0.85), rgba(7, 12, 31, 0.35) 70%, transparent 100%);
         }
-        .hm-dial .astrolabe { position: absolute; inset: 0; margin: 0; }
+        .hm-dial .astrolabe { position: absolute; inset: 0; margin: 0; pointer-events: none; }
         .hm-dial-moon {
-            position: absolute; inset: 0;
+            position: absolute;
+            width: 50%; height: 50%;           /* محصور در حلقه — هرگز روی برچسب‌ها grow نمی‌کند */
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
             display: grid; place-items: center;
             pointer-events: none;
+            z-index: 1;
         }
         .hm-dial-moon svg {
-            width: 38%; height: 38%;
-            filter: drop-shadow(0 0 26px rgba(159, 212, 224, 0.35));
+            width: 100% !important; height: 100% !important;   /* عرض attribute پیش‌فرض (150px) را بی‌اثر می‌کند */
+            filter: drop-shadow(0 0 16px rgba(159, 212, 224, 0.3));
             animation: hmFloat 7s ease-in-out infinite;
         }
+        .hm-dial .astrolabe svg { z-index: 0; }
         @keyframes hmFloat {
             0%, 100% { transform: translateY(0) scale(1); }
             50%      { transform: translateY(-7px) scale(1.03); }
@@ -1404,6 +1525,61 @@
         .hm-svc-chips { display: flex; gap: 6px; flex-wrap: wrap; }
         .hm-svc-go { color: var(--co-gold-400); font-size: 12.5px; font-weight: 700; transition: color .2s, transform .2s; }
         .hm-svc:hover .hm-svc-go { color: var(--co-gold-200); transform: translateX(-4px); }
+
+        /* ═══════ Rack-focus — فوکوس‌کشی سینمایی روی گروه «تحلیل چارت» ═══════
+           دو صفحهٔ عمق: کارت فرد = «نزدیک»، زوج = «دور». همیشه یک صفحه تیز است؛
+           نرم‌شده blur + کم‌نور + کمی درشت، و جاها با منحنی in-out عوض می‌شوند.
+           بوکهٔ هر صفحه دقیقاً وقتی آن صفحه نرم می‌شود متورم و روشن می‌گردد. */
+        .hm-grid.rack { position: relative; }
+        .hm-grid.rack > .hm-svc { z-index: 1; will-change: filter, opacity, scale; }
+        .hm-grid.rack > .rack-bokeh {
+            position: absolute; inset: -14px -4px; z-index: 0; pointer-events: none;
+            background-repeat: no-repeat;
+        }
+        .rack-bokeh.b-near {
+            background-image:
+                radial-gradient(circle 30px at 12% 22%, rgba(236,217,160,.34), transparent 68%),
+                radial-gradient(circle 18px at 38% 78%, rgba(221,192,112,.30), transparent 66%),
+                radial-gradient(circle 40px at 72% 30%, rgba(236,217,160,.24), transparent 70%),
+                radial-gradient(circle 14px at 88% 70%, rgba(253,236,189,.36), transparent 62%);
+        }
+        .rack-bokeh.b-far {
+            background-image:
+                radial-gradient(circle 22px at 22% 60%, rgba(159,212,224,.28), transparent 66%),
+                radial-gradient(circle 34px at 58% 14%, rgba(159,212,224,.22), transparent 70%),
+                radial-gradient(circle 16px at 82% 42%, rgba(162,155,254,.26), transparent 62%),
+                radial-gradient(circle 26px at 92% 86%, rgba(159,212,224,.24), transparent 68%);
+        }
+        .hm-grid.rack .hm-svc:nth-child(odd)  { animation: pull-near 7.4s cubic-bezier(.65,0,.35,1) infinite; }
+        .hm-grid.rack .hm-svc:nth-child(even) { animation: pull-far  7.4s cubic-bezier(.65,0,.35,1) infinite; }
+        /* فوکوس دنبالِ نشانگر: hovered card sharp — !important بر انیمیشن اولویت دارد */
+        .hm-grid.rack .hm-svc:hover { filter: blur(0) !important; opacity: 1 !important; scale: 1.01 !important; }
+        .hm-grid.rack .rack-bokeh.b-near { animation: bokeh-near 7.4s cubic-bezier(.65,0,.35,1) infinite; }
+        .hm-grid.rack .rack-bokeh.b-far  { animation: bokeh-far  7.4s cubic-bezier(.65,0,.35,1) infinite; }
+        @keyframes pull-near {
+            0%, 34%  { filter: blur(0);   opacity: 1;   scale: 1; }
+            50%, 84% { filter: blur(6px); opacity: .42; scale: 1.03; }
+            100%     { filter: blur(0);   opacity: 1;   scale: 1; }
+        }
+        @keyframes pull-far {   /* معکوسِ دقیق — هیچ‌گاه دو صفحه تیز نمی‌شوند */
+            0%, 34%  { filter: blur(6px); opacity: .42; scale: 1.03; }
+            50%, 84% { filter: blur(0);   opacity: 1;   scale: 1; }
+            100%     { filter: blur(6px); opacity: .42; scale: 1.03; }
+        }
+        @keyframes bokeh-near { /* می‌درخشد وقتی صفحهٔ نزدیک نرم می‌شود */
+            0%, 34%  { opacity: .12; scale: .94; }
+            50%, 84% { opacity: .9;  scale: 1.22; }
+            100%     { opacity: .12; scale: .94; }
+        }
+        @keyframes bokeh-far {  /* می‌درخشد وقتی صفحهٔ دور نرم می‌شود */
+            0%, 34%  { opacity: .9;  scale: 1.22; }
+            50%, 84% { opacity: .12; scale: .94; }
+            100%     { opacity: .9;  scale: 1.22; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hm-grid.rack .hm-svc:nth-child(odd), .hm-grid.rack .hm-svc:nth-child(even) { animation: none; }
+            .hm-grid.rack .rack-bokeh { animation: none; opacity: 0; }
+        }
 
         /* ── نوار اطمینان (جای about) ── */
         .hm-band {
@@ -3301,6 +3477,20 @@
     </aside>
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
+    <!-- لنگر پنل‌های داک — پنلِ بازشده کنار دکمه ✦ قرار می‌گیرد -->
+    <div id="kfPanelAnchor"></div>
+
+    <!-- ⭕ ناوبری جنبشی (Kinetics Speed-Dial) — ۴ ابزارِ تاپ‌بار -->
+    <nav class="kf-dial" id="kfDial" aria-label="ابزارهای سریع">
+        <button class="kf-fab" id="kfFab" aria-expanded="false" aria-controls="kfItems" title="ابزارها">✦</button>
+        <div id="kfItems" role="menu">
+            <button type="button" class="kf-item" data-kf-open="cosmicStatusPanel" data-kf-api="CosmicStatus" role="menuitem">🌌<span class="kf-lb">وضعیت آسمان</span></button>
+            <button type="button" class="kf-item" data-kf-open="earthStatusPanel"  data-kf-api="EarthStatus"  role="menuitem">🌍<span class="kf-lb">وضعیت زمین</span></button>
+            <button type="button" class="kf-item" data-kf-open="yogaSummaryPanel"  data-kf-api="YogaSummary"  role="menuitem">🧘<span class="kf-lb">وضعیت یوگا</span></button>
+            <button type="button" class="kf-item" data-kf-open="zodiacPanel"       data-kf-api="ZodiacDisplay" role="menuitem">🐉<span class="kf-lb">سال حیوانی</span></button>
+        </div>
+    </nav>
+
     <!-- ===== محتوای اصلی ===== -->
     <div class="cosmic-main">
 
@@ -3308,6 +3498,7 @@
         <div class="topbar">
             <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">☰</button>
             <canvas class="topbar-orb" id="topbarOrb" width="32" height="32"></canvas>
+            <span class="topbar-brand">Cosmic&nbsp;Oracle</span>
             <canvas class="topbar-visualizer" id="topbarVisualizer" width="120" height="32"></canvas>
             <div class="topbar-player" id="topbarPlayerSlot"></div>
             <div class="topbar-spacer"></div>
@@ -3513,47 +3704,41 @@
                 <!-- ستون صفحه‌ی ماه: اسطرلاب + دیسک زنده -->
                 <div class="hm-dial">
                 <div class="hm-dial-frame">
-                <div class="astrolabe" aria-hidden="true">
-                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="200" cy="200" r="196" fill="none" stroke="#c9a227" stroke-opacity="0.55" stroke-width="1.6"/>
-                        <circle cx="200" cy="200" r="186" fill="none" stroke="#c9a227" stroke-opacity="0.22" stroke-width="1"/>
-                        <circle cx="200" cy="200" r="150" fill="none" stroke="#c9a227" stroke-opacity="0.28" stroke-width="1"/>
-                        <circle cx="200" cy="200" r="96" fill="none" stroke="#c9a227" stroke-opacity="0.22" stroke-width="1"/>
-                        <circle cx="200" cy="200" r="26" fill="none" stroke="#c9a227" stroke-opacity="0.4" stroke-width="1.2"/>
-                        <circle cx="200" cy="128" r="86" fill="none" stroke="#ddc070" stroke-opacity="0.14" stroke-width="0.8"/>
-                        <circle cx="200" cy="272" r="86" fill="none" stroke="#ddc070" stroke-opacity="0.14" stroke-width="0.8"/>
-                        <line x1="50" y1="200" x2="350" y2="200" stroke="#ddc070" stroke-opacity="0.12" stroke-width="0.8"/>
-                        <line x1="200" y1="50" x2="200" y2="350" stroke="#ddc070" stroke-opacity="0.12" stroke-width="0.8"/>
-                        <line x1="94" y1="94" x2="306" y2="306" stroke="#ddc070" stroke-opacity="0.1" stroke-width="0.8"/>
-                        <line x1="306" y1="94" x2="94" y2="306" stroke="#ddc070" stroke-opacity="0.1" stroke-width="0.8"/>
-                        <g class="ring-ticks" fill="#ddc070">
-                            <rect x="199" y="10"  width="2" height="7" rx="1" opacity="0.85"/>
-                            <rect x="199" y="22"  width="2" height="5" rx="1" opacity="0.4"/>
-                            <rect x="199" y="32"  width="2" height="5" rx="1" opacity="0.4"/>
-                            <rect x="199" y="42"  width="2" height="5" rx="1" opacity="0.4"/>
-                            <rect x="199" y="52"  width="2" height="5" rx="1" opacity="0.4"/>
-                        </g>
-                        <g font-family="Georgia, 'Times New Roman', serif" fill="#ecd9a0" font-size="17" text-anchor="middle">
-                            <text x="200" y="52">♈</text>
-                            <text x="270" y="74">♉</text>
-                            <text x="322" y="126">♊</text>
-                            <text x="344" y="202">♋</text>
-                            <text x="322" y="278">♌</text>
-                            <text x="270" y="330">♍</text>
-                            <text x="200" y="352">♎</text>
-                            <text x="130" y="330">♏</text>
-                            <text x="78" y="278">♐</text>
-                            <text x="56" y="202">♑</text>
-                            <text x="78" y="126">♒</text>
-                            <text x="130" y="74">♓</text>
-                        </g>
-                        <g class="sweep-arm">
-                            <line x1="200" y1="200" x2="200" y2="62" stroke="#c9a227" stroke-opacity="0.8" stroke-width="1.4"/>
-                            <circle cx="200" cy="62" r="4.5" fill="#ddc070"/>
-                            <circle cx="200" cy="200" r="4" fill="#c9a227"/>
-                        </g>
-                    </svg>
-                </div>
+                <div class="astrolabe" id="zodiacDial" aria-hidden="true"></div>
+                <script>
+                /* حلقهٔ برج‌ها — فقط ۱۲ برچسب تاریخ، بیرونِ عکسِ ماه؛
+                   هیچ حلقه/نماد/درجه‌بندی روی تصویر نمی‌افتد */
+                (function () {
+                    var host = document.getElementById('zodiacDial'); if (!host) return;
+                    var FAD = '۰۱۲۳۴۵۶۷۸۹';
+                    function fa(s) { return String(s).replace(/\d/g, function (d) { return FAD[+d]; }); }
+                    var R = ['21/3 – 20/4','21/4 – 20/5','21/5 – 21/6','22/6 – 22/7','23/7 – 22/8','23/8 – 22/9',
+                             '23/9 – 22/10','23/10 – 21/11','22/11 – 21/12','22/12 – 19/1','20/1 – 18/2','19/2 – 20/3'];
+                    function signIdx(m, d) {   // 0=♈ … 11=♓ — تقویمِ برجی رایج
+                        var v = m * 100 + d;
+                        if (v >= 321 && v <= 420) return 0;   if (v >= 421 && v <= 520) return 1;
+                        if (v >= 521 && v <= 621) return 2;   if (v >= 622 && v <= 722) return 3;
+                        if (v >= 723 && v <= 822) return 4;   if (v >= 823 && v <= 922) return 5;
+                        if (v >= 923 && v <= 1022) return 6;  if (v >= 1023 && v <= 1121) return 7;
+                        if (v >= 1122 && v <= 1221) return 8; if (v >= 1222 || v <= 119) return 9;
+                        if (v >= 120 && v <= 218) return 10;  return 11;
+                    }
+                    var hl = signIdx(new Date().getMonth() + 1, new Date().getDate());
+                    /* شعاع ۱۵۸ (از ۲۰۰) — بیرونِ کادرِ ماه (r≈۱۰۰) با فاصله */
+                    var RR = 158, s = '<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">';
+                    for (var k = 0; k < 12; k++) {
+                        var a = (k * 30 - 90) * Math.PI / 180;
+                        var x = (200 + RR * Math.cos(a)).toFixed(1), y = (200 + RR * Math.sin(a)).toFixed(1);
+                        var isH = k === hl;
+                        s += '<text x="' + x + '" y="' + y + '" text-anchor="middle" dominant-baseline="middle" direction="ltr" unicode-bidi="bidi-override"'
+                            + ' font-family="Georgia, \'Times New Roman\', serif" font-size="11.5" font-weight="700"'
+                            + ' fill="' + (isH ? '#f3e5b8' : '#93a0c4') + '" opacity="' + (isH ? 1 : 0.72) + '"'
+                            + (isH ? ' style="filter:drop-shadow(0 0 6px rgba(201,162,39,.5))"' : '') + '>' + fa(R[k]) + '</text>';
+                    }
+                    s += '</svg>';
+                    host.innerHTML = s;
+                })();
+                </script>
 
                 <!-- دیسکِ زندهٔ ماه — در مرکز اسطرلاب (theme.js پر می‌کند) -->
                 <div class="hm-dial-moon" id="hmDialMoon" aria-hidden="true"></div>
@@ -3574,7 +3759,7 @@
                     <span class="hm-group-count">۶ ابزار</span>
                     <span class="hm-group-sub">مبتنی بر اخترشناسی ودیک — هر ابزار موتور خودش را همان لحظه بارگذاری می‌کند</span>
                 </div>
-                <div class="hm-grid">
+                <div class="hm-grid rack">
                     <div class="hm-svc" onclick="openService('birth')">
                         <span class="hm-svc-no">۰۱</span>
                         <div class="hm-svc-top"><span class="hm-svc-icon"><img src="static/images/services/birth.svg" alt=""></span><span class="hm-svc-name">چارت تولد</span></div>
@@ -3611,6 +3796,9 @@
                         <div class="hm-svc-desc">تمرکز عاطفی و موضوعات مهمِ ماهِ پیشِ رو را کشف کنید و آگاهانه‌تر برنامه بریزید.</div>
                         <div class="hm-svc-foot"><div class="hm-svc-chips"><span class="co-chip">ماهانه</span></div><span class="hm-svc-go">باز کردن ←</span></div>
                     </div>
+                    <!-- دو صفحهٔ بوکه — هر کدام با نرم‌شدن صفحه‌اش متورم و روشن می‌شود -->
+                    <div class="rack-bokeh b-near" aria-hidden="true"></div>
+                    <div class="rack-bokeh b-far" aria-hidden="true"></div>
                 </div>
             </section>
 
@@ -4569,7 +4757,7 @@
     <script src="static/preset-calendar.js?v=5"></script>
     <script src="static/city-selector.js?v=9"></script>
     <script src="static/spa-router.js?v=8"></script>
-    <script src="static/script.js?v=44"></script>
+    <script src="static/script.js?v=45"></script>
     <script src="static/yoga-data-loader.js?v=1"></script>
     <script src="static/yoga-core.js?v=3"></script>
     <script src="static/yoga-library.js?v=15"></script>
@@ -4577,21 +4765,25 @@
     <script src="static/yoga-practice.js?v=6"></script>
     <script src="static/yoga-player.js?v=25"></script>
     <script src="static/yoga-karma-store.js?v=5"></script>
-    <script src="static/admin-panel.js?v=4"></script>
+    <script src="static/admin-panel.js?v=7"></script>
     <script src="static/breath-module.js?v=1"></script>
     <script src="static/quality-of-life.js?v=1"></script>
     <script src="static/moon-phase.js?v=8"></script>
     <script src="static/theme.js?v=2"></script>
     <script src="static/theme-showcase.js?v=1"></script>
     <script src="static/zodiac-display.js?v=8"></script>
-    <script src="static/cosmic-status.js?v=14"></script>
-    <script src="static/earth-status.js?v=4"></script>
-    <script src="static/yoga-summary.js?v=2"></script>
-    <script src="static/yoga-test.js?v=3"></script>
+    <script src="static/location-service.js?v=1"></script>
+    <script src="static/cosmic-status.js?v=15"></script>
+    <script src="static/earth-status.js?v=5"></script>
+    <script src="static/yoga-summary.js?v=3"></script>
+    <script src="static/yoga-test.js?v=4"></script>
     <script src="static/daily-dashboard.js?v=9"></script>
-    <script src="static/audio-manager.js?v=6"></script>
-    <script src="static/my-dashboard.js?v=12"></script>
-    <script src="static/daily-reminder.js?v=7"></script>
+    <script src="static/audio-manager.js?v=7"></script>
+    <script src="static/vinyl-player.js?v=4"></script>
+    <script src="static/audio-admin.js?v=1"></script>
+    <script src="static/background-admin.js?v=1"></script>
+    <script src="static/my-dashboard.js?v=13"></script>
+    <script src="static/daily-reminder.js?v=8"></script>
 
     <script>
     /* ================================================================
@@ -4780,6 +4972,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         window.showPage = showPage;
+        /* اعلام صفحه به پلیر وینیلی (برای تخصیص موسیقی هر بخش) */
+        var _origShowPage = showPage;
+        window.showPage = function (name) {
+            var r = _origShowPage.apply(this, arguments);
+            if (window.VinylPlayer) { try { VinylPlayer.setSection(name || 'site'); } catch (_) {} }
+            return r;
+        };
 
         /* اسکرول نرم داخل صفحهٔ قالب بصری */
         window.tpScroll = function (e, id) {
@@ -4849,7 +5048,10 @@
         };
 
         /* کلیک روی برندِ نوار بالا → بازگشت به خانه */
-        // topbar-brand removed — visualizer takes its place
+        var _topBrand = document.querySelector('.topbar-brand');
+        if (_topBrand) _topBrand.addEventListener('click', function () {
+            if (window.navigateToNav) window.navigateToNav('home'); else showPage('home');
+        });
 
         document.getElementById('menuToggle').addEventListener('click', function () {
             if (body.classList.contains('sidebar-collapsed')) {
@@ -4859,6 +5061,79 @@
         });
         var backdrop = document.getElementById('sidebarBackdrop');
         if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+        /* ── KF Kinetic Nav — سیدیال + پنل‌های پارک‌شده کنار ✦ ──
+           پنل هر ماژول با API خودش باز/بسته می‌شود و وقتی از داک باز
+           می‌شود به #kfPanelAnchor منتقل می‌گردد (کنار دکمه، نه تاپ‌بار). */
+        (function () {
+            var dial = document.getElementById('kfDial');
+            var fab = document.getElementById('kfFab');
+            var anchor = document.getElementById('kfPanelAnchor');
+            if (!dial || !fab || !anchor) return;
+            var openPanel = null;   // پنلِ پارک‌شدهٔ فعلی
+            function setDial(open) {
+                dial.classList.toggle('open', open);
+                fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
+            function parkPanel(panel) {
+                if (!panel || panel.parentElement === anchor) return;
+                panel._kfHome = panel.parentElement;
+                anchor.appendChild(panel);
+            }
+            function restorePanel() {
+                if (!openPanel) return;
+                var p = document.getElementById(openPanel);
+                if (p && p.parentElement === anchor && p._kfHome) p._kfHome.appendChild(p);
+                openPanel = null;
+            }
+            function closeOpen() {
+                if (!openPanel) return;
+                var p = document.getElementById(openPanel);
+                if (p) p.classList.remove('open');
+                restorePanel();
+            }
+            // آیتم‌ها → API خودِ ماژول (بدون کلیک مجازی روی تاپ‌بار)
+            dial.querySelectorAll('.kf-item').forEach(function (item) {
+                item.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    var wasOnThis = openPanel && item.getAttribute('data-kf-open') === openPanel;
+                    closeOpen();
+                    setDial(false);
+                    if (wasOnThis) return;               // کلیک دوباره روی همان = بستن
+                    var tapId = item.getAttribute('data-kf-tap');
+                    var panelId = item.getAttribute('data-kf-open');
+                    var apiName = item.getAttribute('data-kf-api');
+                    var panel = panelId ? document.getElementById(panelId) : null;
+                    if (panel && panelId !== 'actionsMenu' && panelId !== 'profilePanel') {
+                        parkPanel(panel);
+                        openPanel = panelId;
+                        if (apiName === 'ZodiacDisplay' && window.ZodiacDisplay) ZodiacDisplay.showModal();
+                        else if (window[apiName]) window[apiName].toggle();
+                        else panel.classList.add('open');
+                    } else if (tapId) {
+                        var btn = document.getElementById(tapId);
+                        if (btn) {
+                            if (panel) parkPanel(panel);
+                            openPanel = panelId || null;
+                            btn.click();                  // coordinator تکی است — دوتاگل ندارد
+                        }
+                    }
+                });
+            });
+            // بستن با کلیک بیرون / Escape / ناوبری — پنل را هم به جای خودش برمی‌گرداند
+            document.addEventListener('click', function (e) {
+                if (openPanel && !document.getElementById(openPanel).contains(e.target) && !dial.contains(e.target)) closeOpen();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { setDial(false); closeOpen(); }
+            });
+            window.addEventListener('hashchange', function () { setDial(false); closeOpen(); });
+            fab.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeOpen();
+                setDial(!dial.classList.contains('open'));
+            });
+        })();
 
         /* Ctrl+B for sidebar toggle */
         document.addEventListener('keydown', function (e) {

@@ -1605,7 +1605,8 @@ window.AudioManager = {
     isPlaying: function() { return bgmPlaying && !bgmPaused; },
     // Init
     init: function() {
-        createPlayerWidget();
+        // اگر پلیر وینیلی (vinyl-player.js) فعال است، ویجت قدیمی ساخته نشود تا تداخل نکند
+        if (!window.VinylPlayer) createPlayerWidget();
         // بعد از hydrate، پلی‌لیست/نام‌ها/فایل‌ها را بازتاب بده
         hydrateSettingsFromServer('audio', AUDIO_DB_KEY, updatePlayerUI);
         hydrateSettingsFromServer('backgrounds', BG_DB_KEY);

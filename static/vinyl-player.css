@@ -1,0 +1,229 @@
+/* ═══════════════════════════════════════
+   VINYL PLAYER — نسخه ساید‌باری (کارت خاکستری، دکمه سفید)
+   داخل سایدبار، بالای فوتر سوار می‌شود؛ در صفحات بدون سایدبار
+   به‌صورت شناور گوشه صفحه می‌نشیند (vp-float).
+   ═══════════════════════════════════════ */
+
+/* جایگاه قدیمی تاپ‌بار دیگر استفاده نمی‌شود */
+#topbarPlayerSlot { display: none; }
+
+.vp {
+    --vp-gold: #ddc070;
+    --vp-gold-2: #f3e5b8;
+    --vp-gray: #2b3352;
+    --vp-gray-2: #232a45;
+    position: relative;
+    direction: ltr;
+    font-family: "Vazirmatn", system-ui, sans-serif;
+}
+.vp.vp-empty { display: none; }
+
+/* بلوک داخل سایدبار */
+.vp-wrap {
+    margin: 14px 12px 12px;
+    padding-top: 10px;          /* جا برای بیرون‌زدگی دیسک */
+    position: relative;
+}
+/* حالت شناور (صفحات بدون سایدبار) */
+.vp.vp-float {
+    position: fixed;
+    left: 22px;
+    bottom: 22px;
+    z-index: 3500;
+    width: 240px;
+}
+
+/* ─── کارت کنترل (خاکستری) ─── */
+.vp-panel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    height: 52px;
+    padding: 0 8px 0 54px;
+    background: var(--vp-gray);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* ─── دیسک ─── */
+.vp-disc {
+    position: absolute;
+    left: 6px;
+    top: -9px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 50%, #0c1430 0 21%, transparent 22%),
+        repeating-radial-gradient(circle at 50% 50%, #12183a 0 2px, #232f5c 3px 4px);
+    box-shadow: 0 0 0 4px rgba(8, 13, 32, 0.9), 0 4px 12px rgba(0, 0, 0, 0.45);
+    transform: scale(1);
+    transition: all 0.45s ease;
+}
+.vp-disc::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    background: #b9bfd1;            /* مرکز خاکستری (به‌جای سفید) */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: inset 0 0 0 2px var(--vp-gold);
+}
+.vp-panel.active .vp-disc {
+    box-shadow: 0 0 0 4px rgba(8, 13, 32, 0.9), 0 0 16px 4px rgba(221, 192, 112, 0.35);
+    animation: vp-spin 3s linear infinite;
+}
+@keyframes vp-spin { to { transform: rotate(360deg); } }
+
+/* ─── کنترل‌ها (دکمه‌های سفید) ─── */
+.vp-controls { display: flex; align-items: center; gap: 4px; height: 100%; }
+.vp-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: #fff;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    position: relative;
+    transition: background-color 0.25s ease;
+}
+.vp-btn:hover { background: #e6e9f2; }
+.vp-btn:active { transform: scale(0.92); }
+
+.vp-play::before {
+    content: "";
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 7px 0 7px 11px;
+    border-color: transparent transparent transparent #c2c6cf;   /* آیکون خاکستری روی دکمه سفید */
+    margin-left: 3px;
+}
+.vp-play.is-playing::before {
+    border-width: 0;
+    width: 11px; height: 13px;
+    margin-left: 0;
+    background:
+        linear-gradient(#c2c6cf, #c2c6cf) left/4px 100% no-repeat,
+        linear-gradient(#c2c6cf, #c2c6cf) right/4px 100% no-repeat;
+}
+.vp-prev::before, .vp-next::before {
+    content: "";
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 6px 0 6px 10px;
+}
+.vp-prev::before {
+    border-color: transparent transparent transparent #c2c6cf;
+    transform: scaleX(-1);
+    margin-right: 2px;
+}
+.vp-next::before {
+    border-color: transparent transparent transparent #c2c6cf;
+    margin-left: 2px;
+}
+.vp-prev::after, .vp-next::after {
+    content: "";
+    position: absolute;
+    width: 2px; height: 12px;
+    background: #c2c6cf;
+    border-radius: 1px;
+}
+.vp-prev::after { right: 7px; }
+.vp-next::after { left: 7px; }
+
+/* ─── نوار اطلاعات — داخل خود کارت (بدون پنل جداگانه) ─── */
+.vp-info {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    padding: 2px 104px 8px 54px;      /* چپ=جای دیسک، راست=جای دکمه‌ها، پایین=خط پیشرفت */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    opacity: 1;
+    transform: none;
+    pointer-events: none;              /* کلیک‌های خالی به خود کارت می‌رسد */
+}
+.vp-name {
+    display: block;
+    font-size: 12px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: var(--vp-gold-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    pointer-events: auto;              /* کلیک روی نام → فهرست پخش */
+}
+.vp-time { display: block; font-size: 10px; line-height: 1.1; color: #aab2cd; white-space: nowrap; overflow: hidden; }
+.vp-time b { color: var(--vp-gold); font-weight: 700; }
+.vp-progress {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 5px;
+    height: 3px;
+    background: rgba(236, 230, 214, 0.12);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.vp-bar {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: linear-gradient(90deg, var(--vp-gold), var(--vp-gold-2));
+    border-radius: 2px;
+    transition: width 0.25s linear;
+}
+
+/* ─── فهرست پخش ─── */
+.vp-list {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 4px);
+    background: rgba(12, 20, 48, 0.97);
+    border: 1px solid rgba(221, 192, 112, 0.3);
+    border-radius: 14px;
+    padding: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    z-index: 6;
+}
+.vp-list.show { display: block; }
+.vp-list-title { font-size: 10px; color: #8a93b8; padding: 2px 6px 6px; }
+.vp-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--vp-gold-2);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.vp-item:hover { background: rgba(221, 192, 112, 0.1); }
+.vp-item.active { background: rgba(221, 192, 112, 0.18); font-weight: 700; }
+.vp-item-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* سایدبار جمع‌شده: پلیر مخفی */
+body.cosmic.sidebar-collapsed .vp-wrap { display: none; }
+
+/* شناور موبایل */
+@media (max-width: 640px) {
+    .vp.vp-float { left: 12px; bottom: 12px; width: 210px; }
+}

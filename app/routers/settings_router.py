@@ -7,7 +7,7 @@ cosmic.db (جدول app_settings) ذخیره می‌شوند تا برای هم�
 
 - GET  /settings/{ns}        → عمومی (همه می‌خوانند: پلن‌ها و پس‌زمینه‌ها لازمند)
 - PUT  /settings/{ns}        → فقط ادمین
-- ns معتبر: plans | audio | backgrounds
+- ns معتبر: plans | audio | backgrounds | tracks
 """
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,7 +21,7 @@ import json
 
 router = APIRouter(prefix="/api/v5/settings", tags=["Settings"])
 
-VALID_NAMESPACES = ("plans", "audio", "backgrounds")
+VALID_NAMESPACES = ("plans", "audio", "backgrounds", "tracks")
 
 
 async def _read_ns(db: AsyncSession, ns: str):

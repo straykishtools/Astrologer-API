@@ -11,12 +11,15 @@ var dom = {};
 var isOpen = false;
 var _meteo = null, _meteoAt = 0;
 var _asteroids = null, _asteroidsAt = 0;
+var _meteoLoc = null;   // لوکیشن آخرین fetch (برای بج «📍»)
+/* لوکیشن مرورگر تازه رسید → کش باطل شود تا دفعه‌ی بعد با مختصات نو fetch شود */
+window.addEventListener('geoloc:change', function () { _meteo = null; _meteoAt = 0; });
 
 function fetchMeteo() {
     if (_meteo && (Date.now() - _meteoAt) < 30 * 60 * 1000) return Promise.resolve(_meteo);
-    var lat = (window.sharedInputs && window.sharedInputs.latitude) || 35.6892;
-    var lng = (window.sharedInputs && window.sharedInputs.longitude) || 51.3890;
-    return fetch('/api/v5/weather?lat=' + lat + '&lng=' + lng)
+    var loc = (window.GeoLoc && GeoLoc.resolve()) || { lat: 35.6892, lng: 51.3890 };
+    _meteoLoc = loc;
+    return fetch('/api/v5/weather?lat=' + loc.lat + '&lng=' + loc.lng)
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
             // status === 'partial' هم قبول است (یکی از دو سرویس کار کرده)
@@ -71,7 +74,7 @@ function render() {
 
     var html = '';
     html += '<div class="es-header">';
-    html += '<div class="es-header-title">🌍 وضعیت زمین</div>';
+    html += '<div class="es-header-title">🌍 وضعیت زمین <span id="esLocBadge" style="font-size:10.5px;font-weight:400;color:var(--ink-dim);"></span></div>';
     html += '<div class="es-header-date">' + persianDate + ' · ' + persianTime + '</div>';
     html += '</div>';
 
@@ -101,6 +104,15 @@ function render() {
 
     // ─── آب‌وهوا (OWM) + کیفیت هوا (AQICN) ───
     fetchMeteo().then(function (m) {
+        var badge = document.getElementById('esLocBadge');
+        if (badge) {
+            var loc = _meteoLoc || (window.GeoLoc && GeoLoc.resolve()) || null;
+            if (loc) {
+                var srcMark = loc.source === 'city' ? 'شهر انتخابی شما'
+                    : loc.source === 'browser' ? 'لوکیشن مرورگر' : 'پیش‌فرض';
+                badge.textContent = '· 📍 ' + loc.label + ' (' + srcMark + ')';
+            }
+        }
         var wErr = document.getElementById('esWeatherExtra');
         var airEl = document.getElementById('esAirContent');
         if (!m) {

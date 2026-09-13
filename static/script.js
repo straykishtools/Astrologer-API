@@ -1557,6 +1557,8 @@ function doSwitchTab(tab) {
     var btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
     if (btn) btn.classList.add('active');
     currentTab = tab;
+    /* اعلام بخش فعلی به پلیر وینیلی (تخصیص موسیقی هر سرویس) */
+    if (window.VinylPlayer) { try { VinylPlayer.setSection(tab); } catch (_) {} }
     var formHtml = formBuilders[tab]();
     var info = TAB_INFO[tab];
     if (info) formHtml = makeInfoSection(info.title, info.text) + formHtml;

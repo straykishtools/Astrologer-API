@@ -133,7 +133,7 @@ function getTodayMinutes() {
 var RECOMMENDATIONS = [
     { day: 0, type: 'meditation', name: 'مراقبه هدایت‌شده', icon: '🧘', desc: 'روز استراحت — مراقبه آرام برای بازیابی انرژی', panel: 'meditation', exercise: 'guided' },
     { day: 1, type: 'breathing', name: 'تنفس بوکس', icon: '📦', desc: 'شروع هفته با تمرکز و انرژی', panel: 'breathing', exercise: 'box' },
-    { day: 2, type: 'yoga', name: 'حرکات آسانا', icon: '🧘‍♂️', desc: 'روز تقویت بدن با حرکات یوگا', panel: 'breathing', exercise: 'asana' },
+    { day: 2, type: 'yoga', name: 'حرکات آسانا', icon: '🧘‍♂️', desc: 'روز تقویت بدن با حرکات یوگا', panel: 'yoga', exercise: '' },
     { day: 3, type: 'breathing', name: 'تنفس آتش', icon: '🔥', desc: 'نیمه هفته — افزایش انرژی با کاپالابهاتی', panel: 'breathing', exercise: 'kapalabhati' },
     { day: 4, type: 'meditation', name: 'اسکن بدن', icon: '🩷', desc: 'آرامش عمیق با اسکن بدن', panel: 'meditation', exercise: 'body_scan' },
     { day: 5, type: 'breathing', name: 'تنفس دیافراگمی', icon: '🌬️', desc: 'آماده شدن برای آخر هفته', panel: 'breathing', exercise: 'diaphragmatic' },
@@ -269,7 +269,7 @@ function render() {
     html += '<button class="ys-link" onclick="YogaSummary.quickStart(\'meditation\',\'guided\')"><span class="ys-link-icon">🧘</span><span class="ys-link-text">مراقبه</span></button>';
     html += '<button class="ys-link" onclick="YogaSummary.quickStart(\'meditation\',\'body_scan\')"><span class="ys-link-icon">🩷</span><span class="ys-link-text">اسکن بدن</span></button>';
     html += '<button class="ys-link" onclick="YogaSummary.quickStart(\'breathing\',\'diaphragmatic\')"><span class="ys-link-icon">🌬️</span><span class="ys-link-text">تنفس عمیق</span></button>';
-    html += '<button class="ys-link" onclick="YogaSummary.quickStart(\'breathing\',\'asana\')"><span class="ys-link-icon">🧘‍♂️</span><span class="ys-link-text">حرکات یوگا</span></button>';
+    html += '<button class="ys-link" onclick="YogaSummary.quickStart(\'yoga\',\'\')"><span class="ys-link-icon">🧘‍♂️</span><span class="ys-link-text">حرکات یوگا</span></button>';
     html += '</div>';
     html += '</div>';
 
@@ -279,6 +279,11 @@ function render() {
 // ─── Actions ───
 function quickStart(panel, exercise) {
     close();
+    // «یوگا» = صفحهٔ جدید یوگا (کتابخانه/جلسه/کلاسیک)؛ بقیه پنل شناور تنفس/مراقبه
+    if (panel === 'yoga') {
+        if (window.openService) openService('yoga');
+        return;
+    }
     if (window.YogaEngine) {
         YogaEngine.openPanel(panel);
         if (exercise) YogaEngine.setExercise(exercise);
