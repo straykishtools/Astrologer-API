@@ -311,10 +311,16 @@ def _is_valid_analysis(content: str) -> bool:
     return True
 
 
-async def _call_model(client, api_key, prompt, model):
+async def _call_model(client, api_key, prompt, model, messages=None):
     """Call a single model. Prefers the direct AI provider configured via
     env (AI_API_BASE + AI_API_KEY + AI_MODEL), falls back to the local
-    proxy when only DEEPSEEK_API_KEY is set."""
+    proxy when only DEEPSEEK_API_KEY is set. If `messages` is given, it is
+    used verbatim (conversation/chat); otherwise the astrologer-analysis
+    system+user pair is built from `prompt`."""
+    msgs = messages or [
+        {"role": "system", "content": "You are a professional astrologer. Write detailed Persian astrological analysis using HTML."},
+        {"role": "user", "content": prompt},
+    ]
     base = os.getenv("AI_API_BASE")
     if base:
         # direct provider (OpenAI-compatible)
@@ -326,10 +332,7 @@ async def _call_model(client, api_key, prompt, model):
             },
             json={
                 "model": os.getenv("AI_MODEL", model["name"]),
-                "messages": [
-                    {"role": "system", "content": "You are a professional astrologer. Write detailed Persian astrological analysis using HTML."},
-                    {"role": "user", "content": prompt}
-                ],
+                "messages": msgs,
                 "temperature": 0.75,
                 "max_tokens": model["max_tokens"],
                 "stream": False,
@@ -344,10 +347,7 @@ async def _call_model(client, api_key, prompt, model):
         },
         json={
             "model": model["name"],
-            "messages": [
-                {"role": "system", "content": "You are a professional astrologer. Write detailed Persian astrological analysis using HTML."},
-                {"role": "user", "content": prompt}
-            ],
+            "messages": msgs,
             "temperature": 0.75,
             "max_tokens": model["max_tokens"],
             "stream": False,
@@ -448,4 +448,66 @@ Challenging planets and ways to turn challenges into opportunities
             status_code=502,
             detail=f"All models failed. Errors: {'; '.join(errors)}"
         )
+
+
+class ChatTurn(BaseModel):
+    role: str
+    content: str
+
+
+class AstroChatRequest(BaseModel):
+    message: str
+    history: list[ChatTurn] = []
+    context: str = ""
+
+
+ASTRO_SYSTEM = (
+    "تو «کاسمیک اوراکل» هستی؛ یک اخترشناسِ ودیکِ مهربان و دقیق. "
+    "فارسیِ ساده، گرم و کوتاه (حداکثر ۴ جمله) پاسخ بده، بدون مارک‌داون و HTML. "
+    "اگر کاربر سؤالِ نجومی پرسید، بر پایهٔ نمادهای زودیاک/سیارات پاسخ بده؛ "
+    "اگر خارج از موضوع بود، ادبانه به اخترشناسی برگردان. وعدهٔ قطعیِ پیش‌گویی نده."
+)
+
+
+@router.post("/api/v5/astro-chat")
+async def astro_chat(request: AstroChatRequest):
+    """کوتاه‌مکالمه با اخترشناسِ AI. از همان پروایدر/پراکسیِ تحلیل استفاده می‌کند
+    (env: AI_API_BASE/AI_API_KEY/AI_MODEL یا DEEPSEEK_API_KEY + localhost:20128)."""
+    api_key = os.getenv("AI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="سرویس هوش مصنوعی پیکربندی نشده است")
+    msg = (request.message or "").strip()
+    if not msg:
+        raise HTTPException(status_code=422, detail="پیام خالی است")
+    if len(msg) > 1500:
+        msg = msg[:1500]
+
+    messages = [{"role": "system", "content": ASTRO_SYSTEM}]
+    if request.context.strip():
+        messages.append({"role": "system", "content": "زمینهٔ چارت کاربر (برای پاسخ دقیق‌تر):\n" + request.context.strip()[:2000]})
+    for h in request.history[-6:]:
+        role = "assistant" if h.role == "assistant" else "user"
+        c = (h.content or "").strip()
+        if c:
+            messages.append({"role": role, "content": c[:1200]})
+    messages.append({"role": "user", "content": msg})
+
+    model = {"name": os.getenv("AI_MODEL", "bai/glm-5.3-flash"), "max_tokens": 400}
+    async with httpx.AsyncClient(timeout=90.0, follow_redirects=True) as client:
+        try:
+            resp = await _call_model(client, api_key, msg, model, messages=messages)
+            if resp.status_code != 200:
+                logger.warning("[ASTRO-CHAT] HTTP %s", resp.status_code)
+                raise HTTPException(status_code=502, detail="پاسخ مدل ناموفق بود")
+            content = _extract_analysis_content(resp.text).strip()
+            # حذف برچسب‌های احتمالیِ مارک‌داون/HTML برای رندرِ تمیزِ توکن‌استریم
+            import re as _re
+            content = _re.sub(r"<[^>]+>", "", content)
+            content = _re.sub(r"[#*_`>]+", "", content).strip()
+            return {"status": "success", "reply": content, "model": model["name"]}
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.warning("[ASTRO-CHAT] %s: %s", type(e).__name__, e)
+            raise HTTPException(status_code=502, detail="ارتباط با مدل برقرار نشد")
 

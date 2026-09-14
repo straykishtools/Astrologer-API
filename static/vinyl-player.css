@@ -40,7 +40,7 @@
     align-items: center;
     justify-content: flex-end;
     width: 100%;
-    height: 52px;
+    height: 60px;
     padding: 0 8px 0 54px;
     background: var(--vp-gray);
     border: 1px solid rgba(255, 255, 255, 0.07);
@@ -138,6 +138,39 @@
 .vp-prev::after { right: 7px; }
 .vp-next::after { left: 7px; }
 
+/* ─── اسلایدر صدا (کنار دکمه‌ها) ─── */
+.vp-vol {
+    width: 52px;
+    height: 4px;
+    margin: 0 2px 0 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(236, 230, 214, 0.16);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    align-self: center;
+}
+.vp-vol::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--vp-gold-2);
+    border: 1px solid var(--vp-gold);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+.vp-vol::-moz-range-thumb {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--vp-gold-2);
+    border: 1px solid var(--vp-gold);
+    cursor: pointer;
+}
+.vp-vol::-moz-range-track { background: rgba(236, 230, 214, 0.16); height: 4px; border-radius: 2px; }
+
 /* ─── نوار اطلاعات — داخل خود کارت (بدون پنل جداگانه) ─── */
 .vp-info {
     position: absolute;
@@ -145,14 +178,21 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 1px;
-    padding: 2px 104px 8px 54px;      /* چپ=جای دیسک، راست=جای دکمه‌ها، پایین=خط پیشرفت */
+    gap: 3px;
+    padding: 4px 8px 10px 54px;        /* چپ=جای دیسک، پایین=خط پیشرفت */
     background: transparent;
     border: none;
     box-shadow: none;
     opacity: 1;
     transform: none;
     pointer-events: none;              /* کلیک‌های خالی به خود کارت می‌رسد */
+}
+.vp-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    min-width: 0;
 }
 .vp-name {
     display: block;

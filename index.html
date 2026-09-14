@@ -485,23 +485,43 @@
             }
         }
 
-        /* ─── Sidebar Collapsed State ─── */
+        /* ─── Sidebar Collapsed State (rail) ─── */
         body.cosmic.sidebar-collapsed .sidebar { width: 60px; }
         body.cosmic.sidebar-collapsed .sidebar .sb-section-title,
         body.cosmic.sidebar-collapsed .sidebar .sb-badge,
         body.cosmic.sidebar-collapsed .sidebar .sb-chevron,
         body.cosmic.sidebar-collapsed .sidebar .nav-item span:not(.nav-emoji),
         body.cosmic.sidebar-collapsed .sidebar .sidebar-search,
-        body.cosmic.sidebar-collapsed .sidebar .sidebar-footer .sb-footer-name,
-        body.cosmic.sidebar-collapsed .sidebar .brand-name,
-        body.cosmic.sidebar-collapsed .sidebar .brand-sub { display: none; }
-        body.cosmic.sidebar-collapsed .sidebar .sb-section-header { justify-content: center; padding: 10px 6px; }
-        body.cosmic.sidebar-collapsed .sidebar .nav-item { justify-content: center; padding: 10px 6px; }
+        body.cosmic.sidebar-collapsed .sidebar .sidebar-footer .sb-footer-info,
+        body.cosmic.sidebar-collapsed .sidebar .brand-text { display: none; }
+        body.cosmic.sidebar-collapsed .sidebar .sb-section-header,
+        body.cosmic.sidebar-collapsed .sidebar .nav-item { font-size: 0; justify-content: center; padding: 10px 6px; gap: 0; }
         body.cosmic.sidebar-collapsed .sidebar .sb-footer-user { justify-content: center; }
         body.cosmic.sidebar-collapsed .cosmic-main { margin-right: 60px; }
+        /* برند در حالت ریل: لوگو بالا، دکمه پایین */
+        body.cosmic.sidebar-collapsed .sidebar-brand { flex-direction: column; align-items: center; gap: 10px; padding: 18px 8px 14px; }
+        /* دکمه‌ی جمع/باز */
+        .sb-rail-toggle {
+            margin-inline-start: auto;
+            appearance: none;
+            flex-shrink: 0;
+            align-self: center;
+            width: 26px; height: 26px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--ink-dim);
+            font-size: 15px; line-height: 1;
+            display: grid; place-items: center;
+            cursor: pointer;
+            transition: color .2s, border-color .2s, background .2s, transform .25s;
+        }
+        .sb-rail-toggle:hover { color: var(--gold-200); border-color: var(--gold-400); background: rgba(221, 192, 112, 0.08); }
+        body.cosmic.sidebar-collapsed .sb-rail-toggle { margin-inline-start: 0; transform: rotate(180deg); }
         @media (max-width: 768px) {
             body.cosmic.sidebar-collapsed .sidebar { width: var(--sidebar-w); }
             body.cosmic.sidebar-collapsed .cosmic-main { margin-right: 0; }
+            .sb-rail-toggle { display: none; }
         }
 
         /* ============================================================
@@ -569,12 +589,17 @@
             pointer-events: none;
         }
         .kf-item:hover .kf-lb { opacity: 1; transform: translateX(0); }
-        /* کمانِ باز — ۴ آیتم، ربع راست‌وبالا، شعاع ۹۲ در گام‌های ۳۰° */
+        /* کمانِ باز — ۶ سرویسِ تاپ‌بار (فرزندانِ #kfItems: nth-child از ۱)،
+           ربعِ بالا-راست، شعاع ۹۲ در گام‌های ۱۸°.
+           توجه: در translate() فقط صفر واحد لازم ندارد؛ عدد غیرصفرِ بدون
+           px کل قاعده را باطل می‌کرد (علتِ روی‌هم‌افتادنِ آیتم‌ها). */
         .kf-dial.open .kf-item { opacity: 1; pointer-events: auto; }
-        .kf-dial.open .kf-item:nth-child(2) { transform: translate(0,  -92px) scale(1); transition-delay: 0.02s; }
-        .kf-dial.open .kf-item:nth-child(3) { transform: translate(46, -80px) scale(1); transition-delay: 0.08s; }
-        .kf-dial.open .kf-item:nth-child(4) { transform: translate(80, -46px) scale(1); transition-delay: 0.14s; }
-        .kf-dial.open .kf-item:nth-child(5) { transform: translate(92,   0)   scale(1); transition-delay: 0.20s; }
+        .kf-dial.open .kf-item:nth-child(1) { transform: translate(0px, -92px) scale(1); transition-delay: 0.02s; }
+        .kf-dial.open .kf-item:nth-child(2) { transform: translate(28px, -87px) scale(1); transition-delay: 0.06s; }
+        .kf-dial.open .kf-item:nth-child(3) { transform: translate(54px, -74px) scale(1); transition-delay: 0.10s; }
+        .kf-dial.open .kf-item:nth-child(4) { transform: translate(74px, -54px) scale(1); transition-delay: 0.14s; }
+        .kf-dial.open .kf-item:nth-child(5) { transform: translate(87px, -28px) scale(1); transition-delay: 0.18s; }
+        .kf-dial.open .kf-item:nth-child(6) { transform: translate(92px, 0px) scale(1); transition-delay: 0.22s; }
         /* جمع‌شدنِ سریع (بدون استگرِ دیرکردی — ادای فنرِ برگشت) */
         .kf-dial:not(.open) .kf-item { transition-delay: 0s; }
         @media (max-width: 640px) { .kf-dial { left: 16px; bottom: 16px; } }
@@ -591,6 +616,79 @@
         @media (prefers-reduced-motion: reduce) {
             .kf-fab, .kf-item, .kf-item .kf-lb { transition: opacity 0.2s var(--kf-glide); }
             .kf-dial.open .kf-item { transition-delay: 0s; }
+        }
+
+        /* ============================================================
+           CD — Contextual Dock (Kinetics Orbital/Contextual)
+           سه اکشن ذخیره/اشتراک/پرینت که فقط وقتی نتیجه‌ی چارت روی
+           صفحه هست از لبهٔ بالا-راست با فنرِ overshoot «بالع» می‌شوند.
+        ============================================================ */
+        .cd-dock {
+            --cd-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --cd-glide:  cubic-bezier(0.16, 1, 0.30, 1);
+            position: fixed;
+            top: 74px; right: 22px;
+            display: flex; flex-direction: column; gap: 12px;
+            z-index: 3650;
+            font-family: "Vazirmatn", sans-serif;
+        }
+        .cd-btn {
+            --cd-x: 42px;   /* حالت بسته: کمی بیرون/تار */
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px;
+            border: 1px solid rgba(221, 192, 112, 0.4);
+            border-radius: 50%;
+            background: rgba(16, 26, 61, 0.94);
+            color: #ecd9a0; font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 8px 22px -8px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transform: translateX(var(--cd-x)) scale(0.5);
+            filter: blur(6px);
+            pointer-events: none;
+            transition:
+                transform 0.55s var(--cd-spring),
+                opacity 0.4s var(--cd-glide),
+                filter 0.4s var(--cd-glide),
+                background 0.25s var(--cd-glide),
+                border-color 0.25s var(--cd-glide);
+            will-change: transform;
+        }
+        .cd-btn:hover { background: rgba(37, 53, 107, 0.98); border-color: #ddc070; }
+        .cd-btn:active { transform: scale(0.86); transition: transform 0.08s var(--cd-glide); }
+        .cd-btn .cd-lb {
+            position: absolute; right: 58px; white-space: nowrap;
+            font-size: 11.5px; font-weight: 700; color: #d6dcec;
+            background: rgba(7, 12, 31, 0.9);
+            border: 1px solid rgba(221, 192, 112, 0.25);
+            padding: 4px 11px; border-radius: 999px;
+            opacity: 0; transform: translateX(8px);
+            transition: transform 0.4s var(--cd-spring), opacity 0.3s var(--cd-glide);
+            pointer-events: none;
+        }
+        .cd-btn:hover .cd-lb { opacity: 1; transform: translateX(0); }
+        /* باز شدنِ استگر فنری — فقط وقتی نتیجه روی صفحه هست (JS کلاس show را می‌زند) */
+        .cd-dock.show .cd-btn { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); pointer-events: auto; }
+        .cd-dock.show .cd-btn:nth-child(1) { transition-delay: 0.02s; }
+        .cd-dock.show .cd-btn:nth-child(2) { transition-delay: 0.10s; }
+        .cd-dock.show .cd-btn:nth-child(3) { transition-delay: 0.18s; }
+        /* نشانِ وضعیتِ ذخیره‌شده (پالس کوتاه) */
+        .cd-btn.cd-saved::after {
+            content: "✓"; position: absolute; top: -4px; left: -4px;
+            width: 20px; height: 20px; border-radius: 50%;
+            display: grid; place-items: center; font-size: 12px; font-weight: 900;
+            background: #2ecc71; color: #05130a;
+            animation: cdPop 0.5s var(--cd-spring);
+        }
+        @keyframes cdPop { 0% { transform: scale(0); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @media (max-width: 640px) {
+            .cd-dock { top: 68px; right: 12px; }
+            .cd-btn { width: 46px; height: 46px; font-size: 18px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .cd-btn { transition: opacity 0.2s var(--cd-glide); transform: none; filter: none; }
+            .cd-dock.show .cd-btn { transition-delay: 0s; }
         }
 
         .sidebar-backdrop {
@@ -3286,6 +3384,8 @@
     </style>
     <!-- قالب بصری نسخه ۱ — سامانه‌ی طراحی واحد (توکن‌ها، اجزا، کیت ماه) -->
     <link rel="stylesheet" href="static/theme.css?v=1">
+    <!-- کامپوننت‌های فیزیکی Kinetics (پورت‌شده به پالت کاسمیک) -->
+    <link rel="stylesheet" href="static/kinetics.css?v=3">
 </head>
 <body class="cosmic">
 
@@ -3296,10 +3396,11 @@
     <aside class="sidebar" id="sidebar" aria-label="ناوبری اصلی">
         <div class="sidebar-brand">
             <img class="logo-icon" src="static/images/ui/logo.svg" alt="">
-            <div>
+            <div class="brand-text">
                 <div class="brand-name">Cosmic Oracle</div>
                 <div class="brand-sub">رصدخانه‌ی کیهانی</div>
             </div>
+            <button class="sb-rail-toggle" id="sbRailToggle" title="جمع / باز کردن منو (Ctrl+B)" aria-label="جمع کردن نوار کناری">»</button>
         </div>
 
         <div class="sidebar-search">
@@ -3480,7 +3581,7 @@
     <!-- لنگر پنل‌های داک — پنلِ بازشده کنار دکمه ✦ قرار می‌گیرد -->
     <div id="kfPanelAnchor"></div>
 
-    <!-- ⭕ ناوبری جنبشی (Kinetics Speed-Dial) — ۴ ابزارِ تاپ‌بار -->
+    <!-- ⭕ ناوبری جنبشی (Kinetics Speed-Dial) — هر ۶ سرویسِ تاپ‌بار -->
     <nav class="kf-dial" id="kfDial" aria-label="ابزارهای سریع">
         <button class="kf-fab" id="kfFab" aria-expanded="false" aria-controls="kfItems" title="ابزارها">✦</button>
         <div id="kfItems" role="menu">
@@ -3488,8 +3589,17 @@
             <button type="button" class="kf-item" data-kf-open="earthStatusPanel"  data-kf-api="EarthStatus"  role="menuitem">🌍<span class="kf-lb">وضعیت زمین</span></button>
             <button type="button" class="kf-item" data-kf-open="yogaSummaryPanel"  data-kf-api="YogaSummary"  role="menuitem">🧘<span class="kf-lb">وضعیت یوگا</span></button>
             <button type="button" class="kf-item" data-kf-open="zodiacPanel"       data-kf-api="ZodiacDisplay" role="menuitem">🐉<span class="kf-lb">سال حیوانی</span></button>
+            <button type="button" class="kf-item" data-kf-open="actionsMenu"  data-kf-tap="actionsMenuBtn" role="menuitem">⋯<span class="kf-lb">اشتراک / ذخیره / پرینت</span></button>
+            <button type="button" class="kf-item" data-kf-open="profilePanel" data-kf-tap="payBtn" role="menuitem">🔑<span class="kf-lb">حساب کاربری</span></button>
         </div>
     </nav>
+
+    <!-- ⬤ Contextual Dock — ذخیره/اشتراک/پرینت؛ فقط با نتیجه ظاهر می‌شود -->
+    <div class="cd-dock" id="cdDock" aria-hidden="true">
+        <button class="cd-btn" data-cd="printBtn" title="پرینت">🖨️<span class="cd-lb">پرینت چارت</span></button>
+        <button class="cd-btn" data-cd="shareBtn" title="اشتراک‌گذاری">📤<span class="cd-lb">اشتراک‌گذاری</span></button>
+        <button class="cd-btn" data-cd="saveBtn" title="ذخیره">💾<span class="cd-lb">ذخیره HTML</span></button>
+    </div>
 
     <!-- ===== محتوای اصلی ===== -->
     <div class="cosmic-main">
@@ -4770,6 +4880,8 @@
     <script src="static/quality-of-life.js?v=1"></script>
     <script src="static/moon-phase.js?v=8"></script>
     <script src="static/theme.js?v=2"></script>
+    <script src="static/kinetics.js?v=3"></script>
+    <script src="static/kinetics-cosmic.js?v=6"></script>
     <script src="static/theme-showcase.js?v=1"></script>
     <script src="static/zodiac-display.js?v=8"></script>
     <script src="static/location-service.js?v=1"></script>
@@ -4778,8 +4890,8 @@
     <script src="static/yoga-summary.js?v=3"></script>
     <script src="static/yoga-test.js?v=4"></script>
     <script src="static/daily-dashboard.js?v=9"></script>
-    <script src="static/audio-manager.js?v=7"></script>
-    <script src="static/vinyl-player.js?v=4"></script>
+    <script src="static/audio-manager.js?v=8"></script>
+    <script src="static/vinyl-player.js?v=5"></script>
     <script src="static/audio-admin.js?v=1"></script>
     <script src="static/background-admin.js?v=1"></script>
     <script src="static/my-dashboard.js?v=13"></script>
@@ -4792,6 +4904,7 @@
     window.MeditationTimer = (function() {
         var duration = 600;
         var running = false;
+        var _prevVinylSection = null;   // سگشن وینیل قبل از شروع مدیتیشن
 
         function init() {
             // Populate track select
@@ -4843,6 +4956,16 @@
             var btn = document.getElementById('medStartBtn');
             if (btn) { btn.textContent = '⏹ پایان'; btn.classList.add('running'); }
 
+            /* صدای اختصاصی مدیتیشن: اگر ادمین فایلی برای این بخش گذاشته،
+               وینیل آن را پخش می‌کند (سنتز ambient در medStart رد می‌شود) */
+            _prevVinylSection = null;
+            if (window.VinylPlayer) {
+                try {
+                    _prevVinylSection = VinylPlayer.getSection();
+                    VinylPlayer.setSection('meditation');
+                } catch (_) {}
+            }
+
             AudioManager.medStart({
                 duration: duration,
                 track: trackSel ? trackSel.value : 'cosmic-drone',
@@ -4856,6 +4979,10 @@
         function stop() {
             running = false;
             if (window.AudioManager) AudioManager.medStop();
+            if (window.VinylPlayer) {
+                try { VinylPlayer.setSection(_prevVinylSection || 'site'); } catch (_) {}
+            }
+            _prevVinylSection = null;
             var btn = document.getElementById('medStartBtn');
             if (btn) { btn.textContent = '▶ شروع مدیتیشن'; btn.classList.remove('running'); }
             updatePhase(null);
@@ -5054,9 +5181,7 @@
         });
 
         document.getElementById('menuToggle').addEventListener('click', function () {
-            if (body.classList.contains('sidebar-collapsed')) {
-                body.classList.remove('sidebar-collapsed');
-            }
+            setSidebarRail(false);
             openSidebar();
         });
         var backdrop = document.getElementById('sidebarBackdrop');
@@ -5135,11 +5260,64 @@
             });
         })();
 
-        /* Ctrl+B for sidebar toggle */
+        /* ── CD Contextual Dock — با نتیجه ظاهر/پنهان می‌شود، اکشن‌های
+           موجود script.js را فوروارد می‌کند (بدون تکرار منطق ذخیره/چاپ). ── */
+        (function () {
+            var dock = document.getElementById('cdDock');
+            var result = document.getElementById('result');
+            if (!dock || !result) return;
+            function hasResult() {
+                return result.style.display !== 'none' && result.childElementCount > 0
+                    && !result.querySelector('.result-shimmer');
+            }
+            function sync() {
+                var on = hasResult();
+                dock.classList.toggle('show', on);
+                dock.setAttribute('aria-hidden', on ? 'false' : 'true');
+            }
+            // هر تغییرِ نمایش/محتوای نتیجه → همگام‌سازی (به‌جای پچ صدها نقطه)
+            new MutationObserver(sync).observe(result, {
+                attributes: true, attributeFilter: ['style', 'class'], childList: true, subtree: true
+            });
+            window.addEventListener('hashchange', function () { setTimeout(sync, 60); });
+            dock.querySelectorAll('.cd-btn').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    var target = document.getElementById(b.getAttribute('data-cd'));
+                    if (!target) return;
+                    target.click();
+                    if (b.getAttribute('data-cd') === 'saveBtn') {   // پالس تأییدِ ذخیره
+                        b.classList.add('cd-saved');
+                        setTimeout(function () { b.classList.remove('cd-saved'); }, 1400);
+                    }
+                });
+            });
+            sync();
+        })();
+
+        /* ─── جمع/باز کردن نوار کناری ( rail ) — دکمه + Ctrl+B + حفظ ترجیح ─── */
+        var RAIL_KEY = 'cosmic_sidebar_rail';
+        function setSidebarRail(collapsed, persist) {
+            body.classList.toggle('sidebar-collapsed', collapsed);
+            var tgl = document.getElementById('sbRailToggle');
+            if (tgl) {
+                tgl.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+                tgl.title = collapsed ? 'باز کردن منو (Ctrl+B)' : 'جمع کردن منو (Ctrl+B)';
+            }
+            if (persist !== false) { try { localStorage.setItem(RAIL_KEY, collapsed ? '1' : '0'); } catch (_) {} }
+        }
+        /* اعمال ترجیح ذخیره‌شده (فقط دسکتاپ — موبایل همیشه باز/کشویی است) */
+        try {
+            if (localStorage.getItem(RAIL_KEY) === '1' && window.innerWidth > 768) setSidebarRail(true, false);
+        } catch (_) {}
+        var _railBtn = document.getElementById('sbRailToggle');
+        if (_railBtn) _railBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            setSidebarRail(!body.classList.contains('sidebar-collapsed'));
+        });
         document.addEventListener('keydown', function (e) {
-            if (e.ctrlKey && e.key === 'b') {
+            if (e.ctrlKey && (e.key === 'b' || e.key === 'B')) {
                 e.preventDefault();
-                body.classList.toggle('sidebar-collapsed');
+                setSidebarRail(!body.classList.contains('sidebar-collapsed'));
             }
         });
 

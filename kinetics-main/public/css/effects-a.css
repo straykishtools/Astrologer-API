@@ -1,0 +1,2434 @@
+/* ============================================================
+   Kinetics — effects-a.css
+   Interaction & Input demos (cards 1–8)
+   ============================================================ */
+
+/* 1. Spring card resize */
+.demo-spring-card {
+  width: 220px;
+  height: 64px;
+  padding: 16px 18px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    height 0.5s var(--spring),
+    border-color 0.3s ease;
+}
+.demo-spring-card:hover {
+  border-color: var(--bone-faint);
+}
+.demo-spring-card.expanded {
+  height: 124px;
+}
+.demo-spring-card .title {
+  font-weight: 600;
+  font-size: 14px;
+}
+.demo-spring-card .extra {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--bone-dim);
+  opacity: 0;
+  transition: opacity 0.3s ease 0.1s;
+}
+.demo-spring-card.expanded .extra {
+  opacity: 1;
+}
+
+/* 2. Magnetic button */
+.demo-magnet-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 130px;
+}
+.demo-magnet-btn {
+  padding: 16px 24px;
+  min-height: 48px;
+  background: var(--amber);
+  color: var(--graphite);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 100px;
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+/* 3. Elastic counter */
+.demo-counter {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 68px;
+  color: var(--amber);
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+  transition: transform 0.4s var(--spring);
+}
+.demo-counter.bump {
+  transform: scale(1.22) translateY(-6px);
+}
+
+/* 4. Toast overshoot */
+.demo-toast-zone {
+  position: relative;
+  width: 100%;
+  height: 130px;
+}
+.demo-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 18px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  font-size: 13px;
+  white-space: nowrap;
+  transform: translate(-50%, 140%) scale(0.9);
+  opacity: 0;
+  transition:
+    transform 0.55s cubic-bezier(0.18, 1.25, 0.4, 1),
+    opacity 0.3s ease;
+}
+.demo-toast.show {
+  transform: translate(-50%, 0) scale(1);
+  opacity: 1;
+}
+.dot-ok {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+}
+
+/* 5. Tab pill glide */
+.demo-tabs {
+  position: relative;
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+}
+.demo-tab-pill {
+  position: absolute;
+  top: 5px;
+  height: calc(100% - 10px);
+  background: var(--amber);
+  border-radius: 100px;
+  transition:
+    left 0.4s cubic-bezier(0.65, 0, 0.35, 1),
+    width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+  z-index: 0;
+}
+.demo-tab-btn {
+  position: relative;
+  z-index: 1;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bone-dim);
+  border-radius: 100px;
+  transition: color 0.3s ease;
+}
+.demo-tab-btn.active {
+  color: var(--graphite);
+}
+
+/* 6. Accordion spring */
+.demo-accordion {
+  width: 230px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.demo-acc-item {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.demo-acc-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+.demo-acc-head .chev {
+  color: var(--amber);
+  transition: transform 0.35s var(--spring);
+}
+.demo-acc-item.open .chev {
+  transform: rotate(180deg);
+}
+.demo-acc-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.45s var(--glide);
+}
+.demo-acc-item.open .demo-acc-body {
+  max-height: 100px;
+}
+.demo-acc-body p {
+  padding: 0 14px 12px;
+  font-size: 12px;
+  color: var(--bone-dim);
+}
+
+/* 7. Drag to dismiss */
+.demo-drag-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 130px;
+}
+.demo-drag-card {
+  width: 200px;
+  padding: 16px 18px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition:
+    transform 0.5s var(--spring),
+    opacity 0.4s ease;
+}
+.demo-drag-card.dragging {
+  cursor: grabbing;
+  transition: none;
+}
+.demo-drag-card.gone {
+  transition:
+    transform 0.45s ease-in,
+    opacity 0.45s ease-in;
+}
+.demo-drag-hint {
+  margin-top: 5px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--bone-faint);
+}
+
+/* 8. Ripple feedback */
+.demo-ripple-btn {
+  position: relative;
+  overflow: hidden;
+  padding: 14px 24px;
+  min-height: 48px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  color: var(--bone);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 100px;
+  transition: border-color 0.2s ease;
+}
+.demo-ripple-btn:hover {
+  border-color: var(--bone-faint);
+}
+.demo-ripple-btn .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--amber) 45%, transparent);
+  transform: scale(0);
+  pointer-events: none;
+  animation: ripple-out 0.6s ease-out forwards;
+}
+@keyframes ripple-out {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* 34–36. Contemporary interaction studies */
+.demo-orbit-menu { position: relative; width: 126px; height: 126px; display: grid; place-items: center; }
+.demo-orbit-core, .demo-orbit-action { position: absolute; display: grid; place-items: center; border-radius: 50%; }
+.demo-orbit-core { z-index: 2; width: 46px; height: 46px; background: var(--amber); color: var(--graphite); font-size: 27px; transition: transform .42s var(--spring); }
+.demo-orbit-action { width: 31px; height: 31px; background: var(--card-2); border: 1px solid var(--line); color: var(--bone-dim); font-size: 14px; opacity: 0; transition: transform .46s var(--spring), opacity .2s ease; }
+.demo-orbit-menu:hover .demo-orbit-core { transform: rotate(45deg) scale(.88); }
+.demo-orbit-menu:hover .action-n { transform: translateY(-48px); opacity: 1; }.demo-orbit-menu:hover .action-e { transform: translateX(48px); opacity: 1; }.demo-orbit-menu:hover .action-s { transform: translateY(48px); opacity: 1; }.demo-orbit-menu:hover .action-w { transform: translateX(-48px); opacity: 1; }
+.demo-dock { display: flex; align-items: flex-end; gap: 7px; padding: 13px 15px; background: color-mix(in srgb, var(--card-2) 80%, transparent); border: 1px solid var(--line); border-radius: 20px; }
+.demo-dock button { width: 31px; height: 31px; border-radius: 10px; background: var(--graphite-2); border: 1px solid var(--line); color: var(--bone-dim); transition: transform .3s var(--spring), color .2s ease, background .2s ease; }
+.demo-dock button:hover { transform: translateY(-14px) scale(1.34); color: var(--graphite); background: var(--amber); }.demo-dock button:has(+ button:hover), .demo-dock button:hover + button { transform: translateY(-7px) scale(1.13); }
+.demo-dial { position: relative; width: 106px; height: 106px; display: grid; place-items: center; border-radius: 50%; background: repeating-conic-gradient(from -4deg, var(--bone-faint) 0 2deg, transparent 2deg 12deg), var(--card-2); border: 1px solid var(--line); transition: transform .7s var(--spring); }
+.demo-dial::before { content: ""; position: absolute; inset: 13px; border-radius: 50%; background: var(--graphite); border: 1px solid var(--line); }.demo-dial:hover { transform: rotate(72deg); }.demo-dial-needle { position: absolute; z-index: 2; width: 3px; height: 32px; background: var(--amber); border-radius: 5px; transform: translateY(-15px); transform-origin: bottom; transition: transform .9s .08s var(--spring); }.demo-dial:hover .demo-dial-needle { transform: translateY(-15px) rotate(-42deg); }.demo-dial-readout { position: relative; z-index: 1; font: 600 13px var(--font-mono); color: var(--bone); }
+
+/* ───────────────────────────────────────────────
+   Added interactions (9–12)
+   ─────────────────────────────────────────────── */
+
+/* 9. Hold to confirm */
+.demo-hold-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.demo-hold-btn {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bone-dim);
+  user-select: none;
+  touch-action: none;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+.demo-hold-btn .ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.demo-hold-btn .ring .track {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 3;
+}
+.demo-hold-btn .ring .prog {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 207;
+  stroke-dashoffset: 207;
+  transition: stroke-dashoffset 0.2s ease-out;
+}
+.demo-hold-btn.holding .ring .prog {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.8s linear;
+}
+.demo-hold-btn.done {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: var(--graphite);
+}
+.demo-hold-btn.done .ring .prog {
+  stroke: var(--ok);
+  stroke-dashoffset: 0;
+}
+
+/* 10. Rubber-band slider */
+.demo-rubber {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 220px;
+}
+.demo-rubber-track {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: var(--card-2);
+  border-radius: 100px;
+}
+.demo-rubber-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, var(--amber-deep), var(--amber));
+  border-radius: 100px;
+}
+.demo-rubber-thumb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  border-radius: 50%;
+  background: var(--bone);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  transform: translateY(-50%);
+  cursor: grab;
+  touch-action: none;
+}
+.demo-rubber-thumb.dragging {
+  cursor: grabbing;
+}
+.demo-rubber-thumb.snap {
+  transition: left 0.5s var(--spring);
+}
+.demo-rubber-fill.snap {
+  transition: width 0.5s var(--spring);
+}
+.demo-rubber-val {
+  font-size: 13px;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 11. Like burst */
+.demo-like-zone {
+  position: relative;
+}
+.demo-like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 18px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+}
+.demo-like-btn .heart {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--bone-dim);
+  stroke-width: 2;
+  transition:
+    transform 0.3s var(--spring),
+    fill 0.2s ease,
+    stroke 0.2s ease;
+}
+.demo-like-btn.liked .heart {
+  fill: var(--amber);
+  stroke: var(--amber);
+}
+.demo-like-btn.pop .heart {
+  transform: scale(1.35);
+}
+.demo-like-count {
+  font-size: 13px;
+  color: var(--bone-dim);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease;
+}
+.demo-like-btn.liked .demo-like-count {
+  color: var(--bone);
+}
+.like-particle {
+  position: absolute;
+  top: 50%;
+  left: 22px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  pointer-events: none;
+  animation: like-fly 0.6s var(--glide) forwards;
+}
+@keyframes like-fly {
+  to {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* 12. Cursor trail */
+.demo-trail-zone {
+  position: relative;
+  width: 100%;
+  height: 130px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--graphite-2);
+  overflow: hidden;
+  cursor: crosshair;
+}
+.demo-trail-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: var(--amber);
+  pointer-events: none;
+  will-change: transform;
+}
+.demo-trail-dot:nth-child(2) {
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
+}
+.demo-trail-dot:nth-child(3) {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+.demo-trail-dot:nth-child(4) {
+  width: 10px;
+  height: 10px;
+  opacity: 0.55;
+}
+.demo-trail-dot:nth-child(5) {
+  width: 8px;
+  height: 8px;
+  opacity: 0.4;
+}
+.demo-trail-dot:nth-child(6) {
+  width: 6px;
+  height: 6px;
+  opacity: 0.25;
+}
+.demo-trail-hint {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--bone-faint);
+  pointer-events: none;
+}
+
+/* ───────────────────────────────────────────────
+   Added interactions (13–15)
+   ─────────────────────────────────────────────── */
+
+/* 13. Push button (pure CSS) */
+.demo-push-btn {
+  padding: 12px 26px;
+  border-radius: 12px;
+  background: var(--amber);
+  color: var(--graphite);
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 6px 0 var(--amber-deep);
+  transition:
+    transform 0.06s ease,
+    box-shadow 0.06s ease;
+}
+.demo-push-btn:active {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 var(--amber-deep);
+}
+
+/* 14. Star rating */
+.demo-rating {
+  display: inline-flex;
+  gap: 6px;
+}
+.demo-star {
+  font-size: 30px;
+  line-height: 1;
+  color: var(--line);
+  transition:
+    transform 0.25s var(--spring),
+    color 0.15s ease;
+}
+.demo-star.on {
+  color: var(--amber);
+}
+.demo-star.pop {
+  transform: scale(1.3);
+}
+
+/* 15. Floating label field */
+.demo-field {
+  position: relative;
+  width: 220px;
+}
+.demo-field-input {
+  width: 100%;
+  padding: 16px 14px 6px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--bone);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.demo-field-input:focus {
+  border-color: var(--amber);
+}
+.demo-field-label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--bone-faint);
+  font-size: 14px;
+  pointer-events: none;
+  transition:
+    transform 0.2s var(--glide),
+    color 0.2s ease,
+    font-size 0.2s ease;
+}
+.demo-field-input:focus + .demo-field-label,
+.demo-field-input:not(:placeholder-shown) + .demo-field-label {
+  transform: translateY(-22px) scale(0.82);
+  color: var(--amber);
+}
+
+/* ───────────────────────────────────────────────
+   Added interactions (16–18)
+   ─────────────────────────────────────────────── */
+
+/* 16. Copy button */
+.demo-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 20px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  color: var(--bone);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 100px;
+  transition: border-color 0.2s ease;
+}
+.demo-copy-btn:hover {
+  border-color: var(--bone-faint);
+}
+.demo-copy-icon {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+.demo-copy-icon svg {
+  position: absolute;
+  inset: 0;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s var(--spring);
+}
+.demo-copy-icon .ic-check {
+  opacity: 0;
+  transform: scale(0.5);
+  stroke: var(--ok);
+}
+.demo-copy-btn.copied .ic-copy {
+  opacity: 0;
+  transform: scale(0.5);
+}
+.demo-copy-btn.copied .ic-check {
+  opacity: 1;
+  transform: scale(1);
+}
+.demo-copy-btn.copied {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 45%, transparent);
+}
+
+/* 17. Quantity stepper */
+.demo-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+}
+.demo-step-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--bone);
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
+}
+.demo-step-btn:hover {
+  background: var(--card);
+}
+.demo-step-btn:active {
+  transform: scale(0.9);
+}
+.demo-step-val {
+  display: inline-block;
+  min-width: 2.5ch;
+  text-align: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.35s var(--spring);
+}
+.demo-step-val.bump {
+  transform: scale(1.3);
+}
+
+/* 18. Choice chips */
+.demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.demo-chip {
+  padding: 7px 15px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  color: var(--bone-dim);
+  font-size: 13px;
+  font-weight: 500;
+  transition:
+    transform 0.3s var(--spring),
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.demo-chip:hover {
+  border-color: var(--bone-faint);
+}
+.demo-chip.on {
+  background: var(--amber);
+  color: var(--graphite);
+  border-color: var(--amber);
+}
+.demo-chip.pop {
+  transform: scale(1.12);
+}
+
+/* 19. PIN input */
+.demo-pin {
+  display: flex;
+  gap: 10px;
+}
+.demo-pin-box {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--bone);
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition:
+    transform 0.35s var(--spring),
+    border-color 0.2s ease;
+  will-change: transform;
+}
+.demo-pin-box:focus {
+  border-color: var(--amber);
+}
+.demo-pin-box.filled {
+  border-color: var(--amber);
+}
+.demo-pin-box.pop {
+  transform: scale(1.14);
+}
+
+/* 20. Password meter */
+.demo-pwd {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.demo-pwd-input {
+  width: 100%;
+  padding: 11px 12px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--bone);
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.demo-pwd-input:focus {
+  border-color: var(--bone-faint);
+}
+.demo-pwd-input::placeholder {
+  color: var(--bone-faint);
+}
+.demo-pwd-meter {
+  display: flex;
+  gap: 6px;
+}
+.demo-pwd-meter span {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--card-2);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition:
+    transform 0.35s var(--spring),
+    background 0.2s ease;
+}
+.demo-pwd-meter[data-score="1"] span:nth-child(-n + 1),
+.demo-pwd-meter[data-score="2"] span:nth-child(-n + 2),
+.demo-pwd-meter[data-score="3"] span:nth-child(-n + 3),
+.demo-pwd-meter[data-score="4"] span:nth-child(-n + 4) {
+  transform: scaleX(1);
+}
+.demo-pwd-meter[data-score="1"] span {
+  background: var(--danger);
+}
+.demo-pwd-meter[data-score="2"] span,
+.demo-pwd-meter[data-score="3"] span {
+  background: var(--amber);
+}
+.demo-pwd-meter[data-score="4"] span {
+  background: var(--ok);
+}
+.demo-pwd-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--bone-faint);
+  letter-spacing: 0.03em;
+}
+
+/* 21. Pointer tooltip */
+.demo-pointer-zone {
+  position: relative;
+  overflow: hidden;
+  width: 240px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: crosshair;
+}
+.demo-pointer-hint {
+  color: var(--bone-faint);
+  font-size: 13px;
+}
+.demo-pointer-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 5px 9px;
+  background: var(--amber);
+  color: var(--graphite);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -140%);
+  transition: opacity 0.2s ease;
+  will-change: transform;
+}
+.demo-pointer-zone:hover .demo-pointer-tip {
+  opacity: 1;
+}
+
+/* ───────────────────────────────────────────────
+   Added interactions (22–24)
+   ─────────────────────────────────────────────── */
+
+/* 22. Swipe to reveal */
+.demo-swipe-zone {
+  position: relative;
+  width: 240px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+.demo-swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  gap: 4px;
+  padding: 14px 10px;
+}
+.demo-swipe-action {
+  width: 40px;
+  height: 100%;
+  max-height: 52px;
+  margin: auto 0;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--graphite);
+  transition: transform 0.3s var(--spring);
+}
+.demo-swipe-action.archive {
+  background: var(--wire);
+}
+.demo-swipe-action.delete {
+  background: var(--danger);
+}
+.demo-swipe-item {
+  position: relative;
+  z-index: 1;
+  width: 240px;
+  padding: 16px 18px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition: transform 0.4s var(--spring);
+  will-change: transform;
+}
+.demo-swipe-item.dragging {
+  cursor: grabbing;
+  transition: none;
+}
+.demo-swipe-item.open {
+  transform: translateX(-96px);
+}
+.demo-swipe-hint {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--bone-faint);
+}
+
+/* 23. Rotary knob */
+.demo-knob-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.demo-knob-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.demo-knob {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 40% 35%,
+    var(--card-2),
+    var(--graphite-2)
+  );
+  border: 1px solid var(--line);
+  cursor: grab;
+  touch-action: none;
+  transform: rotate(225deg);
+  transition: transform 0.5s var(--spring);
+  will-change: transform;
+}
+.demo-knob.dragging {
+  cursor: grabbing;
+  transition: none;
+}
+.demo-knob::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 4px;
+  height: 16px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--amber);
+}
+.demo-knob-arc {
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+}
+.demo-knob-arc circle {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.demo-knob-arc .track {
+  stroke: var(--line);
+}
+.demo-knob-arc .fill {
+  stroke: var(--amber);
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transform: rotate(135deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 0.3s var(--glide);
+}
+.demo-knob-val {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 24. Reorderable list */
+.demo-reorder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 220px;
+}
+.demo-reorder-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition:
+    transform 0.3s var(--glide),
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+  will-change: transform;
+}
+.demo-reorder-item.dragging {
+  cursor: grabbing;
+  opacity: 0.9;
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
+  transition: none;
+  z-index: 10;
+}
+.demo-reorder-handle {
+  color: var(--bone-faint);
+  font-size: 16px;
+  line-height: 1;
+  cursor: grab;
+}
+.demo-reorder-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 25. Expanding search */
+.demo-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 56px;
+  padding: 12px 14px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  overflow: hidden;
+  cursor: text;
+  transition:
+    width 0.4s var(--glide),
+    border-color 0.3s ease;
+}
+.demo-search:hover {
+  border-color: var(--bone-faint);
+}
+.demo-search:hover,
+.demo-search:focus-within {
+  width: 230px;
+}
+.demo-search:focus-within {
+  border-color: var(--amber);
+}
+.demo-search-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--bone-dim);
+}
+.demo-search-input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--bone);
+  font-size: 14px;
+}
+.demo-search-input::placeholder {
+  color: var(--bone-faint);
+}
+
+/* 26. Squish button */
+.demo-squish-btn {
+  padding: 14px 26px;
+  min-height: 48px;
+  background: var(--amber);
+  color: var(--graphite);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  transition: transform 0.5s var(--spring);
+  will-change: transform;
+}
+.demo-squish-btn:active {
+  transform: scale(0.88);
+  transition: transform 0.08s ease-out;
+}
+
+/* 27. Toggle pills (radio) */
+.demo-radio-pills {
+  display: flex;
+  gap: 8px;
+}
+.demo-radio-pills label {
+  position: relative;
+  cursor: pointer;
+}
+.demo-radio-pills input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.demo-radio-pills span {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 10px 16px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  font-size: 13px;
+  color: var(--bone-dim);
+  transition:
+    transform 0.5s var(--spring),
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+.demo-radio-pills input:checked + span {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--graphite);
+  font-weight: 600;
+  transform: scale(1.06);
+}
+.demo-radio-pills input:focus-visible + span {
+  outline: 2px solid var(--wire);
+  outline-offset: 2px;
+}
+
+/* 28. Value scrubber */
+.demo-scrubber {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+.demo-scrubber-val {
+  padding: 4px 18px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 50px;
+  line-height: 1;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+  border-radius: var(--radius-sm);
+  cursor: ew-resize;
+  touch-action: none;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.4s var(--spring);
+}
+.demo-scrubber-val.scrubbing {
+  color: var(--amber);
+  background: var(--card-2);
+  transform: scale(1.06);
+}
+.demo-scrubber-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--bone-faint);
+}
+
+/* 29. Speed-dial FAB */
+.demo-speeddial {
+  position: relative;
+  width: 150px;
+  height: 156px;
+}
+.demo-speeddial input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.demo-speeddial-main {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  margin-left: -27px;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  background: var(--amber);
+  color: var(--graphite);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 8px 20px -6px var(--amber-deep);
+  transition: transform 0.4s var(--spring);
+}
+.demo-speeddial-main svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.45s var(--spring);
+}
+.demo-speeddial input:checked ~ .demo-speeddial-main svg {
+  transform: rotate(135deg);
+}
+.demo-speeddial-item {
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  margin-left: -20px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--bone);
+  opacity: 0;
+  transform: translate(0, 0) scale(0.4);
+  pointer-events: none;
+  transition:
+    transform 0.5s var(--spring),
+    opacity 0.3s ease;
+}
+.demo-speeddial-item svg {
+  width: 18px;
+  height: 18px;
+}
+.demo-speeddial input:checked ~ .demo-speeddial-item {
+  opacity: 1;
+  pointer-events: auto;
+}
+.demo-speeddial input:checked ~ .demo-speeddial-item:nth-of-type(1) {
+  transform: translate(-54px, -58px) scale(1);
+  transition-delay: 0.02s;
+}
+.demo-speeddial input:checked ~ .demo-speeddial-item:nth-of-type(2) {
+  transform: translate(0, -80px) scale(1);
+  transition-delay: 0.07s;
+}
+.demo-speeddial input:checked ~ .demo-speeddial-item:nth-of-type(3) {
+  transform: translate(54px, -58px) scale(1);
+  transition-delay: 0.12s;
+}
+
+/* 30. Swatch picker */
+.demo-swatch {
+  display: flex;
+  gap: 14px;
+}
+.demo-swatch label {
+  position: relative;
+  cursor: pointer;
+}
+.demo-swatch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.demo-swatch span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--c);
+  color: #fff;
+  font-size: 16px;
+  box-shadow: 0 0 0 2px var(--graphite);
+  transition:
+    transform 0.5s var(--spring),
+    box-shadow 0.3s ease;
+}
+.demo-swatch span::after {
+  content: "✓";
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.2s ease, transform 0.4s var(--spring);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.demo-swatch input:checked + span {
+  transform: scale(1.2);
+  box-shadow:
+    0 0 0 2px var(--graphite),
+    0 0 0 4px var(--c);
+}
+.demo-swatch input:checked + span::after {
+  opacity: 1;
+  transform: scale(1);
+}
+.demo-swatch input:focus-visible + span {
+  box-shadow:
+    0 0 0 2px var(--graphite),
+    0 0 0 4px var(--wire);
+}
+
+/* 31. Slide to unlock */
+.demo-unlock {
+  position: relative;
+  width: 230px;
+  height: 52px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  overflow: hidden;
+  user-select: none;
+}
+.demo-unlock-fill {
+  position: absolute;
+  inset: 0;
+  width: 49px;
+  background: color-mix(in srgb, var(--ok) 26%, transparent);
+  transition: width 0.45s var(--spring);
+}
+.demo-unlock-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--bone-faint);
+  pointer-events: none;
+}
+.demo-unlock-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  background: var(--amber);
+  color: var(--graphite);
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+  transition:
+    left 0.45s var(--spring),
+    background 0.3s ease;
+}
+.demo-unlock-thumb svg {
+  width: 20px;
+  height: 20px;
+}
+.demo-unlock.dragging .demo-unlock-thumb {
+  transition: background 0.3s ease;
+  cursor: grabbing;
+}
+.demo-unlock.unlocked .demo-unlock-thumb {
+  background: var(--ok);
+}
+
+/* 32. Tag input */
+.demo-taginput {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  width: 240px;
+  min-height: 48px;
+  padding: 8px 10px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.25s ease;
+}
+.demo-taginput:focus-within {
+  border-color: var(--amber);
+}
+.demo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px 4px 11px;
+  background: var(--amber);
+  color: var(--graphite);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 100px;
+  animation: demo-tag-pop 0.4s var(--spring);
+}
+@keyframes demo-tag-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.demo-tag.removing {
+  animation: demo-tag-out 0.24s ease forwards;
+}
+@keyframes demo-tag-out {
+  to {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+.demo-tag button {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--graphite);
+  font-size: 12px;
+  line-height: 1;
+}
+.demo-taginput-field {
+  flex: 1;
+  min-width: 64px;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--bone);
+  font-size: 13px;
+}
+.demo-taginput-field::placeholder {
+  color: var(--bone-faint);
+}
+
+/* 33. Keycap press */
+.demo-keycap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, #2d2d31, #202023);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  box-shadow:
+    0 7px 0 0 #0c0c0e,
+    0 10px 16px -4px rgba(0, 0, 0, 0.6);
+  transform: translateY(0);
+  transition:
+    transform 0.09s ease-out,
+    box-shadow 0.09s ease-out;
+}
+.demo-keycap:active {
+  transform: translateY(6px);
+  box-shadow:
+    0 1px 0 0 #0c0c0e,
+    0 2px 6px -2px rgba(0, 0, 0, 0.6);
+}
+.demo-lasso{position:relative;width:210px;height:112px;border:1px solid var(--line);border-radius:var(--radius);touch-action:none;cursor:crosshair}.demo-lasso>span{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--bone-faint);transition:.3s var(--spring)}.demo-lasso>span:nth-child(1){left:22px;top:24px}.demo-lasso>span:nth-child(2){left:78px;top:65px}.demo-lasso>span:nth-child(3){left:132px;top:29px}.demo-lasso>span:nth-child(4){left:174px;top:73px}.demo-lasso>span:nth-child(5){left:45px;top:83px}.demo-lasso>span.selected{background:var(--amber);transform:scale(1.45)}.demo-lasso i{position:absolute;display:none;border:1px solid var(--amber);background:rgba(255,138,0,.1);border-radius:5px}.demo-lasso.dragging i{display:block}.demo-intent{position:relative;width:132px;height:48px;overflow:hidden;border:1px solid var(--line);border-radius:100px;background:var(--card-2);color:var(--bone)}.demo-intent i{position:absolute;left:14px;right:14px;bottom:8px;height:2px;background:var(--amber);transform:scaleX(0);transform-origin:left}.demo-intent:hover i{transform:scaleX(1);transition:transform .7s linear}.demo-chord{position:relative;display:flex;align-items:center;gap:10px;padding-bottom:24px}.demo-chord button{width:48px;height:48px;border-radius:10px;background:var(--card-2);border:1px solid var(--line);box-shadow:0 5px 0 #09090b;color:var(--bone)}.demo-chord button.hit{transform:translateY(4px);color:var(--amber)}.demo-chord strong{position:absolute;bottom:0;left:0;right:0;text-align:center;color:var(--ok);opacity:0}.demo-chord.done strong{opacity:1}
+
+/* ---- New: Liquid Glass Press ---- */
+.demo-liquid-glass {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 168px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--bone) 18%, transparent);
+  background: color-mix(in srgb, var(--card-2) 55%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  color: var(--bone);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  isolation: isolate;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--bone) 22%, transparent),
+    0 10px 28px -12px rgba(0, 0, 0, 0.55);
+  transition:
+    transform 0.35s var(--spring),
+    box-shadow 0.35s ease,
+    border-color 0.25s ease;
+}
+.demo-liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--amber) 55%, transparent), transparent 42%),
+    radial-gradient(circle at 78% 80%, color-mix(in srgb, var(--wire) 45%, transparent), transparent 40%);
+  filter: blur(12px);
+  opacity: 0.55;
+  transition: transform 0.55s var(--glide), opacity 0.3s ease;
+}
+.demo-liquid-glass::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -30%;
+  width: 55%;
+  height: 160%;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in srgb, var(--bone) 35%, transparent) 48%,
+    transparent 62%
+  );
+  transform: translateX(-120%) rotate(12deg);
+  transition: transform 0.65s var(--glide);
+  pointer-events: none;
+}
+.demo-liquid-glass:hover {
+  border-color: color-mix(in srgb, var(--bone) 35%, transparent);
+  transform: translateY(-2px) scale(1.02);
+}
+.demo-liquid-glass:hover::before {
+  transform: translate(8%, -6%) scale(1.15);
+  opacity: 0.85;
+}
+.demo-liquid-glass:hover::after {
+  transform: translateX(220%) rotate(12deg);
+}
+.demo-liquid-glass:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--bone) 14%, transparent),
+    0 4px 14px -8px rgba(0, 0, 0, 0.55);
+}
+
+/* ---- New: Bento Expand ---- */
+.demo-bento {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 7px;
+  width: 196px;
+  height: 118px;
+}
+.demo-bento span {
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card-2);
+  color: var(--bone-faint);
+  font: 600 11px var(--font-mono);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    transform 0.45s var(--spring),
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    grid-column 0.45s var(--spring),
+    grid-row 0.45s var(--spring);
+}
+.demo-bento span:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+.demo-bento span:hover {
+  z-index: 2;
+  color: var(--graphite);
+  background: var(--amber);
+  border-color: var(--amber);
+  transform: scale(1.04);
+  box-shadow: 0 12px 24px -14px color-mix(in srgb, var(--amber) 70%, transparent);
+}
+.demo-bento:has(span:hover) span:not(:hover) {
+  opacity: 0.45;
+  transform: scale(0.96);
+  filter: saturate(0.7);
+  transition:
+    transform 0.45s var(--spring),
+    opacity 0.3s ease,
+    filter 0.3s ease;
+}
+
+/* ---- New: Snap Rail ---- */
+.demo-snap-rail {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 240px;
+  height: 44px;
+  padding: 4px;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: var(--card-2);
+  /* sliding pill */
+  --snap-i: 0;
+}
+.demo-snap-rail::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  /* exactly one equal third of the inner track */
+  width: calc((100% - 8px) / 3);
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--amber) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--amber) 50%, transparent);
+  box-sizing: border-box;
+  transform: translateX(calc(var(--snap-i) * 100%));
+  transition: transform 0.45s var(--spring);
+  pointer-events: none;
+  z-index: 0;
+}
+.demo-snap-rail:has(button:nth-child(1):hover),
+.demo-snap-rail:not(:has(button:hover)) {
+  --snap-i: 0;
+}
+.demo-snap-rail:has(button:nth-child(2):hover) {
+  --snap-i: 1;
+}
+.demo-snap-rail:has(button:nth-child(3):hover) {
+  --snap-i: 2;
+}
+.demo-snap-rail button {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 100px;
+  background: transparent;
+  color: var(--bone-dim);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  transition: color 0.25s ease;
+}
+.demo-snap-rail button:hover,
+.demo-snap-rail:not(:has(button:hover)) button:first-child {
+  color: var(--amber);
+}
+
+/* 43. Kinetic XY pad */
+.demo-xy-pad {
+  position: relative;
+  width: 214px;
+  height: 124px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 138, 0, 0.08), transparent 36%),
+    var(--card-2);
+  touch-action: none;
+  cursor: crosshair;
+}
+.demo-xy-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.38;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 0.5px), var(--wire) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(transparent calc(50% - 0.5px), var(--wire) 50%, transparent calc(50% + 0.5px)),
+    radial-gradient(circle, var(--bone-faint) 0 1px, transparent 1.5px);
+  background-size: 100% 100%, 100% 100%, 18px 18px;
+}
+.demo-xy-puck {
+  --x: 0;
+  --y: 0;
+  position: absolute;
+  left: calc(50% - 13px);
+  top: calc(50% - 13px);
+  width: 26px;
+  height: 26px;
+  border: 1px solid color-mix(in srgb, var(--amber) 72%, white);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffd399, var(--amber) 42%, #9b5100 100%);
+  box-shadow:
+    0 0 0 7px rgba(255, 138, 0, 0.08),
+    0 0 30px rgba(255, 138, 0, 0.24);
+  translate: calc(var(--x) * 1px) calc(var(--y) * 1px);
+  transition:
+    translate 0.52s var(--spring),
+    box-shadow 0.25s ease,
+    scale 0.25s var(--spring);
+  will-change: translate;
+}
+.demo-xy-pad.dragging .demo-xy-puck {
+  scale: 1.12;
+  transition-duration: 70ms;
+  box-shadow:
+    0 0 0 12px rgba(255, 138, 0, 0.1),
+    0 0 38px rgba(255, 138, 0, 0.36);
+}
+.demo-xy-puck:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 4px;
+}
+.demo-xy-readout {
+  position: absolute;
+  right: 9px;
+  bottom: 7px;
+  font-size: 9px;
+  color: var(--bone-faint);
+  letter-spacing: 0.05em;
+}
+
+/* 44. Command palette bloom */
+.demo-command {
+  position: relative;
+  width: 220px;
+  height: 126px;
+}
+.demo-command-trigger {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 13px;
+  right: 13px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--card-2) 86%, transparent);
+  color: var(--bone);
+  font-size: 12px;
+  text-align: left;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.04);
+  transition:
+    border-color 0.25s ease,
+    transform 0.35s var(--spring);
+}
+.demo-command-trigger > span {
+  color: var(--amber);
+  font-size: 15px;
+}
+.demo-command-trigger kbd {
+  margin-left: auto;
+  padding: 2px 5px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--bone-faint);
+  font: 9px var(--font-mono);
+}
+.demo-command-trigger:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+.demo-command.open .demo-command-trigger {
+  border-color: color-mix(in srgb, var(--amber) 50%, var(--line));
+  transform: translateY(-3px);
+}
+.demo-command-panel {
+  position: absolute;
+  inset: 36px 0 0;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  padding: 11px 8px 7px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--graphite-2) 88%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 34px -22px rgba(0, 0, 0, 0.9);
+  clip-path: inset(0 0 100% 0 round 15px);
+  opacity: 0;
+  transition:
+    clip-path 0.5s var(--glide),
+    opacity 0.24s ease;
+}
+.demo-command-panel button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 25px;
+  padding: 0 7px;
+  border-radius: 7px;
+  color: var(--bone-dim);
+  font-size: 10px;
+  opacity: 0;
+  transform: translateY(-7px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.4s var(--spring),
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.demo-command-panel button i {
+  width: 15px;
+  color: var(--amber);
+  font-style: normal;
+}
+.demo-command-panel button:hover,
+.demo-command-panel button:focus-visible {
+  color: var(--bone);
+  background: rgba(255, 255, 255, 0.05);
+  outline: none;
+}
+.demo-command.open .demo-command-panel {
+  clip-path: inset(0 round 15px);
+  opacity: 1;
+}
+.demo-command.open .demo-command-panel button {
+  opacity: 1;
+  transform: translateY(0);
+}
+.demo-command.open .demo-command-panel button:nth-child(2) { transition-delay: 55ms; }
+.demo-command.open .demo-command-panel button:nth-child(3) { transition-delay: 110ms; }
+
+/* 45. Momentum picker */
+.demo-momentum-picker {
+  --picker-i: 1;
+  position: relative;
+  width: 208px;
+  height: 122px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card-2);
+  outline: none;
+}
+.demo-momentum-picker:focus-visible {
+  box-shadow: 0 0 0 2px var(--graphite), 0 0 0 4px var(--amber);
+}
+.demo-momentum-picker::before,
+.demo-momentum-picker::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  height: 35px;
+  pointer-events: none;
+}
+.demo-momentum-picker::before {
+  top: 0;
+  background: linear-gradient(var(--card-2), transparent);
+}
+.demo-momentum-picker::after {
+  bottom: 0;
+  background: linear-gradient(transparent, var(--card-2));
+}
+.demo-picker-focus {
+  position: absolute;
+  z-index: 0;
+  top: 37px;
+  left: 10px;
+  right: 10px;
+  height: 38px;
+  border: 1px solid color-mix(in srgb, var(--amber) 46%, transparent);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--amber) 8%, transparent);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.04);
+}
+.demo-picker-track {
+  position: absolute;
+  z-index: 1;
+  top: 37px;
+  left: 10px;
+  right: 10px;
+  display: grid;
+  transform: translateY(calc(var(--picker-i) * -38px));
+  transition: transform 0.58s var(--spring);
+}
+.demo-picker-track button {
+  height: 38px;
+  color: var(--bone);
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s var(--spring),
+    color 0.25s ease;
+}
+.demo-picker-track button:not(.active) {
+  opacity: 0.28;
+  transform: scale(0.88);
+}
+.demo-picker-track button.active {
+  color: var(--amber);
+}
+.demo-picker-value {
+  position: absolute;
+  z-index: 4;
+  right: 10px;
+  bottom: 5px;
+  color: var(--bone-faint);
+  font-size: 8px;
+  letter-spacing: 0.05em;
+}
+
+/* 46. Prompt composer */
+.demo-composer {
+  width: 236px;
+  display: grid;
+  gap: 7px;
+}
+.demo-composer-field {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  align-items: end;
+  gap: 8px;
+  padding: 10px 10px 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card-2);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.4s ease;
+}
+.demo-composer.focused .demo-composer-field {
+  border-color: color-mix(in srgb, var(--amber) 45%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber) 9%, transparent);
+}
+.demo-composer-halo {
+  position: absolute;
+  z-index: -1;
+  inset: -1px;
+  overflow: hidden;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.demo-composer-halo::before {
+  content: "";
+  position: absolute;
+  inset: -70%;
+  background: conic-gradient(
+    transparent,
+    var(--amber),
+    transparent 38%,
+    var(--wire),
+    transparent 72%
+  );
+  animation: composer-halo 4.2s linear infinite;
+}
+.demo-composer.focused .demo-composer-halo {
+  opacity: 0.9;
+}
+@keyframes composer-halo {
+  to { transform: rotate(1turn); }
+}
+.demo-composer-input {
+  height: 20px;
+  max-height: 74px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--bone);
+  font: 400 12px/20px var(--font-body);
+  resize: none;
+  transition: height 0.34s var(--glide);
+}
+.demo-composer-input::placeholder {
+  color: var(--bone-faint);
+}
+.demo-composer-send {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  transform: scale(0.78);
+  opacity: 0.4;
+  transition:
+    transform 0.42s var(--spring),
+    opacity 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease;
+}
+.demo-composer-send::before,
+.demo-composer-send::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transition:
+    opacity 0.22s ease,
+    transform 0.4s var(--spring);
+}
+.demo-composer-send::before {
+  width: 7px;
+  height: 7px;
+  margin: -1px 0 0 -4px;
+  border-top: 1.6px solid currentColor;
+  border-right: 1.6px solid currentColor;
+  color: var(--bone-dim);
+  transform: translate(0, -50%) rotate(-45deg);
+}
+.demo-composer-send::after {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 2px;
+  background: var(--graphite);
+  transform: scale(0);
+}
+.demo-composer.ready .demo-composer-send {
+  transform: scale(1);
+  opacity: 1;
+  background: var(--amber);
+  border-color: var(--amber);
+}
+.demo-composer.ready .demo-composer-send::before {
+  color: var(--graphite);
+}
+.demo-composer.sending .demo-composer-send::before {
+  opacity: 0;
+  transform: translate(0, -50%) rotate(-45deg) scale(0.4);
+}
+.demo-composer.sending .demo-composer-send::after {
+  transform: scale(1);
+}
+.demo-composer.sending .demo-composer-field::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  animation: composer-run 1.15s var(--glide) infinite;
+}
+@keyframes composer-run {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+.demo-composer-meta {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  color: var(--bone-faint);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.demo-composer.ready .demo-composer-count {
+  color: var(--amber);
+}
+
+/* 47. Filmstrip scrubber */
+.demo-filmstrip {
+  --head: 28;
+  position: relative;
+  width: 224px;
+  padding: 16px 12px 26px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card-2);
+  touch-action: none;
+}
+.demo-filmstrip-track {
+  display: flex;
+  gap: 4px;
+  height: 44px;
+}
+.demo-filmstrip-track button {
+  --near: 0;
+  flex: 1;
+  border-radius: 4px;
+  background: linear-gradient(160deg, #2f2f35, #1c1c20);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transform: scaleY(calc(1 + var(--near) * 0.16));
+  transition:
+    transform 0.32s var(--spring),
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.demo-filmstrip-track button.active {
+  background: linear-gradient(160deg, #4a3418, #23201d);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 40%, transparent);
+}
+.demo-filmstrip-head {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 2px;
+  height: 56px;
+  border-radius: 2px;
+  background: var(--amber);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--amber) 65%, transparent);
+  translate: calc(var(--head) * 1px - 1px) 0;
+  transition: translate 0.48s var(--spring);
+}
+.demo-filmstrip-head::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--amber);
+}
+.demo-filmstrip.scrubbing .demo-filmstrip-head {
+  transition-duration: 90ms;
+}
+.demo-filmstrip-time {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  color: var(--bone-faint);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+}
+.demo-filmstrip.scrubbing .demo-filmstrip-time {
+  color: var(--amber);
+}
+
+/* 48. Drag stack collect */
+.demo-dragstack {
+  --px: 0;
+  --py: 0;
+  position: relative;
+  width: 226px;
+  height: 132px;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+.demo-dragstack-row {
+  display: flex;
+  gap: 8px;
+}
+.demo-dragstack-row button {
+  --dx: 0;
+  --dy: 0;
+  --i: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card-2);
+  color: var(--bone-dim);
+  font: 500 10px var(--font-mono);
+  white-space: nowrap;
+  cursor: grab;
+  translate: 0 0;
+  transition:
+    translate 0.55s var(--spring),
+    rotate 0.55s var(--spring),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+.demo-dragstack-row button:nth-child(2) { --i: 1; transition-delay: 30ms; }
+.demo-dragstack-row button:nth-child(3) { --i: 2; transition-delay: 60ms; }
+.demo-dragstack.gathered .demo-dragstack-row button {
+  translate: calc(var(--dx) * 1px) calc(var(--dy) * 1px);
+  rotate: calc(var(--i) * 6deg - 6deg);
+  border-color: color-mix(in srgb, var(--amber) 40%, transparent);
+  color: var(--bone);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.5);
+  transition-duration: 130ms;
+  transition-delay: 0s;
+  cursor: grabbing;
+}
+.demo-dragstack-badge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin: -10px -10px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: var(--graphite);
+  font-size: 9px;
+  font-weight: 700;
+  translate: calc(var(--px) * 1px + 26px) calc(var(--py) * 1px - 22px);
+  transform: scale(0);
+  transition: transform 0.4s var(--spring);
+  pointer-events: none;
+}
+.demo-dragstack.gathered .demo-dragstack-badge {
+  transform: scale(1);
+}
+.demo-dragstack-hint {
+  position: absolute;
+  bottom: 4px;
+  color: var(--bone-faint);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  transition: opacity 0.3s ease;
+}
+.demo-dragstack.gathered .demo-dragstack-hint {
+  opacity: 0;
+}
+
+/* 49. Focus relay */
+.demo-focus-relay {
+  --x: 0px;
+  --y: 0px;
+  --w: 214px;
+  --h: 40px;
+  position: relative;
+  display: grid;
+  gap: 8px;
+  width: 214px;
+}
+.demo-focus-relay button {
+  position: relative;
+  z-index: 1;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--card-2);
+  color: var(--bone-dim);
+  font: 500 13px var(--font-body);
+  text-align: left;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+.demo-focus-relay button.active {
+  color: var(--bone);
+  border-color: transparent;
+}
+.demo-focus-ring {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  width: var(--w);
+  height: var(--h);
+  translate: var(--x) var(--y);
+  border: 1.5px solid var(--amber);
+  border-radius: 11px;
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--amber) 16%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--amber) 20%, transparent);
+  pointer-events: none;
+  transition:
+    translate 0.48s var(--spring),
+    width 0.48s var(--spring),
+    height 0.48s var(--spring);
+}
+.demo-focus-relay button:focus-visible {
+  outline: none;
+}
+
+/* 50. Hold to talk */
+.demo-talk {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: 200px;
+}
+.demo-talk-wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 42px;
+}
+.demo-talk-wave i {
+  display: block;
+  width: 4px;
+  height: 36px;
+  border-radius: 4px;
+  background: var(--amber);
+  transform: scaleY(0.12);
+  transform-origin: center;
+  transition: transform 0.4s var(--spring), background 0.3s ease;
+}
+.demo-talk.live .demo-talk-wave i {
+  animation: talk-bar 0.42s ease-in-out infinite alternate;
+}
+.demo-talk.live .demo-talk-wave i:nth-child(1),
+.demo-talk.live .demo-talk-wave i:nth-child(7) { animation-duration: 0.52s; }
+.demo-talk.live .demo-talk-wave i:nth-child(2),
+.demo-talk.live .demo-talk-wave i:nth-child(6) { animation-duration: 0.34s; }
+.demo-talk.live .demo-talk-wave i:nth-child(3),
+.demo-talk.live .demo-talk-wave i:nth-child(5) { animation-duration: 0.26s; }
+.demo-talk.live .demo-talk-wave i:nth-child(4) { animation-duration: 0.2s; }
+@keyframes talk-bar {
+  from { transform: scaleY(0.18); }
+  to { transform: scaleY(1); }
+}
+.demo-talk.sent .demo-talk-wave i {
+  background: var(--ok);
+  transform: scaleY(0.18);
+}
+.demo-talk-btn {
+  position: relative;
+  min-width: 132px;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 100px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  color: var(--bone);
+  font: 600 12px var(--font-body);
+  letter-spacing: 0.02em;
+  touch-action: none;
+  user-select: none;
+  transition:
+    transform 0.35s var(--spring),
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+.demo-talk-btn::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 1.5px solid color-mix(in srgb, var(--amber) 70%, transparent);
+  opacity: 0;
+  transform: scale(0.86);
+  transition: opacity 0.35s ease, transform 0.45s var(--spring);
+}
+.demo-talk.live .demo-talk-btn {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--graphite);
+  transform: scale(0.96);
+}
+.demo-talk.live .demo-talk-btn::after {
+  opacity: 1;
+  transform: scale(1);
+}
+.demo-talk.sent .demo-talk-btn {
+  border-color: color-mix(in srgb, var(--ok) 55%, transparent);
+  color: var(--ok);
+}
+.demo-talk-status {
+  height: 12px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--ok);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.4s var(--spring);
+}
+.demo-talk.sent .demo-talk-status {
+  opacity: 1;
+  transform: none;
+}
+
+/* 51. Lattice snap */
+.demo-lattice {
+  --c: 0;
+  --r: 0;
+  --tx: 0;
+  --ty: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  width: 200px;
+  height: 118px;
+  touch-action: none;
+}
+.demo-lattice > span {
+  border: 1px dashed color-mix(in srgb, var(--line) 90%, var(--bone-faint));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--card-2) 55%, transparent);
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.demo-lattice > span.hot {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--amber) 55%, transparent);
+  background: color-mix(in srgb, var(--amber) 8%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 12%, transparent);
+}
+.demo-lattice-tile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: calc((100% - 16px) / 3);
+  height: calc((100% - 8px) / 2);
+  border-radius: 10px;
+  background:
+    radial-gradient(120% 80% at 30% 20%, #ffd08a, var(--amber) 46%, #b36200);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  cursor: grab;
+  translate: calc(var(--c) * (100% + 8px)) calc(var(--r) * (100% + 8px));
+  transition: translate 0.5s var(--spring), scale 0.3s var(--spring);
+}
+.demo-lattice.dragging .demo-lattice-tile {
+  cursor: grabbing;
+  scale: 1.06;
+  translate: calc(var(--tx) * 1px) calc(var(--ty) * 1px);
+  transition-duration: 80ms;
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.45),
+    0 0 0 4px color-mix(in srgb, var(--amber) 18%, transparent);
+}
+.demo-lattice-tile:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 3px;
+}

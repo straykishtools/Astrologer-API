@@ -1,0 +1,395 @@
+/* ================================================================
+   KINETICS-COSMIC — پورت تم‌دار کامپوننت‌های فیزیکی کتابخانهٔ Kinetics
+   (منبع: kinetics-main/public/css/effects-a|b|c.css)
+   همهٔ حرکات با فنر overshoot / glide — بدون ease خطی.
+   پیشوند k- تا با co-* و style.css تداخل نکند.
+   ================================================================ */
+.k-phys {
+    --k-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* overshoot ≈1.08 */
+    --k-glide:  cubic-bezier(0.16, 1, 0.30, 1);
+}
+
+/* ═══ Inertial Dial — قطب‌نمای متمرکز (کارت ۴ Dial + مومنتوم) ═══ */
+.k-dial {
+    position: relative;
+    width: 150px; height: 150px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background:
+        repeating-conic-gradient(from -4deg, rgba(236, 217, 160, .18) 0 2deg, transparent 2deg 12deg),
+        radial-gradient(circle at 35% 30%, rgba(37, 53, 107, .9), rgba(7, 12, 31, .95));
+    border: 1px solid var(--co-line-strong, rgba(221, 192, 112, .42));
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+.k-dial.dragging { cursor: grabbing; }
+/* ── هشت تیکِ نام‌دار دور صفحه ── */
+.k-dial-ticks { position: absolute; inset: 0; pointer-events: none; }
+.k-dial-ticks span {
+    position: absolute; inset: 0;
+    display: grid; place-items: start center;
+    transform: rotate(var(--a, 0deg));
+}
+.k-dial-ticks span::before {
+    content: ""; width: 1.5px; height: 7px;
+    margin-top: 2px; border-radius: 2px;
+    background: linear-gradient(180deg, #ffd976, rgba(201,162,39,.3));
+}
+.k-dial-ticks b {
+    font-weight: 500; font-size: 8.5px; line-height: 1;
+    color: var(--co-ink-faint, #7c86a6);
+    margin-top: 1px; padding: 2px 4px; border-radius: 6px;
+    transform: rotate(calc(var(--a, 0deg) * -1));
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.30, 1), background 0.3s;
+}
+.k-dial-ticks b.on { color: #ffd976; background: rgba(201, 162, 39, 0.16); }
+.k-dial::before {
+    content: "";
+    position: absolute; inset: 18px;
+    border-radius: 50%;
+    background: rgba(7, 12, 31, .92);
+    border: 1px solid var(--co-line, rgba(221, 192, 112, .16));
+}
+.k-dial-needle {
+    position: absolute; z-index: 2;
+    width: 3px; height: 44px;
+    background: linear-gradient(180deg, #ffd976, var(--co-gold-500, #c9a227));
+    border-radius: 5px;
+    transform: translateY(-20px);
+    transform-origin: bottom center;
+    filter: drop-shadow(0 0 8px rgba(201, 162, 39, .6));
+}
+.k-dial-hub {
+    position: absolute; z-index: 3;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f3e5b8, #8a691f);
+    box-shadow: 0 0 10px rgba(201, 162, 39, .5);
+}
+.k-dial readout, .k-dial-readout {
+    position: relative; z-index: 1;
+    margin-top: 96px;
+    font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: var(--co-ink, #ece6d6);
+    text-align: center;
+    max-width: 130px;
+}
+
+/* ═══ Kinetic XY Pad (کارت ۴۳) ═══ */
+.k-xypad {
+    position: relative;
+    width: 220px; height: 128px;
+    overflow: hidden;
+    border: 1px solid var(--co-line, rgba(221, 192, 112, .16));
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(201, 162, 39, .08), transparent 36%),
+        rgba(16, 26, 61, .75);
+    touch-action: none;
+    cursor: crosshair;
+}
+.k-xygrid {
+    position: absolute; inset: 0; opacity: .4;
+    background:
+        linear-gradient(90deg, transparent calc(50% - .5px), rgba(159, 212, 224, .35) 50%, transparent calc(50% + .5px)),
+        linear-gradient(transparent calc(50% - .5px), rgba(159, 212, 224, .35) 50%, transparent calc(50% + .5px)),
+        radial-gradient(circle, rgba(236, 217, 160, .18) 0 1px, transparent 1.5px);
+    background-size: 100% 100%, 100% 100%, 18px 18px;
+}
+.k-xypuck {
+    --x: 0; --y: 0;
+    position: absolute;
+    left: calc(50% - 13px); top: calc(50% - 13px);
+    width: 26px; height: 26px;
+    border: 1px solid #f3e5b8;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f9efd0, var(--co-gold-500, #c9a227) 42%, #8a691f);
+    box-shadow: 0 0 0 7px rgba(201, 162, 39, .08), 0 0 30px rgba(201, 162, 39, .24);
+    translate: calc(var(--x) * 1px) calc(var(--y) * 1px);
+    transition:
+        translate 0.52s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.25s cubic-bezier(0.16, 1, 0.30, 1),
+        scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: translate;
+    z-index: 2;
+}
+.k-xypad.dragging .k-xypuck {
+    scale: 1.12;
+    transition-duration: 70ms;
+    box-shadow: 0 0 0 12px rgba(201, 162, 39, .1), 0 0 38px rgba(201, 162, 39, .36);
+}
+.k-xyread {
+    position: absolute; right: 9px; bottom: 7px;
+    font-size: 10.5px; color: var(--co-ink-dim, #aab2cd);
+}
+/* برچسب چهار گوشه — خواب‌آلود بالا-چپ، آرام بالا-راست، پرتنش پایین-چپ، پرانرژی پایین-راست */
+.k-axlabel { position: absolute; font-size: 9.5px; font-weight: 600; color: var(--co-ink-faint, #7c86a6); pointer-events: none; }
+.k-axlabel.x-minus { top: 6px; left: 9px; }
+.k-axlabel.y-plus { top: 6px; right: 9px; }
+.k-axlabel.y-minus { bottom: 24px; left: 9px; }
+.k-axlabel.x-plus { bottom: 24px; right: 9px; }
+.k-xyread { left: 50% !important; right: auto !important; transform: translateX(-50%); }
+
+/* ═══ Like Burst (کارت ۱۱) — حلقهٔ ذرات شعاعی ═══ */
+.k-burst { position: relative; }
+.k-heart {
+    width: 22px; height: 22px;
+    fill: none; stroke: var(--co-ink-dim, #aab2cd); stroke-width: 2;
+    transition:
+        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        fill 0.2s cubic-bezier(0.16, 1, 0.30, 1),
+        stroke 0.2s cubic-bezier(0.16, 1, 0.30, 1);
+}
+.k-burst.liked .k-heart { fill: var(--co-gold-400, #ddc070); stroke: var(--co-gold-400, #ddc070); }
+.k-burst.pop .k-heart { transform: scale(1.35); }
+/* نسخهٔ دکمهٔ متنی (♡/♥) — همان پرش/رنگ بدون SVG */
+.k-burst { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s, color 0.2s; }
+.k-burst.liked { color: var(--co-gold-300, #ecd9a0); border-color: var(--co-gold-400, #ddc070); }
+.k-burst.pop { transform: scale(1.12); }
+.k-particle {
+    position: absolute; top: 50%; left: 50%;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--co-gold-400, #ddc070);
+    pointer-events: none;
+    animation: k-fly 0.6s cubic-bezier(0.16, 1, 0.30, 1) forwards;
+}
+@keyframes k-fly {
+    to { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+/* ═══ Bento Expand (کارت New: Bento) ═══ */
+.k-bento {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr .9fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    min-height: 190px;
+}
+.k-bento-cell {
+    display: grid; place-items: center;
+    border-radius: 14px;
+    border: 1px solid var(--co-line, rgba(221, 192, 112, .16));
+    background: rgba(16, 26, 61, .72);
+    color: var(--co-ink-dim, #aab2cd);
+    font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    transition:
+        transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background 0.3s cubic-bezier(0.16, 1, 0.30, 1),
+        color 0.3s cubic-bezier(0.16, 1, 0.30, 1),
+        border-color 0.3s cubic-bezier(0.16, 1, 0.30, 1),
+        grid-column 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+        grid-row 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.k-bento-cell b {
+    display: block; text-align: center;
+    font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+    font-size: 14px; color: var(--co-gold-200, #f3e5b8);
+    margin-bottom: 4px;
+}
+.k-bento-cell .k-bd {
+    font-size: 10.5px; line-height: 1.8; color: var(--co-ink-dim, #aab2cd);
+    padding: 0 10px; text-align: center;
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height .5s cubic-bezier(0.16, 1, 0.30, 1), opacity .4s cubic-bezier(0.16, 1, 0.30, 1);
+}
+/* هاور فقط اشارهٔ ظریف می‌دهد — باز شدن با «کلیک» (class .expanded) است؛
+   باز‌شدنِ grid با :hover حلقهٔ لرزش می‌ساخت (کارت از زیر ماوس جابه‌جا می‌شد). */
+.k-bento-cell:hover { border-color: rgba(221, 192, 112, 0.45); transform: scale(1.015); }
+.k-bento-cell.expanded {
+    z-index: 2;
+    color: var(--co-ink, #ece6d6);
+    background: linear-gradient(160deg, rgba(37, 53, 107, 0.8), rgba(16, 26, 61, 0.95));
+    border-color: var(--co-gold-400, #ddc070);
+    transform: scale(1.02);
+    box-shadow: 0 14px 28px -14px rgba(201, 162, 39, 0.5);
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+}
+.k-bento-cell.expanded .k-bd { max-height: 160px; opacity: 1; }
+.k-bento:has(.k-bento-cell.expanded) .k-bento-cell:not(.expanded) {
+    opacity: .45;
+    transform: scale(0.96);
+    filter: saturate(0.7);
+}
+.k-bento-cell:first-child { grid-column: 1; grid-row: 1 / span 2; }
+
+/* ═══ Prompt Composer (کارت ۴۶) ═══ */
+.k-composer {
+    position: relative;
+    display: flex; align-items: flex-end; gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--co-line, rgba(221, 192, 112, .16));
+    border-radius: 18px;
+    background: rgba(9, 14, 34, .7);
+    transition:
+        border-color 0.35s cubic-bezier(0.16, 1, 0.30, 1),
+        box-shadow 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.k-composer:focus-within {
+    border-color: var(--co-gold-400, #ddc070);
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, .12), 0 0 26px rgba(201, 162, 39, .15);
+}
+.k-composer textarea {
+    flex: 1;
+    resize: none;
+    border: none; outline: none; background: transparent;
+    color: var(--co-ink, #ece6d6);
+    font-family: "Vazirmatn", sans-serif; font-size: 13.5px; line-height: 2;
+    height: 26px; max-height: 74px;
+    transition: height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.k-composer textarea::placeholder { color: var(--co-ink-faint, #7c86a6); }
+.k-send {
+    display: grid; place-items: center;
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid var(--co-line-strong, rgba(221, 192, 112, .42));
+    background: rgba(22, 34, 77, .6);
+    color: var(--co-ink-dim, #aab2cd);
+    font-size: 16px; cursor: pointer;
+    transition:
+        transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background 0.3s cubic-bezier(0.16, 1, 0.30, 1),
+        color 0.3s cubic-bezier(0.16, 1, 0.30, 1),
+        opacity 0.3s;
+    opacity: .55;
+}
+.k-composer.ready .k-send { opacity: 1; color: #0c1430; background: var(--co-gold-400, #ddc070); border-color: transparent; }
+.k-send:active { transform: scale(0.86); transition-duration: 0.08s; }
+.k-composer.sending .k-send { transform: scale(.9); }
+.k-count {
+    position: absolute; left: 14px; bottom: 6px;
+    font-size: 10px; color: var(--co-ink-faint, #7c86a6);
+}
+
+/* ═══ Token Stream (کارت New: Token Stream) + Bounce (کارت ۱۲) ═══ */
+.k-tokens {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    align-content: flex-start;
+    min-height: 34px;
+    padding: 4px 2px;
+}
+.k-tokens span {
+    display: inline-flex; align-items: center;
+    height: 26px; padding: 0 10px;
+    border-radius: 8px;
+    background: rgba(16, 26, 61, .75);
+    border: 1px solid var(--co-line, rgba(221, 192, 112, .16));
+    color: var(--co-ink-dim, #aab2cd);
+    font-size: 12px; font-weight: 600;
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+    animation: k-token 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.k-tokens span.hl { color: var(--co-gold-400, #ddc070); border-color: rgba(201, 162, 39, .4); }
+@keyframes k-token {
+    0%   { opacity: 0; transform: translateY(10px) scale(0.92); }
+    60%  { opacity: 1; transform: translateY(0) scale(1.04); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.k-bounce { display: inline-flex; gap: 6px; align-items: flex-end; padding: 6px 4px; }
+.k-bounce i {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--co-gold-300, #ecd9a0);
+    animation: k-bdrop 1s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+}
+.k-bounce i:nth-child(2) { animation-delay: 0.12s; }
+.k-bounce i:nth-child(3) { animation-delay: 0.24s; }
+@keyframes k-bdrop {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+}
+
+/* ═══ Hold to Talk / Waveform (کارت ۵۰) — موجِ بریفینگ صوتی ═══ */
+.k-talk { display: grid; justify-items: center; gap: 12px; width: 100%; }
+.k-talk-wave { display: flex; align-items: center; justify-content: center; gap: 4px; height: 42px; }
+.k-talk-wave i {
+    display: block; width: 4px; height: 36px; border-radius: 4px;
+    background: linear-gradient(180deg, #f3e5b8, var(--co-gold-500, #c9a227));
+    transform: scaleY(0.12); transform-origin: center;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s cubic-bezier(0.16, 1, 0.30, 1);
+}
+.k-talk.live .k-talk-wave i { animation: k-talk-bar 0.42s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+.k-talk.live .k-talk-wave i:nth-child(1), .k-talk.live .k-talk-wave i:nth-child(7) { animation-duration: 0.52s; }
+.k-talk.live .k-talk-wave i:nth-child(2), .k-talk.live .k-talk-wave i:nth-child(6) { animation-duration: 0.34s; }
+.k-talk.live .k-talk-wave i:nth-child(3), .k-talk.live .k-talk-wave i:nth-child(5) { animation-duration: 0.26s; }
+.k-talk.live .k-talk-wave i:nth-child(4) { animation-duration: 0.2s; }
+@keyframes k-talk-bar { from { transform: scaleY(0.18); } to { transform: scaleY(1); } }
+.k-talk-btn {
+    position: relative;
+    min-width: 148px; min-height: 42px;
+    padding: 0 20px;
+    border-radius: 100px;
+    background: rgba(16, 26, 61, .8);
+    border: 1px solid var(--co-line, rgba(221, 192, 112, .16));
+    color: var(--co-ink, #ece6d6);
+    font-family: "Vazirmatn", sans-serif; font-size: 12.5px; font-weight: 700;
+    cursor: pointer; touch-action: none; user-select: none;
+    transition:
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background 0.25s cubic-bezier(0.16, 1, 0.30, 1),
+        border-color 0.25s cubic-bezier(0.16, 1, 0.30, 1),
+        color 0.25s cubic-bezier(0.16, 1, 0.30, 1);
+}
+.k-talk-btn::after {
+    content: "";
+    position: absolute; inset: -6px;
+    border-radius: inherit;
+    border: 1.5px solid rgba(221, 192, 112, .7);
+    opacity: 0; transform: scale(0.86);
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.30, 1), transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.k-talk.live .k-talk-btn {
+    background: linear-gradient(180deg, var(--co-gold-300, #ecd9a0), var(--co-gold-500, #c9a227) 60%, var(--co-gold-600, #a8812a));
+    border-color: transparent; color: #0c1430; font-weight: 900;
+    transform: scale(0.96);
+}
+.k-talk.live .k-talk-btn::after { opacity: 1; transform: scale(1); }
+.k-talk.sent .k-talk-btn { border-color: rgba(46, 204, 113, .55); color: var(--co-success, #2ecc71); }
+.k-talk.sent .k-talk-wave i { background: var(--co-success, #2ecc71); transform: scaleY(0.18); }
+.k-talk-status {
+    height: 12px; font-size: 9.5px; letter-spacing: .12em;
+    color: var(--co-success, #2ecc71);
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.30, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.k-talk.sent .k-talk-status { opacity: 1; transform: none; }
+
+/* ═══ چیدمان بخش «آسمانِ جنبشی» در داشبورد ═══ */
+.kx-section {
+    max-width: 1080px; margin: 34px auto 0;
+    font-family: "Vazirmatn", sans-serif;
+}
+.kx-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 14px; margin-top: 16px;
+}
+.kx-card {
+    background: var(--co-panel, rgba(16, 26, 61, .72));
+    border: 1px solid var(--co-line, rgba(221, 192, 112, .16));
+    border-radius: 18px;
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 14px; align-items: center;
+}
+.kx-card h4 {
+    margin: 0; align-self: flex-start;
+    font-family: "Reem Kufi", "Vazirmatn", sans-serif;
+    font-size: 14px; color: var(--co-gold-300, #ecd9a0);
+}
+.kx-card .kx-note { font-size: 11px; color: var(--co-ink-faint, #7c86a6); margin: 0 auto; }
+.kx-mood-row { display: flex; align-items: center; gap: 12px; }
+.kx-mood-log { font-size: 11.5px; color: var(--co-ink-dim, #aab2cd); min-height: 18px; text-align: center; }
+
+@media (max-width: 720px) {
+    .k-bento { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 90px); }
+    .k-bento-cell:first-child { grid-column: 1 / -1; grid-row: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .k-dial-needle, .k-xypuck, .k-bento-cell, .k-send, .k-heart { transition: none !important; }
+    .k-tokens span { animation-duration: 0.01s; }
+    .k-bounce i { animation: none; }
+}

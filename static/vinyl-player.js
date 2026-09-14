@@ -260,6 +260,13 @@
         setVolume: function (v) { volume = Math.max(0, Math.min(1, v)); if (audio) audio.volume = volume; lsSet(VOL_KEY, volume); },
         toggle: function () { markGesture(); toggle(); },
         isPlaying: function () { return !!(audio && !audio.paused); },
+        /** آیا برای این بخش فایلی تخصیص داده شده؟ (مدیتیشن می‌پرسد تا سنتز را رد کند) */
+        hasFileFor: function (key) {
+            return tracks.some(function (t) {
+                var a = t.assignedTo || [];
+                return t.fileUrl && (a.indexOf('all') >= 0 || a.indexOf(key) >= 0);
+            });
+        },
         reload: function () { refresh(); },
         refresh: refresh
     };

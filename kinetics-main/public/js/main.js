@@ -1,0 +1,1940 @@
+/* ============================================================
+   Kinetics — main.js
+   Code-panel UI + all live demo interactions
+   ============================================================ */
+(function () {
+  'use strict';
+
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  /* ---------------------------------------------------------
+     Code modal: "View code" opens a shared dialog.
+     Each card keeps its .code-panel as a hidden template; we
+     clone its tabs + body into the modal on open.
+  --------------------------------------------------------- */
+  const modal = (function buildModal() {
+    const el = document.createElement('div');
+    el.className = 'code-modal';
+    el.id = 'code-modal';
+    el.hidden = true;
+    el.innerHTML =
+      '<div class="code-modal-backdrop" data-close></div>' +
+      '<div class="code-modal-dialog" role="dialog" aria-modal="true" aria-label="Source code">' +
+        '<div class="code-modal-head">' +
+          '<div class="code-modal-title"></div>' +
+          '<button class="code-modal-close" data-close aria-label="Close">✕</button>' +
+        '</div>' +
+        '<div class="code-modal-content"></div>' +
+      '</div>';
+    document.body.appendChild(el);
+    return el;
+  })();
+
+  const modalTitle = $('.code-modal-title', modal);
+  const modalContent = $('.code-modal-content', modal);
+  let lastTrigger = null;
+
+  const openModal = (card) => {
+    const panel = $('.code-panel', card);
+    if (!panel) return;
+    const name = (card.querySelector('.name') || {}).textContent || 'Source';
+    const param = (card.querySelector('.card-param') || {}).textContent || '';
+    modalTitle.innerHTML = name + (param ? '<span class="param">' + param + '</span>' : '');
+
+    modalContent.innerHTML = '';
+    const clone = panel.cloneNode(true);
+    clone.classList.remove('open');
+    modalContent.appendChild(clone);
+
+    // normalise to the first (CSS) tab on every open
+    const tabs = $$('.code-tab', clone);
+    const pres = $$('pre[data-lang]', clone);
+    tabs.forEach((t, i) => t.classList.toggle('active', i === 0));
+    const first = tabs[0] && tabs[0].dataset.lang;
+    pres.forEach((p) => p.classList.toggle('hidden', p.dataset.lang !== first));
+
+    modal.hidden = false;
+    requestAnimationFrame(() => modal.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { modal.hidden = true; modalContent.innerHTML = ''; }, 280);
+    if (lastTrigger) lastTrigger.focus();
+  };
+
+  $$('.view-code').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      lastTrigger = btn;
+      openModal(btn.closest('.card'));
+    });
+  });
+
+  // Tab switching + copy, delegated within the modal
+  modal.addEventListener('click', async (e) => {
+    if (e.target.closest('[data-close]')) { closeModal(); return; }
+
+    const tab = e.target.closest('.code-tab');
+    if (tab) {
+      const lang = tab.dataset.lang;
+      $$('.code-tab', modalContent).forEach((t) => t.classList.toggle('active', t === tab));
+      $$('pre[data-lang]', modalContent).forEach((pre) => {
+        pre.classList.toggle('hidden', pre.dataset.lang !== lang);
+      });
+      return;
+    }
+
+    const copyBtn = e.target.closest('.copy-btn');
+    if (copyBtn) {
+      const visible = $$('pre[data-lang]', modalContent).find((p) => !p.classList.contains('hidden'));
+      if (!visible) return;
+      try {
+        await navigator.clipboard.writeText(visible.innerText);
+      } catch (_) {
+        const r = document.createRange();
+        r.selectNodeContents(visible);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(r);
+        document.execCommand('copy');
+        sel.removeAllRanges();
+      }
+      copyBtn.textContent = 'Copied';
+      copyBtn.classList.add('copied');
+      setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 1400);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.hidden) closeModal();
+  });
+
+  /* ---------------------------------------------------------
+     1. Spring card resize
+  --------------------------------------------------------- */
+  $$('.demo-spring-card').forEach((card) => {
+    card.addEventListener('click', () => card.classList.toggle('expanded'));
+  });
+
+  /* ---------------------------------------------------------
+     2. Magnetic button
+  --------------------------------------------------------- */
+  $$('.demo-magnet-zone').forEach((zone) => {
+    const btn = $('.demo-magnet-btn', zone);
+    if (!btn) return;
+    const PULL = 0.35;
+    zone.addEventListener('mousemove', (e) => {
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - (r.left + r.width / 2);
+      const y = e.clientY - (r.top + r.height / 2);
+      btn.style.transform = `translate(${x * PULL}px, ${y * PULL}px)`;
+    });
+    zone.addEventListener('mouseleave', () => { btn.style.transform = 'translate(0,0)'; });
+  });
+
+  /* ---------------------------------------------------------
+     3. Elastic counter
+  --------------------------------------------------------- */
+  $$('.demo-counter').forEach((el) => {
+    let val = parseInt(el.dataset.value || el.textContent, 10) || 0;
+    el.addEventListener('click', () => {
+      val += 1;
+      el.textContent = val;
+      el.classList.remove('bump');
+      void el.offsetWidth; // restart transition
+      el.classList.add('bump');
+      setTimeout(() => el.classList.remove('bump'), 400);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     4. Toast overshoot
+  --------------------------------------------------------- */
+  $$('.demo-toast-trigger').forEach((btn) => {
+    const zone = btn.closest('.demo-toast-zone');
+    const toast = $('.demo-toast', zone);
+    let timer;
+    btn.addEventListener('click', () => {
+      clearTimeout(timer);
+      toast.classList.add('show');
+      timer = setTimeout(() => toast.classList.remove('show'), 2200);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     5. Tab pill glide
+  --------------------------------------------------------- */
+  $$('.demo-tabs').forEach((tabs) => {
+    const pill = $('.demo-tab-pill', tabs);
+    const btns = $$('.demo-tab-btn', tabs);
+    const move = (target) => {
+      pill.style.left = target.offsetLeft + 'px';
+      pill.style.width = target.offsetWidth + 'px';
+    };
+    const active = btns.find((b) => b.classList.contains('active')) || btns[0];
+    if (active) requestAnimationFrame(() => move(active));
+    btns.forEach((b) => b.addEventListener('click', () => {
+      btns.forEach((x) => x.classList.toggle('active', x === b));
+      move(b);
+    }));
+  });
+
+  /* ---------------------------------------------------------
+     6. Accordion spring
+  --------------------------------------------------------- */
+  $$('.demo-acc-head').forEach((head) => {
+    head.addEventListener('click', () => {
+      head.closest('.demo-acc-item').classList.toggle('open');
+    });
+  });
+
+  /* ---------------------------------------------------------
+     7. Drag to dismiss
+  --------------------------------------------------------- */
+  $$('.demo-drag-card').forEach((card) => {
+    let startX = 0, x = 0, dragging = false;
+    const reset = () => { x = 0; card.style.transform = ''; card.style.opacity = ''; };
+
+    const down = (e) => {
+      dragging = true; startX = e.clientX;
+      card.classList.add('dragging');
+      card.setPointerCapture(e.pointerId);
+    };
+    const move = (e) => {
+      if (!dragging) return;
+      x = e.clientX - startX;
+      card.style.transform = `translateX(${x}px) rotate(${x * 0.04}deg)`;
+      card.style.opacity = Math.max(1 - Math.abs(x) / 260, 0.25);
+    };
+    const up = () => {
+      if (!dragging) return;
+      dragging = false;
+      card.classList.remove('dragging');
+      if (Math.abs(x) > 100) {
+        card.classList.add('gone');
+        card.style.transform = `translateX(${x > 0 ? 400 : -400}px) rotate(${x > 0 ? 24 : -24}deg)`;
+        card.style.opacity = '0';
+        setTimeout(() => { card.classList.remove('gone'); reset(); }, 480);
+      } else {
+        reset();
+      }
+    };
+    card.addEventListener('pointerdown', down);
+    card.addEventListener('pointermove', move);
+    card.addEventListener('pointerup', up);
+    card.addEventListener('pointercancel', up);
+  });
+
+  /* ---------------------------------------------------------
+     8. Ripple feedback (delegated to all ripple buttons)
+  --------------------------------------------------------- */
+  $$('.demo-ripple-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const r = btn.getBoundingClientRect();
+      const size = Math.max(r.width, r.height);
+      const span = document.createElement('span');
+      span.className = 'ripple';
+      span.style.width = span.style.height = size + 'px';
+      span.style.left = (e.clientX - r.left - size / 2) + 'px';
+      span.style.top  = (e.clientY - r.top  - size / 2) + 'px';
+      btn.appendChild(span);
+      setTimeout(() => span.remove(), 650);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     9. Scramble reveal
+  --------------------------------------------------------- */
+  const SCRAMBLE_CHARS = '!<>-_/[]{}=+*^?#________';
+  $$('.demo-scramble').forEach((el) => {
+    const text = el.dataset.text || el.textContent;
+    let running = false;
+    const play = () => {
+      if (running) return;
+      running = true;
+      let frame = 0;
+      const total = 26;
+      const id = setInterval(() => {
+        frame++;
+        el.textContent = text.split('').map((c, i) => {
+          if (c === ' ') return ' ';
+          const progress = frame - i * 1.4;
+          if (progress > total * 0.55) return c;
+          return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        }).join('');
+        if (frame > total + text.length) {
+          clearInterval(id);
+          el.textContent = text;
+          running = false;
+        }
+      }, 35);
+    };
+    el.addEventListener('click', play);
+    el.addEventListener('mouseenter', play);
+  });
+
+  /* ---------------------------------------------------------
+     10. Morph icon swap
+  --------------------------------------------------------- */
+  $$('.demo-morph-icon').forEach((wrap) => {
+    const svgs = $$('svg', wrap);
+    if (svgs.length < 2) return;
+    wrap.addEventListener('click', () => {
+      svgs.forEach((svg) => {
+        const showing = svg.classList.contains('show');
+        svg.classList.toggle('show', !showing);
+        svg.classList.toggle('hide', showing);
+      });
+    });
+  });
+
+  /* ---------------------------------------------------------
+     11. Elastic progress randomize
+  --------------------------------------------------------- */
+  $$('.demo-progress-trigger').forEach((btn) => {
+    const fill = $('.demo-progress-fill', btn.closest('.card-stage'));
+    btn.addEventListener('click', () => {
+      fill.style.width = (15 + Math.floor(Math.random() * 80)) + '%';
+    });
+  });
+
+  /* ---------------------------------------------------------
+     12. Switch spring
+  --------------------------------------------------------- */
+  $$('.demo-switch').forEach((sw) => {
+    sw.addEventListener('click', () => sw.classList.toggle('on'));
+  });
+
+  /* ---------------------------------------------------------
+     13. Error shake (retriggerable)
+  --------------------------------------------------------- */
+  $$('.demo-shake-trigger').forEach((btn) => {
+    const zone = btn.closest('.demo-shake-zone');
+    const input = $('.demo-shake-input', zone);
+    btn.addEventListener('click', () => {
+      zone.classList.add('invalid');
+      input.classList.remove('error');
+      void input.offsetWidth;
+      input.classList.add('error');
+    });
+    input.addEventListener('animationend', () => input.classList.remove('error'));
+  });
+
+  /* ---------------------------------------------------------
+     14. Confetti burst
+  --------------------------------------------------------- */
+  const CONFETTI_COLORS = ['#FF8A00', '#5B8DEF', '#4CD08A', '#EDE9E0'];
+  $$('.demo-confetti-btn').forEach((btn) => {
+    const zone = btn.closest('.demo-confetti-zone');
+    btn.addEventListener('click', () => {
+      const N = 16;
+      for (let i = 0; i < N; i++) {
+        const angle = (Math.PI * 2 * i) / N + Math.random() * 0.4;
+        const dist = 55 + Math.random() * 55;
+        const p = document.createElement('span');
+        p.className = 'confetti-particle';
+        p.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+        p.style.setProperty('--tx', `calc(-50% + ${Math.cos(angle) * dist}px)`);
+        p.style.setProperty('--ty', `calc(-50% + ${Math.sin(angle) * dist}px)`);
+        p.style.setProperty('--rot', `${Math.random() * 360}deg`);
+        zone.appendChild(p);
+        setTimeout(() => p.remove(), 950);
+      }
+    });
+  });
+
+  /* ---------------------------------------------------------
+     15. Parallax tilt
+  --------------------------------------------------------- */
+  $$('.demo-tilt-zone').forEach((zone) => {
+    const card = $('.demo-tilt-card', zone);
+    const glow = $('.glow', card);
+    zone.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      card.style.transform = `rotateX(${(py - 0.5) * -16}deg) rotateY(${(px - 0.5) * 16}deg)`;
+      if (glow) { glow.style.left = px * 100 + '%'; glow.style.top = py * 100 + '%'; }
+    });
+    zone.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+
+  /* ---------------------------------------------------------
+     16. Page peel
+  --------------------------------------------------------- */
+  $$('.demo-peel-trigger').forEach((btn) => {
+    const zone = btn.closest('.demo-peel-zone');
+    const cards = $$('.demo-peel-card', zone); // [back, front] in DOM order
+    btn.addEventListener('click', () => {
+      // peel the topmost (last in DOM) card that isn't peeled yet
+      const top = cards.slice().reverse().find((c) => !c.classList.contains('peeled'));
+      if (top) {
+        top.classList.add('peeled');
+      } else {
+        cards.forEach((c) => c.classList.remove('peeled'));
+      }
+    });
+  });
+
+  /* ---------------------------------------------------------
+     17. Cursor spotlight
+  --------------------------------------------------------- */
+  $$('.demo-spotlight-zone').forEach((zone) => {
+    const glow = $('.demo-spotlight-glow', zone);
+    zone.addEventListener('mousemove', (e) => {
+      const r = zone.getBoundingClientRect();
+      glow.style.left = (e.clientX - r.left) + 'px';
+      glow.style.top  = (e.clientY - r.top) + 'px';
+    });
+  });
+
+  /* ---------------------------------------------------------
+     18. Stagger entrance (IntersectionObserver re-trigger)
+  --------------------------------------------------------- */
+  $$('.demo-stagger-list').forEach((list) => {
+    const items = $$('.demo-stagger-item', list);
+    items.forEach((it) => it.classList.remove('in'));
+    const reveal = () => items.forEach((it, i) => setTimeout(() => it.classList.add('in'), i * 90));
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) { reveal(); obs.disconnect(); }
+        });
+      }, { threshold: 0.4 });
+      obs.observe(list);
+    } else {
+      reveal();
+    }
+  });
+
+  /* ---------------------------------------------------------
+     19. Hold to confirm
+  --------------------------------------------------------- */
+  $$('.demo-hold-btn').forEach((btn) => {
+    const label = $('.demo-hold-label', btn);
+    let timer = null;
+    const start = (e) => {
+      if (btn.classList.contains('done')) return;
+      e.preventDefault();
+      btn.classList.add('holding');
+      timer = setTimeout(() => {
+        btn.classList.remove('holding');
+        btn.classList.add('done');
+        if (label) label.textContent = '✓';
+        setTimeout(() => {
+          btn.classList.remove('done');
+          if (label) label.textContent = 'Hold';
+        }, 1400);
+      }, 800);
+    };
+    const cancel = () => {
+      clearTimeout(timer);
+      if (!btn.classList.contains('done')) btn.classList.remove('holding');
+    };
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', cancel);
+    btn.addEventListener('pointerleave', cancel);
+    btn.addEventListener('pointercancel', cancel);
+  });
+
+  /* ---------------------------------------------------------
+     20. Rubber-band slider
+  --------------------------------------------------------- */
+  $$('.demo-rubber').forEach((root) => {
+    const track = $('.demo-rubber-track', root);
+    const thumb = $('.demo-rubber-thumb', root);
+    const fill = $('.demo-rubber-fill', root);
+    const out = $('.demo-rubber-val', root);
+    let dragging = false;
+
+    const apply = (clientX, rubber) => {
+      const r = track.getBoundingClientRect();
+      let raw = (clientX - r.left) / r.width;       // may go <0 or >1
+      const clamped = Math.min(Math.max(raw, 0), 1);
+      let pct = clamped;
+      if (rubber) pct = clamped + (raw - clamped) * 0.32; // resistance past ends
+      thumb.style.left = (pct * 100) + '%';
+      fill.style.width = (clamped * 100) + '%';
+      if (out) out.textContent = clamped.toFixed(2);
+    };
+
+    const down = (e) => {
+      dragging = true;
+      thumb.classList.add('dragging');
+      thumb.classList.remove('snap'); fill.classList.remove('snap');
+      thumb.setPointerCapture && thumb.setPointerCapture(e.pointerId);
+      apply(e.clientX, true);
+    };
+    const move = (e) => { if (dragging) apply(e.clientX, true); };
+    const up = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      thumb.classList.remove('dragging');
+      thumb.classList.add('snap'); fill.classList.add('snap');
+      apply(e.clientX, false); // snap back inside range
+    };
+    thumb.addEventListener('pointerdown', down);
+    thumb.addEventListener('pointermove', move);
+    thumb.addEventListener('pointerup', up);
+    thumb.addEventListener('pointercancel', up);
+  });
+
+  /* ---------------------------------------------------------
+     21. Like burst
+  --------------------------------------------------------- */
+  $$('.demo-like-btn').forEach((btn) => {
+    const zone = btn.closest('.demo-like-zone');
+    const count = $('.demo-like-count', btn);
+    let base = parseInt(count.textContent.replace(/\D/g, ''), 10) || 0;
+    btn.addEventListener('click', () => {
+      const liked = btn.classList.toggle('liked');
+      count.textContent = base + (liked ? 1 : 0);
+      btn.classList.remove('pop');
+      void btn.offsetWidth;
+      btn.classList.add('pop');
+      setTimeout(() => btn.classList.remove('pop'), 320);
+      if (liked) {
+        for (let i = 0; i < 8; i++) {
+          const a = (Math.PI * 2 * i) / 8;
+          const d = 22 + Math.random() * 14;
+          const p = document.createElement('span');
+          p.className = 'like-particle';
+          p.style.setProperty('--tx', Math.cos(a) * d + 'px');
+          p.style.setProperty('--ty', Math.sin(a) * d + 'px');
+          zone.appendChild(p);
+          setTimeout(() => p.remove(), 620);
+        }
+      }
+    });
+  });
+
+  /* ---------------------------------------------------------
+     22. Cursor trail
+  --------------------------------------------------------- */
+  $$('.demo-trail-zone').forEach((zone) => {
+    const dots = $$('.demo-trail-dot', zone);
+    if (!dots.length) return;
+    const pts = dots.map(() => ({ x: -20, y: -20 }));
+    let target = { x: -20, y: -20 };
+    let active = false;
+
+    zone.addEventListener('pointerenter', () => { active = true; });
+    zone.addEventListener('pointermove', (e) => {
+      const r = zone.getBoundingClientRect();
+      target = { x: e.clientX - r.left, y: e.clientY - r.top };
+    });
+    zone.addEventListener('pointerleave', () => { active = false; });
+
+    const tick = () => {
+      let lead = target;
+      pts.forEach((p, i) => {
+        p.x += (lead.x - p.x) * 0.35;
+        p.y += (lead.y - p.y) * 0.35;
+        dots[i].style.transform = `translate(${p.x}px, ${p.y}px)`;
+        dots[i].style.opacity = active ? '' : '0';
+        lead = p;
+      });
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+
+  /* ---------------------------------------------------------
+     23. Checkbox draw
+  --------------------------------------------------------- */
+  $$('.demo-check').forEach((box) => {
+    box.addEventListener('click', (e) => {
+      e.preventDefault();
+      box.classList.toggle('checked');
+    });
+  });
+
+  /* ---------------------------------------------------------
+     24. Typewriter
+  --------------------------------------------------------- */
+  $$('.demo-typewriter').forEach((el) => {
+    const out = $('.demo-type-text', el);
+    const phrases = (el.dataset.phrases || 'spring(320, 24);damping matters;ship the motion').split(';');
+    let pi = 0, ci = 0, deleting = false;
+    const loop = () => {
+      const word = phrases[pi];
+      out.textContent = word.slice(0, ci);
+      if (!deleting && ci < word.length) {
+        ci++; setTimeout(loop, 55);
+      } else if (!deleting && ci === word.length) {
+        deleting = true; setTimeout(loop, 1100);
+      } else if (deleting && ci > 0) {
+        ci--; setTimeout(loop, 30);
+      } else {
+        deleting = false; pi = (pi + 1) % phrases.length; setTimeout(loop, 320);
+      }
+    };
+    loop();
+  });
+
+  /* ---------------------------------------------------------
+     25. Odometer count-up (on scroll into view)
+  --------------------------------------------------------- */
+  $$('.demo-odometer').forEach((el) => {
+    const target = parseInt(el.dataset.target, 10) || 0;
+    const fmt = (n) => Math.round(n).toLocaleString('en-US');
+    let done = false;
+    const run = () => {
+      if (done) return; done = true;
+      const dur = 1400, t0 = performance.now();
+      const step = (t) => {
+        const p = Math.min((t - t0) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(target * eased);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = fmt(target);
+      };
+      requestAnimationFrame(step);
+    };
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((en) => { if (en.isIntersecting) { run(); obs.disconnect(); } });
+      }, { threshold: 0.5 });
+      obs.observe(el);
+    } else { run(); }
+  });
+
+  /* ---------------------------------------------------------
+     26. Status pill (idle -> loading -> success)
+  --------------------------------------------------------- */
+  const CHECK_SVG = '<svg viewBox="0 0 24 24"><path d="M5 12.5 L10 17.5 L19 7"/></svg>';
+  $$('.demo-status-pill').forEach((pill) => {
+    const icon = $('.demo-status-icon', pill);
+    const text = $('.demo-status-text', pill);
+    const label = text ? text.textContent : 'Deploy';
+    let busy = false;
+    pill.addEventListener('click', () => {
+      if (busy) return;
+      const state = pill.dataset.state;
+      if (state === 'success') {
+        pill.dataset.state = 'idle'; icon.innerHTML = ''; if (text) text.textContent = label;
+        return;
+      }
+      busy = true;
+      pill.dataset.state = 'loading'; icon.innerHTML = ''; if (text) text.textContent = 'Deploying…';
+      setTimeout(() => {
+        pill.dataset.state = 'success'; icon.innerHTML = CHECK_SVG; if (text) text.textContent = 'Deployed';
+        busy = false;
+      }, 1500);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     27. Flip card
+  --------------------------------------------------------- */
+  $$('.demo-flip-card').forEach((card) => {
+    card.addEventListener('click', () => card.classList.toggle('flipped'));
+  });
+
+  /* ---------------------------------------------------------
+     28. Star rating
+  --------------------------------------------------------- */
+  $$('.demo-rating').forEach((rating) => {
+    const stars = $$('.demo-star', rating);
+    const paint = (n) => stars.forEach((s, i) => s.classList.toggle('on', i < n));
+    const current = () => parseInt(rating.dataset.value, 10) || 0;
+    stars.forEach((star) => {
+      const n = parseInt(star.dataset.i, 10);
+      star.addEventListener('mouseenter', () => paint(n));
+      star.addEventListener('click', () => {
+        rating.dataset.value = n;
+        paint(n);
+        star.classList.remove('pop');
+        void star.offsetWidth;
+        star.classList.add('pop');
+        setTimeout(() => star.classList.remove('pop'), 260);
+      });
+    });
+    rating.addEventListener('mouseleave', () => paint(current()));
+  });
+
+  /* ---------------------------------------------------------
+     29. Success check (draw on toggle)
+  --------------------------------------------------------- */
+  $$('.demo-draw-check').forEach((btn) => {
+    btn.addEventListener('click', () => btn.classList.toggle('done'));
+  });
+
+  /* ---------------------------------------------------------
+     30. Segment loader (staggered fill)
+  --------------------------------------------------------- */
+  $$('.demo-segments-trigger').forEach((btn) => {
+    const zone = btn.closest('.demo-segments-zone');
+    const segments = $$('.demo-segment', zone);
+    btn.addEventListener('click', () => {
+      segments.forEach((s) => s.classList.remove('filled'));
+      // reflow so a rapid re-run animates from empty again
+      void zone.offsetWidth;
+      segments.forEach((s, i) => setTimeout(() => s.classList.add('filled'), i * 120));
+    });
+  });
+
+  /* ---------------------------------------------------------
+     31. Copy button
+  --------------------------------------------------------- */
+  $$('.demo-copy-btn').forEach((btn) => {
+    const label = $('.demo-copy-label', btn);
+    let timer = null;
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.copy || '';
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (_) { /* clipboard may be unavailable; still show feedback */ }
+      btn.classList.add('copied');
+      if (label) label.textContent = 'Copied';
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        btn.classList.remove('copied');
+        if (label) label.textContent = 'Copy';
+      }, 1400);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     32. Quantity stepper
+  --------------------------------------------------------- */
+  $$('.demo-stepper').forEach((stepper) => {
+    const val = $('.demo-step-val', stepper);
+    let n = parseInt(val.textContent, 10) || 0;
+    $$('.demo-step-btn', stepper).forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const dir = parseInt(btn.dataset.dir, 10) || 0;
+        n = Math.max(0, n + dir);
+        val.textContent = n;
+        val.classList.remove('bump');
+        void val.offsetWidth;
+        val.classList.add('bump');
+        setTimeout(() => val.classList.remove('bump'), 350);
+      });
+    });
+  });
+
+  /* ---------------------------------------------------------
+     33. Choice chips
+  --------------------------------------------------------- */
+  $$('.demo-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('on');
+      chip.classList.remove('pop');
+      void chip.offsetWidth;
+      chip.classList.add('pop');
+      setTimeout(() => chip.classList.remove('pop'), 300);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     34. Progress ring (randomize)
+  --------------------------------------------------------- */
+  $$('.demo-ring-trigger').forEach((btn) => {
+    const zone = btn.closest('.demo-ring-zone');
+    const prog = $('.demo-ring .prog', zone);
+    const out = $('.demo-ring-val', zone);
+    const C = 2 * Math.PI * 34; // r = 34
+    const set = (pct) => {
+      prog.style.strokeDashoffset = C * (1 - pct / 100);
+      if (out) out.textContent = pct + '%';
+    };
+    set(0);
+    btn.addEventListener('click', () => set(10 + Math.floor(Math.random() * 90)));
+  });
+
+  /* ---------------------------------------------------------
+     35. Notification slide-in
+  --------------------------------------------------------- */
+  $$('.demo-notify-trigger').forEach((btn) => {
+    const zone = btn.closest('.demo-notify-zone');
+    const notify = $('.demo-notify', zone);
+    let timer;
+    btn.addEventListener('click', () => {
+      clearTimeout(timer);
+      notify.classList.add('show');
+      timer = setTimeout(() => notify.classList.remove('show'), 2200);
+    });
+  });
+
+  /* 19a. Pointer tooltip — label eases toward the cursor each frame */
+  $$('.demo-pointer-zone').forEach((zone) => {
+    const tip = $('.demo-pointer-tip', zone);
+    if (!tip) return;
+    const pos = { x: 0, y: 0, tx: 0, ty: 0 };
+    let raf = null, active = false;
+
+    const loop = () => {
+      pos.x += (pos.tx - pos.x) * 0.18;
+      pos.y += (pos.ty - pos.y) * 0.18;
+      tip.style.transform =
+        'translate(' + pos.x + 'px, ' + pos.y + 'px) translate(-50%, -140%)';
+      tip.textContent = 'x: ' + Math.round(pos.tx) + ', y: ' + Math.round(pos.ty);
+      if (active || Math.abs(pos.tx - pos.x) > 0.3 || Math.abs(pos.ty - pos.y) > 0.3) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        raf = null;
+      }
+    };
+    zone.addEventListener('mousemove', (e) => {
+      const r = zone.getBoundingClientRect();
+      pos.tx = e.clientX - r.left;
+      pos.ty = e.clientY - r.top;
+      active = true;
+      if (!raf) raf = requestAnimationFrame(loop);
+    });
+    zone.addEventListener('mouseleave', () => { active = false; });
+  });
+
+  /* 19b. PIN input — digit pops and focus auto-advances */
+  $$('.demo-pin').forEach((group) => {
+    const boxes = $$('.demo-pin-box', group);
+    boxes.forEach((box, i) => {
+      box.addEventListener('input', () => {
+        box.value = box.value.replace(/\D/g, '').slice(0, 1);
+        if (box.value) {
+          box.classList.add('filled', 'pop');
+          setTimeout(() => box.classList.remove('pop'), 350);
+          if (boxes[i + 1]) boxes[i + 1].focus();
+        } else {
+          box.classList.remove('filled');
+        }
+      });
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && boxes[i - 1]) boxes[i - 1].focus();
+      });
+    });
+  });
+
+  /* 19d. Password meter — score fills and tints the segment bars */
+  $$('.demo-pwd').forEach((field) => {
+    const input = $('.demo-pwd-input', field);
+    const meter = $('.demo-pwd-meter', field);
+    const label = $('.demo-pwd-label', field);
+    const words = ['Strength', 'Weak', 'Fair', 'Good', 'Strong'];
+    input.addEventListener('input', () => {
+      const v = input.value;
+      let s = 0;
+      if (v.length > 4) s++;
+      if (v.length > 8) s++;
+      if (/[0-9]/.test(v)) s++;
+      if (/[^a-zA-Z0-9]/.test(v)) s++;
+      s = Math.min(s, 4);
+      meter.setAttribute('data-score', s);
+      label.textContent = words[s];
+    });
+  });
+
+  /* 20a. Undo snackbar — timed bar drains, dismissible early */
+  $$('.demo-undo-trigger').forEach((btn) => {
+    const zone = btn.closest('.demo-undo-zone');
+    const bar = $('.demo-undo-bar', zone);
+    const progress = $('.demo-undo-progress', zone);
+    const undo = $('.demo-undo-action', zone);
+    let timer;
+    const hide = () => { clearTimeout(timer); bar.classList.remove('show'); };
+    btn.addEventListener('click', () => {
+      clearTimeout(timer);
+      bar.classList.remove('show');
+      // force reflow so the drain animation restarts on rapid clicks
+      void progress.offsetWidth;
+      bar.classList.add('show');
+      timer = setTimeout(hide, 3000);
+    });
+    if (undo) undo.addEventListener('click', hide);
+  });
+
+  /* 21a. Submit states — label -> dots -> checkmark, self-resetting */
+  $$('.demo-loaddone-btn').forEach((btn) => {
+    let busy = false;
+    btn.addEventListener('click', () => {
+      if (busy) return;
+      busy = true;
+      btn.classList.add('loading');
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        btn.classList.add('done');
+        setTimeout(() => {
+          btn.classList.remove('done');
+          busy = false;
+        }, 1500);
+      }, 1400);
+    });
+  });
+
+  /* 20b. Step progress — Next advances the fill and active nodes, wraps */
+  $$('.demo-steps-next').forEach((btn) => {
+    const zone = btn.closest('.demo-steps-zone');
+    const steps = $('.demo-steps', zone);
+    const nodes = $$('.demo-step', steps);
+    const count = nodes.length;
+    const apply = (n) => {
+      steps.setAttribute('data-step', n);
+      nodes.forEach((node, i) => node.classList.toggle('active', i < n));
+    };
+    apply(1);
+    btn.addEventListener('click', () => {
+      const cur = parseInt(steps.getAttribute('data-step'), 10) || 1;
+      apply((cur % count) + 1);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     22. Swipe to reveal
+  --------------------------------------------------------- */
+  $$('.demo-swipe-item').forEach((item) => {
+    let startX = 0, dx = 0, dragging = false;
+    const down = (e) => {
+      dragging = true; startX = e.clientX; dx = 0;
+      item.classList.add('dragging');
+      item.classList.remove('open');
+      item.setPointerCapture(e.pointerId);
+    };
+    const move = (e) => {
+      if (!dragging) return;
+      dx = Math.min(0, e.clientX - startX);
+      item.style.transform = `translateX(${dx}px)`;
+    };
+    const up = () => {
+      if (!dragging) return;
+      dragging = false;
+      item.classList.remove('dragging');
+      item.style.transform = '';
+      if (dx <= -96) item.classList.add('open');
+    };
+    item.addEventListener('pointerdown', down);
+    item.addEventListener('pointermove', move);
+    item.addEventListener('pointerup', up);
+    item.addEventListener('pointercancel', up);
+  });
+
+  /* ---------------------------------------------------------
+     23. Rotary knob
+  --------------------------------------------------------- */
+  $$('.demo-knob').forEach((knob) => {
+    const zone = knob.closest('.demo-knob-zone');
+    const val = $('.demo-knob-val', zone);
+    const fill = $('.demo-knob-arc .fill', zone);
+    const MAX = 270, STEPS = 10, C = 2 * Math.PI * 45, POINTER_OFFSET = 225;
+    let angle = 0, dragging = false, prevA = 0;
+
+    const getAngle = (e) => {
+      const r = knob.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      return Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90;
+    };
+    const apply = (a) => {
+      angle = a;
+      knob.style.transform = `rotate(${a + POINTER_OFFSET}deg)`;
+      if (val) val.textContent = Math.round((a / MAX) * 100);
+      if (fill) fill.style.strokeDashoffset = C * (1 - a / 360);
+    };
+    const down = (e) => {
+      dragging = true;
+      knob.classList.add('dragging');
+      prevA = getAngle(e);
+      knob.setPointerCapture(e.pointerId);
+    };
+    const move = (e) => {
+      if (!dragging) return;
+      const cur = getAngle(e);
+      let delta = cur - prevA;
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+      prevA = cur;
+      apply(Math.min(MAX, Math.max(0, angle + delta)));
+    };
+    const up = () => {
+      if (!dragging) return;
+      dragging = false;
+      knob.classList.remove('dragging');
+      const detent = MAX / STEPS;
+      apply(Math.round(angle / detent) * detent);
+    };
+    knob.addEventListener('pointerdown', down);
+    knob.addEventListener('pointermove', move);
+    knob.addEventListener('pointerup', up);
+    knob.addEventListener('pointercancel', up);
+    apply(0);
+  });
+
+  /* ---------------------------------------------------------
+     24. Reorderable list
+  --------------------------------------------------------- */
+  $$('.demo-reorder').forEach((list) => {
+    const items = $$('.demo-reorder-item', list);
+    let dragEl = null, startY = 0, dragOffset = 0;
+
+    const renumber = () => {
+      $$('.demo-reorder-num', list).forEach((n, i) => { n.textContent = i + 1; });
+    };
+
+    items.forEach((item) => {
+      const down = (e) => {
+        dragEl = item;
+        startY = e.clientY;
+        const r = item.getBoundingClientRect();
+        dragOffset = 0;
+        item.classList.add('dragging');
+        item.setPointerCapture(e.pointerId);
+      };
+      const move = (e) => {
+        if (!dragEl || dragEl !== item) return;
+        dragOffset = e.clientY - startY;
+        item.style.transform = `translateY(${dragOffset}px)`;
+
+        const r = item.getBoundingClientRect();
+        const midY = r.top + r.height / 2;
+        const others = $$('.demo-reorder-item', list).filter((el) => el !== item);
+        for (const other of others) {
+          const or = other.getBoundingClientRect();
+          const oMid = or.top + or.height / 2;
+          if (dragOffset < 0 && midY < oMid && other.previousElementSibling !== item) {
+            list.insertBefore(item, other);
+            startY = e.clientY;
+            item.style.transform = '';
+            dragOffset = 0;
+            break;
+          } else if (dragOffset > 0 && midY > oMid && other.nextElementSibling !== item) {
+            if (other.nextElementSibling) {
+              list.insertBefore(item, other.nextElementSibling);
+            } else {
+              list.appendChild(item);
+            }
+            startY = e.clientY;
+            item.style.transform = '';
+            dragOffset = 0;
+            break;
+          }
+        }
+        renumber();
+      };
+      const up = () => {
+        if (!dragEl) return;
+        item.classList.remove('dragging');
+        item.style.transform = '';
+        dragEl = null;
+        renumber();
+      };
+      item.addEventListener('pointerdown', down);
+      item.addEventListener('pointermove', move);
+      item.addEventListener('pointerup', up);
+      item.addEventListener('pointercancel', up);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     22b. Countdown ring
+  --------------------------------------------------------- */
+  $$('.demo-countdown').forEach((cd) => {
+    const zone = cd.closest('.demo-countdown-zone');
+    const label = $('.demo-countdown-label', zone);
+    const num = $('.demo-countdown-num', cd);
+    const prog = $('.prog', cd);
+    const C = 2 * Math.PI * 34;
+    const SECONDS = 5;
+    let running = false;
+
+    const setVal = (n) => {
+      if (num) num.textContent = n;
+      if (prog) {
+        prog.style.strokeDashoffset = C * (1 - n / SECONDS);
+      }
+    };
+
+    cd.addEventListener('click', () => {
+      if (running) return;
+      running = true;
+      cd.classList.remove('done');
+      if (label) label.textContent = 'Running…';
+      let n = SECONDS;
+      setVal(n);
+      const tick = () => {
+        n--;
+        setVal(n);
+        if (n <= 0) {
+          running = false;
+          cd.classList.add('done');
+          if (label) label.textContent = 'Done! Tap to restart';
+          setTimeout(() => {
+            cd.classList.remove('done');
+            if (label) label.textContent = 'Tap to start';
+            setVal(SECONDS);
+          }, 1800);
+        } else {
+          setTimeout(tick, 1000);
+        }
+      };
+      setTimeout(tick, 1000);
+    });
+    setVal(SECONDS);
+  });
+
+  /* ---------------------------------------------------------
+     23b. Skeleton to content
+  --------------------------------------------------------- */
+  $$('.demo-skel-content').forEach((el) => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('loaded');
+    });
+  });
+
+  /* ---------------------------------------------------------
+     24b. Toast stack
+  --------------------------------------------------------- */
+  $$('.demo-toaststack-trigger').forEach((btn) => {
+    const zone = btn.closest('.demo-toaststack-zone');
+    const stack = $('.demo-toaststack', zone);
+    const MAX = 3;
+    let counter = 0;
+
+    btn.addEventListener('click', () => {
+      counter++;
+      const item = document.createElement('div');
+      item.className = 'demo-toaststack-item';
+      item.innerHTML = '<span class="demo-toaststack-dot"></span> Saved #' + counter;
+      stack.appendChild(item);
+
+      while (stack.children.length > MAX) {
+        const old = stack.firstElementChild;
+        old.classList.add('hide');
+        setTimeout(() => old.remove(), 400);
+      }
+
+      requestAnimationFrame(() => item.classList.add('show'));
+
+      setTimeout(() => {
+        item.classList.remove('show');
+        item.classList.add('hide');
+        setTimeout(() => item.remove(), 400);
+      }, 2400);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     22c. Text split reveal (hover toggle)
+  --------------------------------------------------------- */
+  $$('.demo-split').forEach((el) => {
+    el.addEventListener('mouseenter', () => el.classList.add('in'));
+    el.addEventListener('mouseleave', () => el.classList.remove('in'));
+  });
+
+  /* Header dropdown — Colorion network links */
+  $$('.nav-dropdown').forEach((drop) => {
+    const trigger = $('.nav-dropdown-trigger', drop);
+    const close = () => {
+      drop.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+    };
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = drop.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', (e) => {
+      if (!drop.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
+  });
+
+  /* Mobile header menu */
+  const header = $('.site-header');
+  const menuToggle = $('.nav-toggle', header);
+  const mobileMenu = $('#mobile-nav', header);
+  let menuCloseTimer = null;
+
+  const closeMobileMenu = () => {
+    if (!header || !menuToggle || !mobileMenu) return;
+    clearTimeout(menuCloseTimer);
+    header.classList.remove('menu-open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.setAttribute('aria-label', 'Open menu');
+    mobileMenu.querySelectorAll('.nav-dropdown').forEach((drop) => {
+      drop.classList.remove('open');
+      const trigger = $('.nav-dropdown-trigger', drop);
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+    menuCloseTimer = setTimeout(() => {
+      if (!header.classList.contains('menu-open')) {
+        mobileMenu.hidden = true;
+      }
+    }, 300);
+  };
+
+  const openMobileMenu = () => {
+    if (!header || !menuToggle || !mobileMenu) return;
+    clearTimeout(menuCloseTimer);
+    mobileMenu.hidden = false;
+    requestAnimationFrame(() => header.classList.add('menu-open'));
+    menuToggle.setAttribute('aria-expanded', 'true');
+    menuToggle.setAttribute('aria-label', 'Close menu');
+  };
+
+  if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (header.classList.contains('menu-open')) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    });
+
+    mobileMenu.addEventListener('click', (e) => {
+      if (e.target.closest('a')) {
+        closeMobileMenu();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!header.contains(e.target)) closeMobileMenu();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMobileMenu();
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.matchMedia('(min-width: 721px)').matches) closeMobileMenu();
+    });
+  }
+
+  /* ---------------------------------------------------------
+     36. Value scrubber — drag horizontally, 1px ≈ 1 unit
+  --------------------------------------------------------- */
+  $$('.demo-scrubber-val').forEach((el) => {
+    let startX = 0, startVal = 0, dragging = false;
+    const setVal = (v) => { el.textContent = v; el.dataset.value = v; };
+    setVal(parseInt(el.dataset.value || el.textContent, 10) || 0);
+
+    const down = (e) => {
+      dragging = true;
+      startX = e.clientX;
+      startVal = parseInt(el.dataset.value, 10) || 0;
+      el.classList.add('scrubbing');
+      el.setPointerCapture(e.pointerId);
+    };
+    const move = (e) => {
+      if (!dragging) return;
+      setVal(startVal + Math.round(e.clientX - startX));
+    };
+    const up = () => {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove('scrubbing');
+    };
+    el.addEventListener('pointerdown', down);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+  });
+
+  /* ---------------------------------------------------------
+     37. 3D cube — click rotates a quarter turn to the next face
+  --------------------------------------------------------- */
+  $$('.demo-cube').forEach((cube) => {
+    let n = 0;
+    (cube.closest('.demo-cube-scene') || cube).addEventListener('click', () => {
+      n += 1;
+      cube.style.transform = `translateZ(-56px) rotateY(${-90 * n}deg)`;
+    });
+  });
+
+  /* ---------------------------------------------------------
+     38. Slide to unlock — drag past 85% to latch, else spring back
+  --------------------------------------------------------- */
+  $$('.demo-unlock').forEach((track) => {
+    const thumb = $('.demo-unlock-thumb', track);
+    const fill = $('.demo-unlock-fill', track);
+    const label = $('.demo-unlock-label', track);
+    const PAD = 3, TW = 46;
+    const maxLeft = () => track.clientWidth - TW - PAD;
+    let dragging = false, startX = 0, startLeft = PAD;
+
+    const place = (px) => {
+      const l = Math.min(Math.max(px, PAD), maxLeft());
+      thumb.style.left = l + 'px';
+      fill.style.width = (l + TW) + 'px';
+      return l;
+    };
+    place(PAD);
+
+    const down = (e) => {
+      if (track.classList.contains('unlocked')) {
+        track.classList.remove('unlocked');
+        if (label) label.textContent = 'slide to unlock';
+      }
+      dragging = true;
+      track.classList.add('dragging');
+      startX = e.clientX;
+      startLeft = parseFloat(thumb.style.left) || PAD;
+      thumb.setPointerCapture(e.pointerId);
+    };
+    const move = (e) => { if (dragging) place(startLeft + (e.clientX - startX)); };
+    const up = () => {
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove('dragging');
+      const l = parseFloat(thumb.style.left) || PAD;
+      if (l >= maxLeft() * 0.85) {
+        place(maxLeft());
+        fill.style.width = '100%';
+        track.classList.add('unlocked');
+        if (label) label.textContent = 'unlocked';
+      } else {
+        place(PAD);
+      }
+    };
+    thumb.addEventListener('pointerdown', down);
+    thumb.addEventListener('pointermove', move);
+    thumb.addEventListener('pointerup', up);
+    thumb.addEventListener('pointercancel', up);
+  });
+
+  /* ---------------------------------------------------------
+     39. Tag input — Enter adds a chip, × (or Backspace) removes it
+  --------------------------------------------------------- */
+  $$('.demo-taginput').forEach((box) => {
+    const field = $('.demo-taginput-field', box);
+    const remove = (tag) => {
+      tag.classList.add('removing');
+      setTimeout(() => tag.remove(), 240);
+    };
+    const addTag = (text) => {
+      const tag = document.createElement('span');
+      tag.className = 'demo-tag';
+      tag.append(document.createTextNode(text));
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'Remove ' + text);
+      btn.textContent = '×';
+      tag.appendChild(btn);
+      box.insertBefore(tag, field);
+    };
+    box.addEventListener('click', (e) => {
+      const btn = e.target.closest('.demo-tag button');
+      if (btn) remove(btn.closest('.demo-tag'));
+      else if (e.target === box) field.focus();
+    });
+    field.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const v = field.value.trim();
+        if (v) { addTag(v); field.value = ''; }
+      } else if (e.key === 'Backspace' && !field.value) {
+        const last = field.previousElementSibling;
+        if (last && last.classList.contains('demo-tag')) remove(last);
+      }
+    });
+  });
+
+  /* ---------------------------------------------------------
+     40. Badge counter — click increments with a spring pop
+  --------------------------------------------------------- */
+  $$('.demo-cartbadge').forEach((el) => {
+    const count = $('.demo-cartbadge-count', el);
+    let n = parseInt(count.textContent, 10) || 0;
+    el.addEventListener('click', () => {
+      n += 1;
+      count.textContent = n;
+      count.classList.remove('pop');
+      void count.offsetWidth;
+      count.classList.add('pop');
+      setTimeout(() => count.classList.remove('pop'), 320);
+    });
+  });
+
+  /* ---------------------------------------------------------
+     41. Before / after compare — drag handle wipes the top layer
+  --------------------------------------------------------- */
+  $$('.demo-compare').forEach((zone) => {
+    const after = $('.demo-compare-after', zone);
+    const divider = $('.demo-compare-divider', zone);
+    const handle = $('.demo-compare-handle', zone);
+    let dragging = false;
+
+    const setPct = (p) => {
+      const pct = Math.min(Math.max(p, 0), 100);
+      after.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+      divider.style.left = pct + '%';
+      handle.style.left = pct + '%';
+    };
+    const fromEvent = (e) => {
+      const r = zone.getBoundingClientRect();
+      setPct(((e.clientX - r.left) / r.width) * 100);
+    };
+    const down = (e) => { dragging = true; zone.setPointerCapture(e.pointerId); fromEvent(e); };
+    const move = (e) => { if (dragging) fromEvent(e); };
+    const up = () => { dragging = false; };
+
+    zone.addEventListener('pointerdown', down);
+    zone.addEventListener('pointermove', move);
+    zone.addEventListener('pointerup', up);
+    zone.addEventListener('pointercancel', up);
+    setPct(50);
+  });
+
+  $$('.demo-lasso').forEach((zone) => { const box=$('i',zone),dots=$$(':scope > span',zone);let start=null;const draw=e=>{const r=zone.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,l=Math.min(start.x,x),t=Math.min(start.y,y),w=Math.abs(x-start.x),h=Math.abs(y-start.y);Object.assign(box.style,{left:l+'px',top:t+'px',width:w+'px',height:h+'px'});dots.forEach(d=>d.classList.toggle('selected',d.offsetLeft+6>=l&&d.offsetLeft+6<=l+w&&d.offsetTop+6>=t&&d.offsetTop+6<=t+h))};zone.addEventListener('pointerdown',e=>{const r=zone.getBoundingClientRect();start={x:e.clientX-r.left,y:e.clientY-r.top};zone.classList.add('dragging');zone.setPointerCapture(e.pointerId);draw(e)});zone.addEventListener('pointermove',e=>start&&draw(e));const end=()=>{start=null;zone.classList.remove('dragging')};zone.addEventListener('pointerup',end);zone.addEventListener('pointercancel',end)});
+  $$('.demo-chord').forEach(c=>{const keys=$$('button',c);let step=0,t;keys.forEach((k,i)=>k.addEventListener('click',()=>{clearTimeout(t);if(i!==step){keys.forEach(x=>x.classList.remove('hit'));c.classList.remove('done');step=0;return}k.classList.add('hit');if(++step===2)c.classList.add('done');t=setTimeout(()=>{keys.forEach(x=>x.classList.remove('hit'));c.classList.remove('done');step=0},1200)}))});
+
+  /* Kinetic XY pad — direct manipulation with a spring-home release. */
+  $$('.demo-xy-pad').forEach((pad) => {
+    const puck = $('.demo-xy-puck', pad);
+    const readout = $('.demo-xy-readout', pad);
+    let dragging = false;
+
+    const setPosition = (clientX, clientY) => {
+      const rect = pad.getBoundingClientRect();
+      const x = Math.round(Math.max(-82, Math.min(82, clientX - rect.left - rect.width / 2)));
+      const y = Math.round(Math.max(-38, Math.min(38, clientY - rect.top - rect.height / 2)));
+      puck.style.setProperty('--x', x);
+      puck.style.setProperty('--y', y);
+      readout.textContent = (x >= 0 ? '+' : '') + x + ' · ' + (y >= 0 ? '+' : '') + y;
+    };
+    const reset = () => {
+      dragging = false;
+      pad.classList.remove('dragging');
+      puck.style.setProperty('--x', 0);
+      puck.style.setProperty('--y', 0);
+      readout.textContent = '0 · 0';
+    };
+
+    pad.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      pad.classList.add('dragging');
+      pad.setPointerCapture(e.pointerId);
+      setPosition(e.clientX, e.clientY);
+    });
+    pad.addEventListener('pointermove', (e) => {
+      if (dragging) setPosition(e.clientX, e.clientY);
+    });
+    pad.addEventListener('pointerup', reset);
+    pad.addEventListener('pointercancel', reset);
+    puck.addEventListener('keydown', (e) => {
+      const step = e.shiftKey ? 12 : 6;
+      const x = Number(puck.style.getPropertyValue('--x')) || 0;
+      const y = Number(puck.style.getPropertyValue('--y')) || 0;
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home'].includes(e.key)) return;
+      e.preventDefault();
+      if (e.key === 'Home') return reset();
+      const nextX = x + (e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0);
+      const nextY = y + (e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0);
+      const clampedX = Math.max(-82, Math.min(82, nextX));
+      const clampedY = Math.max(-38, Math.min(38, nextY));
+      puck.style.setProperty('--x', clampedX);
+      puck.style.setProperty('--y', clampedY);
+      readout.textContent = clampedX + ' · ' + clampedY;
+    });
+  });
+
+  /* Command palette bloom. */
+  $$('.demo-command').forEach((command) => {
+    const trigger = $('.demo-command-trigger', command);
+    const panel = $('.demo-command-panel', command);
+    const setOpen = (open) => {
+      command.classList.toggle('open', open);
+      trigger.setAttribute('aria-expanded', String(open));
+      panel.setAttribute('aria-hidden', String(!open));
+    };
+    trigger.addEventListener('click', () => setOpen(!command.classList.contains('open')));
+    $$('.demo-command-panel button', command).forEach((button) => {
+      button.addEventListener('click', () => {
+        setOpen(false);
+        trigger.focus();
+      });
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (!command.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && command.classList.contains('open')) {
+        setOpen(false);
+        trigger.focus();
+      }
+    });
+  });
+
+  /* Momentum picker — wheel, keyboard and direct selection share one state. */
+  $$('.demo-momentum-picker').forEach((picker) => {
+    const track = $('.demo-picker-track', picker);
+    const buttons = $$('button', track);
+    const output = $('.demo-picker-value', picker);
+    let index = 1;
+    let wheelLocked = false;
+    const select = (next) => {
+      index = Math.max(0, Math.min(buttons.length - 1, next));
+      picker.style.setProperty('--picker-i', index);
+      buttons.forEach((button, i) => button.classList.toggle('active', i === index));
+      output.textContent = buttons[index].textContent.toUpperCase() + ' · 0' + (index + 1);
+    };
+    buttons.forEach((button, i) => button.addEventListener('click', () => select(i)));
+    picker.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked || Math.abs(e.deltaY) < 2) return;
+      select(index + (e.deltaY > 0 ? 1 : -1));
+      wheelLocked = true;
+      window.setTimeout(() => { wheelLocked = false; }, 260);
+    }, { passive: false });
+    picker.addEventListener('keydown', (e) => {
+      if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
+      e.preventDefault();
+      if (e.key === 'Home') select(0);
+      else if (e.key === 'End') select(buttons.length - 1);
+      else select(index + (e.key === 'ArrowDown' ? 1 : -1));
+    });
+    select(index);
+  });
+
+  /* Prompt composer — auto-grow, focus bloom, send/settle cycle. */
+  $$('.demo-composer').forEach((composer) => {
+    const input = $('.demo-composer-input', composer);
+    const send = $('.demo-composer-send', composer);
+    const count = $('.demo-composer-count', composer);
+    let timer = null;
+
+    const grow = () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 74) + 'px';
+      composer.classList.toggle('ready', input.value.trim().length > 0);
+      count.textContent = input.value.length;
+    };
+    const run = () => {
+      if (!composer.classList.contains('ready') || composer.classList.contains('sending')) return;
+      composer.classList.add('sending');
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        composer.classList.remove('sending');
+        input.value = '';
+        grow();
+      }, 1500);
+    };
+
+    input.addEventListener('input', grow);
+    input.addEventListener('focus', () => composer.classList.add('focused'));
+    input.addEventListener('blur', () => composer.classList.remove('focused'));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        run();
+      }
+    });
+    send.addEventListener('click', run);
+    grow();
+  });
+
+  /* Filmstrip scrubber — playhead tracks the pointer, snaps on release. */
+  $$('.demo-filmstrip').forEach((strip) => {
+    const track = $('.demo-filmstrip-track', strip);
+    const frames = $$('button', track);
+    const time = $('.demo-filmstrip-time', strip);
+    const last = frames.length - 1;
+    let index = 0;
+
+    const stamp = (i) => {
+      const seconds = i * 4;
+      time.textContent =
+        '00:' + String(seconds).padStart(2, '0') + ' · f' + (i + 1);
+    };
+    // Playhead position is measured, never assumed from a step size.
+    const head = (clientX) => {
+      const rect = strip.getBoundingClientRect();
+      strip.style.setProperty('--head', Math.round(clientX - rect.left));
+    };
+    const select = (next) => {
+      index = Math.max(0, Math.min(last, next));
+      frames.forEach((f, i) => f.classList.toggle('active', i === index));
+      const rect = frames[index].getBoundingClientRect();
+      head(rect.left + rect.width / 2);
+      stamp(index);
+    };
+    // Distance-weighted swell, same ratio the playhead uses.
+    const proximity = (clientX) => {
+      frames.forEach((frame) => {
+        const rect = frame.getBoundingClientRect();
+        const d = Math.abs(clientX - (rect.left + rect.width / 2));
+        frame.style.setProperty('--near', Math.max(0, 1 - d / 70).toFixed(3));
+      });
+    };
+    const nearest = (clientX) => {
+      const rect = track.getBoundingClientRect();
+      const ratio = (clientX - rect.left) / rect.width;
+      return Math.round(ratio * last);
+    };
+
+    // While scrubbing the head follows the raw pointer; on release it
+    // springs to the centre of the frame it landed on.
+    const drag = (clientX) => {
+      const rect = track.getBoundingClientRect();
+      head(Math.max(rect.left, Math.min(rect.right, clientX)));
+      const next = Math.max(0, Math.min(last, nearest(clientX)));
+      if (next !== index) {
+        index = next;
+        frames.forEach((f, i) => f.classList.toggle('active', i === index));
+        stamp(index);
+      }
+    };
+    const release = () => {
+      if (!strip.classList.contains('scrubbing')) return;
+      strip.classList.remove('scrubbing');
+      select(index);
+    };
+
+    track.addEventListener('pointerdown', (e) => {
+      strip.classList.add('scrubbing');
+      track.setPointerCapture(e.pointerId);
+      drag(e.clientX);
+    });
+    track.addEventListener('pointermove', (e) => {
+      proximity(e.clientX);
+      if (strip.classList.contains('scrubbing')) drag(e.clientX);
+    });
+    track.addEventListener('pointerup', release);
+    track.addEventListener('pointercancel', release);
+    track.addEventListener('pointerleave', () => {
+      release();
+      frames.forEach((f) => f.style.setProperty('--near', 0));
+    });
+    frames.forEach((frame, i) => {
+      frame.addEventListener('click', () => select(i));
+      frame.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        select(index + (e.key === 'ArrowRight' ? 1 : -1));
+        frames[index].focus();
+      });
+    });
+    select(0);
+  });
+
+  /* Drag stack — press anywhere on the row to gather every item. */
+  $$('.demo-dragstack').forEach((stack) => {
+    const items = $$('.demo-dragstack-row button', stack);
+    let dragging = false;
+    // Resting slots, stored relative to the stack so a mid-flight
+    // transform can never contaminate the measurement.
+    let homes = [];
+
+    const measure = () => {
+      const host = stack.getBoundingClientRect();
+      homes = items.map((item) => {
+        const r = item.getBoundingClientRect();
+        const dx = Number(item.style.getPropertyValue('--dx')) || 0;
+        const dy = Number(item.style.getPropertyValue('--dy')) || 0;
+        return {
+          x: r.left + r.width / 2 - dx - host.left,
+          y: r.top + r.height / 2 - dy - host.top,
+        };
+      });
+    };
+
+    const gather = (rawX, rawY) => {
+      const host = stack.getBoundingClientRect();
+      // Keep the whole pile — and its badge — inside the stage.
+      const cx = host.left + host.width / 2;
+      const cy = host.top + host.height / 2;
+      const clientX = Math.max(cx - 52, Math.min(cx + 46, rawX));
+      const clientY = Math.max(cy - 36, Math.min(cy + 30, rawY));
+      stack.style.setProperty('--px', Math.round(clientX - cx));
+      stack.style.setProperty('--py', Math.round(clientY - cy));
+      items.forEach((item, i) => {
+        item.style.setProperty('--dx', Math.round(clientX - host.left - homes[i].x));
+        item.style.setProperty('--dy', Math.round(clientY - host.top - homes[i].y));
+      });
+    };
+    const release = () => {
+      if (!dragging) return;
+      dragging = false;
+      stack.classList.remove('gathered');
+      items.forEach((item) => {
+        item.style.setProperty('--dx', 0);
+        item.style.setProperty('--dy', 0);
+      });
+    };
+
+    items.forEach((item) => {
+      item.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        dragging = true;
+        item.setPointerCapture(e.pointerId);
+        stack.classList.add('gathered');
+        gather(e.clientX, e.clientY);
+      });
+      item.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        const host = stack.getBoundingClientRect();
+        dragging = true;
+        stack.classList.add('gathered');
+        gather(host.left + host.width / 2, host.top + host.height / 2);
+        window.setTimeout(release, 900);
+      });
+      item.addEventListener('pointermove', (e) => {
+        if (dragging) gather(e.clientX, e.clientY);
+      });
+      item.addEventListener('pointerup', release);
+      item.addEventListener('pointercancel', release);
+    });
+
+    measure();
+    window.addEventListener('resize', () => {
+      if (!dragging) measure();
+    });
+  });
+
+  /* Focus relay — one ring morphs between fields. */
+  $$('.demo-focus-relay').forEach((relay) => {
+    const fields = $$('button', relay);
+    const place = (el) => {
+      const host = relay.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      relay.style.setProperty('--x', Math.round(r.left - host.left) + 'px');
+      relay.style.setProperty('--y', Math.round(r.top - host.top) + 'px');
+      relay.style.setProperty('--w', Math.round(r.width) + 'px');
+      relay.style.setProperty('--h', Math.round(r.height) + 'px');
+      fields.forEach((f) => f.classList.toggle('active', f === el));
+    };
+    fields.forEach((field) => {
+      field.addEventListener('pointerenter', () => place(field));
+      field.addEventListener('focus', () => place(field));
+    });
+    if (fields[0]) place(fields[0]);
+    window.addEventListener('resize', () => {
+      const active = fields.find((f) => f.classList.contains('active')) || fields[0];
+      if (active) place(active);
+    });
+  });
+
+  /* Hold to talk — waveform lives only while pressed. */
+  $$('.demo-talk').forEach((talk) => {
+    const btn = $('.demo-talk-btn', talk);
+    let timer = null;
+    let live = false;
+    const start = (e) => {
+      if (e.cancelable) e.preventDefault();
+      live = true;
+      talk.classList.remove('sent');
+      talk.classList.add('live');
+      if (e.pointerId != null) btn.setPointerCapture(e.pointerId);
+    };
+    const end = () => {
+      if (!live) return;
+      live = false;
+      talk.classList.remove('live');
+      talk.classList.add('sent');
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => talk.classList.remove('sent'), 900);
+    };
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', end);
+    btn.addEventListener('pointercancel', end);
+    btn.addEventListener('keydown', (e) => {
+      if (e.key !== ' ' && e.key !== 'Enter') return;
+      if (e.repeat) return;
+      start(e);
+    });
+    btn.addEventListener('keyup', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') end();
+    });
+  });
+
+  /* Lattice snap — tile trails the pointer, then springs to a cell. */
+  $$('.demo-lattice').forEach((lattice) => {
+    const tile = $('.demo-lattice-tile', lattice);
+    const cells = $$(':scope > span', lattice);
+    const cols = 3;
+    const rows = 2;
+    let dragging = false;
+    let col = 0;
+    let row = 0;
+
+    const snap = (c, r) => {
+      col = Math.max(0, Math.min(cols - 1, c));
+      row = Math.max(0, Math.min(rows - 1, r));
+      lattice.style.setProperty('--c', col);
+      lattice.style.setProperty('--r', row);
+    };
+    const cellAt = (clientX, clientY) => {
+      const rect = lattice.getBoundingClientRect();
+      const x = (clientX - rect.left) / rect.width;
+      const y = (clientY - rect.top) / rect.height;
+      return [
+        Math.max(0, Math.min(cols - 1, Math.floor(x * cols))),
+        Math.max(0, Math.min(rows - 1, Math.floor(y * rows))),
+      ];
+    };
+    const heat = (c, r) => {
+      cells.forEach((cell, i) => cell.classList.toggle('hot', i === r * cols + c));
+    };
+    const follow = (clientX, clientY) => {
+      const rect = lattice.getBoundingClientRect();
+      const tw = tile.offsetWidth;
+      const th = tile.offsetHeight;
+      const x = Math.max(0, Math.min(rect.width - tw, clientX - rect.left - tw / 2));
+      const y = Math.max(0, Math.min(rect.height - th, clientY - rect.top - th / 2));
+      lattice.style.setProperty('--tx', Math.round(x));
+      lattice.style.setProperty('--ty', Math.round(y));
+      const next = cellAt(clientX, clientY);
+      heat(next[0], next[1]);
+    };
+
+    tile.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      dragging = true;
+      lattice.classList.add('dragging');
+      tile.setPointerCapture(e.pointerId);
+      follow(e.clientX, e.clientY);
+    });
+    tile.addEventListener('pointermove', (e) => {
+      if (dragging) follow(e.clientX, e.clientY);
+    });
+    const release = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      lattice.classList.remove('dragging');
+      const next = cellAt(e.clientX, e.clientY);
+      snap(next[0], next[1]);
+      cells.forEach((cell) => cell.classList.remove('hot'));
+    };
+    tile.addEventListener('pointerup', release);
+    tile.addEventListener('pointercancel', release);
+    tile.addEventListener('keydown', (e) => {
+      const map = {
+        ArrowLeft: [-1, 0],
+        ArrowRight: [1, 0],
+        ArrowUp: [0, -1],
+        ArrowDown: [0, 1],
+        Home: [-cols, -rows],
+      };
+      if (!map[e.key]) return;
+      e.preventDefault();
+      if (e.key === 'Home') snap(0, 0);
+      else snap(col + map[e.key][0], row + map[e.key][1]);
+    });
+    snap(0, 0);
+  });
+
+  /* ---------------------------------------------------------
+     Library search — filters cards by name, description and
+     the keyword index in search-index.js. Each card gets its
+     keywords stamped onto data-keywords at init.
+  --------------------------------------------------------- */
+  (function librarySearch() {
+    const input = $('#effect-search');
+    if (!input) return;
+
+    const clearBtn = $('#search-clear');
+    const countEl = $('#search-count');
+    const emptyEl = $('#search-empty');
+    const emptyQ = $('#search-empty-q');
+    const keywords = window.KINETICS_KEYWORDS || {};
+
+    // Card name lives in .name, or (compact cards) as the first
+    // text of the row's first div.
+    const cardName = (card) => {
+      const n = $('.card-foot .name', card);
+      if (n) return n.textContent.trim();
+      const holder = $('.card-foot .row > div', card);
+      if (!holder) return '';
+      for (const node of holder.childNodes) {
+        const text = node.textContent.trim();
+        if (!text) continue;
+        if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('desc')) continue;
+        return text;
+      }
+      return '';
+    };
+
+    // Only sections that contain a gallery participate.
+    const sections = $$('.section').filter((s) => $('.gallery', s)).map((section) => {
+      const countSpan = $('.section-head .count', section);
+      const cards = $$('.gallery .card', section).map((card) => {
+        const name = cardName(card);
+        const desc = ($('.card-foot .desc', card) || {}).textContent || '';
+        const param = ($('.card-param', card) || {}).textContent || '';
+        const kw = (keywords[name] || []).join(' ');
+        card.dataset.keywords = kw;
+        return {
+          el: card,
+          haystack: (name + ' ' + desc + ' ' + param + ' ' + kw).toLowerCase(),
+        };
+      });
+      return {
+        el: section,
+        countSpan,
+        originalCount: countSpan ? countSpan.textContent : '',
+        cards,
+      };
+    });
+
+    const total = sections.reduce((n, s) => n + s.cards.length, 0);
+
+    const apply = () => {
+      const q = input.value.trim().toLowerCase();
+      const tokens = q.split(/\s+/).filter(Boolean);
+      const filtering = tokens.length > 0;
+      let visible = 0;
+
+      sections.forEach((section) => {
+        let sectionVisible = 0;
+        section.cards.forEach((card) => {
+          const hit = !filtering || tokens.every((t) => card.haystack.includes(t));
+          card.el.classList.toggle('search-hidden', !hit);
+          if (hit) sectionVisible++;
+        });
+        visible += sectionVisible;
+        section.el.classList.toggle('search-hidden', filtering && sectionVisible === 0);
+        if (section.countSpan) {
+          section.countSpan.textContent = filtering
+            ? sectionVisible + ' / ' + section.cards.length
+            : section.originalCount;
+        }
+      });
+
+      clearBtn.hidden = !filtering;
+      countEl.hidden = !filtering;
+      countEl.textContent = visible + ' / ' + total;
+      emptyEl.hidden = !(filtering && visible === 0);
+      if (emptyQ) emptyQ.textContent = input.value.trim();
+    };
+
+    input.addEventListener('input', apply);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && input.value) {
+        e.stopPropagation();
+        input.value = '';
+        apply();
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      apply();
+      input.focus();
+    });
+
+    $$('.search-suggestion').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        input.value = btn.dataset.q;
+        apply();
+        input.focus();
+      });
+    });
+
+    // "/" focuses the search from anywhere (unless already typing).
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target;
+      if (t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+      e.preventDefault();
+      input.focus();
+      input.select();
+      input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
+  })();
+})();

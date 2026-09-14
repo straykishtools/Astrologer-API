@@ -828,17 +828,10 @@ function seedAudioDefaults() {
     }
 }
 
-/* ─── فایل‌کمک‌ها ───
-   هر آیتم audioDb با کلید trackId شناسایی می‌شود. فایل آپلودی روی سرور
-   در static/audio/bgm/{trackId}.ext نوشته می‌شود و از
-   /static/audio/bgm/{trackId}.ext سرو می‌گردد. item.fileUrl آینه‌ی آن URL. */
-function _adminToken() { try { return localStorage.getItem('cosmic_token') || ''; } catch (_) { return ''; } }
-function _fileKeyOf(item) {
-    if (!item) return '';
-    if (item.trackId) return item.trackId;
-    return 'custom-' + item.id; // صدای تازه‌ی بدون سنتز
-}
-function _audioAccept() { return '.mp3,.ogg,.wav,.m4a,audio/mpeg,audio/ogg,audio/wav,audio/mp4,audio/x-m4a'; }
+/* (بازنشسته) CRUD قدیمیِ صدا/تصویر → AudioAdmin + BackgroundAdmin
+   توجه: helperهای خط ۷۴۴–۸۲۹ (getAudioDb/seed/hydrate) هنوز توسط
+   init() و پلیر سنتزی یوگا استفاده می‌شوند — حذف نشوند. */
+
 
 function refreshAudioFilesFromServer(cb) {
     var token = _adminToken();
@@ -1461,8 +1454,10 @@ function medStart(cfg) {
     medTimer.remaining = medTimer.duration;
     medTimer.running = true;
 
-    // Phase 1: start ambient music
-    playBgm(medTimer.track);
+    // Phase 1: start ambient music — اگر برای بخش مدیتیشن فایل آپلودی وجود
+    // داشته باشد، وینیل (VinylPlayer) پخشش می‌کند و سنتز ambient رد می‌شود
+    var _vinylHas = window.VinylPlayer && VinylPlayer.hasFileFor && VinylPlayer.hasFileFor('meditation');
+    if (!_vinylHas) playBgm(medTimer.track);
     if (medTimer.onPhase) medTimer.onPhase('ambient');
 
     // After 5 seconds, start breath guide
@@ -1618,19 +1613,9 @@ window.AudioManager = {
     medIsRunning: medIsRunning,
     medRemaining: medRemaining,
     medFormatTime: medFormatTime,
-    // Admin
-    renderAdminAudio: renderAdminAudio,
-    adminToggle: adminToggle,
-    adminPreview: adminPreview,
-    adminEdit: adminEdit,
-    adminDelete: adminDelete,
-    adminAdd: adminAdd,
-    adminUploadFile: adminUploadFile,
-    refreshAudioFiles: refreshAudioFilesFromServer,
-    adminDeleteBg: adminDeleteBg,
-    adminEditBg: adminEditBg,
-    applyAdminBackgrounds: applyAdminBackgrounds,
-    seedAudioDefaults: seedAudioDefaults
+    // Admin — تنها applyAdminBackgrounds هنوز لازم است (تب 🖼️ پس‌زمینه آن را صدا می‌زند).
+    // CRUD قدیمیِ صدا/تصویر حذف شده: AudioAdmin + BackgroundAdmin جانشین شده‌اند.
+    applyAdminBackgrounds: applyAdminBackgrounds
 };
 
 function _esc(s) {
