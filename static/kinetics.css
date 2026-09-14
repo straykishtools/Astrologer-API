@@ -401,7 +401,7 @@
     55%      { box-shadow: 0 10px 26px -8px rgba(63,138,181,.6), 0 0 0 13px rgba(159,212,224,0); }
 }
 .co-chat-pop {
-    position: fixed; top: 60px; left: 18px; z-index: 3601;
+    position: fixed; top: 60px; right: 18px; left: auto; z-index: 3601;
     width: min(380px, calc(100vw - 40px));
     display: none; flex-direction: column; gap: 10px;
     background: var(--co-panel, rgba(16,26,61,.94));
@@ -420,7 +420,7 @@
 .co-chat-pop .k-tokens { min-height: 20px; max-height: 38vh; overflow-y: auto; }
 .co-chat-pop .k-composer { align-items: flex-end; }
 .co-chat-pop .k-composer textarea { font-size: 12.5px; }
-@media (max-width: 640px) { .co-chat-pop { top: 54px; left: 10px; width: calc(100vw - 20px); } }
+@media (max-width: 640px) { .co-chat-pop { top: 54px; left: 10px; right: 10px; width: auto; } }
 @media (prefers-reduced-motion: reduce) { .co-chat-pop.show { transition: opacity .2s linear; transform: none; } }
 
 /* ═══ چیدمان بخش «آسمانِ جنبشی» در داشبورد ═══ */

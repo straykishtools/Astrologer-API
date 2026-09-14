@@ -284,8 +284,23 @@ function wireChatPop() {
     if (!btn || !pop || btn._coWired) return;
     btn._coWired = true;
     var talker = null;
+
+    /* پاپ‌اور را دقیقاً زیرِ دکمه و داخل صفحه قرار می‌دهد */
+    function position() {
+        var r = btn.getBoundingClientRect();
+        var pw = pop.offsetWidth || 380;
+        var ph = pop.offsetHeight || 320;
+        var m = 12, vw = window.innerWidth, vh = window.innerHeight;
+        var left = Math.min(Math.max(m, r.right - pw), vw - pw - m);
+        var top = r.bottom + 8;
+        if (top + ph > vh - m) top = Math.max(m, r.top - ph - 8);   /* جا نبود → بالای دکمه */
+        pop.style.left = Math.round(left) + 'px';
+        pop.style.right = 'auto';
+        pop.style.top = Math.round(top) + 'px';
+    }
     function open() {
         pop.classList.add('open');
+        position();
         requestAnimationFrame(function () { pop.classList.add('show'); });
         if (!talker && window.Kinetics) {
             talker = makeAstroTalker(document.getElementById('coChatStream'), true);
@@ -308,6 +323,7 @@ function wireChatPop() {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && pop.classList.contains('open')) close();
     });
+    window.addEventListener('resize', function () { if (pop.classList.contains('open')) position(); });
 }
 
 if (document.readyState === 'loading') {

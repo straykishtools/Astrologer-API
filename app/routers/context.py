@@ -420,7 +420,10 @@ Challenging planets and ways to turn challenges into opportunities
     if _fb and _fb != models[0]["name"]:
         models.append({"name": _fb, "max_tokens": 16384})
 
-    async with httpx.AsyncClient(timeout=180.0, follow_redirects=True) as client:
+    # تحلیلِ ۱۶هزارتوکنیِ فارسی روی مدلِ رایگان کند است؛ ۱۸۰ ثانیه کم بود.
+    # timeout تفکیکی: اتصال/خواندنِ اولیه سریع شکست بخورد ولی تولید طولانی جا داشته باشد.
+    _to = httpx.Timeout(300.0, connect=15.0)
+    async with httpx.AsyncClient(timeout=_to, follow_redirects=True) as client:
         errors = []
         for model in models:
             try:

@@ -122,6 +122,8 @@ code,digits{font-variant-numeric:tabular-nums;}
   box-shadow:0 0 10px var(--teal-glow);
 }
 .side-nav .sn-sep{height:1px;background:var(--glass-line);margin:6px 12px;}
+/* hamburger is a mobile-only affordance — never shows on desktop rails */
+.side-nav .sn-toggle{display:none;}
 /* compact icon-rail variant — used over the live practice scene */
 .side-nav.compact{
   left:16px;top:128px;transform:none;border-radius:22px;padding:8px 6px;
@@ -130,21 +132,53 @@ code,digits{font-variant-numeric:tabular-nums;}
 .side-nav.compact .sn-item span{display:none;}
 .side-nav.compact .sn-sep{margin:4px 8px;}
 
-/* ── SplitToolbar (home.xml) — preserved role, glass-styled ── */
+/* ── SplitToolbar (home.xml) — curved wave dock: shoulders raised at
+   the edges, wide notch in the center; deep navy body with a top
+   hairline highlight and teal line icons (reference dock) ── */
 .split-toolbar{
   position:relative;z-index:5;
-  display:flex;align-items:stretch;justify-content:space-around;
-  background:linear-gradient(180deg, rgba(44,95,138,.92), rgba(35,78,116,.96));
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-top:1px solid var(--glass-line);
-  min-height:60px;
+  display:flex;align-items:flex-start;justify-content:space-around;
+  height:86px;padding:26px 10px 0;gap:2px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 86' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%231d324b'/%3E%3Cstop offset='1' stop-color='%230f1c2e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 34C0 18 12 10 28 10H132C300 10 358 46 500 46C642 46 700 10 868 10H972C988 10 1000 18 1000 34V86H0Z' fill='url(%23g)' stroke='%23ffffff22' stroke-width='2'/%3E%3C/svg%3E") center/100% 100% no-repeat;
 }
 .split-toolbar .st-btn{
-  flex:1;max-width:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;color:#fff;font-size:11px;opacity:.92;padding:8px 0;transition:.18s;border-radius:0;
+  flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  gap:4px;color:#67d8c3;font-size:11px;font-weight:700;padding:0 0 8px;transition:.18s;
 }
-.split-toolbar .st-btn img{width:24px;height:24px;object-fit:contain;filter:brightness(0) invert(1);opacity:.9;}
-.split-toolbar .st-btn:hover{background:rgba(255,255,255,.12);opacity:1;}
+.split-toolbar .st-btn svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s, filter .18s;}
+.split-toolbar .st-btn:hover{color:#a5f3e3;}
+.split-toolbar .st-btn:hover svg{transform:translateY(-2px);filter:drop-shadow(0 0 8px rgba(62,220,199,.55));}
+.split-toolbar .st-btn:active{transform:scale(.95);}
+/* کارما — PNG symbol; hover/tap reveals the points bubble (no nav) */
+.st-btn.karma-btn img{width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));transition:transform .18s, filter .18s;}
+.st-btn.karma-btn:hover img{transform:translateY(-2px);filter:drop-shadow(0 0 10px rgba(62,220,199,.6)) drop-shadow(0 2px 6px rgba(0,0,0,.5));}
+.st-btn.karma-btn{position:relative;}
+.st-btn .ktip{
+  position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%) translateY(6px) scale(.94);
+  background:rgba(13,25,42,.9);backdrop-filter:blur(14px);
+  border:1px solid rgba(62,220,199,.5);border-radius:14px;
+  padding:4px 14px;font-size:12.5px;font-weight:900;color:#8ff0e0;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:.22s;
+  box-shadow:0 8px 22px rgba(6,16,30,.5);
+}
+.st-btn .ktip::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:rgba(13,25,42,.9);
+}
+.st-btn.karma-btn.show-tip .ktip{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
+/* ride the wave — the notch is ~36px deeper at center, ~10px at 30/70% */
+.split-toolbar .st-btn:nth-child(2),
+.split-toolbar .st-btn:nth-child(4){margin-top:10px;}
+.split-toolbar .st-btn:nth-child(3){margin-top:32px;}
+@media (max-width:560px){
+  .split-toolbar{height:76px;padding-top:20px;}
+  .split-toolbar .st-btn{font-size:10px;}
+  .split-toolbar .st-btn svg{width:20px;height:20px;}
+  .st-btn.karma-btn img{width:22px;height:22px;}
+  .split-toolbar .st-btn:nth-child(2),
+  .split-toolbar .st-btn:nth-child(4){margin-top:7px;}
+  .split-toolbar .st-btn:nth-child(3){margin-top:22px;}
+}
 
 /* ── Home — three-column: info | practice (real-size pose) | details ── */
 #scr-home .home-top{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;overflow:hidden;}
@@ -306,10 +340,25 @@ code,digits{font-variant-numeric:tabular-nums;}
 .back-btn img{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7));}
 
 /* ── Preview — light surface, soft cards ── */
-.appbar{position:relative;z-index:5;background:linear-gradient(180deg,var(--colorPrimary),var(--colorPrimaryDark));}
-.appbar .tb{display:flex;align-items:center;min-height:56px;padding:0 10px;}
-.appbar .tb .tb-title{flex:1;color:#fff;font-size:18px;font-weight:800;padding:0 10px;text-shadow:0 1px 4px rgba(0,0,0,.25);}
-.appbar .tb .tb-karma{display:flex;align-items:center;gap:5px;color:#fff;font-size:18px;font-weight:700;padding-left:12px;}
+/* appbar — same navy + wave language as the dock: gradient body,
+   hairline highlight and a soft wave cut into the bottom edge */
+.appbar{
+  position:relative;z-index:5;
+  background:linear-gradient(180deg,#1d324b,#122238);
+  box-shadow:0 8px 26px rgba(6,16,30,.4);
+}
+.appbar::after{
+  content:'';position:absolute;left:0;right:0;top:100%;height:12px;
+  background:#122238;
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 12" preserveAspectRatio="none"><path d="M0 0 C 240 10 480 10 720 4 C 960 -2 1200 -2 1440 6 L1440 0 Z" fill="black"/></svg>') center/100% 100% no-repeat;
+  mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 12" preserveAspectRatio="none"><path d="M0 0 C 240 10 480 10 720 4 C 960 -2 1200 -2 1440 6 L1440 0 Z" fill="black"/></svg>') center/100% 100% no-repeat;
+}
+.appbar.ghost{background:transparent;box-shadow:none;}
+.appbar.ghost::after{display:none;}
+.appbar .tb{display:flex;align-items:center;min-height:56px;padding:0 10px;position:relative;z-index:1;}
+.appbar .tb .tb-title{color:#a5f3e3;font-size:18px;font-weight:900;padding:0 10px;text-shadow:0 1px 4px rgba(0,0,0,.35);
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.appbar .tb .tb-karma{display:flex;align-items:center;gap:5px;color:#8ff0e0;font-size:18px;font-weight:700;margin-inline-start:auto;}
 .appbar .tb .tb-karma img{width:20px;height:20px;}
 .appbar .tb button img{width:28px;height:28px;object-fit:contain;filter:invert(1);}
 #previewWhite{position:relative;z-index:2;flex:1;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,#f5fafd,#e8f2f9);}
@@ -351,20 +400,34 @@ code,digits{font-variant-numeric:tabular-nums;}
   border-bottom:1px solid var(--glass-line);
   box-shadow:0 12px 40px rgba(6,16,30,.45);
 }
-.yh-row{display:flex;align-items:center;height:48px;padding:0 10px;gap:4px;}
+.yh-row{display:flex;align-items:center;height:42px;padding:0 14px;gap:4px;}
 .yh-row .spacer{flex:1;}
 .yh-btn{
   width:38px;height:38px;display:grid;place-items:center;border-radius:12px;transition:.18s;
 }
 .yh-btn:hover{background:rgba(255,255,255,.14);}
 .yh-btn img{width:20px;height:20px;filter:invert(1);opacity:.92;}
-.yh-title{
-  position:absolute;left:50%;top:16px;transform:translate(-50%,-50%);
-  font-size:16px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.3);
-  width:max-content;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+/* floating audio pair — top-left edge, glass */
+.yh-audio{
+  position:absolute;left:12px;top:12px;z-index:9;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(13,25,42,.55);backdrop-filter:blur(20px) saturate(1.25);
+  -webkit-backdrop-filter:blur(20px) saturate(1.25);
+  border:1px solid var(--glass-line-strong);border-radius:16px;
+  padding:5px;
+  box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.12);
 }
-/* the corner action rail owns the top-right — keep the header trio clear */
-body.in-player .yh-row{padding-right:150px;}
+.yh-audio button{
+  width:34px;height:34px;display:grid;place-items:center;border-radius:11px;
+  background:rgba(255,255,255,.07);border:1px solid var(--glass-line);transition:.18s;
+}
+.yh-audio button:hover{background:rgba(62,220,199,.16);border-color:rgba(62,220,199,.55);}
+.yh-audio button img{width:17px;height:17px;filter:invert(1);opacity:.92;}
+.yh-title{
+  position:relative;margin-inline:auto;
+  font-size:16px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.3);
+  max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
 .yh-clock{
   position:absolute;left:50%;top:8px;transform:translateX(calc(-50% - 250px));
   display:flex;align-items:center;gap:6px;
@@ -751,18 +814,6 @@ body.in-player .yh-row{padding-right:150px;}
 .poses-panel .pp-tabs .tab:hover{opacity:1;}
 .poses-panel .pp-tabs .tab.on{opacity:1;background:rgba(62,220,199,.16);box-shadow:inset 0 0 0 1px rgba(62,220,199,.45);color:#aef3e6;}
 .poses-panel .pp-tabs .tab img{width:16px;height:16px;filter:invert(1);}
-/* panel toggle tab — mid-right edge */
-#panelToggle{
-  position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:45;
-  width:26px;height:56px;border-radius:12px 0 0 12px;
-  background:rgba(20,44,70,.9);border:1px solid var(--glass-line);border-right:none;
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  display:grid;place-items:center;transition:.25s;
-}
-#panelToggle img{width:14px;height:14px;filter:invert(1);transition:transform .3s;}
-#panelToggle:hover{background:rgba(30,60,92,.95);}
-body.panel-open #panelToggle{right:min(340px,88vw);border-radius:0 12px 12px 0;}
-body.panel-open #panelToggle img{transform:rotate(180deg);}
 
 /* stat chips — single glass capsule, top-RIGHT (reference layout) */
 .stat-chips{
@@ -1008,9 +1059,11 @@ a.pose-ref:hover{color:#155f92;}
 .ar-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
 /* inside the player the chips capsule steps aside for the rail */
 body.in-player .stat-chips{right:154px;}
-/* on chrome screens the rail covers the top-right, where the appbar
-   back button lives — shift that row's start aside */
-body.rail-on .appbar .tb{padding-right:150px;}
+/* on chrome screens the rail owns the top-right corner → the appbar's
+   own back button (first button in the row) steps out of the way */
+body.rail-on .appbar .tb > button:first-child{display:none;}
+/* the poses screen has a second button (layout toggle) — keep it clear */
+body.rail-on .appbar .tb{padding-right:64px;}
 .ar-btn:hover{background:rgba(62,220,199,.16);border-color:rgba(62,220,199,.55);transform:scale(1.06);}
 .ar-btn:active{transform:scale(.95);}
 .ar-btn[hidden]{display:none;}
@@ -1038,39 +1091,67 @@ body.rail-on .appbar .tb{padding-right:150px;}
   .session-ctrl{bottom:152px;}
 }
 /* ════ mobile deck layout ════
-   the desktop edge rails don't fit a phone:
-   · nav + env rail become horizontal chip-rows docked under the header
-   · action rail shrinks to a corner strip · ring floats right
-   · control bar + practice bar ride in one clean bottom stack      */
+   · stat chips: top-left under the header
+   · side-nav: collapsed FAB (hamburger) → tap opens the icon column
+   · env-rail: thin collapsed pill (active icon only) → tap expands
+   · action rail corner strip · ring floats right
+   · pose-pill rides above the pose · bottom bars stack clean       */
 @media (max-width:880px){
   .side-nav{left:10px;padding:10px 6px;gap:4px;border-radius:22px;}
-  .side-nav .sn-item{width:48px;padding:9px 2px 7px;}
-  .side-nav .sn-item span{display:none;}   /* never show labels on mobile, compact or not */
+  .side-nav .sn-item span{display:none;}
   .side-nav .sn-item svg{width:19px;height:19px;}
   .poses-panel{width:min(300px,92vw);}
-  body.panel-open #panelToggle{right:min(300px,92vw);}
   #yogaPose{max-width:76vw;}
   .pc-center{height:min(46vh,420px);}
   .pc-side{width:20vw;min-width:70px;height:min(30vh,260px);}
   .pc-side .pc-tag{font-size:9px;}
   .yh-title{font-size:14px;}
-  .pose-pill{top:auto;bottom:55%;right:calc(100% + 24px);padding:6px 16px;}
-  .pose-pill .nm{font-size:14px;}
+  /* pose pill → centered above the pose (fits in the top gap) */
+  .pose-pill{
+    right:50%;bottom:calc(100% + 10px);transform:translateX(50%);
+    padding:5px 14px;max-width:84vw;text-align:center;
+  }
+  .pose-pill .nm{font-size:13.5px;}
+  .pose-pill::before{display:none;}
 
-  /* — nav: horizontal icon row, docked under the glass header — */
+  /* — stat chips: top-left of the stage, right under the header — */
+  .stat-chips, body.in-player .stat-chips{right:auto;left:8px;top:104px;padding:3px 3px;}
+  .chip-stat{padding:2px 9px;font-size:11.5px;}
+
+  /* — side-nav: collapsed hamburger FAB, tap to open the column — */
   .side-nav.compact{
-    left:8px;top:120px;transform:none;
-    flex-direction:row;gap:2px;padding:5px;border-radius:18px;
+    left:8px;top:152px;transform:none;
+    flex-direction:column;gap:2px;padding:5px;border-radius:16px;
   }
-  .side-nav.compact .sn-item{width:42px;padding:8px 2px 6px;border-radius:13px;}
+  .side-nav.compact .sn-item{width:40px;padding:8px 2px 6px;border-radius:12px;}
   .side-nav.compact .sn-sep{display:none;}
-  .side-nav.compact .sn-item.on::before{
-    right:50%;left:auto;top:auto;bottom:-5px;transform:translateX(50%);
-    width:16px;height:3px;
+  .side-nav.compact:not(.open) .sn-item{display:none;}
+  .sn-toggle{
+    width:38px;height:38px;display:grid;place-items:center;border-radius:12px;
+    background:var(--glass-fill);border:1px solid var(--glass-line);color:#8ff0e0;transition:.18s;
   }
+  .sn-toggle svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+  .sn-toggle:hover{background:var(--glass-hi);}
+  .side-nav:not(.compact) .sn-toggle{display:none;}   /* desktop rails never show the FAB */
 
-  /* — action rail: compact horizontal strip, top-right corner — */
-  .action-rail{right:8px;left:auto;top:50px;padding:5px;border-radius:15px;gap:4px;}
+  /* — env rail: thin, collapsed to the active icon; tap to expand — */
+  .env-rail{
+    left:8px;right:auto;top:200px;bottom:auto;transform:none;
+    flex-direction:column;padding:4px;gap:2px;border-radius:14px;width:42px;
+  }
+  .env-rail .er-btn{width:32px;height:32px;border-radius:10px;}
+  .env-rail .er-btn svg{width:15px;height:15px;}
+  .env-rail:not(.open) .er-btn:not(.on),
+  .env-rail:not(.open) .er-slider{display:none;}
+  .env-rail .er-slider{max-height:0;transition:none;width:100%;}
+  .env-rail .er-slider input{transform:none;width:56px;margin:0;padding:8px 0;}
+  .env-rail.custom .er-slider{max-height:60px;}
+  /* when the nav opens above it, the env rail slides down to make room */
+  body.nav-open .env-rail{top:392px;}
+  .env-rail{transition:top .25s ease;}
+
+  /* — action rail: pinned top-right, small edge gap — */
+  .action-rail{right:8px;left:auto;top:8px;padding:5px;border-radius:15px;gap:4px;}
   .action-rail .ar-btn{width:34px;height:34px;border-radius:11px;}
   .action-rail .ar-btn svg{width:16px;height:16px;}
 
@@ -1081,19 +1162,7 @@ body.rail-on .appbar .tb{padding-right:150px;}
   .session-ring .sr-num{font-size:16px;}
   .session-ring .sr-lbl{font-size:7px;}
 
-  /* — env rail: horizontal chips, docked top-left under the nav row — */
-  .env-rail{
-    left:8px;right:auto;top:178px;bottom:auto;transform:none;
-    flex-direction:row;flex-wrap:wrap;justify-content:center;
-    padding:5px;border-radius:18px;gap:3px;
-  }
-  .env-rail .er-btn{width:36px;height:36px;border-radius:12px;}
-  .env-rail .er-btn svg{width:17px;height:17px;}
-  .env-rail .er-slider{max-height:0;transition:none;width:100%;}
-  .env-rail .er-slider input{transform:none;width:132px;margin:0;}
-  .env-rail.custom .er-slider{max-height:36px;padding:6px 4px 2px;}
-
-  /* — breath card: top-right corner, compact — */
+  /* — breath card: right edge, below the action rail — */
   .breath-fab{right:8px;top:120px;padding:9px 11px;min-width:0;gap:6px;border-radius:20px;}
   .breath-fab .yoga-circle{width:52px;height:52px;}
   .breath-fab .yoga-circle .yp-breath-text{font-size:11px;}
@@ -1106,8 +1175,6 @@ body.rail-on .appbar .tb{padding-right:150px;}
   .breath-fab .sw .sw-knob{width:13px;height:13px;top:1px;right:1px;}
   .breath-fab .sw[aria-checked="true"] .sw-knob{transform:translateX(-13px);}
 
-  .stat-chips{right:8px;top:12px;padding:3px 3px;}
-  .chip-stat{padding:2px 9px;font-size:11.5px;}
   /* one row on mobile too — drop the percent, compact timers */
   .seek-wrap{left:2%;right:2%;bottom:14px;gap:8px;padding:8px 12px;}
   .seek-wrap .t-time{font-size:12px;min-width:44px;}
@@ -1138,12 +1205,16 @@ body.rail-on .appbar .tb{padding-right:150px;}
   .pc-side{display:none;}
   .home-side{display:none;}
   .practice-card .pc-img{height:min(42vh,380px);}
-  .side-nav .sn-item{width:40px;padding:8px 0 6px;}
-  /* header is shorter here — pull the deck up, ring stays right-bottom */
-  .side-nav.compact{top:106px;}
+  .side-nav .sn-item{width:36px;padding:7px 0 5px;}
+  .side-nav.compact .sn-item{width:36px;padding:7px 0 5px;}
+  .side-nav.compact .sn-toggle{width:34px;height:34px;}
+  /* header is shorter here — pull the left deck up with it */
+  .stat-chips{top:92px;}
+  .side-nav.compact{top:128px;}
+  .env-rail{top:178px;}
+  body.nav-open .env-rail{top:356px;}
   .breath-fab{top:100px;}
-  .action-rail{top:44px;}
-  .env-rail{top:164px;}
+  .action-rail{top:8px;}
   .session-ctrl{bottom:130px;}
   #resumePractice{padding:8px 14px;font-size:12px;}
 }
@@ -1181,6 +1252,9 @@ body.rail-on .appbar .tb{padding-right:150px;}
 
 <!-- ═══════════ FLOATING GLASS SIDE NAV (خانه · تمرین‌ها · پروفایل · تنظیمات) ═══════════ -->
 <nav class="side-nav hide" id="sideNav" aria-label="منوی اصلی">
+  <button class="sn-toggle" id="snToggle" title="باز/بسته کردن منو" aria-label="باز/بسته کردن منو">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
   <button class="sn-item" data-nav="home" title="خانه">
     <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
     <span>خانه</span>
@@ -1206,11 +1280,14 @@ body.rail-on .appbar .tb{padding-right:150px;}
   <button class="ar-btn" id="uiCloseStudio" title="بستن استودیو" hidden>
     <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
   </button>
-  <button class="ar-btn" id="uiQuit" title="منوی یوگا">
+  <button class="ar-btn" id="uiQuit" title="منوی یوگا" hidden>
     <svg viewBox="0 0 24 24"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5"/><path d="M21 12H9"/><path d="m17 8 4 4-4 4"/></svg>
   </button>
-  <button class="ar-btn" id="btnRestart" title="شروع دوباره از ابتدا">
+  <button class="ar-btn" id="btnRestart" title="شروع دوباره از ابتدا" hidden>
     <svg viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>
+  </button>
+  <button class="ar-btn" id="arBack" title="بازگشت" hidden>
+    <svg viewBox="0 0 24 24"><path d="M14 5l7 7-7 7"/><path d="M21 12H9"/><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/></svg>
   </button>
 </nav>
 
@@ -1321,8 +1398,9 @@ body.rail-on .appbar .tb{padding-right:150px;}
       <span id="hdrCurTime">۰:۰۰</span> · <span id="hdrRemTime">-۰:۰۰</span>
     </div>
   </header>
-  <!-- floating audio pair — pinned to the top-left edge -->
+  <!-- floating audio + poses triggers — pinned to the top-left edge -->
   <div class="yh-audio">
+    <button id="btnPosePanel" title="پنل حرکات (فهرست و پرش)"><img src="static/yoga-data/resources/res/drawable-mdpi/ic_view_module_white_24dp.png" alt="حرکات"></button>
     <button id="ytMusic" title="موسیقی محیطی: روشن/خاموش"><img src="static/yoga-data/resources/res/drawable-mdpi/airplay_icon.png" alt="موسیقی"></button>
     <button id="ytSound" title="راهنمای صوتی: روشن/خاموش"><img src="static/yoga-data/resources/res/drawable-mdpi/volume_on.png" alt="صدا"></button>
   </div>
@@ -1439,7 +1517,6 @@ body.rail-on .appbar .tb{padding-right:150px;}
       <div class="tab" id="ppVol"><img src="static/yoga-data/resources/res/drawable-mdpi/sound_controls_icon.png" alt=""><input type="range" id="uiVolumePanel" min="0" max="100" value="100" style="width:90px;"></div>
     </div>
   </aside>
-  <button id="panelToggle" title="پنل حرکات"><img src="static/yoga-data/resources/res/drawable-mdpi/left_arrow.png" alt=""></button>
 </section>
 
 <!-- ═══════════ POST SESSION ═══════════ -->
@@ -1577,7 +1654,7 @@ body.rail-on .appbar .tb{padding-right:150px;}
 <!-- ═══════════ SETTINGS ═══════════ -->
 <section class="screen" id="scr-settings">
   <div class="bgview" id="settingsBg"></div>
-  <div class="appbar" style="background:transparent;position:absolute;top:0;left:0;right:0;">
+  <div class="appbar ghost" style="background:transparent;position:absolute;top:0;left:0;right:0;">
     <div class="tb">
       <button id="settingsBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,.8));" alt="بازگشت"></button>
       <div class="tb-title">تنظیمات</div>
@@ -1604,7 +1681,7 @@ body.rail-on .appbar .tb{padding-right:150px;}
 <!-- ═══════════ ABOUT ═══════════ -->
 <section class="screen" id="scr-about">
   <div class="bgview" id="aboutBg"></div>
-  <div class="appbar" style="background:transparent;position:absolute;top:0;left:0;right:0;">
+  <div class="appbar ghost" style="background:transparent;position:absolute;top:0;left:0;right:0;">
     <div class="tb">
       <button id="aboutBack"><img src="static/yoga-data/resources/res/drawable-mdpi/pvc_back_button.png" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,.8));" alt="بازگشت"></button>
       <div class="tb-title">درباره</div>
@@ -1628,6 +1705,6 @@ body.rail-on .appbar .tb{padding-right:150px;}
 <script src="static/yoga-classic/data.js?v=9"></script>
 <script src="static/yoga-classic/engine.js?v=6"></script>
 <script src="static/yoga-classic/audio.js?v=8"></script>
-<script src="static/yoga-classic/app.js?v=21"></script>
+<script src="static/yoga-classic/app.js?v=25"></script>
 </body>
 </html>

@@ -18,7 +18,9 @@ import secrets
 try:
     from dotenv import load_dotenv
 
-    load_dotenv()  # مقادیر .env را وارد os.environ می‌کند (بدون بازنویسی var موجود)
+    # override=True → مقدار .env همیشه برنده است؛ وگرنه اگر در پوسته/پروسه
+    # متغیر قدیمیِ AI_MODEL مانده باشد، restart هم .env تازه را اعمال نمی‌کرد.
+    load_dotenv(override=True)
 except Exception:  # pragma: no cover - dotenv نصب نیست
     pass
 

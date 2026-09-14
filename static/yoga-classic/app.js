@@ -55,6 +55,25 @@ function currentScreenId() {
    — active state syncs with the visible screen; hidden during a
      live session (the player owns the screen) and on the splash. */
 function sessionLive() { return typeof Player !== 'undefined' && !!Player.live; }
+/* هر صفحه‌ای که دکمه بازگشت دارد → آیدی همان دکمه؛ ریل اکشن با
+   کلیک روی «بازگشت» دقیقاً همان را صدا می‌زند (منطق ناوبری یکی بماند) */
+const BACK_BY_SCREEN = {
+  'scr-preview': 'pvBack',
+  'scr-store': 'storeBack',
+  'scr-history': 'historyBack',
+  'scr-history-detail': 'hdetailBack',
+  'scr-poses': 'posesBack',
+  'scr-settings': 'settingsBack',
+  'scr-about': 'aboutBack',
+};
+function wireRailBack() {
+  const ab = $('arBack');
+  if (!ab) return;
+  ab.onclick = () => {
+    const target = $(BACK_BY_SCREEN[currentScreenId()]);
+    if (target) target.click();
+  };
+}
 function syncSideNav() {
   const nav = document.getElementById('sideNav');
   if (!nav) return;
@@ -72,24 +91,25 @@ function syncSideNav() {
      user is on another screen */
   const pill = $('resumePractice');
   if (pill) pill.hidden = !(sessionLive() && id !== 'scr-yoga');
-  /* action rail — بستن استودیو / منوی یوگا / شروع دوباره
-     · hidden on splash & post & home-lobby? No — visible everywhere
-       except splash; in the player it docks left-center (body.in-player)
-     · «منوی یوگا» + «شروع دوباره» only apply while a session is live
-     · «بستن استودیو» only when embedded in the cosmic parent app */
+  /* action rail — top-right corner everywhere it applies:
+     · «منوی یوگا» + «شروع دوباره» only while a session is live
+     · «بستن استودیو» only when embedded in the cosmic parent app
+     · «بازگشت» on every chrome screen that has a back button
+       (replaces that screen's appbar ✕ — same handler, rail style) */
   const rail = document.getElementById('actionRail');
   if (rail) {
     const live = sessionLive();
     const cosmic = inCosmicIframe();
-    const q = $('uiQuit'), r = $('btnRestart'), cs = $('uiCloseStudio');
+    const q = $('uiQuit'), r = $('btnRestart'), cs = $('uiCloseStudio'), ab = $('arBack');
     if (q) q.hidden = !live;
     if (r) r.hidden = !live;
     if (cs) cs.hidden = !cosmic;
+    const backId = BACK_BY_SCREEN[id];
+    if (ab) ab.hidden = !backId;
     /* empty rail looks broken — hide the whole panel when nothing applies */
-    const railEmpty = (id === 'scr-splash' || id === 'scr-post') || (!live && !cosmic);
+    const railEmpty = (id === 'scr-splash' || id === 'scr-post') || (!live && !cosmic && !backId);
     rail.hidden = railEmpty;
-    /* on chrome screens the appbar's back button sits at the top-right —
-       shift it aside while the rail covers that corner */
+    /* on chrome screens the rail owns the corner → hide the appbar's ✕ */
     document.body.classList.toggle('rail-on', !railEmpty && id !== 'scr-yoga');
   }
   document.body.classList.toggle('in-player', id === 'scr-yoga');
@@ -102,10 +122,29 @@ function showScreen(id) {
 function initSideNav() {
   const nav = document.getElementById('sideNav');
   if (!nav) return;
+  wireRailBack();
+  /* mobile hamburger — collapsed FAB opens/closes the icon column */
+  const snT = $('snToggle');
+  if (snT) snT.onclick = e => {
+    e.stopPropagation();
+    const open = !nav.classList.contains('open');
+    nav.classList.toggle('open', open);
+    document.body.classList.toggle('nav-open', open);
+  };
+  /* env rail collapse (mobile): tapping the shown active icon expands;
+     tapping it again, or another icon, collapses after switching */
+  const er = $('envRail');
+  if (er) er.addEventListener('click', e => {
+    const btn = e.target.closest('.er-btn');
+    if (btn && btn.classList.contains('on')) er.classList.toggle('open');
+  });
   const pill = $('resumePractice');
   if (pill) pill.onclick = () => showScreen('scr-yoga');
   nav.querySelectorAll('.sn-item').forEach(b => {
     b.onclick = () => {
+      /* موبایل: بعد از انتخاب، ستون منو دوباره جمع می‌شود */
+      nav.classList.remove('open');
+      document.body.classList.remove('nav-open');
       const n = b.dataset.nav;
       /* حین جلسه فعال: بقیه گزینه‌ها تمرین را قطع نمی‌کنند؛
          فقط «خانه» می‌پرسد و بعد جلسه را می‌بندد. بقیه صفحه را
@@ -151,18 +190,38 @@ function applyBackground(name) {
 const Home = {
   idx: 0,
   init() {
-    const items = [
-      { icon: 'ui_karmabutton.png', label: FA_UI.karma, act: () => Store.open('karma') },
-      { icon: 'ui_historybutton.png', label: FA_UI.history, act: () => History.open() },
-      { icon: 'ui_previewbutton.png', label: FA_UI.preview, act: () => Preview.open(Home.current()) },
-      { icon: 'ui_settingsbutton.png', label: FA_UI.settings, act: () => Settings.open() },
-      { icon: 'ui_infobutton.png', label: FA_UI.about, act: () => About.open() },
-    ];
-    $('homeToolbar').innerHTML = items.map((it, i) =>
-      '<button class="st-btn" data-i="' + i + '"><img src="' + DRAW_MDPI + it.icon + '" alt=""><span>' + esc(it.label) + '</span></button>'
-    ).join('');
-    $('homeToolbar').querySelectorAll('.st-btn').forEach(b => {
-      b.onclick = () => items[+b.dataset.i].act();
+    /* teal line icons — drawn inline so the curved dock stays one-family
+       (stroke:currentColor; hover glow comes from CSS) */
+    const IC = {
+      history: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13l2.6 1.8"/><path d="M4.5 5.5 7 3.5"/>',
+      preview: '<path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z"/><circle cx="12" cy="12" r="2.6"/>',
+      bgs:     '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.7"/><path d="m5 16.5 4.5-5 3 3.2 2.7-2.9 3.3 4.7"/>',
+      about:   '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    };
+    const tb = $('homeToolbar');
+    tb.innerHTML =
+      '<button class="st-btn karma-btn" id="stKarma" title="امتیاز کارمای من">' +
+        '<img src="' + DRAW_MDPI + 'karma_symbol.png" alt="">' +
+        '<span>' + FA_UI.karma + '</span>' +
+        '<span class="ktip" id="karmaTip">۰ کارما</span>' +
+      '</button>' +
+      '<button class="st-btn" data-act="history"><svg viewBox="0 0 24 24">' + IC.history + '</svg><span>' + FA_UI.history + '</span></button>' +
+      '<button class="st-btn" data-act="preview"><svg viewBox="0 0 24 24">' + IC.preview + '</svg><span>' + FA_UI.preview + '</span></button>' +
+      '<button class="st-btn" data-act="bgs"><svg viewBox="0 0 24 24">' + IC.bgs + '</svg><span>پس‌زمینه‌ها</span></button>' +
+      '<button class="st-btn" data-act="about"><svg viewBox="0 0 24 24">' + IC.about + '</svg><span>' + FA_UI.about + '</span></button>';
+    tb.querySelector('.st-btn[data-act="history"]').onclick = () => History.open();
+    tb.querySelector('.st-btn[data-act="preview"]').onclick = () => Preview.open(Home.current());
+    tb.querySelector('.st-btn[data-act="bgs"]').onclick = () => Store.open('backgrounds');
+    tb.querySelector('.st-btn[data-act="about"]').onclick = () => About.open();
+    /* کارما: ناوبری ندارد — هاور/تپ، امتیاز را در حباب نشان می‌دهد */
+    const kb = $('stKarma'), kt = $('karmaTip');
+    const karmaShow = () => { kt.textContent = faNum(DB.karma) + ' کارما'; kb.classList.add('show-tip'); };
+    kb.addEventListener('mouseenter', karmaShow);
+    kb.addEventListener('mouseleave', () => kb.classList.remove('show-tip'));
+    kb.addEventListener('click', e => {   /* لمس: یک بار نشان، بار دوم پنهان */
+      e.stopPropagation();
+      if (kb.classList.contains('show-tip')) kb.classList.remove('show-tip');
+      else karmaShow();
     });
     $('homeKarma').textContent = faNum(DB.karma);
     $('homePrev').onclick = () => this.go(this.idx - 1);
@@ -1073,7 +1132,8 @@ const PosePanel = {
   query: '',
   init() {
     $('btnPosePanel').onclick = () => this.toggle();
-    $('panelToggle').onclick = () => this.toggle();
+    const pt = $('panelToggle');
+    if (pt) pt.onclick = () => this.toggle();   /* دکمه لبه حذف شد — امن */
     $('ppClose').onclick = () => this.toggle(false);
     $('ppTabAll').onclick = () => { this.mode = 'all'; this.render(); this.syncTabs(); };
     $('ppTabSession').onclick = () => { this.mode = 'session'; this.render(); this.syncTabs(); };
