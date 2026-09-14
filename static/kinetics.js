@@ -147,8 +147,11 @@ function burst(host, opts) {
     }
 }
 
-/* ═══ Prompt Composer — رشد خودکار + commit فنری (از main.js) ═══ */
-function mountComposer(root) {
+/* ═══ Prompt Composer — رشد خودکار + commit فنری (از main.js) ═══
+   opts.onSubmit در صورت وجود بر Kinetics.onSubmit global اولویت دارد
+   (چند کامپوزر هم‌زمان روی صفحه با هم تداخل نکنند). */
+function mountComposer(root, opts) {
+    opts = opts || {};
     var input = root.querySelector('textarea');
     var send = root.querySelector('.k-send');
     var count = root.querySelector('.k-count');
@@ -162,7 +165,8 @@ function mountComposer(root) {
         if (!root.classList.contains('ready')) return;
         var val = input.value.trim();
         root.classList.add('sending');
-        (Kinetics.onSubmit || function () {})(val);
+        var cb = opts.onSubmit || Kinetics.onSubmit;
+        (cb || function () {})(val);
         setTimeout(function () { root.classList.remove('sending'); input.value = ''; grow(); input.focus(); }, 420);
     }
     input.addEventListener('input', grow);

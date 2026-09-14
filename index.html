@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="static/date-wheel-picker.css?v=2">
     <link rel="stylesheet" href="static/shamsi-calendar.css?v=3">
     <link rel="stylesheet" href="static/preset-calendar.css?v=1">
-    <link rel="stylesheet" href="static/vinyl-player.css?v=5">
+    <link rel="stylesheet" href="static/vinyl-player.css?v=6">
     <link rel="stylesheet" href="static/yoga-v3.css?v=13">
 
     <style>
@@ -498,6 +498,27 @@
         body.cosmic.sidebar-collapsed .sidebar .nav-item { font-size: 0; justify-content: center; padding: 10px 6px; gap: 0; }
         body.cosmic.sidebar-collapsed .sidebar .sb-footer-user { justify-content: center; }
         body.cosmic.sidebar-collapsed .cosmic-main { margin-right: 60px; }
+        /* حالت ریل: هدر دسته‌ها کلیک‌پذیرِ محض‌اند (tooltip اسم با JS) */
+        body.cosmic.sidebar-collapsed .sidebar .sb-section { margin-bottom: 0; }
+        /* دسته‌ای که در حالت ریل باز شده: آیکون‌هایش داخل یک جعبه‌ی جدا از دسته بعدی */
+        body.cosmic.sidebar-collapsed .sidebar .sb-section-items.open {
+            max-height: none;
+            margin: 2px 8px 8px;
+            padding: 6px 0;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(7, 12, 31, 0.5);
+        }
+        body.cosmic.sidebar-collapsed .sidebar .sb-section-items { max-height: 0; }
+        /* حالت بازِ عادی: خط جداکننده‌ی نرم زیر زیرمجموعه‌های باز تا دسته بعدی قاطی نشود */
+        body.cosmic:not(.sidebar-collapsed) .sidebar .sb-section-items.open {
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--line);
+        }
+        /* هاور روی هدرِ دسته در حالت ریل — نشانه‌ی کوچکِ باز بودن */
+        body.cosmic.sidebar-collapsed .sidebar .sb-section-header { position: relative; }
+        body.cosmic.sidebar-collapsed .sidebar .sb-section-header:hover .sb-section-icon { filter: drop-shadow(0 0 6px rgba(221,192,112,0.6)); }
         /* برند در حالت ریل: لوگو بالا، دکمه پایین */
         body.cosmic.sidebar-collapsed .sidebar-brand { flex-direction: column; align-items: center; gap: 10px; padding: 18px 8px 14px; }
         /* دکمه‌ی جمع/باز */
@@ -533,7 +554,8 @@
             --kf-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* overshoot(≈1.08) */
             --kf-glide:  cubic-bezier(0.16, 1, 0.30, 1);       /* اصطکاک نرم */
             position: fixed;
-            left: 26px; bottom: 26px;
+            left: 50%; bottom: 26px;
+            transform: translateX(-50%);          /* مرکزِ پایین صفحه */
             width: 56px; height: 56px;
             z-index: 3600;
             font-family: "Vazirmatn", sans-serif;
@@ -594,25 +616,35 @@
            توجه: در translate() فقط صفر واحد لازم ندارد؛ عدد غیرصفرِ بدون
            px کل قاعده را باطل می‌کرد (علتِ روی‌هم‌افتادنِ آیتم‌ها). */
         .kf-dial.open .kf-item { opacity: 1; pointer-events: auto; }
-        .kf-dial.open .kf-item:nth-child(1) { transform: translate(0px, -92px) scale(1); transition-delay: 0.02s; }
-        .kf-dial.open .kf-item:nth-child(2) { transform: translate(28px, -87px) scale(1); transition-delay: 0.06s; }
-        .kf-dial.open .kf-item:nth-child(3) { transform: translate(54px, -74px) scale(1); transition-delay: 0.10s; }
-        .kf-dial.open .kf-item:nth-child(4) { transform: translate(74px, -54px) scale(1); transition-delay: 0.14s; }
-        .kf-dial.open .kf-item:nth-child(5) { transform: translate(87px, -28px) scale(1); transition-delay: 0.18s; }
-        .kf-dial.open .kf-item:nth-child(6) { transform: translate(92px, 0px) scale(1); transition-delay: 0.22s; }
+        /* کمانِ رو به بالا، از راست به چپ (شعاع ۹۰، ۱۵°→۱۶۵°) */
+        .kf-dial.open .kf-item:nth-child(1) { transform: translate(87px, -23px) scale(1); transition-delay: 0.02s; }
+        .kf-dial.open .kf-item:nth-child(2) { transform: translate(64px, -64px) scale(1); transition-delay: 0.06s; }
+        .kf-dial.open .kf-item:nth-child(3) { transform: translate(23px, -87px) scale(1); transition-delay: 0.10s; }
+        .kf-dial.open .kf-item:nth-child(4) { transform: translate(-23px, -87px) scale(1); transition-delay: 0.14s; }
+        .kf-dial.open .kf-item:nth-child(5) { transform: translate(-64px, -64px) scale(1); transition-delay: 0.18s; }
+        .kf-dial.open .kf-item:nth-child(6) { transform: translate(-87px, -23px) scale(1); transition-delay: 0.22s; }
         /* جمع‌شدنِ سریع (بدون استگرِ دیرکردی — ادای فنرِ برگشت) */
         .kf-dial:not(.open) .kf-item { transition-delay: 0s; }
-        @media (max-width: 640px) { .kf-dial { left: 16px; bottom: 16px; } }
-        /* ── لنگر پنل‌ها — پنلِ بازشده از داک، بالای دکمه ✦ ظاهر می‌شود ──
-           anchor بدون اندازه است؛ پنل‌ها absolute از گوشهٔ پایین-چپ آن باز می‌شوند
-           تا پنلِ بسته (visibility:hidden) جایی را اشغال/کلیک‌گیر نکند. */
-        #kfPanelAnchor { position: fixed; left: 30px; bottom: 92px; width: 0; height: 0; z-index: 3650; }
+        @media (max-width: 640px) {
+            .kf-dial { left: 50%; bottom: 16px; }
+            /* روی موبایل کمان جمع‌تر تا از لبه نزند بیرون */
+            .kf-dial.open .kf-item:nth-child(1) { transform: translate(66px, -18px) scale(1); }
+            .kf-dial.open .kf-item:nth-child(2) { transform: translate(49px, -49px) scale(1); }
+            .kf-dial.open .kf-item:nth-child(3) { transform: translate(18px, -66px) scale(1); }
+            .kf-dial.open .kf-item:nth-child(4) { transform: translate(-18px, -66px) scale(1); }
+            .kf-dial.open .kf-item:nth-child(5) { transform: translate(-49px, -49px) scale(1); }
+            .kf-dial.open .kf-item:nth-child(6) { transform: translate(-66px, -18px) scale(1); }
+        }
+        /* ── لنگر پنل‌ها — پنلِ بازشده از داک، بالای دکمهٔ وسط‌چین ظاهر می‌شود ──
+           anchor بدون اندازه است؛ پنل‌ها absolute از آن باز می‌شوند تا پنلِ بسته
+           (visibility:hidden) جایی را اشغال/کلیک‌گیر نکند. تراز تقریبیِ وسط: */
+        #kfPanelAnchor { position: fixed; left: max(20px, calc(50% - 160px)); bottom: 92px; width: 0; height: 0; z-index: 3650; }
         #kfPanelAnchor > * {
             position: absolute !important;
             left: 0 !important; right: auto !important; top: auto !important; bottom: 0 !important;
             margin: 0 !important; max-width: calc(100vw - 44px);
         }
-        @media (max-width: 640px) { #kfPanelAnchor { left: 20px; bottom: 84px; } }
+        @media (max-width: 640px) { #kfPanelAnchor { left: 50%; bottom: 84px; } #kfPanelAnchor > * { transform: translateX(-50%); } }
         @media (prefers-reduced-motion: reduce) {
             .kf-fab, .kf-item, .kf-item .kf-lb { transition: opacity 0.2s var(--kf-glide); }
             .kf-dial.open .kf-item { transition-delay: 0s; }
@@ -3385,7 +3417,7 @@
     <!-- قالب بصری نسخه ۱ — سامانه‌ی طراحی واحد (توکن‌ها، اجزا، کیت ماه) -->
     <link rel="stylesheet" href="static/theme.css?v=1">
     <!-- کامپوننت‌های فیزیکی Kinetics (پورت‌شده به پالت کاسمیک) -->
-    <link rel="stylesheet" href="static/kinetics.css?v=3">
+    <link rel="stylesheet" href="static/kinetics.css?v=4">
 </head>
 <body class="cosmic">
 
@@ -3601,6 +3633,17 @@
         <button class="cd-btn" data-cd="saveBtn" title="ذخیره">💾<span class="cd-lb">ذخیره HTML</span></button>
     </div>
 
+    <!-- ✨ پاپ‌اور چت اخترشناس — از دکمهٔ تاپ‌بار باز می‌شود -->
+    <div class="co-chat-pop" id="coChatPop" role="dialog" aria-label="چت اخترشناس">
+        <div class="co-chat-head"><b>✨ گفت‌وگو با اخترشناس</b><button class="co-chat-close" id="coChatClose" type="button" title="بستن">✕</button></div>
+        <div class="k-tokens" id="coChatStream"></div>
+        <div class="k-composer" id="coChatComposer">
+            <textarea rows="1" placeholder="سؤالِ چارت، یوگا یا آسمان بپرس…"></textarea>
+            <span class="k-count">0</span>
+            <button class="k-send" type="button" title="ارسال">➤</button>
+        </div>
+    </div>
+
     <!-- ===== محتوای اصلی ===== -->
     <div class="cosmic-main">
 
@@ -3613,6 +3656,7 @@
             <div class="topbar-player" id="topbarPlayerSlot"></div>
             <div class="topbar-spacer"></div>
             <div class="header-actions">
+                <button id="coChatBtn" class="co-chat-btn" type="button" aria-haspopup="dialog" aria-controls="coChatPop" title="گفت‌وگو با اخترشناس"><span class="co-chat-ic">✨</span><span class="tb-label">چت اخترشناس</span></button>
                 <div class="yoga-summary-dropdown" id="yogaSummaryDropdown">
                     <button class="btn-action primary tb-icon-only" id="yogaEngineToggle" title="یوگا">🧘<span class="tb-label">یوگا</span></button>
                     <div class="yoga-summary-panel" id="yogaSummaryPanel"></div>
@@ -4873,7 +4917,7 @@
     <script src="static/yoga-library.js?v=15"></script>
     <script src="static/yoga-engine.js?v=2"></script>
     <script src="static/yoga-practice.js?v=6"></script>
-    <script src="static/yoga-player.js?v=25"></script>
+    <script src="static/yoga-player.js?v=26"></script>
     <script src="static/yoga-karma-store.js?v=5"></script>
     <script src="static/admin-panel.js?v=7"></script>
     <script src="static/breath-module.js?v=1"></script>
@@ -4891,7 +4935,7 @@
     <script src="static/yoga-test.js?v=4"></script>
     <script src="static/daily-dashboard.js?v=9"></script>
     <script src="static/audio-manager.js?v=8"></script>
-    <script src="static/vinyl-player.js?v=5"></script>
+    <script src="static/vinyl-player.js?v=6"></script>
     <script src="static/audio-admin.js?v=1"></script>
     <script src="static/background-admin.js?v=1"></script>
     <script src="static/my-dashboard.js?v=13"></script>
@@ -5462,18 +5506,44 @@
             _tooltipEl.innerHTML = '<div class="sb-tooltip-name"></div><div class="sb-tooltip-desc"></div>';
             document.body.appendChild(_tooltipEl);
         }
+        /* نشان‌دادن tooltip کنار target؛ اگر سمت چپ جا نشد (حالت ریل) به سمت راست می‌چرخد */
+        function showTip(target, name, desc) {
+            createTooltip();
+            _tooltipEl.querySelector('.sb-tooltip-name').textContent = name || '';
+            var d = _tooltipEl.querySelector('.sb-tooltip-desc');
+            if (desc) { d.textContent = desc; d.style.display = ''; }
+            else { d.textContent = ''; d.style.display = 'none'; }
+            _tooltipEl.classList.add('visible');
+            // اندازه پس از visible شدن خوانده شود
+            var rect = target.getBoundingClientRect();
+            var tw = _tooltipEl.offsetWidth || 230;
+            var th = _tooltipEl.offsetHeight || 60;
+            var left = rect.left - tw - 10;
+            if (left < 8) left = rect.right + 10;               /* flip به راست (ریل) */
+            if (left + tw > window.innerWidth - 8) left = Math.max(8, window.innerWidth - tw - 8);
+            var top = rect.top + rect.height / 2 - th / 2;
+            top = Math.max(8, Math.min(top, window.innerHeight - th - 8));
+            _tooltipEl.style.top = top + 'px';
+            _tooltipEl.style.left = left + 'px';
+        }
+        function hideTip() { if (_tooltipEl) _tooltipEl.classList.remove('visible'); }
+
+        /* هدر دسته‌ها: در حالت ریل نام دسته را tooltip می‌دهد */
+        document.querySelectorAll('.sidebar .sb-section-header').forEach(function (hdr) {
+            hdr.addEventListener('mouseenter', function () {
+                if (!document.body.classList.contains('sidebar-collapsed')) return;
+                var titleEl = hdr.querySelector('.sb-section-title');
+                showTip(hdr, titleEl ? titleEl.textContent.trim() : '', null);
+            });
+            hdr.addEventListener('mouseleave', hideTip);
+        });
+
         document.querySelectorAll('.sidebar .nav-item').forEach(function(item) {
             item.addEventListener('mouseenter', function(e) {
                 var nav = this.dataset.nav;
                 var desc = TOOL_DESC[nav];
                 if (!desc) return;
-                createTooltip();
-                _tooltipEl.querySelector('.sb-tooltip-name').textContent = this.textContent.trim();
-                _tooltipEl.querySelector('.sb-tooltip-desc').textContent = desc;
-                var rect = this.getBoundingClientRect();
-                _tooltipEl.style.top = rect.top + 'px';
-                _tooltipEl.style.left = (rect.left - 230) + 'px';
-                _tooltipEl.classList.add('visible');
+                showTip(this, this.textContent.trim(), desc);
             });
             item.addEventListener('mouseleave', function() {
                 if (_tooltipEl) _tooltipEl.classList.remove('visible');

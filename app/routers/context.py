@@ -260,7 +260,18 @@ def _extract_analysis_content(response_text: str) -> str:
     # 1) Standard JSON response
     try:
         data = _json.loads(text)
-        return data["choices"][0]["message"]["content"]
+        # پاسخ‌های c2pa/manifestدار (مثل bai/qwen3.8-flash مستقیم) داخل data کدنویسی‌اند؛
+        # اگر جای content، خروجیِ reasoningِ مدل‌های تفکر (mimo) را بردار
+        if isinstance(data, dict) and "_manifest" in data:
+            import base64 as _b64
+            try:
+                inner = _b64.b64decode(data["_manifest"]["data"])
+                data = _json.loads(inner[inner.index(b'{"model"') if inner.find(b'{"model"') >= 0 else 0:])
+            except Exception:
+                data = None
+        if isinstance(data, dict):
+            msg = data.get("choices", [{}])[0].get("message", {})
+            return msg.get("content") or msg.get("reasoning") or ""
     except Exception:
         pass
 
@@ -331,7 +342,7 @@ async def _call_model(client, api_key, prompt, model, messages=None):
                 "Content-Type": "application/json",
             },
             json={
-                "model": os.getenv("AI_MODEL", model["name"]),
+                "model": model["name"],   # نام مدل از فراخوان می‌آید (AI_MODEL/AI_MODEL_FALLBACK)
                 "messages": msgs,
                 "temperature": 0.75,
                 "max_tokens": model["max_tokens"],
@@ -403,8 +414,11 @@ Challenging planets and ways to turn challenges into opportunities
 """
 
     models = [
-        {"name": os.getenv("AI_MODEL", "bai/glm-5.3-flash"), "max_tokens": 16384},
+        {"name": os.getenv("AI_MODEL", "qwen3.8-flash"), "max_tokens": 16384},
     ]
+    _fb = os.getenv("AI_MODEL_FALLBACK", "")   # ترکیب: qwen3.8-flash + میمو (mimo)
+    if _fb and _fb != models[0]["name"]:
+        models.append({"name": _fb, "max_tokens": 16384})
 
     async with httpx.AsyncClient(timeout=180.0, follow_redirects=True) as client:
         errors = []
@@ -462,10 +476,15 @@ class AstroChatRequest(BaseModel):
 
 
 ASTRO_SYSTEM = (
-    "تو «کاسمیک اوراکل» هستی؛ یک اخترشناسِ ودیکِ مهربان و دقیق. "
+    "تو «کاسمیک اوراکل» هستی؛ اخترشناسِ ودیک و مربیِ مجازیِ یوگا. "
     "فارسیِ ساده، گرم و کوتاه (حداکثر ۴ جمله) پاسخ بده، بدون مارک‌داون و HTML. "
     "اگر کاربر سؤالِ نجومی پرسید، بر پایهٔ نمادهای زودیاک/سیارات پاسخ بده؛ "
-    "اگر خارج از موضوع بود، ادبانه به اخترشناسی برگردان. وعدهٔ قطعیِ پیش‌گویی نده."
+    "اگر خارج از موضوع بود، ادبانه به اخترشناسی برگردان. وعدهٔ قطعیِ پیش‌گویی نده.\n"
+    "سؤالاتِ یوگا/تمرین را از دانشِ زیر پاسخ بده و هرگز از کاربر نخواه متنِ چارت یا توضیحِ اضافه بفرستد: "
+    "تمرین‌های آماده: اقیانوس(وینیاسا، HIIT)، کویر(هاتا/یین، کششی-آرام)، کوه(پاور/آشتانگا، قدرتی)، سلام‌خورشید A/B(کلاسیک)؛ "
+    "سطح‌ها: مبتدی/متوسط/پیشرفته؛ کتابخانه ۵۴۲ حرکت + تنفس و مدیتیشن؛ "
+    "استودیوی کلاسیک با راهنمای صوتی و فروشگاه کارما. "
+    "برای پیشنهادِ تمرین، سطح و هدفِ کاربر را در یک جمله بپرس، نه بیشتر."
 )
 
 
@@ -492,22 +511,32 @@ async def astro_chat(request: AstroChatRequest):
             messages.append({"role": role, "content": c[:1200]})
     messages.append({"role": "user", "content": msg})
 
-    model = {"name": os.getenv("AI_MODEL", "bai/glm-5.3-flash"), "max_tokens": 400}
+    import re as _re
+    # max_tokens=800: مدل‌های reasoning (mimo) بودجه را با «اندیشه» مصرف می‌کنند؛
+    # با ۴۰۰، finish_reason=length و content ته‌مانده‌ی تهی می‌شد
+    models = [{"name": os.getenv("AI_MODEL", "qwen3.8-flash"), "max_tokens": 800}]
+    _fb = os.getenv("AI_MODEL_FALLBACK", "")   # qwen ↔ میمو — چت هم ترکیبی
+    if _fb and _fb != models[0]["name"]:
+        models.append({"name": _fb, "max_tokens": 1500})
     async with httpx.AsyncClient(timeout=90.0, follow_redirects=True) as client:
-        try:
-            resp = await _call_model(client, api_key, msg, model, messages=messages)
-            if resp.status_code != 200:
-                logger.warning("[ASTRO-CHAT] HTTP %s", resp.status_code)
-                raise HTTPException(status_code=502, detail="پاسخ مدل ناموفق بود")
-            content = _extract_analysis_content(resp.text).strip()
-            # حذف برچسب‌های احتمالیِ مارک‌داون/HTML برای رندرِ تمیزِ توکن‌استریم
-            import re as _re
-            content = _re.sub(r"<[^>]+>", "", content)
-            content = _re.sub(r"[#*_`>]+", "", content).strip()
-            return {"status": "success", "reply": content, "model": model["name"]}
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.warning("[ASTRO-CHAT] %s: %s", type(e).__name__, e)
-            raise HTTPException(status_code=502, detail="ارتباط با مدل برقرار نشد")
+        last_err = "ارتباط با مدل برقرار نشد"
+        for model in models:
+            try:
+                resp = await _call_model(client, api_key, msg, model, messages=messages)
+                if resp.status_code != 200:
+                    logger.warning("[ASTRO-CHAT] %s -> HTTP %s", model["name"], resp.status_code)
+                    last_err = "پاسخ مدل ناموفق بود"
+                    continue
+                content = _extract_analysis_content(resp.text).strip()
+                # حذف برچسب‌های احتمالیِ مارک‌داون/HTML برای رندرِ تمیزِ توکن‌استریم
+                content = _re.sub(r"<[^>]+>", "", content)
+                content = _re.sub(r"[#*_`>]+", "", content).strip()
+                if not content:
+                    last_err = "پاسخ مدل خالی بود"
+                    continue
+                return {"status": "success", "reply": content, "model": model["name"]}
+            except Exception as e:
+                logger.warning("[ASTRO-CHAT] %s: %s", type(e).__name__, e)
+                last_err = "ارتباط با مدل برقرار نشد"
+        raise HTTPException(status_code=502, detail=last_err)
 

@@ -47,9 +47,82 @@ function toast(msg) {
 }
 
 /* ── screens ──────────────────────────────────────────────────── */
+function currentScreenId() {
+  const cur = document.querySelector('.screen.show');
+  return cur ? cur.id : '';
+}
+/* floating glass side nav: خانه · تمرین‌ها · پروفایل · تنظیمات
+   — active state syncs with the visible screen; hidden during a
+     live session (the player owns the screen) and on the splash. */
+function sessionLive() { return typeof Player !== 'undefined' && !!Player.live; }
+function syncSideNav() {
+  const nav = document.getElementById('sideNav');
+  if (!nav) return;
+  const id = currentScreenId();
+  /* hidden only on splash & post-session; inside the live practice it
+     docks as a compact icon rail at the top-left (reference layout) */
+  const chromeOnly = (id === 'scr-splash' || id === 'scr-post');
+  nav.classList.toggle('hide', chromeOnly);
+  nav.classList.toggle('compact', id === 'scr-yoga');
+  let active = 'home';
+  if (id === 'scr-preview' || id === 'scr-poses' || id === 'scr-store' || id === 'scr-history' || id === 'scr-history-detail') active = 'practices';
+  else if (id === 'scr-settings') active = 'settings';
+  nav.querySelectorAll('.sn-item').forEach(b => b.classList.toggle('on', b.dataset.nav === active));
+  /* «بازگشت به تمرین» pill — visible while a session is alive but the
+     user is on another screen */
+  const pill = $('resumePractice');
+  if (pill) pill.hidden = !(sessionLive() && id !== 'scr-yoga');
+  /* action rail — بستن استودیو / منوی یوگا / شروع دوباره
+     · hidden on splash & post & home-lobby? No — visible everywhere
+       except splash; in the player it docks left-center (body.in-player)
+     · «منوی یوگا» + «شروع دوباره» only apply while a session is live
+     · «بستن استودیو» only when embedded in the cosmic parent app */
+  const rail = document.getElementById('actionRail');
+  if (rail) {
+    const live = sessionLive();
+    const cosmic = inCosmicIframe();
+    const q = $('uiQuit'), r = $('btnRestart'), cs = $('uiCloseStudio');
+    if (q) q.hidden = !live;
+    if (r) r.hidden = !live;
+    if (cs) cs.hidden = !cosmic;
+    /* empty rail looks broken — hide the whole panel when nothing applies */
+    const railEmpty = (id === 'scr-splash' || id === 'scr-post') || (!live && !cosmic);
+    rail.hidden = railEmpty;
+    /* on chrome screens the appbar's back button sits at the top-right —
+       shift it aside while the rail covers that corner */
+    document.body.classList.toggle('rail-on', !railEmpty && id !== 'scr-yoga');
+  }
+  document.body.classList.toggle('in-player', id === 'scr-yoga');
+}
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('show'));
   $(id).classList.add('show');
+  syncSideNav();
+}
+function initSideNav() {
+  const nav = document.getElementById('sideNav');
+  if (!nav) return;
+  const pill = $('resumePractice');
+  if (pill) pill.onclick = () => showScreen('scr-yoga');
+  nav.querySelectorAll('.sn-item').forEach(b => {
+    b.onclick = () => {
+      const n = b.dataset.nav;
+      /* حین جلسه فعال: بقیه گزینه‌ها تمرین را قطع نمی‌کنند؛
+         فقط «خانه» می‌پرسد و بعد جلسه را می‌بندد. بقیه صفحه را
+         باز می‌کنند ولی جلسه زنده می‌ماند و با پیل «بازگشت» برمی‌گردی. */
+      if (sessionLive() && n !== 'home') {
+        if (!Player.paused && Player.running) Player.pause();   /* سکوت حین مرور */
+      }
+      if (n === 'home') {
+        if (sessionLive() && !confirm(FA_UI.quitConfirm)) return;
+        if (sessionLive()) { Player._quitToLobby = true; Player.stop(false); }
+        showScreen('scr-home'); Home.go(Home.idx, true);
+      }
+      else if (n === 'practices') Poses.open();      /* کتابخانه حرکات/جلسات */
+      else if (n === 'profile') History.open();      /* آمار و تاریخچه کاربر */
+      else if (n === 'settings') Settings.open();
+    };
+  });
 }
 function currentBgName() { return DB.currentBg; }
 function currentBgImage() { return 'url("' + bgImageUrl(currentBgName(), 'x') + '")'; }
@@ -350,6 +423,7 @@ const Player = {
   side: 'L', breathIdx: 0, breathPhase: 'inhale',
   level: 0, durationMin: 30,
   practice: null, visited: null, ticker: null,
+  live: false,   /* session survives across screens (side-nav browsing) */
 
   start(practice, minutes, level, durationIndex) {
     this.practice = practice;
@@ -371,6 +445,11 @@ const Player = {
     const fa = PRACTICE_FA[practice.name] || {};
     $('ytTitle').textContent = 'تمرین ' + (fa.title || practice.title || practice.name);
     $('ytKarma').textContent = faNum(DB.karma);
+    /* current-practice capsule (bottom-left of the scene) */
+    $('npName').textContent = fa.title || practice.title || practice.name;
+    $('npSub').textContent = (fa.style || practice.style || '') + ' · ' + faNum(minutes) + ' دقیقه';
+    /* session ring resets with the fresh total */
+    this._syncRing(0);
 
     /* preload audio for the whole session */
     const uniqMoves = new Set(), uniqPoses = new Set();
@@ -389,6 +468,7 @@ const Player = {
 
     $('calValue').textContent = faNum(0);
     this._setPlayIcon(false);
+    this.live = true;                     /* session alive across screens */
     /* build timeline strip + poses panel content */
     this.buildStrip();
     if (typeof PosePanel !== 'undefined') PosePanel.render();
@@ -484,6 +564,7 @@ const Player = {
   },
   stop(completed) {
     this.running = false;
+    this.live = false;                    /* session over — hide the resume pill */
     clearInterval(this.ticker);
     this.ticker = null;
     Ambient.stop();
@@ -547,6 +628,17 @@ const Player = {
     const hr = $('hdrRemTime'); if (hr) hr.textContent = rem;
     const sp = $('seekPct'); if (sp) sp.textContent = faNum(Math.round(tPct)) + '٪';
     if (DB.settings.calories) $('calValue').textContent = faNum(caloriesFor(this.elapsedMs / 1000));
+    this._syncRing(tPct);
+  },
+
+  /** circular minute counter — remaining minutes in the core,
+      elapsed portion fills the turquoise arc (r=42 → C≈263.9) */
+  _syncRing(tPct) {
+    const total = this.totalSeconds || 1;
+    const remMin = Math.max(0, Math.ceil((total - this.elapsedMs / 1000) / 60));
+    const num = $('sessionRemMin'); if (num) num.textContent = faNum(remMin);
+    const arc = $('sessionProg');
+    if (arc) arc.style.strokeDashoffset = String(264 - 264 * Math.min(1, (tPct || 0) / 100));
   },
 
   /** Teach a pose's instruction once per base pose (variations like
@@ -649,10 +741,15 @@ const Player = {
 
   _updatePhase() {
     const circle = $('breathCircle');
+    const torch = $('torch');
     circle.classList.remove('inhale', 'exhale');
+    if (torch) torch.classList.remove('inhale', 'exhale');
+    /* breath guide circle always pulses on holds; the focus torch
+       only follows when «حالت تمرکز» is switched on */
     if (this.current && this.current.type === 'hold') {
       circle.classList.add(this.breathPhase);
       $('breathText').textContent = this.breathPhase === 'inhale' ? 'دم' : 'بازدم';
+      if (torch && DB.settings.breathFocus) torch.classList.add(this.breathPhase);
     } else {
       $('breathText').textContent = '—';
     }
@@ -802,9 +899,16 @@ $('uiQuit').onclick = () => {
   Player._quitToLobby = true;
   Player.stop(false);
   /* quit = back to the classic lobby, both standalone and inside cosmic
-     (the cosmic modal itself is closed with its own ✕ button) */
+     (the cosmic modal itself is closed with «بستن استودیو» → postMessage) */
   showScreen('scr-home');
   Home.go(Home.idx, true);
+};
+/* بستن استودیو — ask the cosmic parent to close the whole modal */
+$('uiCloseStudio').onclick = () => {
+  if (!inCosmicIframe()) { showScreen('scr-home'); Home.go(Home.idx, true); return; }
+  if (Player.live && Player.elapsedMs > 30000 && !confirm(FA_UI.quitConfirm)) return;
+  if (Player.live) { Player._quitToLobby = true; Player.stop(false); }
+  try { window.parent.postMessage({ source: 'yoga-classic', type: 'close' }, '*'); } catch (e) {}
 };
 /* اسلایدر صدا — هم نوارِ پایین هم تبِ پنل حرکات (id تکراری داشت: uiVolumePanel) */
 function onVolInput(e) {
@@ -843,13 +947,87 @@ $('ytMusic').onclick = () => {
   else Ambient.play(Player.musicIdFor(Player.idx));
   toast(DB.settings.music ? 'موسیقی روشن شد' : 'موسیقی خاموش شد');
 };
+/* ═══ ENV RAIL — نور روز / حالت شب / تنظیم دستی نور صحنه
+   (the rail beside the practice scene; affects the background image
+    only, glass panels stay readable) ═══ */
+const ENV_MODES = {
+  light:  { b: 1.18, c: 1.04 },
+  dark:   { b: 0.78, c: 0.96 },
+  custom: null,                       /* from slider */
+};
+function envApply() {
+  const m = DB.settings.envMode || 'light';
+  const root = document.documentElement.style;
+  let b = 1, c = 1;
+  if (m === 'custom') { b = (DB.settings.envBrightness || 100) / 100; c = 1; }
+  else { const e = ENV_MODES[m] || ENV_MODES.light; b = e.b; c = e.c; }
+  root.setProperty('--scene-b', String(b));
+  root.setProperty('--scene-c', String(c));
+  const rail = $('envRail');
+  if (rail) {
+    rail.classList.toggle('custom', m === 'custom');
+    rail.querySelectorAll('.er-btn').forEach(x => x.classList.toggle('on', x.dataset.mode === m));
+  }
+  const sl = $('envBrightness');
+  if (sl) sl.value = DB.settings.envBrightness || 100;
+}
+function envWire() {
+  ['envLight', 'envDark', 'envCustom'].forEach(id => {
+    const btn = $(id); if (!btn) return;
+    btn.onclick = () => {
+      DB.settings.envMode = btn.dataset.mode;
+      DB.save(); envApply();
+      toast(btn.dataset.mode === 'light' ? 'نور روز' : btn.dataset.mode === 'dark' ? 'حالت شب' : 'تنظیم دستی نور');
+    };
+  });
+  const sl = $('envBrightness');
+  if (sl) sl.oninput = () => {
+    DB.settings.envMode = 'custom';
+    DB.settings.envBrightness = +sl.value;
+    DB.save(); envApply();
+  };
+}
+
+/* ═══ FOCUS MODE — «حالت تمرکز» switch on the breath card.
+   OFF by default: the torch (breathing light around the scene) stays
+   hidden until the user switches it on. The breath circle itself is
+   always live. ═══ */
+function syncBreathFab() {
+  const on = !!DB.settings.breathFocus;
+  const sw = $('breathSwitch');
+  if (sw) sw.setAttribute('aria-checked', on ? 'true' : 'false');
+  const fab = $('breathFab');
+  if (fab) fab.classList.toggle('off', !on);
+  const torch = $('torch');
+  if (torch) {
+    torch.classList.toggle('on', on);
+    if (!on) torch.classList.remove('inhale', 'exhale');
+  }
+}
+function toggleBreathFocus() {
+  DB.settings.breathFocus = !DB.settings.breathFocus;
+  DB.save();
+  syncBreathFab();
+  if (DB.settings.breathFocus) Player._updatePhase();   /* join the current breath now */
+  toast(DB.settings.breathFocus ? '🔦 حالت تمرکز روشن شد — نور با تنفس نفس می‌کشد' : 'حالت تمرکز خاموش شد');
+}
+(function () {
+  const sw = $('breathSwitch');
+  if (sw) {
+    sw.addEventListener('click', e => { e.stopPropagation(); toggleBreathFocus(); });
+    sw.addEventListener('keydown', e => {
+      if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); e.stopPropagation(); toggleBreathFocus(); }
+    });
+  }
+})();
+
 /* keyboard shortcuts — desktop */
 window.addEventListener('keydown', e => {
   if (!$('scr-yoga').classList.contains('show')) return;
-  if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;   /* حین تایپ، میان‌برها غیرفعال */
+  if (e.target && (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || (e.target.closest && e.target.closest('#breathFab')))) return;   /* حین تایپ یا روی دکمه تنفس، میان‌برها غیرفعال */
   if (e.code === 'Space') { e.preventDefault(); Player.toggle(); }
-  else if (e.key === 'ArrowLeft') Player.next();   /* RTL: left = forward */
-  else if (e.key === 'ArrowRight') Player.prev();
+  else if (e.key === 'ArrowLeft') Player.prev();   /* media convention: left = back */
+  else if (e.key === 'ArrowRight') Player.next();
 });
 /* strip drag — horizontal browse (in-header timeline) */
 (function () {
@@ -1368,6 +1546,9 @@ function reportSessionEnd(completed, seconds) {
       }
     }
     Audio2.loadGuide();
+    initSideNav();
+    envWire(); envApply();
+    syncBreathFab();
     Home.init();
     PosePanel.init();
     applyBackground(DB.currentBg);

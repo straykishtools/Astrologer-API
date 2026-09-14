@@ -82,7 +82,7 @@
 @keyframes vp-spin { to { transform: rotate(360deg); } }
 
 /* ─── کنترل‌ها (دکمه‌های سفید) ─── */
-.vp-controls { display: flex; align-items: center; gap: 4px; height: 100%; }
+.vp-controls { display: flex; align-items: center; gap: 4px; height: 100%; pointer-events: auto; }
 .vp-btn {
     width: 28px;
     height: 28px;
@@ -151,6 +151,7 @@
     cursor: pointer;
     flex-shrink: 0;
     align-self: center;
+    pointer-events: auto;              /* داخل vp-info که none است */
 }
 .vp-vol::-webkit-slider-thumb {
     appearance: none;
@@ -260,8 +261,30 @@
 .vp-item.active { background: rgba(221, 192, 112, 0.18); font-weight: 700; }
 .vp-item-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* سایدبار جمع‌شده: پلیر مخفی */
-body.cosmic.sidebar-collapsed .vp-wrap { display: none; }
+/* سایدبار جمع‌شده (ریل): کارت پلیر مخفی، مینی‌دکمه پخش/توقف نمایان */
+body.cosmic.sidebar-collapsed .vp-wrap .vp { display: none; }
+body.cosmic.sidebar-collapsed .vp-wrap { margin: 8px 0 10px; padding-top: 0; }
+.vp-rail-btn {
+    display: none;
+    width: 36px;
+    height: 36px;
+    margin: 6px auto;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid rgba(221, 192, 112, 0.4);
+    background: var(--vp-gray);
+    color: var(--vp-gold-2);
+    font-size: 14px;
+    font-family: "Vazirmatn", system-ui, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: background 0.2s, transform 0.15s;
+}
+.vp-rail-btn:hover { background: var(--vp-gray-2); }
+.vp-rail-btn:active { transform: scale(0.9); }
+body.cosmic.sidebar-collapsed .vp-wrap .vp-rail-btn { display: grid; }
+/* ترک فعالی وجود ندارد → مینی‌دکمه هم مخفی */
+.vp.vp-empty + .vp-rail-btn { display: none !important; }
 
 /* شناور موبایل */
 @media (max-width: 640px) {

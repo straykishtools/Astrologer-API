@@ -1506,14 +1506,14 @@ var YogaClassicModal = {
         wrap.innerHTML =
             '<div class="ycm-backdrop"></div>' +
             '<div class="ycm-frame">' +
-                '<button class="ycm-close" title="بستن استودیو کلاسیک">✕</button>' +
                 '<iframe src="yoga-classic.html' + (query || '') + '" allow="autoplay" allowfullscreen></iframe>' +
             '</div>';
         document.body.appendChild(wrap);
         document.body.style.overflow = 'hidden';
         this._el = wrap;
         var self = this;
-        wrap.querySelector('.ycm-close').onclick = function () { self.close(); };
+        /* ✕ حذف شد — «بستن استودیو» داخل خود کلاسیک (action-rail) است؛
+           کلیک روی بک‌دراپ هم همچنان می‌بندد */
         wrap.querySelector('.ycm-backdrop').onclick = function () { self.close(); };
         this._msgHandler = function (ev) {
             var d = ev.data || {};

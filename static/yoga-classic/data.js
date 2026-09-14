@@ -62,7 +62,7 @@ const DB = {
   history: lsGet(LS.history, []),
   unlocked: lsGet(LS.unlocked, ['Home', 'Studio', 'Office']),
   currentBg: lsGet(LS.current, 'Home'),
-  settings: Object.assign({ voice: true, music: true, calories: true }, lsGet(LS.settings, {})),
+  settings: Object.assign({ voice: true, music: true, calories: true, breathFocus: false, envMode: 'light', envBrightness: 100 }, lsGet(LS.settings, {})),
   save() {
     lsSet(LS.karma, this.karma);
     lsSet(LS.history, this.history);

@@ -172,20 +172,23 @@ function wireTalk(root) {
     });
 }
 
-/* ── E) composer + token stream + bounce (چت AI با fallback) ── */
-function wireComposer(root) {
-    var stream = root.querySelector('#kxStream');
-    Kinetics.mountComposer(root.querySelector('#kxComposer'));
+/* ── E) composer + token stream + bounce (چت AI با fallback) ──
+   هستهٔ پرس‌وجو در makeAstroTalker مشترک است: داشبورد و اوربِ شناور
+   هر دو از یک history و یک endpoint استفاده می‌کنند. */
+function makeAstroTalker(stream, greet) {
     var history = [];   // نوبت‌های [role,content] برای مکالمهٔ چندتایی
-    Kinetics.onSubmit = function (text) {
+    function ask(text) {
         var dots = document.createElement('div');
         dots.className = 'k-bounce';
         dots.innerHTML = '<i></i><i></i><i></i>';
         stream.innerHTML = ''; stream.appendChild(dots);
 
+        /* اگر همین نشست چارت گرفته، زمینه‌اش بی‌صدا اضافه می‌شود — کاربر چیزی نمی‌فرستد */
+        var ctx = '';
+        try { ctx = (window.currentContext || '').slice(0, 2000); } catch (e) {}
         fetch('/api/v5/astro-chat', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, history: history.slice(-6) })
+            body: JSON.stringify({ message: text, history: history.slice(-6), context: ctx })
         })
         .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('http')); })
         .then(function (d) {
@@ -193,14 +196,21 @@ function wireComposer(root) {
             if (!reply) reply = 'کیهان پاسخی نداشت — دوباره بپرس ✦';
             history.push({ role: 'user', content: text });
             history.push({ role: 'assistant', content: reply });
-            Kinetics.tokens(stream, reply, { hl: /(ماه|خورشید|مریخ|ونوس|زحل|برج|خانه|نیت|اوراکل)/ });
+            Kinetics.tokens(stream, reply, { hl: /(ماه|خورشید|مریخ|ونوس|زحل|برج|خانه|نیت|اوراکل|یوگا|تمرین|آسانا|تنفس|مدیتیشن|کارما|سطح)/ });
         })
         .catch(function () {
             var reply = 'کیهان در پاسخ به «' + text.slice(0, 24) + '»: امروز انرژیِ ماه را با آرامش پیش ببر ✦';
             Kinetics.tokens(stream, reply, { hl: /(ماه|نیت|آرامش)/ });
         });
-    };
-    Kinetics.tokens(stream, 'سلام — کاسمیک اوراکل در خدمتِ پرسش‌های کیهانیِ توست ✦', { hl: /(اوراکل|کیهانی)/ });
+    }
+    if (greet) Kinetics.tokens(stream, 'سلام — کاسمیک اوراکل در خدمتِ پرسش‌های کیهانی و یوگاییِ توست ✦', { hl: /(اوراکل|کیهانی|یوگا)/ });
+    return { ask: ask, history: history };
+}
+
+function wireComposer(root) {
+    var stream = root.querySelector('#kxStream');
+    var talker = makeAstroTalker(stream, true);
+    Kinetics.mountComposer(root.querySelector('#kxComposer'), { onSubmit: talker.ask });
 }
 
 /* ── B) bento فال امروز — از سرویس تاروت ── */
@@ -267,13 +277,47 @@ function saveMood(x, y) {
     } catch (e) {}
 }
 
+/* ── چت اخترشناس در تاپ‌بار — مستقل از داشبورد، همه‌جا کار می‌کند ── */
+function wireChatPop() {
+    var btn = document.getElementById('coChatBtn');
+    var pop = document.getElementById('coChatPop');
+    if (!btn || !pop || btn._coWired) return;
+    btn._coWired = true;
+    var talker = null;
+    function open() {
+        pop.classList.add('open');
+        requestAnimationFrame(function () { pop.classList.add('show'); });
+        if (!talker && window.Kinetics) {
+            talker = makeAstroTalker(document.getElementById('coChatStream'), true);
+            Kinetics.mountComposer(document.getElementById('coChatComposer'), { onSubmit: talker.ask });
+        }
+        var ta = pop.querySelector('textarea');
+        if (ta) setTimeout(function () { ta.focus(); }, 120);
+    }
+    function close() { pop.classList.remove('open', 'show'); }
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        pop.classList.contains('open') ? close() : open();
+    });
+    var x = document.getElementById('coChatClose');
+    if (x) x.addEventListener('click', close);
+    pop.addEventListener('click', function (e) { e.stopPropagation(); });
+    document.addEventListener('click', function (e) {
+        if (pop.classList.contains('open') && !pop.contains(e.target) && !btn.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && pop.classList.contains('open')) close();
+    });
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
 } else { boot(); }
 function boot() {
     console.info('[Kinetics] installer loaded — waiting for engine + dashboard anchor…');
+    try { wireChatPop(); } catch (e) { console.warn('[Kinetics] chat pop', e); }
     mount();                                   /* تلاش فوری */
-    retryTimer = setInterval(mount, 400);      /* تا موفقیت ادامه بده */
+    retryTimer = setInterval(function () { mount(); try { wireChatPop(); } catch (e) {} }, 400);      /* تا موفقیت ادامه بده */
 }
 /* داشبورد با روتینگ عوض می‌شود — دوباره چک کن */
 window.addEventListener('hashchange', function () { setTimeout(mount, 250); });

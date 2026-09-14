@@ -78,24 +78,30 @@
 
     /* ─── DOM ─── */
     function build(slot) {
-        // ترتیب: اول پنل (کارت)، بعد نوار اطلاعات — CSS با «panel.active ~ info» بالا می‌آوردش
+        // چیدمان دو‌خطی: بالا نام+زمان، پایین دیسک-کنترل‌ها-ولوم؛ + مینی‌دکمه ریل
         slot.innerHTML =
             '<div class="vp" id="vinylPlayer">' +
                 '<div class="vp-panel" id="vpPanel">' +
                     '<div class="vp-disc"></div>' +
-                    '<div class="vp-controls">' +
-                        '<div class="vp-btn vp-prev" id="vpPrev" title="قبلی"></div>' +
-                        '<div class="vp-btn vp-play" id="vpPlay" title="پخش/مکث"></div>' +
-                        '<div class="vp-btn vp-next" id="vpNext" title="بعدی"></div>' +
+                    '<div class="vp-info" id="vpInfo">' +
+                        '<div class="vp-line">' +
+                            '<span class="vp-name" id="vpName">—</span>' +
+                            '<span class="vp-time"><b id="vpCur">00:00</b> / <span id="vpDur">00:00</span></span>' +
+                        '</div>' +
+                        '<div class="vp-line">' +
+                            '<div class="vp-controls">' +
+                                '<div class="vp-btn vp-prev" id="vpPrev" title="قبلی"></div>' +
+                                '<div class="vp-btn vp-play" id="vpPlay" title="پخش/مکث"></div>' +
+                                '<div class="vp-btn vp-next" id="vpNext" title="بعدی"></div>' +
+                            '</div>' +
+                            '<input type="range" class="vp-vol" id="vpVol" min="0" max="1" step="0.05" value="' + volume + '" title="بلندی صدا" dir="ltr">' +
+                        '</div>' +
                     '</div>' +
                 '</div>' +
-                '<div class="vp-info" id="vpInfo">' +
-                    '<span class="vp-name" id="vpName">—</span>' +
-                    '<span class="vp-time"><b id="vpCur">00:00</b> / <span id="vpDur">00:00</span></span>' +
-                    '<div class="vp-progress"><div class="vp-bar" id="vpBar"></div></div>' +
-                '</div>' +
+                '<div class="vp-progress"><div class="vp-bar" id="vpBar"></div></div>' +
                 '<div class="vp-list" id="vpList"></div>' +
-            '</div>';
+            '</div>' +
+            '<button class="vp-rail-btn" id="vpRailBtn" title="پخش/توقف موسیقی" aria-label="پخش یا توقف موسیقی">▶</button>';
 
         root = slot.firstChild;
         els.info = document.getElementById('vpInfo');
@@ -106,22 +112,35 @@
         els.bar = document.getElementById('vpBar');
         els.list = document.getElementById('vpList');
         els.play = document.getElementById('vpPlay');
+        els.vol = document.getElementById('vpVol');
+        els.rail = document.getElementById('vpRailBtn');
 
         els.play.addEventListener('click', function (e) { e.stopPropagation(); markGesture(); toggle(); });
         document.getElementById('vpPrev').addEventListener('click', function (e) { e.stopPropagation(); markGesture(); step(-1); });
         document.getElementById('vpNext').addEventListener('click', function (e) { e.stopPropagation(); markGesture(); step(1); });
+        els.vol.addEventListener('input', function () { markGesture(); setVolume(+this.value); });
+        els.rail.addEventListener('click', function (e) { e.stopPropagation(); markGesture(); toggle(); });
         els.panel.addEventListener('click', function (e) {
-            if (e.target.closest('.vp-btn')) return;
-            els.info.classList.toggle('active');
-            renderList();
+            if (e.target.closest('.vp-btn, .vp-vol, .vp-name')) return;
+            els.list.classList.toggle('show'); renderList();
         });
         els.name.addEventListener('click', function (e) { e.stopPropagation(); els.list.classList.toggle('show'); renderList(); });
         document.addEventListener('click', function (e) {
-            if (root && !root.contains(e.target)) {
-                els.info.classList.remove('active');
-                els.list.classList.remove('show');
-            }
+            if (root && !slot.contains(e.target)) els.list.classList.remove('show');
         });
+    }
+
+    function setVolume(v) {
+        volume = Math.max(0, Math.min(1, v));
+        if (audio) audio.volume = volume;
+        lsSet(VOL_KEY, volume);
+        refreshPlayIcons();
+    }
+    function refreshPlayIcons() {
+        if (!audio) return;
+        var playing = !audio.paused;
+        if (els.play) els.play.classList.toggle('is-playing', playing);
+        if (els.rail) els.rail.textContent = playing ? '❚❚' : '▶';
     }
 
     function markGesture() {
@@ -135,6 +154,7 @@
     function ensureAudio() {
         if (audio) return;
         volume = (lsGet(VOL_KEY) != null) ? lsGet(VOL_KEY) : 0.5;
+        if (els.vol) els.vol.value = volume;
         audio = new window.Audio();
         audio.preload = 'metadata'; // تا قبل از تعامل کاربر فقط متادیتا می‌آید (بدون دانلود کامل)
         audio.volume = volume;
@@ -207,6 +227,7 @@
         var playing = audio && !audio.paused;
         els.play.classList.toggle('is-playing', playing);
         els.panel.classList.toggle('active', playing);
+        if (els.rail) els.rail.textContent = playing ? '❚❚' : '▶';
         renderList();
     }
     function renderList() {
@@ -257,7 +278,7 @@
     window.VinylPlayer = {
         setSection: function (key) { currentSection = key || 'site'; applySection(); },
         getSection: function () { return currentSection; },
-        setVolume: function (v) { volume = Math.max(0, Math.min(1, v)); if (audio) audio.volume = volume; lsSet(VOL_KEY, volume); },
+        setVolume: function (v) { setVolume(v); },
         toggle: function () { markGesture(); toggle(); },
         isPlaying: function () { return !!(audio && !audio.paused); },
         /** آیا برای این بخش فایلی تخصیص داده شده؟ (مدیتیشن می‌پرسد تا سنتز را رد کند) */
