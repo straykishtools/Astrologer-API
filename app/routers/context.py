@@ -299,6 +299,23 @@ def _extract_analysis_content(response_text: str) -> str:
     return ""
 
 
+def _sanitize_ai_text(content: str, *, strip_tags: bool = False) -> str:
+    """تمیزکاری خروجی مدل برای فارسی.
+
+    ⚠ برخی مدل‌ها (qwen/میمو) به‌جای فاصله «_» می‌گذارند؛ حذفِ مستقیمِ _
+    کلمات فارسی را به هم می‌چسباند → اول تبدیل به فاصله، بعد حذف مارک‌داون.
+    strip_tags: برای چت (رندرِ متن‌خالص) برچسب‌های HTML هم پاک می‌شوند؛
+    برای تحلیل چارت نه چون خروجی با innerHTML نشان داده می‌شود.
+    """
+    import re as _re
+    if strip_tags:
+        content = _re.sub(r"<[^>]+>", " ", content)
+    content = content.replace("_", " ")
+    content = _re.sub(r"[#*`>]+", "", content)
+    content = _re.sub(r"[ \t]{2,}", " ", content)
+    return content.strip()
+
+
 def _is_valid_analysis(content: str) -> bool:
     """
     Validate that the content is a real astrological analysis, not a
@@ -446,7 +463,9 @@ Challenging planets and ways to turn challenges into opportunities
 
                 if _is_valid_analysis(content):
                     logger.info("[ANALYSIS] Success with %s (%d chars)", model["name"], len(content))
-                    return {"analysis": content}
+                    # ⚠ همان تمیزکاریِ چت: «_»های مدل → فاصله، تا کلمات فارسی
+                    # به هم نچسبند. HTML حذف نمی‌شود چون خروجی با innerHTML رندر می‌شود.
+                    return {"analysis": _sanitize_ai_text(content, strip_tags=False)}
 
                 err_msg = f"{model['name']} -> invalid response ({len(content)} chars)"
                 logger.warning("[ANALYSIS] %s", err_msg)
@@ -514,7 +533,6 @@ async def astro_chat(request: AstroChatRequest):
             messages.append({"role": role, "content": c[:1200]})
     messages.append({"role": "user", "content": msg})
 
-    import re as _re
     # max_tokens=800: مدل‌های reasoning (mimo) بودجه را با «اندیشه» مصرف می‌کنند؛
     # با ۴۰۰، finish_reason=length و content ته‌مانده‌ی تهی می‌شد
     models = [{"name": os.getenv("AI_MODEL", "qwen3.8-flash"), "max_tokens": 800}]
@@ -530,10 +548,8 @@ async def astro_chat(request: AstroChatRequest):
                     logger.warning("[ASTRO-CHAT] %s -> HTTP %s", model["name"], resp.status_code)
                     last_err = "پاسخ مدل ناموفق بود"
                     continue
-                content = _extract_analysis_content(resp.text).strip()
-                # حذف برچسب‌های احتمالیِ مارک‌داون/HTML برای رندرِ تمیزِ توکن‌استریم
-                content = _re.sub(r"<[^>]+>", "", content)
-                content = _re.sub(r"[#*_`>]+", "", content).strip()
+                content = _sanitize_ai_text(
+                    _extract_analysis_content(resp.text), strip_tags=True)
                 if not content:
                     last_err = "پاسخ مدل خالی بود"
                     continue

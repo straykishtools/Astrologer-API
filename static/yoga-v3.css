@@ -798,22 +798,46 @@
 .yp-btn:disabled { opacity: .35; cursor: not-allowed; }
 
 /* مربی‌ها */
-.yp-instructors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.yp-instructors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
 .yp-instructor-card {
+    display: block; width: 100%; cursor: pointer; font: inherit; color: inherit;
     background: var(--card-bg, #141a2a); border: 1px solid rgba(184,160,90,.22); border-radius: 14px;
-    padding: 16px 14px; text-align: center; transition: transform .15s ease, border-color .15s ease;
+    padding: 16px 14px; text-align: center; transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
 }
 .yp-instructor-card:hover { transform: translateY(-2px); border-color: var(--gold-300,#b8a05a); }
+.yp-instructor-card.active {
+    border-color: var(--gold-300,#b8a05a); background: rgba(184,160,90,.1);
+    box-shadow: 0 0 0 1px rgba(184,160,90,.4), 0 8px 22px rgba(0,0,0,.3);
+}
 .yp-instructor-avatar {
+    position: relative;
     width: 52px; height: 52px; margin: 0 auto 8px; border-radius: 50%;
     background: linear-gradient(135deg, rgba(201,162,39,.25), rgba(221,192,112,.08));
     border: 1px solid var(--gold-500,#8a6d1f); display: flex; align-items: center; justify-content: center;
     font-size: 22px; font-weight: 700; color: var(--gold-300,#b8a05a);
 }
+.yp-instr-count {
+    position: absolute; top: -6px; left: -6px; min-width: 20px; height: 20px; padding: 0 5px;
+    border-radius: 10px; background: var(--gold-300,#b8a05a); color: #1a1204;
+    font-size: 11px; font-weight: 800; display: grid; place-items: center;
+    border: 2px solid var(--card-bg, #141a2a);
+}
+.yp-instructor-card.active .yp-instr-count { background: #fff; }
 .yp-instructor-name { font-weight: 700; margin-bottom: 2px; }
 .yp-instructor-spec { font-size: 12px; opacity: .8; margin-bottom: 6px; }
 .yp-instructor-bio { font-size: 11px; opacity: .65; line-height: 1.7; margin-top: 8px; }
+.yp-instructor-cta { margin-top: 10px; font-size: 11px; font-weight: 700; color: var(--gold-300,#b8a05a); opacity: .85; }
+.yp-instructor-card.active .yp-instructor-cta { opacity: 1; }
 .yp-coach-sub { margin: 6px 0 10px; font-size: 15px; opacity: .9; }
+.yp-coach-filter {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    background: rgba(184,160,90,.08); border: 1px solid rgba(184,160,90,.3); border-radius: 12px;
+    padding: 10px 14px; margin-bottom: 12px; font-size: 13px;
+}
+.yp-coach-filter b { color: var(--gold-300,#b8a05a); }
+.yp-chip.clear { cursor: pointer; background: rgba(255,255,255,.08); border: 1px solid rgba(184,160,90,.4); color: var(--gold-300,#b8a05a); padding: 5px 12px; border-radius: 20px; font: inherit; font-size: 12px; transition: .15s; }
+.yp-chip.clear:hover { background: rgba(184,160,90,.18); }
+.yp-empty { grid-column: 1 / -1; text-align: center; opacity: .7; font-size: 13px; padding: 26px 14px; border: 1px dashed rgba(184,160,90,.3); border-radius: 14px; }
 
 /* پلیر + مودال پایان */
 .yp-main { position: relative; }
@@ -899,19 +923,39 @@
     .yp-detail-body { padding: 16px; }
 }
 
-/* ═══ پیش‌نمایش سریع — overlay پلیر واقعی ═══ */
+/* ═══ پیش‌نمایش سریع — overlay با ابعاد ثابت (هیچ‌وقت با عوض‌شدن عکس‌ها جابه‌جا نشود) ═══ */
 .yp-preview-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(5,8,20,.78); backdrop-filter: blur(5px); padding: 18px; }
 .yp-preview-shell {
     background: rgba(7, 12, 31, 0.97); border: 1px solid var(--line-strong); border-radius: 18px;
-    width: min(680px, 96vw); max-height: 92vh; display: flex; flex-direction: column; overflow: hidden;
+    width: min(720px, 96vw); height: min(88vh, 740px);
+    display: flex; flex-direction: column; overflow: hidden;
 }
-.yp-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.yp-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); flex: 0 0 auto; }
 .yp-preview-head h3 { margin: 0; font-size: 15px; color: var(--gold-200); }
 .yp-preview-note { font-size: 12px; color: var(--ink-dim); }
 .yp-preview-x { background: rgba(255,255,255,.06); border: 1px solid var(--line-strong); color: #eee; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 13px; }
 .yp-preview-x:hover { background: rgba(255,118,117,.2); color: #ff7675; }
-.yp-preview-host { padding: 16px; overflow-y: auto; flex: 1; }
-.yp-preview-host .yp-player { margin: 0; }
+/* پلیر داخل host رندر می‌شود (host خودِ ریشه‌ی پلیر است) → ستون flex با ارتفاع ثابت */
+.yp-preview-host { padding: 14px 16px; overflow: hidden; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+/* صحنه‌ی پیش‌نمایش: قاب ثابت — تصویر داخل کادر ثابت contain می‌شود، پس اندازه‌ی باکس هرگز عوض نمی‌شود */
+.yp-preview-host .yp-topbar, .yp-preview-host .yp-progress, .yp-preview-host .yp-seek-labels { flex: 0 0 auto; }
+.yp-preview-host .yp-main { flex: 1 1 auto; min-height: 0; gap: 18px; margin-bottom: 10px; }
+.yp-preview-host .yp-stage { flex: 1 1 55%; min-width: 0; max-width: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.yp-preview-host .yp-img {
+    width: min(320px, 100%); height: min(44vh, 320px); flex: 0 0 auto;
+    max-width: 100%; max-height: none; object-fit: contain;
+    border-radius: 18px; background: rgba(255,255,255,.03); border: 1px solid var(--line);
+    box-shadow: inset 0 0 40px rgba(0,0,0,.35);
+    contain: strict; /* ابعاد قاب از محتوای تصویر مستقل بماند */
+}
+.yp-preview-host .yp-pose-name { font-size: 16px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.yp-preview-host .yp-timer-big { font-size: 22px; margin-top: 4px; }
+.yp-preview-host .yp-breath { flex: 0 0 150px; }
+.yp-preview-host .yp-breath .yoga-circle { width: 108px; height: 108px; }
+.yp-preview-host .yp-breath-text { font-size: 20px; }
+.yp-preview-host .yp-controls { flex: 0 0 auto; margin-bottom: 4px; }
+.yp-preview-host .yp-btn { padding: 8px 16px; font-size: 13.5px; }
+.yp-preview-host .yp-elapsed { flex: 0 0 auto; }
 
 /* ─── نوار تایم‌لاین پیش‌نمایش — همان الگوی استودیو کلاسیک ─── */
 .yq-strip.yh-strip {
@@ -949,10 +993,16 @@
 /* موبایل: پیش‌نمایش و پلیر — تارگت لمسی بزرگ‌تر، فشرده‌تر */
 @media (max-width: 560px) {
     .yp-preview-overlay { padding: 10px; }
-    .yp-preview-shell { width: 100%; max-height: 94vh; border-radius: 14px; }
+    .yp-preview-shell { width: 100%; height: min(92vh, 700px); border-radius: 14px; }
     .yp-preview-head { flex-wrap: wrap; padding: 10px 12px; }
     .yp-preview-note { display: none; }   /* در موبایل جا را می‌گیرد؛ عنوان و ✕ کافی است */
     .yp-preview-host { padding: 10px; }
+    .yp-preview-host .yp-main { gap: 10px; }
+    .yp-preview-host .yp-stage { flex: 1 1 100%; }
+    .yp-preview-host .yp-img { width: min(260px, 92%); height: min(32vh, 230px); }
+    .yp-preview-host .yp-breath { flex: 0 0 auto; flex-direction: row; width: 100%; justify-content: center; }
+    .yp-preview-host .yp-breath .yoga-circle { width: 88px; height: 88px; }
+    .yp-preview-host .yp-breath-text { font-size: 16px; }
     .yp-main { gap: 12px; margin-bottom: 12px; }
     .yp-stage { flex: 1 1 100%; max-width: none; }
     .yp-img { max-height: 250px; }

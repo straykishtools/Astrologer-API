@@ -138,7 +138,7 @@ code,digits{font-variant-numeric:tabular-nums;}
 .split-toolbar{
   position:relative;z-index:5;
   display:flex;align-items:flex-start;justify-content:space-around;
-  height:86px;padding:26px 10px 0;gap:2px;
+  height:118px;padding:26px 10px 0;gap:2px;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 86' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%231d324b'/%3E%3Cstop offset='1' stop-color='%230f1c2e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 34C0 18 12 10 28 10H132C300 10 358 46 500 46C642 46 700 10 868 10H972C988 10 1000 18 1000 34V86H0Z' fill='url(%23g)' stroke='%23ffffff22' stroke-width='2'/%3E%3C/svg%3E") center/100% 100% no-repeat;
 }
 .split-toolbar .st-btn{
@@ -150,8 +150,16 @@ code,digits{font-variant-numeric:tabular-nums;}
 .split-toolbar .st-btn:hover svg{transform:translateY(-2px);filter:drop-shadow(0 0 8px rgba(62,220,199,.55));}
 .split-toolbar .st-btn:active{transform:scale(.95);}
 /* کارما — PNG symbol; hover/tap reveals the points bubble (no nav) */
-.st-btn.karma-btn img{width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));transition:transform .18s, filter .18s;}
-.st-btn.karma-btn:hover img{transform:translateY(-2px);filter:drop-shadow(0 0 10px rgba(62,220,199,.6)) drop-shadow(0 2px 6px rgba(0,0,0,.5));}
+.st-btn.karma-btn img{
+  width:38px;height:38px;object-fit:contain;
+  border-radius:50%;padding:5px;
+  background:radial-gradient(circle at 38% 32%, rgba(62,220,199,.22), rgba(13,25,42,.65));
+  border:1px solid rgba(62,220,199,.55);
+  filter:brightness(1.55) saturate(1.35) drop-shadow(0 0 6px rgba(249,217,118,.4));
+  box-shadow:0 4px 14px rgba(6,16,30,.5), inset 0 1px 0 rgba(255,255,255,.18);
+  transition:transform .18s, filter .18s, box-shadow .18s;
+}
+.st-btn.karma-btn:hover img{transform:translateY(-2px);filter:brightness(1.8) saturate(1.4) drop-shadow(0 0 10px rgba(62,220,199,.65));box-shadow:0 8px 22px rgba(6,16,30,.55), 0 0 16px rgba(62,220,199,.35), inset 0 1px 0 rgba(255,255,255,.18);}
 .st-btn.karma-btn{position:relative;}
 .st-btn .ktip{
   position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%) translateY(6px) scale(.94);
@@ -171,10 +179,10 @@ code,digits{font-variant-numeric:tabular-nums;}
 .split-toolbar .st-btn:nth-child(4){margin-top:10px;}
 .split-toolbar .st-btn:nth-child(3){margin-top:32px;}
 @media (max-width:560px){
-  .split-toolbar{height:76px;padding-top:20px;}
+  .split-toolbar{height:92px;padding-top:20px;}
   .split-toolbar .st-btn{font-size:10px;}
   .split-toolbar .st-btn svg{width:20px;height:20px;}
-  .st-btn.karma-btn img{width:22px;height:22px;}
+  .st-btn.karma-btn img{width:32px;height:32px;padding:4px;}
   .split-toolbar .st-btn:nth-child(2),
   .split-toolbar .st-btn:nth-child(4){margin-top:7px;}
   .split-toolbar .st-btn:nth-child(3){margin-top:22px;}
@@ -832,23 +840,6 @@ code,digits{font-variant-numeric:tabular-nums;}
 .chip-stat img{width:15px;height:15px;filter:brightness(0) invert(1);}
 .chip-stat small{font-size:10px;font-weight:400;color:rgba(255,255,255,.7);}
 
-/* audio preload strip (home bottom, above toolbar) — slim glass */
-.audio-strip{
-  position:relative;z-index:5;
-  background:rgba(17,42,68,.85);backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  border-top:1px solid var(--glass-line);
-  display:flex;align-items:center;gap:12px;padding:9px 16px;
-}
-.audio-strip .as-label{font-size:12px;color:rgba(255,255,255,.9);font-weight:700;min-width:170px;}
-.audio-strip .as-bar{flex:1;height:6px;background:rgba(255,255,255,.14);border-radius:3px;overflow:hidden;}
-.audio-strip .as-fill{height:100%;width:0;background:linear-gradient(90deg,var(--colorAccentDeep),var(--colorAccent));border-radius:3px;transition:width .3s;}
-.audio-strip .as-test{
-  padding:6px 16px;border-radius:14px;font-size:12.5px;font-weight:800;
-  background:var(--glass-fill);border:1px solid var(--glass-line-strong);color:#fff;transition:.18s;
-}
-.audio-strip .as-test:hover{background:var(--glass-hi);}
-
 /* ════════════════════════════════════════════════════════════
    POST SESSION
    ════════════════════════════════════════════════════════════ */
@@ -1095,8 +1086,10 @@ body.rail-on .appbar .tb{padding-right:64px;}
    · side-nav: collapsed FAB (hamburger) → tap opens the icon column
    · env-rail: thin collapsed pill (active icon only) → tap expands
    · action rail corner strip · ring floats right
-   · pose-pill rides above the pose · bottom bars stack clean       */
-@media (max-width:880px){
+   · pose-pill rides above the pose · bottom bars stack clean
+   NOTE: also triggers on short viewports — inside the Cosmic iframe the
+   page is wide (~1180px) but only ~620px tall, so the tall rails never fit. */
+@media (max-width:880px), (max-height:700px){
   .side-nav{left:10px;padding:10px 6px;gap:4px;border-radius:22px;}
   .side-nav .sn-item span{display:none;}
   .side-nav .sn-item svg{width:19px;height:19px;}
@@ -1114,29 +1107,41 @@ body.rail-on .appbar .tb{padding-right:64px;}
   .pose-pill .nm{font-size:13.5px;}
   .pose-pill::before{display:none;}
 
-  /* — stat chips: top-left of the stage, right under the header — */
-  .stat-chips, body.in-player .stat-chips{right:auto;left:8px;top:104px;padding:3px 3px;}
+  /* — stat chips: top-left of the stage, CLEAR of the glass header
+     (row42 + strip66 + wave ≈ 122px tall — anything under that is eaten) — */
+  .stat-chips, body.in-player .stat-chips{right:auto;left:8px;top:128px;padding:3px 3px;}
   .chip-stat{padding:2px 9px;font-size:11.5px;}
 
   /* — side-nav: collapsed hamburger FAB, tap to open the column — */
   .side-nav.compact{
-    left:8px;top:152px;transform:none;
+    left:8px;top:164px;transform:none;
     flex-direction:column;gap:2px;padding:5px;border-radius:16px;
+    transition:background .25s, border-color .25s, padding .25s, box-shadow .25s;
+  }
+  /* collapsed = just the button — the dark panel behind it disappears */
+  .side-nav.compact:not(.open){
+    background:transparent;border-color:transparent;padding:0;
+    box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
   }
   .side-nav.compact .sn-item{width:40px;padding:8px 2px 6px;border-radius:12px;}
   .side-nav.compact .sn-sep{display:none;}
   .side-nav.compact:not(.open) .sn-item{display:none;}
-  .sn-toggle{
-    width:38px;height:38px;display:grid;place-items:center;border-radius:12px;
-    background:var(--glass-fill);border:1px solid var(--glass-line);color:#8ff0e0;transition:.18s;
+  /* FAB: more specific than the desktop .side-nav .sn-toggle{display:none} */
+  .side-nav.compact .sn-toggle{
+    width:42px;height:42px;display:grid;place-items:center;border-radius:14px;
+    background:linear-gradient(160deg, rgba(38,74,105,.92), rgba(17,36,58,.92));
+    border:1.5px solid rgba(62,220,199,.75);color:#8ff0e0;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    box-shadow:0 6px 20px rgba(6,16,30,.6), 0 0 14px rgba(62,220,199,.25), inset 0 1px 0 rgba(255,255,255,.2);
+    transition:.18s;
   }
-  .sn-toggle svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
-  .sn-toggle:hover{background:var(--glass-hi);}
-  .side-nav:not(.compact) .sn-toggle{display:none;}   /* desktop rails never show the FAB */
+  .side-nav.compact .sn-toggle svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.3;stroke-linecap:round;}
+  .side-nav.compact .sn-toggle:hover{background:rgba(30,64,92,.95);color:#eafffb;}
+  .side-nav.compact.open .sn-toggle{background:linear-gradient(160deg,rgba(62,220,199,.35),rgba(24,179,160,.2));color:#fff;border-color:rgba(62,220,199,.95)}
 
   /* — env rail: thin, collapsed to the active icon; tap to expand — */
   .env-rail{
-    left:8px;right:auto;top:200px;bottom:auto;transform:none;
+    left:8px;right:auto;top:214px;bottom:auto;transform:none;
     flex-direction:column;padding:4px;gap:2px;border-radius:14px;width:42px;
   }
   .env-rail .er-btn{width:32px;height:32px;border-radius:10px;}
@@ -1207,7 +1212,7 @@ body.rail-on .appbar .tb{padding-right:64px;}
   .practice-card .pc-img{height:min(42vh,380px);}
   .side-nav .sn-item{width:36px;padding:7px 0 5px;}
   .side-nav.compact .sn-item{width:36px;padding:7px 0 5px;}
-  .side-nav.compact .sn-toggle{width:34px;height:34px;}
+  .side-nav.compact .sn-toggle{width:38px;height:38px;}
   /* header is shorter here — pull the left deck up with it */
   .stat-chips{top:92px;}
   .side-nav.compact{top:128px;}
@@ -1274,8 +1279,8 @@ body.rail-on .appbar .tb{padding-right:64px;}
   </button>
 </nav>
 
-<!-- ═══════════ SESSION ACTION RAIL — بستن استودیو · منوی یوگا · شروع دوباره
-     (left edge; each button shows only when it applies) ═══════════ -->
+<!-- ═══════════ SESSION ACTION RAIL — بستن استودیو (فقط منو) · منوی یوگا
+     و شروع دوباره (فقط پلیر) · بازگشت (صفحات جانبی) — top-right ═══════════ -->
 <nav class="action-rail" id="actionRail" hidden aria-label="کنترل‌های جلسه">
   <button class="ar-btn" id="uiCloseStudio" title="بستن استودیو" hidden>
     <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
@@ -1353,12 +1358,6 @@ body.rail-on .appbar .tb{padding-right:64px;}
     </div>
   </div>
   <div class="split-toolbar" id="homeToolbar"></div>
-  <!-- audio preload strip: shows cue buffering + self-test button -->
-  <div class="audio-strip" id="audioStrip">
-    <span class="as-label" id="asLabel">🎧 آماده‌سازی صداها…</span>
-    <div class="as-bar"><div class="as-fill" id="asFill"></div></div>
-    <button class="as-test" id="asTest" title="یک نمونه صدا پخش کن">🔊 تست صدا</button>
-  </div>
 </section>
 
 <!-- ═══════════ PREVIEW ═══════════ -->
@@ -1705,6 +1704,6 @@ body.rail-on .appbar .tb{padding-right:64px;}
 <script src="static/yoga-classic/data.js?v=9"></script>
 <script src="static/yoga-classic/engine.js?v=6"></script>
 <script src="static/yoga-classic/audio.js?v=8"></script>
-<script src="static/yoga-classic/app.js?v=25"></script>
+<script src="static/yoga-classic/app.js?v=29"></script>
 </body>
 </html>

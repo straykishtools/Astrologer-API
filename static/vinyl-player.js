@@ -305,10 +305,11 @@
     function boot() {
         if (_booted) return;
         _booted = true;
-        // ترجیحاً داخل سایدبار، بالای فوتر؛ سایدبار کشویی موبایل → شناور گوشه صفحه
+        // همیشه داخل سایدبار (در موبایل سایدبار = drawer کشویی، همان‌جا دیده می‌شود)؛
+        // شناور گوشه فقط برای صفحاتی که اصلاً سایدبار ندارند
         var sidebar = document.querySelector('.sidebar');
         var host = document.createElement('div');
-        if (sidebar && !window.matchMedia('(max-width: 768px)').matches) {
+        if (sidebar) {
             host.className = 'vp-wrap';
             var footer = sidebar.querySelector('.sidebar-footer');
             if (footer) sidebar.insertBefore(host, footer);
@@ -317,9 +318,7 @@
             document.body.appendChild(host);
         }
         build(host);
-        if (!sidebar || window.matchMedia('(max-width: 768px)').matches) {
-            if (root) root.classList.add('vp-float');
-        }
+        if (!sidebar && root) root.classList.add('vp-float');
         currentSection = detectSectionFromHash();
         refresh();
         window.addEventListener('hashchange', function () {

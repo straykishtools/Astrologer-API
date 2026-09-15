@@ -231,12 +231,17 @@ function tokens(host, str, opts) {
     opts = opts || {};
     host.innerHTML = '';
     var parts = str.split(/(\s+)/).filter(function (s) { return s.trim().length; });
+    /* موج کلمات: برای متن‌های بلند تاخیر فشرده می‌شود تا کل پاسخ در ~۱.۲s ظاهر شود */
+    var step = parts.length > 14 ? (1.1 / parts.length) : 0.09;
     parts.forEach(function (w, i) {
         var s = document.createElement('span');
         s.textContent = w;
         if (opts.hl && opts.hl.test && opts.hl.test(w)) s.classList.add('hl');
-        s.style.animationDelay = (i * 0.09).toFixed(2) + 's';
+        s.style.animationDelay = (i * step).toFixed(3) + 's';
         host.appendChild(s);
+        /* فاصلهٔ واقعی بین کلمات: وابسته به CSS نبودن + کپی‌پیست درست
+           (در کانتینر flex با gap، گره‌های صرفاً-فاصله رندر نمی‌شوند) */
+        host.appendChild(document.createTextNode(' '));
     });
 }
 

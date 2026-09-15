@@ -177,11 +177,54 @@ function wireTalk(root) {
    هر دو از یک history و یک endpoint استفاده می‌کنند. */
 function makeAstroTalker(stream, greet) {
     var history = [];   // نوبت‌های [role,content] برای مکالمهٔ چندتایی
+
+    stream.classList.remove('k-tokens');    /* استایل کارتِ توکن → ستون حبابی */
+    stream.classList.add('cc-msgs');
+
+    function scrollDown() {
+        requestAnimationFrame(function () { stream.scrollTop = stream.scrollHeight; });
+    }
+    /* حباب ساده (متن خالص) */
+    function addBubble(role, text) {
+        var row = document.createElement('div');
+        row.className = 'cc-msg cc-msg--' + (role === 'user' ? 'me' : 'ai');
+        var b = document.createElement('div');
+        b.className = 'cc-bubble';
+        b.textContent = text;
+        row.appendChild(b);
+        stream.appendChild(row);
+        scrollDown();
+        return b;
+    }
+    /* حباب AI با موج نورانی کلمات (باز استفاده از Kinetics.tokens) */
+    function addAiBubble(text, hl) {
+        var row = document.createElement('div');
+        row.className = 'cc-msg cc-msg--ai';
+        var b = document.createElement('div');
+        b.className = 'cc-bubble';
+        var w = document.createElement('span');
+        w.className = 'cc-words';
+        b.appendChild(w);
+        row.appendChild(b);
+        stream.appendChild(row);
+        Kinetics.tokens(w, text, hl ? { hl: hl } : undefined);
+        scrollDown();
+    }
+    /* سه‌نقطه «در حال نوشتن» داخل حباب AI */
+    function addTyping() {
+        var row = document.createElement('div');
+        row.className = 'cc-msg cc-msg--ai';
+        row.innerHTML = '<div class="cc-bubble"><span class="k-bounce"><i></i><i></i><i></i></span></div>';
+        stream.appendChild(row);
+        scrollDown();
+        return row;
+    }
+
+    var HL = /(ماه|خورشید|مریخ|ونوس|زحل|برج|خانه|نیت|اوراکل|یوگا|تمرین|آسانا|تنفس|مدیتیشن|کارما|سطح)/;
+
     function ask(text) {
-        var dots = document.createElement('div');
-        dots.className = 'k-bounce';
-        dots.innerHTML = '<i></i><i></i><i></i>';
-        stream.innerHTML = ''; stream.appendChild(dots);
+        addBubble('user', text);
+        var typing = addTyping();
 
         /* اگر همین نشست چارت گرفته، زمینه‌اش بی‌صدا اضافه می‌شود — کاربر چیزی نمی‌فرستد */
         var ctx = '';
@@ -196,14 +239,15 @@ function makeAstroTalker(stream, greet) {
             if (!reply) reply = 'کیهان پاسخی نداشت — دوباره بپرس ✦';
             history.push({ role: 'user', content: text });
             history.push({ role: 'assistant', content: reply });
-            Kinetics.tokens(stream, reply, { hl: /(ماه|خورشید|مریخ|ونوس|زحل|برج|خانه|نیت|اوراکل|یوگا|تمرین|آسانا|تنفس|مدیتیشن|کارما|سطح)/ });
+            typing.remove();
+            addAiBubble(reply, HL);
         })
         .catch(function () {
-            var reply = 'کیهان در پاسخ به «' + text.slice(0, 24) + '»: امروز انرژیِ ماه را با آرامش پیش ببر ✦';
-            Kinetics.tokens(stream, reply, { hl: /(ماه|نیت|آرامش)/ });
+            typing.remove();
+            addAiBubble('کیهان در پاسخ به «' + text.slice(0, 24) + '»: امروز انرژیِ ماه را با آرامش پیش ببر ✦', /(ماه|نیت|آرامش)/);
         });
     }
-    if (greet) Kinetics.tokens(stream, 'سلام — کاسمیک اوراکل در خدمتِ پرسش‌های کیهانی و یوگاییِ توست ✦', { hl: /(اوراکل|کیهانی|یوگا)/ });
+    if (greet) addAiBubble('سلام — کاسمیک اوراکل در خدمتِ پرسش‌های کیهانی و یوگاییِ توست ✦', /(اوراکل|کیهانی|یوگا)/);
     return { ask: ask, history: history };
 }
 

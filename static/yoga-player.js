@@ -702,19 +702,22 @@ var PracticeUI = {
         });
     },
 
-    /** نوار آمار استودیو کلاسیک (کارما/جلسه/دقیقه/هفته/آخرین) — از localStorage؛
+    /** نوار آمار استودیو کلاسیک (کارما/جلسه/دقیقه/کالری/هفته/آخرین) — از localStorage؛
         بعد از بستن مودال کلاسیک هم صدا زده می‌شود تا آمار بلافاصله تازه شود.
         شمارش «جلسه» فقط تمرین‌های کامل‌شده است؛ «دقیقه» همیشه کل زمان تمرین. */
     refreshClassicStats: function () {
         try {
             var k = JSON.parse(localStorage.getItem('py_karma') || '0') || 0;
             var hist = JSON.parse(localStorage.getItem('py_history') || '[]') || [];
-            var totalMin = 0, sessions = 0, weekCount = 0, weekStart = new Date();
+            var totalMin = 0, totalCal = 0, sessions = 0, weekCount = 0, weekStart = new Date();
             weekStart.setDate(weekStart.getDate() - weekStart.getDay());
             weekStart.setHours(0, 0, 0, 0);
             var last = null;
             hist.forEach(function (h) {
                 totalMin += Math.round((h.seconds || 0) / 60);
+                /* کالری با همان فرمول موتور (3.5 kcal/min) — رکورد‌به‌رورد گرد می‌شود
+                   تا با عددی که حین تمرین به کاربر نمایش داده شده یکسان بماند */
+                totalCal += Math.round((h.seconds || 0) / 60 * 3.5);
                 /* رکوردهای قدیمی (بدون flag) کامل فرض می‌شوند تا آمار از دست نرود */
                 var done = (h.completed === undefined) ? true : !!h.completed;
                 if (done) sessions++;
@@ -726,6 +729,7 @@ var PracticeUI = {
             set('pycKarma', k);
             set('pycSessions', sessions);
             set('pycTime', totalMin);
+            set('pycCal', totalCal);
             set('pycWeek', weekCount);
             var lw = document.getElementById('pycLastWrap');
             if (lw && last) {
@@ -992,6 +996,18 @@ var PracticeUI = {
         });
         /* reverse-insert: گام اول در لبه راست (حس RTL) */
         for (var j = cards.length - 1; j >= 0; j--) inner.appendChild(cards[j].el);
+        /* پیش‌لود تصویر کامل حرکات — با عوض‌شدن گام، تصویر از کش می‌آید
+           و صحنه لحظه‌ای خالی/بازنگام نمی‌شود (علت اصلی سنگینی بصری پیش‌نمایش) */
+        try {
+            var seen = {};
+            player.steps.forEach(function (s) {
+                var pn = s.toPose || s.name || s.pose || '';
+                if (!pn || seen[pn]) return;
+                seen[pn] = 1;
+                var u = poseImage(pn, s.side);
+                if (u) { var im = new Image(); im.src = u; }
+            });
+        } catch (e) {}
         function sync() {
             var cur = Math.max(0, player._idx - 1);
             var curCard = null;
@@ -1198,6 +1214,14 @@ var CoachUI = {
     _duration: 30,
     _bg: 'Home',
     _bgOverridden: false,
+    _filterInstr: null,   /* instructor object — only that coach's practices are listed */
+    /* تطبیق تمرین با مربی: اول شناسه (اختصاص ادمین)، سپس نام */
+    matchInstr: function (p, instr) {
+        if (!instr) return true;
+        if (instr.id && p.instructor_id) return String(p.instructor_id) === String(instr.id);
+        if (instr.name && p.instructor_name) return p.instructor_name === instr.name;
+        return false;
+    },
 
     init: function () {
         var el = document.getElementById(this.panelId);
@@ -1222,7 +1246,7 @@ var CoachUI = {
             .then(function (data) {
                 if (data && data.items && data.items.length) {
                     return data.items.map(function (i) {
-                        return { name: i.name, specialty: i.specialty || '', level: i.level || 'intermediate', bio: i.bio || '' };
+                        return { id: i.id, name: i.name, specialty: i.specialty || '', level: i.level || 'intermediate', bio: i.bio || '' };
                     });
                 }
                 return DEFAULT_INSTRUCTORS;
@@ -1276,7 +1300,15 @@ var CoachUI = {
         var self = this;
         if (this._detail && this._selected) { this.renderDetail(el, this._selected); return; }
         var practices = this.apiPractices || D.practices || [];
-        var cards = practices.map(function (p) {
+        var instrs = (this._instructors && this._instructors.length ? this._instructors : DEFAULT_INSTRUCTORS).map(function (i, k) {
+            /* بشمار تمرین‌هایی که ادمین به این مربی اختصاص داده */
+            var n = practices.filter(function (p) { return self.matchInstr(p, i); }).length;
+            return { idx: k, name: i.name, specialty: i.specialty, level: i.level, bio: i.bio, id: i.id, count: n };
+        });
+        var filter = this._filterInstr;
+        var shown = filter ? practices.filter(function (p) { return self.matchInstr(p, filter); }) : practices;
+
+        var cards = shown.map(function (p) {
             var lvls = (p.difficulties || []).filter(function (d) { return LEVEL_FA[LEVEL_KEYS[d]]; }).map(function (d) {
                 return '<span class="yp-chip">' + esc(LEVEL_FA[LEVEL_KEYS[d]]) + '</span>';
             }).join('');
@@ -1298,27 +1330,40 @@ var CoachUI = {
                 '</div>' +
                 '<div class="yp-coach-detail" data-yp-coach-body="' + esc(p.name) + '" style="display:none;"></div>' +
             '</div>';
-        }).join('');
+        }).join('') || ('<div class="yp-empty">' + (filter
+            ? '🔍 برای «' + esc(filter.name) + '» هنوز تمرینی اختصاص داده نشده است.'
+            : 'هنوز تمرینی ثبت نشده است.') + '</div>');
 
-        var instrCards = (this._instructors || DEFAULT_INSTRUCTORS).map(function (i) {
-            return '<div class="yp-instructor-card">' +
-                '<div class="yp-instructor-avatar">' + esc((i.name || '؟').trim().charAt(0)) + '</div>' +
+        var instrCards = instrs.map(function (i) {
+            var on = filter && ((filter.id && String(filter.id) === String(i.id)) || filter.name === i.name);
+            return '<button class="yp-instructor-card' + (on ? ' active' : '') + '" data-yp-coach-instr="' + i.idx + '">' +
+                '<div class="yp-instructor-avatar">' + esc((i.name || '؟').trim().charAt(0)) +
+                    '<span class="yp-instr-count">' + faNum(i.count) + '</span></div>' +
                 '<div class="yp-instructor-name">' + esc(i.name) + '</div>' +
                 (i.specialty ? '<div class="yp-instructor-spec">' + esc(i.specialty) + '</div>' : '') +
                 '<span class="yp-chip dim">' + esc(LEVEL_FA[i.level] || i.level) + '</span>' +
-                (i.bio ? '<div class="yp-instructor-bio">' + esc(i.bio) + '</div>' : '') +
-            '</div>';
+                '<div class="yp-instructor-cta">' + (on ? '✓ در حال نمایش تمرین‌ها' : 'نمایش ' + faNum(i.count) + ' تمرین') + '</div>' +
+            '</button>';
         }).join('');
+
+        var filterBar = filter
+            ? '<div class="yp-coach-filter">' +
+                '<span>فیلتر فعال: <b>👤 ' + esc(filter.name) + '</b> — ' + faNum(shown.length) + ' تمرین</span>' +
+                '<button class="yp-chip clear" data-yp-coach-clear>✕ نمایش همه مربیان</button>' +
+              '</div>'
+            : '';
 
         el.innerHTML =
             '<div class="yp-coach">' +
                 '<div class="yp-coach-head"><h3>👨‍🏫 مربی‌های یوگا</h3>' +
-                    '<span class="yp-note">مربیان رصدخانه و تمرین‌های هر یک — نمای فنی برای مربی‌ها</span></div>' +
+                    '<span class="yp-note">روی هر مربی بزن تا فقط تمرین‌های اختصاصی‌اش را ببینی</span></div>' +
                 '<div class="yp-coach-stats" id="yogaCoachStats">' +
                     (authToken() ? '<span class="yp-note">در حال بارگذاری آمار…</span>' : '<span class="yp-note">برای مشاهده آمار وارد شوید</span>') +
                 '</div>' +
+                '<h4 class="yp-coach-sub">🧑‍🏫 مربیان — ' + faNum(instrs.length) + ' نفر</h4>' +
                 '<div class="yp-instructors-grid">' + instrCards + '</div>' +
-                '<h4 class="yp-coach-sub">📋 تمرین‌ها</h4>' +
+                filterBar +
+                '<h4 class="yp-coach-sub">' + (filter ? ('📋 تمرین‌های ' + esc(filter.name)) : '📋 همه تمرین‌ها — ' + faNum(shown.length)) + '</h4>' +
                 '<div class="yp-coach-grid">' + cards + '</div>' +
             '</div>';
         this.bindEvents(el);
@@ -1359,6 +1404,20 @@ var CoachUI = {
             }
             var dBack = t.closest('[data-yp-detail-back]');
             if (dBack) { self._detail = false; self.render(el); return; }
+            /* انتخاب مربی → فیلتر تمرین‌ها به همان مربی (کلیک دوباره = لغو) */
+            var iCard = t.closest('[data-yp-coach-instr]');
+            if (iCard) {
+                var list = (self._instructors && self._instructors.length ? self._instructors : DEFAULT_INSTRUCTORS);
+                var pick = list[+iCard.getAttribute('data-yp-coach-instr')];
+                if (pick) {
+                    var same = self._filterInstr && ((self._filterInstr.id && String(self._filterInstr.id) === String(pick.id)) || self._filterInstr.name === pick.name);
+                    self._filterInstr = same ? null : pick;
+                }
+                self.render(el);
+                return;
+            }
+            var clr = t.closest('[data-yp-coach-clear]');
+            if (clr) { self._filterInstr = null; self.render(el); return; }
             var dPrev = t.closest('[data-yp-detail-preview]');
             if (dPrev) { if (window.YogaPracticeUI) YogaPracticeUI.previewPractice(self._selected); return; }
             var go = t.closest('[data-yp-go]');
@@ -1476,6 +1535,7 @@ var CoachUI = {
 window.YogaSessionPlayer = YogaSessionPlayer;
 window.YogaPracticeUI = PracticeUI;
 window.YogaCoachUI = CoachUI;
+window.yogaPracticeImage = practiceImage;   /* تصویر نماینده تمرین — برای تب روزانه */
 
 /* «وارد شوید» در کارت پایان تمرین — مودال لاگین را همان‌جا باز می‌کند
    و پس از لاگین، پنل مربی/تمرین را دوباره رندر می‌کند تا آمار و استریک ظاهر شود */

@@ -91,26 +91,34 @@ function syncSideNav() {
      user is on another screen */
   const pill = $('resumePractice');
   if (pill) pill.hidden = !(sessionLive() && id !== 'scr-yoga');
-  /* action rail — top-right corner everywhere it applies:
-     · «منوی یوگا» + «شروع دوباره» only while a session is live
-     · «بستن استودیو» only when embedded in the cosmic parent app
-     · «بازگشت» on every chrome screen that has a back button
-       (replaces that screen's appbar ✕ — same handler, rail style) */
+  /* action rail — top-right corner:
+     · «منوی یوگا» داخل خودِ پلیر تمرین (با تأیید، جلسه را می‌بندد و به
+       لابی برمی‌گرداند)؛ در صفحات جانبی «بازگشت» همین نقش را دارد
+     · «بستن استودیو» فقط روی صفحهٔ منو (و فقط داخل cosmic) — کل مودال را
+       با postMessage می‌بندد؛ مسیر: هر بخش → منو → بستن استودیو
+     · «شروع دوباره» فقط داخل تمرین با جلسه زنده
+     · «بازگشت» در صفحاتی که دکمه بازگشت دارند (handler همان appbar ✕) */
   const rail = document.getElementById('actionRail');
   if (rail) {
     const live = sessionLive();
     const cosmic = inCosmicIframe();
-    const q = $('uiQuit'), r = $('btnRestart'), cs = $('uiCloseStudio'), ab = $('arBack');
-    if (q) q.hidden = !live;
-    if (r) r.hidden = !live;
-    if (cs) cs.hidden = !cosmic;
+    const isHome = (id === 'scr-home');
+    const isMenuless = (id === 'scr-splash' || id === 'scr-post');
     const backId = BACK_BY_SCREEN[id];
+    const inPractice = (id === 'scr-yoga');
+    const q = $('uiQuit'), r = $('btnRestart'), cs = $('uiCloseStudio'), ab = $('arBack');
+    /* «منوی یوگا» فقط داخل پلیرِ تمرین — در صفحات جانبی (فروشگاه/تاریخچه/…)
+       دکمهٔ «بازگشت» همین کار را می‌کند و دو دکمهٔ مشابه لازم نیست */
+    const showQuit = inPractice && !isMenuless;
+    if (q) q.hidden = !showQuit;
+    if (r) r.hidden = !(live && inPractice);
+    if (cs) cs.hidden = !(cosmic && isHome);
     if (ab) ab.hidden = !backId;
-    /* empty rail looks broken — hide the whole panel when nothing applies */
-    const railEmpty = (id === 'scr-splash' || id === 'scr-post') || (!live && !cosmic && !backId);
-    rail.hidden = railEmpty;
-    /* on chrome screens the rail owns the corner → hide the appbar's ✕ */
-    document.body.classList.toggle('rail-on', !railEmpty && id !== 'scr-yoga');
+    /* empty rail looks broken — hide the panel when no button applies */
+    const anyBtn = showQuit || (cosmic && isHome) || (live && inPractice) || !!backId;
+    rail.hidden = isMenuless || !anyBtn;
+    /* on chrome screens the rail owns the corner → hide the appbar ✕ */
+    document.body.classList.toggle('rail-on', !rail.hidden && !inPractice);
   }
   document.body.classList.toggle('in-player', id === 'scr-yoga');
 }
@@ -954,11 +962,12 @@ $('uiPlay').onclick = () => Player.toggle();
 $('uiNext').onclick = () => Player.next();
 $('uiPrev').onclick = () => Player.prev();
 $('uiQuit').onclick = () => {
-  if (Player.running && Player.elapsedMs > 30000 && !confirm(FA_UI.quitConfirm)) return;
-  Player._quitToLobby = true;
-  Player.stop(false);
-  /* quit = back to the classic lobby, both standalone and inside cosmic
-     (the cosmic modal itself is closed with «بستن استودیو» → postMessage) */
+  if (Player.live) {
+    if (Player.running && Player.elapsedMs > 30000 && !confirm(FA_UI.quitConfirm)) return;
+    Player._quitToLobby = true;
+    Player.stop(false);
+  }
+  /* quit = back to the classic menu (لابی)، از هر بخشی */
   showScreen('scr-home');
   Home.go(Home.idx, true);
 };
@@ -1614,27 +1623,14 @@ function reportSessionEnd(completed, seconds) {
     applyBackground(DB.currentBg);
     syncSoundBtn();
     syncMusicBtn();
-    /* preload the core cues right away (home) — user can verify with the
-       test button before starting a practice; full session preloads on start */
-    Audio2.onProgress((n, total) => {
-      const fill = $('asFill'), label = $('asLabel');
-      if (!fill) return;
-      fill.style.width = total ? Math.round(n / total * 100) + '%' : '100%';
-      if (label) label.textContent = n >= total
-        ? '✓ صداها آماده است — با دکمه تست بشنو'
-        : '🎧 آماده‌سازی صداها… ' + faNum(n) + ' از ' + faNum(total);
-    });
+    /* preload the core cues right away (home) so the first spoken cue is
+       instant; full session preloads on start */
     Audio2.preload([
       'general_soften.ogg','general_hold.ogg','general_rest.ogg',
       'general_inhale.ogg','general_exhale.ogg','general_dynamic_state_going_silent.ogg',
       'moves_childwidestart_to_childwide.ogg','moves_childwidestart_to_childwidestart.ogg',
       'numbers_number_1.ogg','numbers_number_2.ogg',
     ]);
-    $('asTest').onclick = () => {
-      Audio2.unlock();          /* user gesture */
-      Audio2.test();
-      toast('اگر صدای «نرم‌شو» شنیدی، صداها سالم‌اند 🎧');
-    };
     /* cosmic iframe mode: auto-start the requested practice — ONCE per
        page lifetime; reopening the modal keeps the classic lobby */
     const q = classicQuery();

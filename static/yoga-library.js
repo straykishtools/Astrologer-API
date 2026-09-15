@@ -628,9 +628,14 @@ function renderDailyPanel() {
             var reasonsHtml = (data.reasons || []).map(function (r) {
                 return '<div class="yoga-rec-reason">' + C.esc(r) + '</div>';
             }).join('');
+            var recThumb = '';
+            try { if (window.yogaPracticeImage) recThumb = window.yogaPracticeImage(p, 'thumb'); } catch (e) {}
             recBox.innerHTML =
                 '<div class="yoga-rec-card">' +
-                    '<div class="yoga-rec-head"><span class="yoga-rec-emoji">🧘</span>' +
+                    '<div class="yoga-rec-head">' +
+                        (recThumb
+                            ? '<div class="yoga-rec-thumb" style="background-image:url(\'' + C.escAttr(recThumb) + '\')" role="img" aria-label="' + C.escAttr(p.displayName || p.name) + '"></div>'
+                            : '<span class="yoga-rec-emoji">🧘</span>') +
                         '<div><div class="yoga-rec-name">' + C.esc(p.displayName || p.name) + '</div>' +
                         '<div class="yoga-rec-meta">' + C.esc((p.description || '').slice(0, 120)) + (p.description && p.description.length > 120 ? '…' : '') + '</div></div>' +
                     '</div>' +
