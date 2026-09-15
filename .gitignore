@@ -138,3 +138,15 @@ rapidapi.json
 *.db
 *.sqlite
 *.sqlite3
+*.db-wal
+*.db-shm
+backups/
+
+# IDE / assistant-tool cruft (2026-09-15 review)
+.vs/
+.workbuddy-ai/
+.freebuff/
+.verdentc.json
+
+# Kinetics effect-gallery vendored for inspiration — not part of the app
+kinetics-main/

@@ -352,6 +352,41 @@
 }
 /* نشانگر تایپ (سه نقطهٔ شناور داخل حباب) */
 .cc-msg .k-bounce { padding: 2px 0; }
+
+/* ── واپاشی جواب قبلی: کلمات ذره‌ذره می‌شوند + حباب حل می‌شود ── */
+.cc-bubble { position: relative; }
+.cc-words span.cc-out {
+    animation: cc-diss-word .5s cubic-bezier(.36,.07,.19,.97) forwards !important;
+    opacity: 1; filter: none; transform: none;
+}
+@keyframes cc-diss-word {
+    0%   { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); filter: blur(0); }
+    35%  { opacity: .95; text-shadow: 0 0 10px rgba(221,192,112,.9); }
+    100% { opacity: 0; transform: translate(var(--dx,20px), var(--dy,-24px)) rotate(var(--rot,30deg)) scale(.35); filter: blur(4px); }
+}
+.cc-bubble.cc-dissolve {
+    animation: cc-diss-box .55s ease-out forwards;
+}
+@keyframes cc-diss-box {
+    0%   { border-color: rgba(221,192,112,.5); box-shadow: inset 0 0 0 0 rgba(221,192,112,0); }
+    40%  { box-shadow: inset 0 0 18px -6px rgba(221,192,112,.5); }
+    100% { opacity: 0; transform: scale(.94); border-color: rgba(221,192,112,0); box-shadow: 0 0 26px -6px rgba(221,192,112,.4); }
+}
+/* حباب‌های نورانی ریز هنگام واپاشی */
+.cc-spark {
+    position: absolute; top: 50%; left: 50%;
+    width: var(--sz,3px); height: var(--sz,3px);
+    border-radius: 50%;
+    background: radial-gradient(circle, #f3e5b8 0%, rgba(221,192,112,.85) 55%, rgba(221,192,112,0) 75%);
+    box-shadow: 0 0 6px rgba(221,192,112,.9);
+    pointer-events: none;
+    animation: cc-spark .8s ease-out var(--sd,0s) forwards;
+}
+@keyframes cc-spark {
+    0%   { opacity: 0; transform: translate(-50%,-50%) scale(.4); }
+    15%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--sx,18px)), calc(-50% + var(--sy,-22px))) scale(1.3); }
+}
 .k-bounce { display: inline-flex; gap: 6px; align-items: flex-end; padding: 6px 4px; }
 .k-bounce i {
     width: 8px; height: 8px; border-radius: 50%;
@@ -520,5 +555,8 @@
     .k-tokens span { animation-duration: 0.01s; }
     .cc-words span { animation-duration: 0.01s; filter: none; }
     .cc-msg { animation-duration: 0.01s; }
+    .cc-words span.cc-out { animation: none !important; opacity: 0; transition: opacity .15s; }
+    .cc-bubble.cc-dissolve { animation: none; opacity: 0; }
+    .cc-spark { display: none; }
     .k-bounce i { animation: none; }
 }

@@ -33,6 +33,7 @@ from app.models import (
     UserResponse,
 )
 from app.schemas.user import UserOut
+from app.utils.validation_helpers import password_problem, valid_email
 from app.middleware.rate_limit_middleware import (
     LOGIN_FAILURE_LIMIT,
     clear_login_failures,
@@ -63,10 +64,11 @@ def _user_response(user) -> UserResponse:
 @router.post("/register", response_model=TokenResponse)
 async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
     """ثبت‌نام کاربر جدید"""
-    if len(data.password) < 6:
-        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل ۶ کاراکتر باشد")
+    bad = password_problem(data.password)
+    if bad:
+        raise HTTPException(status_code=400, detail=bad)
 
-    if "@" not in data.email or "." not in data.email:
+    if not valid_email(data.email):
         raise HTTPException(status_code=400, detail="ایمیل نامعتبر است")
 
     user = await auth_service.create_user(db, data.email, data.password, data.display_name or "")
@@ -262,8 +264,9 @@ async def change_user_password(data: ChangePassword, user=Depends(get_current_us
     - **current_password**: رمز عبور امروزی
     - **new_password**: رمز جدید (حداقل 6 کاراکتر)
     """
-    if len(data.new_password) < 6:
-        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل 6 کاراکتر باشد")
+    bad = password_problem(data.new_password)
+    if bad:
+        raise HTTPException(status_code=400, detail=bad)
     ok = await auth_service.change_password(db, user, data.current_password, data.new_password)
     if not ok:
         raise HTTPException(status_code=400, detail="رمز عبور امروزی اشتباه است")
@@ -367,8 +370,9 @@ async def reset_password(data: dict, request: Request, db: AsyncSession = Depend
     new_password = data.get("new_password") or ""
     if not token:
         raise HTTPException(status_code=400, detail="توکن لازم است")
-    if len(new_password) < 6:
-        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل ۶ کاراکتر باشد")
+    bad = password_problem(new_password)
+    if bad:
+        raise HTTPException(status_code=400, detail=bad)
 
     try:
         await auth_service.reset_password_with_token(db, token, new_password)
@@ -678,9 +682,10 @@ async def admin_create_user(data: AdminCreateUser, admin=Depends(get_admin_user)
     - **plan**: نام پلن (پیش‌فرض: free)
     - **is_admin**: آیا کاربر ادمین باشد (پیش‌فرض: false)
     """
-    if len(data.password) < 6:
-        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل ۶ کاراکتر باشد")
-    if "@" not in data.email or "." not in data.email:
+    bad = password_problem(data.password)
+    if bad:
+        raise HTTPException(status_code=400, detail=bad)
+    if not valid_email(data.email):
         raise HTTPException(status_code=400, detail="ایمیل نامعتبر است")
 
     # چک کن پلن وجود داشته باشد
@@ -932,8 +937,9 @@ async def seed_admin_user(data: dict, db: AsyncSession = Depends(get_db)):
     email = (data.get("email", "admin@cosmic.ir") or "admin@cosmic.ir").lower().strip()
     password = data.get("password", "admin123") or "admin123"
 
-    if len(password) < 6:
-        raise HTTPException(status_code=400, detail="رمز عبور باید حداقل ۶ کاراکتر باشد")
+    bad = password_problem(password)
+    if bad:
+        raise HTTPException(status_code=400, detail=bad)
 
     user = (
         await db.execute(select(User).where(User.email == email))

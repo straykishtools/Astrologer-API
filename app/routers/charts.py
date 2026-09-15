@@ -4,6 +4,7 @@ Chart endpoints - SVG rendering.
 All endpoints that return rendered SVG charts via /api/v5/chart/*.
 """
 
+import asyncio
 from datetime import datetime, timezone
 from logging import getLogger
 from fastapi import APIRouter, Request
@@ -85,7 +86,7 @@ async def now_chart(request_body: NowChartRequestModel, request: Request) -> JSO
             custom_distribution_weights=request_body.custom_distribution_weights,
         )
 
-        payload = chart_payload(
+        payload = await asyncio.to_thread(chart_payload,
             chart_data,
             request_body.theme,
             request_body.language,
@@ -117,7 +118,7 @@ async def natal_chart(request_body: BirthChartRequestModel, request: Request) ->
 
     try:
         chart_data = await create_natal_chart_data(request_body)
-        payload = chart_payload(
+        payload = await asyncio.to_thread(chart_payload,
             chart_data,
             request_body.theme,
             request_body.language,
@@ -148,7 +149,7 @@ async def synastry_chart(request_body: SynastryChartRequestModel, request: Reque
 
     try:
         chart_data = await create_synastry_chart_data(request_body)
-        payload = chart_payload(
+        payload = await asyncio.to_thread(chart_payload,
             chart_data,
             request_body.theme,
             request_body.language,
@@ -179,7 +180,7 @@ async def composite_chart(request_body: CompositeChartRequestModel, request: Req
 
     try:
         chart_data = await create_composite_chart_data(request_body)
-        payload = chart_payload(
+        payload = await asyncio.to_thread(chart_payload,
             chart_data,
             request_body.theme,
             request_body.language,
@@ -210,7 +211,7 @@ async def transit_chart(request_body: TransitChartRequestModel, request: Request
 
     try:
         chart_data = await create_transit_chart_data(request_body)
-        payload = chart_payload(
+        payload = await asyncio.to_thread(chart_payload,
             chart_data,
             request_body.theme,
             request_body.language,
@@ -241,7 +242,7 @@ async def solar_return_chart(request_body: PlanetaryReturnRequestModel, request:
 
     try:
         chart_data = await calculate_return_chart_data(request_body, "Solar")
-        payload = chart_payload(
+        payload = await asyncio.to_thread(chart_payload,
             chart_data,
             request_body.theme,
             request_body.language,
@@ -274,7 +275,7 @@ async def lunar_return_chart(request_body: PlanetaryReturnRequestModel, request:
 
     try:
         chart_data = await calculate_return_chart_data(request_body, "Lunar")
-        payload = chart_payload(
+        payload = await asyncio.to_thread(chart_payload,
             chart_data,
             request_body.theme,
             request_body.language,
@@ -306,20 +307,10 @@ async def get_chart_svg(request_body: BirthChartRequestModel):
         chart_data = await create_natal_chart_data(request_body)
         
         # 2. تولید payload کامل که شامل SVG است
-        payload = chart_payload(
-            chart_data,
-            theme="dark",
-            language="fa",
-            split_chart=False,
-            transparent_background=False,
-            show_house_position_comparison=False,
-            show_cusp_position_comparison=False,
-            show_degree_indicators=True,
-            show_aspect_icons=True,
-            custom_title=None,
-            style="modern",
-            show_zodiac_background_ring=True,
-            double_chart_aspect_grid_type="list"
+        # ترتیب موقعیتی = امضای chart_payload (to_thread کلیدواژه نمی‌پذیرد)
+        payload = await asyncio.to_thread(
+            chart_payload, chart_data, "dark", "fa", False, False, False, False,
+            True, True, None, "modern", True, "list",
         )
         
         # 3. استخراج SVG از payload

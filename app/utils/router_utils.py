@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from logging import getLogger
 from typing import Optional, Sequence, Union
@@ -853,25 +854,28 @@ async def calculate_return_chart_data(
 
     try:
         if request_body.iso_datetime:
-            return_subject = return_factory.next_return_from_iso_formatted_time(
-                request_body.iso_datetime, return_type
+            return_subject = await asyncio.to_thread(
+                return_factory.next_return_from_iso_formatted_time,
+                request_body.iso_datetime, return_type,
             )  # type: ignore[arg-type]
         elif request_body.month:
             if request_body.year is None:
                 raise KerykeionException("Year must be provided when month is specified.")
-            return_subject = return_factory.next_return_from_date(
+            return_subject = await asyncio.to_thread(
+                return_factory.next_return_from_date,
                 request_body.year,
                 request_body.month,
                 request_body.day or 1,
-                return_type=return_type,
+                return_type,
             )
         else:
             if request_body.year is None:
                 raise KerykeionException(
                     "Year must be provided when iso_datetime is not set."
                 )
-            return_subject = return_factory.next_return_from_date(
-                request_body.year, 1, 1, return_type=return_type
+            return_subject = await asyncio.to_thread(
+                return_factory.next_return_from_date,
+                request_body.year, 1, 1, return_type,
             )
     except KerykeionException:
         raise
@@ -883,7 +887,8 @@ async def calculate_return_chart_data(
         ) from exc
 
     if request_body.wheel_type == "dual":
-        chart_data = ChartDataFactory.create_return_chart_data(
+        chart_data = await asyncio.to_thread(
+            ChartDataFactory.create_return_chart_data,
             natal_subject,
             return_subject,
             active_points=active_points,
@@ -893,7 +898,8 @@ async def calculate_return_chart_data(
             custom_distribution_weights=request_body.custom_distribution_weights,
         )
     else:
-        chart_data = ChartDataFactory.create_single_wheel_return_chart_data(
+        chart_data = await asyncio.to_thread(
+            ChartDataFactory.create_single_wheel_return_chart_data,
             return_subject,
             active_points=active_points,
             active_aspects=active_aspects,
@@ -917,7 +923,9 @@ async def create_natal_chart_data(
     active_aspects = resolve_active_aspects(request_body.active_aspects)
     await resolve_location_for_subject(request_body.subject)
     subject = build_subject(request_body.subject, active_points=active_points)
-    chart_data = ChartDataFactory.create_natal_chart_data(
+    # محاسبه افمریس CPU-bound است → thread-pool تا event loop بلاک نشود
+    chart_data = await asyncio.to_thread(
+        ChartDataFactory.create_natal_chart_data,
         subject,
         active_points=active_points,
         active_aspects=active_aspects,
@@ -944,7 +952,8 @@ async def create_synastry_chart_data(
         request_body.second_subject, active_points=active_points
     )
     try:
-        chart_data = ChartDataFactory.create_synastry_chart_data(
+        chart_data = await asyncio.to_thread(
+            ChartDataFactory.create_synastry_chart_data,
             first_subject,
             second_subject,
             active_points=active_points,
@@ -963,7 +972,8 @@ async def create_synastry_chart_data(
                 "Synastry relationship scoring failed (%s), retrying without it.",
                 exc,
             )
-            chart_data = ChartDataFactory.create_synastry_chart_data(
+            chart_data = await asyncio.to_thread(
+                ChartDataFactory.create_synastry_chart_data,
                 first_subject,
                 second_subject,
                 active_points=active_points,
@@ -997,7 +1007,8 @@ async def create_transit_chart_data(
         custom_ayanamsa_t0=request_body.first_subject.custom_ayanamsa_t0,
         custom_ayanamsa_ayan_t0=request_body.first_subject.custom_ayanamsa_ayan_t0,
     )
-    chart_data = ChartDataFactory.create_transit_chart_data(
+    chart_data = await asyncio.to_thread(
+        ChartDataFactory.create_transit_chart_data,
         natal_subject,
         transit_subject,
         active_points=active_points,
@@ -1026,9 +1037,9 @@ async def create_composite_chart_data(
         request_body.second_subject, active_points=active_points
     )
     try:
-        composite_subject = CompositeSubjectFactory(
-            first_subject, second_subject
-        ).get_midpoint_composite_subject_model()
+        composite_subject = await asyncio.to_thread(
+            CompositeSubjectFactory(first_subject, second_subject).get_midpoint_composite_subject_model
+        )
     except (TypeError, AttributeError, KerykeionException) as exc:
         logger.warning(
             "Composite subject creation failed (%s).", exc,
@@ -1047,7 +1058,8 @@ async def create_composite_chart_data(
         ) from exc
 
     try:
-        chart_data = ChartDataFactory.create_composite_chart_data(
+        chart_data = await asyncio.to_thread(
+            ChartDataFactory.create_composite_chart_data,
             composite_subject,
             active_points=active_points,
             active_aspects=active_aspects,

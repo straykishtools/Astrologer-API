@@ -43,7 +43,7 @@ function mount() {
             anchor.insertAdjacentElement('afterend', section);
         }
         /* هر کامپوننت جدا — خطای یکی بقیه را نکشد */
-        [wireDial, wirePad, wireTalk, wireComposer, wireBento].forEach(function (fn) {
+        [wireDial, wirePad, wireTalk, wireBento].forEach(function (fn) {
             try { fn(section); } catch (e) { console.warn('[Kinetics]', fn.name, e); }
         });
         mounted = true;
@@ -58,7 +58,7 @@ function mount() {
 function markup() {
     return ''
     + '<div class="co-section-head"><div class="co-section-title">⚡ آسمانِ جنبشی</div>'
-    +   '<div class="co-section-sub">ابزارهای تعاملی فیزیکی (Kinetics) — قطب‌نما، بن‌تو، ثبت خلق و پیش‌نمایش چت</div></div>'
+    +   '<div class="co-section-sub">ابزارهای تعاملی فیزیکی (Kinetics) — قطب‌نما، بن‌تو، ثبت خلق و بریفینگ صوتی</div></div>'
     + '<div class="kx-grid">'
 
     /* ── A) Inertial Dial — هشت تیکِ نام‌دار دور صفحه ── */
@@ -105,15 +105,7 @@ function markup() {
     +   '<p class="kx-note">انگشت را نگه‌دار — موج زنده می‌شود و بریفینگِ آسمانِ امروز پخش می‌گردد</p>'
     + '</div>'
 
-    /* ── E) Prompt Composer + Token Stream + Bounce ── */
-    + '<div class="kx-card" style="grid-column:1/-1"><h4>🤖 چتِ اخترشناس (پیش‌نمایش)</h4>'
-    +   '<div class="k-tokens k-phys" id="kxStream" style="width:100%"></div>'
-    +   '<div class="k-composer k-phys" id="kxComposer" style="width:100%;max-width:560px">'
-    +     '<textarea rows="1" placeholder="سؤالت را از کیهان بپرس… (این پیش‌نمایشِ رابط است)"></textarea>'
-    +     '<span class="k-count">0</span>'
-    +     '<button class="k-send" type="button" title="ارسال">➤</button>'
-    +   '</div>'
-    + '</div>'
+    /* چت اخترشناس منحصراً در تاپ‌بار (coChatBtn) است — کارت داشبورد حذف شد */
 
     + '</div>';
 }
@@ -172,52 +164,90 @@ function wireTalk(root) {
     });
 }
 
-/* ── E) composer + token stream + bounce (چت AI با fallback) ──
-   هستهٔ پرس‌وجو در makeAstroTalker مشترک است: داشبورد و اوربِ شناور
-   هر دو از یک history و یک endpoint استفاده می‌کنند. */
+/* ── چت اخترشناس (فقط تاپ‌بار): یک‌جوابی با افکت واپاشی ──
+   جواب جدید که می‌رسد، جواب قبلی ذره‌ذره (حباب‌های نورانی) در فضا
+   متلاشی می‌شود و بعد پاسخ تازه کلمه‌به‌کلمه از راه می‌رسد. */
+
+/* حباب‌های نورانی کوچک که از حباب به بیرون شناور می‌شوند */
+function starBurst(el) {
+    var n = 14;
+    for (var i = 0; i < n; i++) {
+        var p = document.createElement('i');
+        p.className = 'cc-spark';
+        var ang = (Math.PI * 2 * i) / n + Math.random() * .5;
+        var d = 26 + Math.random() * 38;
+        p.style.setProperty('--sx', (Math.cos(ang) * d).toFixed(1) + 'px');
+        p.style.setProperty('--sy', (Math.sin(ang) * d - 14).toFixed(1) + 'px');
+        p.style.setProperty('--sz', (2 + Math.random() * 4).toFixed(1) + 'px');
+        p.style.setProperty('--sd', (Math.random() * .18).toFixed(2) + 's');
+        el.appendChild(p);
+        (function (x) { setTimeout(function () { x.remove(); }, 900); })(p);
+    }
+}
+
 function makeAstroTalker(stream, greet) {
     var history = [];   // نوبت‌های [role,content] برای مکالمهٔ چندتایی
 
-    stream.classList.remove('k-tokens');    /* استایل کارتِ توکن → ستون حبابی */
+    stream.classList.remove('k-tokens');
     stream.classList.add('cc-msgs');
 
     function scrollDown() {
         requestAnimationFrame(function () { stream.scrollTop = stream.scrollHeight; });
     }
-    /* حباب ساده (متن خالص) */
-    function addBubble(role, text) {
+    /* تنها جوابِ فعال را نگه می‌دارد: قبلی‌ها کلمه‌به‌کلمه متلاشی می‌شوند */
+    function dissolveOld() {
+        var olds = stream.querySelectorAll('.cc-row');
+        [].forEach.call(olds, function (row, idx) {
+            var b = row.querySelector('.cc-bubble');
+            if (!b) { row.remove(); return; }
+            var words = b.querySelectorAll('.cc-words > span');
+            if (words.length) {
+                [].forEach.call(words, function (s, i) {
+                    var a = Math.random() * Math.PI * 2;
+                    var d = 22 + Math.random() * 46;
+                    s.style.setProperty('--dx', (Math.cos(a) * d).toFixed(1) + 'px');
+                    s.style.setProperty('--dy', (Math.sin(a) * d - 12).toFixed(1) + 'px');
+                    s.style.setProperty('--rot', (Math.random() * 120 - 60).toFixed(0) + 'deg');
+                    s.style.animationDelay = (i * 0.018).toFixed(3) + 's';
+                    s.classList.add('cc-out');
+                });
+            }
+            b.classList.add('cc-dissolve');
+            starBurst(b);
+            setTimeout(function () { row.remove(); }, idx === olds.length - 1 ? 620 : 260);
+        });
+    }
+    /* حباب کاربر — کلمات جدا تا هنگام واپاشی ذره‌ذره شوند */
+    function addBubbleMe(text) {
         var row = document.createElement('div');
-        row.className = 'cc-msg cc-msg--' + (role === 'user' ? 'me' : 'ai');
-        var b = document.createElement('div');
-        b.className = 'cc-bubble';
-        b.textContent = text;
-        row.appendChild(b);
+        row.className = 'cc-row cc-msg--me';
+        row.innerHTML = '<div class="cc-msg cc-msg--me"><div class="cc-bubble"><span class="cc-words"></span></div></div>';
+        Kinetics.tokens(row.querySelector('.cc-words'), text, { instant: true });
         stream.appendChild(row);
         scrollDown();
-        return b;
     }
-    /* حباب AI با موج نورانی کلمات (باز استفاده از Kinetics.tokens) */
-    function addAiBubble(text, hl) {
+    /* حباب AI — با کلاس cc-row تا جواب بعدی بداند کدام را متلاشی کند */
+    function newAiRow() {
         var row = document.createElement('div');
-        row.className = 'cc-msg cc-msg--ai';
+        row.className = 'cc-row cc-msg--ai';
+        var wrap = document.createElement('div');
+        wrap.className = 'cc-msg cc-msg--ai';
         var b = document.createElement('div');
         b.className = 'cc-bubble';
         var w = document.createElement('span');
         w.className = 'cc-words';
         b.appendChild(w);
-        row.appendChild(b);
+        wrap.appendChild(b);
+        row.appendChild(wrap);
         stream.appendChild(row);
-        Kinetics.tokens(w, text, hl ? { hl: hl } : undefined);
         scrollDown();
+        return { row: row, words: w, bubble: b };
     }
-    /* سه‌نقطه «در حال نوشتن» داخل حباب AI */
     function addTyping() {
-        var row = document.createElement('div');
-        row.className = 'cc-msg cc-msg--ai';
-        row.innerHTML = '<div class="cc-bubble"><span class="k-bounce"><i></i><i></i><i></i></span></div>';
-        stream.appendChild(row);
-        scrollDown();
-        return row;
+        var ai = newAiRow();
+        ai.bubble.innerHTML = '<span class="k-bounce"><i></i><i></i><i></i></span>';
+        ai.words = null;
+        return ai;
     }
 
     var HL = /(ماه|خورشید|مریخ|ونوس|زحل|برج|خانه|نیت|اوراکل|یوگا|تمرین|آسانا|تنفس|مدیتیشن|کارما|سطح)/;
@@ -227,26 +257,32 @@ function makeAstroTalker(stream, greet) {
     }
 
     function ask(text) {
-        addBubble('user', text);
-        var typing = addTyping();
+        /* ۱) جواب قبلی ذره‌ذره می‌شود  ۲) سؤال تازه  ۳) سه‌نقطه  ۴) استریم */
+        dissolveOld();
+        addBubbleMe(text);
+        var live = addTyping();
         var acc = '', got = false;
-        var wordsEl = null, bubbleEl = null;   // حباب زندهٔ استریم
 
-        /* اگر همین نشست چارت گرفته، زمینه‌اش بی‌صدا اضافه می‌شود — کاربر چیزی نمی‌فرستد */
         var ctx = '';
         try { ctx = (window.currentContext || '').slice(0, 2000); } catch (e) {}
         var body = JSON.stringify({ message: text, history: history.slice(-6), context: ctx });
 
-        function settle(reply) {
+        function commit(reply) {
             history.push({ role: 'user', content: text });
             history.push({ role: 'assistant', content: reply });
-            typing.remove();
-            if (bubbleEl) {
-                // متن زنده آمد؛ حالا کلمات با موجِ یک‌دفعه مرتب می‌شوند
-                Kinetics.tokens(wordsEl, reply, { hl: HL, instant: true });
-            } else {
-                addAiBubble(reply, HL);
+        }
+        function finish(reply, wave) {
+            commit(reply);
+            if (!live.words) {                  // حباب هنوز جای typing است → پاک و بازسازی
+                live.bubble.innerHTML = '';
+                var w = document.createElement('span');
+                w.className = 'cc-words';
+                live.bubble.appendChild(w);
+                live.words = w;
             }
+            if (wave) Kinetics.tokens(live.words, reply, { hl: HL });
+            else { live.words.textContent = reply; }
+            scrollDown();
         }
 
         // مرورگر/بیلد قدیمی بدون پشتیبانی استریم → JSON معمولی
@@ -255,8 +291,8 @@ function makeAstroTalker(stream, greet) {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body
             })
             .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('http')); })
-            .then(function (d) { settle((d && d.reply) || 'کیهان پاسخی نداشت — دوباره بپرس ✦'); })
-            .catch(function () { settle(fallbackReply(text)); });
+            .then(function (d) { finish((d && d.reply) || 'کیهان پاسخی نداشت — دوباره بپرس ✦', true); })
+            .catch(function () { finish(fallbackReply(text), true); });
             return;
         }
 
@@ -269,39 +305,38 @@ function makeAstroTalker(stream, greet) {
                 acc += piece;
                 if (!got) {
                     got = true;
-                    typing.remove();
-                    var row = document.createElement('div');
-                    row.className = 'cc-msg cc-msg--ai';
-                    bubbleEl = document.createElement('div');
-                    bubbleEl.className = 'cc-bubble';
-                    wordsEl = document.createElement('span');
-                    wordsEl.className = 'cc-words';
-                    bubbleEl.appendChild(wordsEl);
-                    row.appendChild(bubbleEl);
-                    stream.appendChild(row);
+                    /* typing جایش را به حباب زنده می‌دهد */
+                    live.words = live.row.querySelector('.cc-words') ||
+                        (function () {
+                            var b = live.row.querySelector('.cc-bubble');
+                            b.innerHTML = '';
+                            var w = document.createElement('span');
+                            w.className = 'cc-words';
+                            b.appendChild(w);
+                            return w;
+                        })();
                 }
-                wordsEl.textContent = acc;   // متنِ زنده، بدون انیمیشنِ کلمه‌ای
+                live.words.textContent = acc;
                 scrollDown();
             });
         })
         .then(function () {
-            if (!acc) { if (typing.parentNode) typing.remove(); addAiBubble('کیهان پاسخی نداشت — دوباره بپرس ✦', HL); return; }
-            settle(acc);
+            if (!acc) { finish('کیهان پاسخی نداشت — دوباره بپرس ✦', true); return; }
+            commit(acc);
+            /* متن زنده خوانده شده — فقط هایلایتِ کلمات کلیدی، بدون موجِ دوباره */
+            Kinetics.tokens(live.words, acc, { hl: HL, instant: true });
+            scrollDown();
         })
         .catch(function () {
-            if (typing.parentNode) typing.remove();
-            if (got && acc) { settle(acc); }          // نصفه آمده — همان را نگه می‌داریم
-            else settle(fallbackReply(text));
+            if (acc) { commit(acc); }
+            else finish(fallbackReply(text), true);
         });
     }
-    if (greet) addAiBubble('سلام — کاسمیک اوراکل در خدمتِ پرسش‌های کیهانی و یوگاییِ توست ✦', /(اوراکل|کیهانی|یوگا)/);
+    if (greet) {
+        var ai = newAiRow();
+        Kinetics.tokens(ai.words, 'سلام — کاسمیک اوراکل در خدمتِ پرسش‌های کیهانی و یوگاییِ توست ✦', { hl: /(اوراکل|کیهانی|یوگا)/ });
+    }
     return { ask: ask, history: history };
-}
-
-function wireComposer(root) {
-    var stream = root.querySelector('#kxStream');
-    var talker = makeAstroTalker(stream, true);
-    Kinetics.mountComposer(root.querySelector('#kxComposer'), { onSubmit: talker.ask });
 }
 
 /* ── B) bento فال امروز — از سرویس تاروت ── */

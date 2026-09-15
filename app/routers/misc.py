@@ -4,10 +4,13 @@ Miscellaneous endpoints.
 Health check and status probes only.
 """
 
+import asyncio
 from logging import getLogger
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
+from ..config.database import engine
 from ..config.settings import settings
 from ..types.response_models import (
     StatusResponseModel,
@@ -29,13 +32,25 @@ async def health() -> JSONResponse:
     """
     **GET** `/health`
 
-    Public liveness probe for load balancers and monitoring.
-    This endpoint is excluded from authentication.
+    Liveness + shallow DB probe for load balancers and monitoring.
+    Returns 200 `{"status":"OK"}` only when SQLite answers within 3s;
+    otherwise 503 `degraded` (so deploy health-checks catch a dead DB).
 
     **Returns:**
-    - `status`: "OK"
+    - `status`: "OK" | "degraded"
     """
-    return JSONResponse(content={"status": "OK"}, status_code=200)
+    try:
+        async def _db_ok() -> None:
+            async with engine.connect() as conn:
+                await conn.execute(text("SELECT 1"))
+        await asyncio.wait_for(_db_ok(), timeout=3.0)
+        return JSONResponse(content={"status": "OK"}, status_code=200)
+    except Exception as exc:
+        logger.warning("Health check DB probe failed: %s", exc)
+        return JSONResponse(
+            content={"status": "degraded", "checks": {"db": "unreachable"}},
+            status_code=503,
+        )
 
 
 @router.get(

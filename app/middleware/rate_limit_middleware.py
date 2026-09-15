@@ -307,13 +307,25 @@ _guest_cleanup_time = 0
 
 
 def _get_guest_ip(scope):
-    """Extract client IP from ASGI scope"""
+    """Extract client IP from ASGI scope.
+
+    ⚠ X-Forwarded-For فقط وقتی معتبر است که اتصال از خودِ پراکسی/لوکال‌هاست
+    بیاید (Railway/نُرمُد). درغیراین‌ها هدر جعلی نمی‌تواند محدودیت مهمان را
+    دور بزند — client واقعی ملاک است.
+    """
+    import ipaddress
+
+    client = scope.get("client")
+    peer = client[0] if client else None
     headers = dict(scope.get("headers", []))
     forwarded = headers.get(b"x-forwarded-for", b"").decode()
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    client = scope.get("client")
-    return client[0] if client else "unknown"
+    if forwarded and peer:
+        try:
+            if ipaddress.ip_address(peer).is_private or peer in ("127.0.0.1", "::1", "localhost"):
+                return forwarded.split(",")[0].strip()
+        except ValueError:
+            pass
+    return peer or "unknown"
 
 
 def _guest_key(ip):

@@ -12,7 +12,7 @@ var C = window.YogaCore;
 var allPoses = [], filteredPoses = [], poseMap = {};
 var currentView = 'grid', showTertiary = false, currentSort = 'name_fa';
 var currentFilters = { difficulty: [], subcategory: [], category: [], visibility: [], search: '' };
-var _inited = false, _activeTab = 'library', _dataLoaded = false;
+var _inited = false, _activeTab = 'daily', _dataLoaded = false;
 var activeDetailPose = null, activeDetailSide = 'R';
 var _smartOn = false, _smartSnapshot = null, _smartProfile = null;
 var SMART_LS = 'yoga_smart_on';
@@ -598,6 +598,30 @@ function renderDailyPanel() {
     if (tmax) maxDiff = tmax;
 
     var html = '<div class="yoga-daily">';
+
+    /* پیام خوش‌آمدِ کوتاه، وابسته به روز هفته + نام کاربر (یا «مهمان») */
+    var dayIdx = new Date().getDay();
+    var DAY_WELCOME = [
+        'یکشنبه‌ت پر از آرامش — یه کششِ ملایم حالتِ امروزت رو می‌سازه.',
+        'دوشنبه، شروعِ خوب هفته؛ بدنت تشکر می‌کنه.',
+        'سه‌شنبه‌ی پرانرژی! یه جلسهٔ کوتاه کافیه.',
+        'چهارشنبه، نصفهٔ راه؛ یه نفسِ عمیق بگیر.',
+        'پنجشنبه‌ی درخشون — بدنت آمادهٔ حرکته.',
+        'جمعه‌ت آروم و ترمیمی؛ یوگای یین پیشنهاد می‌شه.',
+        'شنبه‌ت سرشار از قدرت؛ یه تمرینِ ایستاده عالی می‌شه.'
+    ];
+    var weekdayFa = '';
+    try { weekdayFa = new Intl.DateTimeFormat('fa-IR', { weekday: 'long' }).format(new Date()); } catch (e) {}
+    var uname = 'مهمان';
+    try {
+        var cu = JSON.parse(localStorage.getItem('cosmic_user') || '{}');
+        if (cu && (cu.display_name || cu.name)) uname = cu.display_name || cu.name;
+    } catch (e) {}
+    html += '<div class="yoga-welcome">🙏 <b>' + C.esc(uname) + '</b>، '
+          + C.esc(DAY_WELCOME[dayIdx] || 'خوش آمدید')
+          + (weekdayFa ? ' <span class="yoga-welcome-day">' + C.esc(weekdayFa) + '</span>' : '')
+          + '</div>';
+
     html += '<div class="yoga-daily-stats">';
     html += '<div class="yoga-stat"><div class="yoga-stat-num">' + C.faNum(practice.streak) + '</div><div class="yoga-stat-label">🔥 روز متوالی</div></div>';
     html += '<div class="yoga-stat"><div class="yoga-stat-num">' + C.faNum(practice.totalSessions) + '</div><div class="yoga-stat-label">🧘 جلسه</div></div>';

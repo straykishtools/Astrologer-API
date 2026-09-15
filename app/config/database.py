@@ -30,12 +30,17 @@ class Base(DeclarativeBase):
     """Declarative base for all ORM models in the Cosmic Oracle database."""
 
 
-# Enable SQLite foreign-key enforcement (off by default in SQLite).
+# SQLite tuning: foreign keys + WAL + busy_timeout.
+# WAL خواندن/نوشتن همزمان را قفل نمی‌کند و busy_timeout مهلت انتظار می‌دهد؛
+# بدون این، چند کاربر همزمان (ثبت‌نام/ذخیره چارت) با «database is locked» روبرو می‌شدند.
 @event.listens_for(engine.sync_engine, "connect")
-def _enable_sqlite_fks(dbapi_connection, connection_record):
+def _sqlite_pragmas(dbapi_connection, connection_record):
     try:
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.execute("PRAGMA busy_timeout=5000")
         cursor.close()
     except Exception:
         pass

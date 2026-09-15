@@ -36,6 +36,16 @@ from .utils.validation_helpers import format_extra_field_error
 logging.config.dictConfig(settings.LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
+# ─── Sentry (اختیاری) — فقط اگر SENTRY_DSN ست باشد فعال می‌شود ───
+_sentry_dsn = os.getenv("SENTRY_DSN", "").strip()
+if _sentry_dsn:
+    try:
+        import sentry_sdk
+        sentry_sdk.init(dsn=_sentry_dsn, traces_sample_rate=0.1)
+        logger.info("Sentry error tracking enabled.")
+    except ImportError:
+        logger.warning("SENTRY_DSN set but sentry-sdk not installed — error tracking disabled.")
+
 # ============================================
 # ساخت اپلیکیشن FastAPI
 # ============================================
@@ -177,9 +187,8 @@ async def serve_yoga_cue(key: str):
     )
 
 
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
+# توجه: /health واقعی در app/routers/misc.py ثبت شده (با چک DB) — این مسیر
+# به دلیل ثبت‌شدن زودترِ روتر هیچ‌وقت فراخوانی نمی‌شد و حذف گردید.
 
 
 @app.get("/api/v5/rate-limits", tags=["Info"])
@@ -294,7 +303,9 @@ _cors_origins = settings.allowed_cors_origins or [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8000",
 ]
-if settings.debug and "*" not in _cors_origins:
+# ⚠ wildcard فقط در محیط غیرتولیدی: اگر debug در prod اشتباهاً true شود
+# (env فراموش‌شده)، باز هم * اضافه نمی‌شود
+if settings.debug and str(getattr(settings, "env_type", "")) not in ("production", "prod") and "*" not in _cors_origins:
     _cors_origins.append("*")
 
 app.add_middleware(

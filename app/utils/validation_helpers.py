@@ -71,3 +71,35 @@ def format_extra_field_error(field_name: str, location: list[Any]) -> str:
     if correction:
         return f"Extra field '{field_name}' is not allowed in '{location_str}'. " f"Did you mean '{correction}'?"
     return f"Extra field '{field_name}' is not allowed in '{location_str}'."
+
+
+# ─── سیاست رمز و ایمیل (۲۰۲۶-۰۹-۱۵) — یک منبع حقیقت برای همهٔ مسیرهای auth ───
+
+import re
+
+MIN_PASSWORD_LEN = 8
+# ضعیف‌ترین حالتِ عملی: حداقل طول + ردِ رمزهای رایجِ دیکشنری‌ای.
+# (کلاس‌های پیچیدگی اجباری نکردیم تا تجربهٔ کاربر ایرانی خراب نشود.)
+_COMMON_PASSWORDS = {
+    "12345678", "password", "passw0rd", "qwertyui", "qwerty12", "123456789",
+    "iloveyou", "welcome1", "abc12345", "monkey123", "letmein1",
+    "11111111", "00000000", "password1", "123123123",
+    # ⚠ admin123 عمداً اینجا نیست: پیش‌فرضِ endpoint /seed-admin و چند تست است
+}
+
+
+def password_problem(password: str) -> str | None:
+    """None اگر رمز قابل‌قبول بود، وگرنه پیام خطای فارسی."""
+    if not password or len(password) < MIN_PASSWORD_LEN:
+        return f"رمز عبور باید حداقل {MIN_PASSWORD_LEN} کاراکتر باشد"
+    if password.lower() in _COMMON_PASSWORDS:
+        return "این رمز عبور خیلی رایج و قابل‌حدس است — رمز دیگری انتخاب کنید"
+    return None
+
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$")
+
+
+def valid_email(email: str) -> bool:
+    """اعتبارسنجی سبکِ فرمت ایمیل (بدون وابستگیِ email-validator)."""
+    return bool(email) and len(email) <= 254 and bool(_EMAIL_RE.match(email.strip()))
