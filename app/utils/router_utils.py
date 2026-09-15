@@ -543,11 +543,143 @@ def context_payload(chart_data) -> dict:
     Returns:
         dict: The response payload containing status, context, and chart_data.
     """
+    xml = to_context(chart_data)
+    brief = build_chart_brief(chart_data)
     return {
         "status": "OK",
-        "context": to_context(chart_data),
+        # ⚠ ai_brief اول context می‌آید: مسیر چت آن را به ۲۰۰۰ کاراکتر برش
+        # می‌زند و زوایا/توزیع‌ها در انتهای XML خام همیشه دور ریخته می‌شدند
+        "context": (brief + "\n" if brief else "") + xml,
         "chart_data": dump(chart_data),
     }
+
+
+# ─── ai_brief — خلاصه تحلیلی فشرده ابتدای context (۲۰۲۶-۰۹-۱۵) ───
+# kerykeion زوایا و توازن عنصر/کیفیت را محاسبه می‌کند ولی آخر XML خام
+# می‌گذاردشان (از دیدِ مدل بریده‌شدنی)؛ حاکم چارت و خانه‌های خالی هم هیچ‌جا
+# نیستند. این تابع هر دو را از همان داده‌های ازپیش‌حساب‌آمده بیرون می‌کشد.
+
+_TRAD_RULERS = {
+    0: ("Mars", None), 1: ("Venus", None), 2: ("Mercury", None), 3: ("Moon", None),
+    4: ("Sun", None), 5: ("Mercury", None), 6: ("Venus", None), 7: ("Mars", "Pluto"),
+    8: ("Jupiter", None), 9: ("Saturn", None), 10: ("Saturn", "Uranus"), 11: ("Jupiter", "Neptune"),
+}
+_SIGN_WORDS = (
+    "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+)
+_HOUSE_WORDS = (
+    "", "First", "Second", "Third", "Fourth", "Fifth", "Sixth",
+    "Seventh", "Eighth", "Ninth", "Tenth", "Eleventh", "Twelfth",
+)
+_HOUSE_NUM = {w: i for i, w in enumerate(_HOUSE_WORDS) if i}
+_MAJOR_ASPECTS = {"conjunction", "opposition", "trine", "square", "sextile"}
+_OCCUPANT_ATTRS = (
+    "sun", "moon", "mercury", "venus", "mars",
+    "jupiter", "saturn", "uranus", "neptune", "pluto",
+)
+
+
+def _brief_sign(point) -> str:
+    num = getattr(point, "sign_num", None)
+    if isinstance(num, int) and 0 <= num <= 11:
+        return _SIGN_WORDS[num]
+    return str(getattr(point, "sign", "?"))
+
+
+def _brief_house(point):
+    h = getattr(point, "house", None)
+    if not h:
+        return None
+    word = str(h).split(".")[-1].split("_")[0]
+    return _HOUSE_NUM.get(word)
+
+
+def build_chart_brief(chart_data) -> str:
+    """بلوک XML فشرده (<ai_brief>) با داده‌ای که مدل باید ببیند:
+    زوایای اصلیِ واقعی (سبک‌ترین اُرب‌ها)، سه‌گانه، حاکم چارت،
+    توازن عنصر/کیفیت، خانه‌های خالی + حاکم‌شان، امتیاز رابطه (دوالی).
+    هیچ‌وقت خطا نمی‌دهد — در بدترین حالت "" برمی‌گرداند."""
+    try:
+        lines = ["<ai_brief>"]
+
+        majors = [a for a in (getattr(chart_data, "aspects", None) or [])
+                  if str(a.aspect).lower() in _MAJOR_ASPECTS]
+        majors.sort(key=lambda a: abs(a.orbit))
+        if majors:
+            items = []
+            for a in majors[:14]:
+                mv = str(a.aspect_movement or "").lower()
+                if mv.startswith("appl"):
+                    tag = " applying"
+                elif mv.startswith("separ"):
+                    tag = " separating"
+                else:  # static و حالت‌های ناشناخته
+                    tag = ""
+                if a.p1_owner and a.p2_owner and a.p1_owner != a.p2_owner:
+                    pair = f"{a.p1_owner}'s {a.p1_name} - {a.p2_owner}'s {a.p2_name}"
+                else:
+                    pair = f"{a.p1_name}-{a.p2_name}"
+                items.append(f"{pair} {str(a.aspect).lower()} orb {abs(a.orbit):.1f}°{tag}")
+            lines.append("aspects_top: " + "; ".join(items))
+
+        subject = getattr(chart_data, "subject", None)
+        if subject is not None:
+            sun = getattr(subject, "sun", None)
+            moon = getattr(subject, "moon", None)
+            asc = getattr(subject, "ascendant", None)
+            if sun is not None and moon is not None and asc is not None:
+                lines.append(
+                    f"big_three: Sun {_brief_sign(sun)} H{_brief_house(sun)} | "
+                    f"Moon {_brief_sign(moon)} H{_brief_house(moon)} | "
+                    f"Ascendant {_brief_sign(asc)}"
+                )
+                sign_num = getattr(asc, "sign_num", None)
+                if isinstance(sign_num, int) and 0 <= sign_num <= 11:
+                    ruler_name, modern = _TRAD_RULERS[sign_num]
+                    ruler = getattr(subject, ruler_name.lower(), None)
+                    extra = f" (modern: {modern})" if modern else ""
+                    pos = (f" in {_brief_sign(ruler)}, H{_brief_house(ruler)}" if ruler is not None else "")
+                    lines.append(f"chart_ruler: {ruler_name}{extra}{pos}")
+
+                occupied = set()
+                for attr in _OCCUPANT_ATTRS:
+                    p = getattr(subject, attr, None)
+                    if p is not None:
+                        hn = _brief_house(p)
+                        if hn:
+                            occupied.add(hn)
+                empties = []
+                for n in range(1, 13):
+                    if n in occupied:
+                        continue
+                    hp = getattr(subject, _HOUSE_WORDS[n].lower() + "_house", None)
+                    if hp is not None:
+                        rn, _m = _TRAD_RULERS.get(getattr(hp, "sign_num", 0) or 0, ("?", None))
+                        empties.append(f"H{n} {_brief_sign(hp)} ruler {rn}")
+                lines.append("empty_houses: " + (", ".join(empties) if empties else "none"))
+
+        ed = getattr(chart_data, "element_distribution", None)
+        if ed is not None:
+            lines.append(
+                f"element_balance: Fire {ed.fire_percentage}% Earth {ed.earth_percentage}% "
+                f"Air {ed.air_percentage}% Water {ed.water_percentage}%"
+            )
+        qd = getattr(chart_data, "quality_distribution", None)
+        if qd is not None:
+            lines.append(
+                f"quality_balance: Cardinal {qd.cardinal_percentage}% "
+                f"Fixed {qd.fixed_percentage}% Mutable {qd.mutable_percentage}%"
+            )
+        rs = getattr(chart_data, "relationship_score", None)
+        if rs is not None:
+            lines.append(f"relationship_score: {rs.score_value}/44 {rs.score_description}")
+
+        lines.append("</ai_brief>")
+        return "\n".join(lines)
+    except Exception as exc:  # هرگز context اصلی را فدای خلاصه نکن
+        logger.warning("ai_brief build failed: %s", exc)
+        return ""
 
 
 def _classify_geonames_error(message: str) -> Optional[str]:
