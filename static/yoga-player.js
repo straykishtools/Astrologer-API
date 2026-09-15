@@ -86,6 +86,27 @@ function practiceDesc(p) {
     if (p.description && !BAD_NAME_RX.test(p.description) && /[؀-ۿ]/.test(p.description)) return p.description;
     return p.description || '';
 }
+/* عنوان + توضیح فارسی تمرین — همان ملاک تب «جلسه تمرین». اگر API نام/توضیح
+   انگلیسی یا ترجمه‌ی ماشینی داد، نام از PRACTICE_NAME_FA و توضیح عمومیِ فارسی
+   از سبک/مدت/تعداد حرکت ساخته می‌شود (برای تب روزانه و جاهای مشترک). */
+function hasFa(t) { return /[؀-ۿ]/.test(String(t || '')); }
+function practiceFaTexts(p) {
+    var title = practiceTitle(p) || (p && p.name) || 'تمرین یوگا';
+    var desc = practiceDesc(p);
+    if (!hasFa(title) && p) {
+        title = (p.style && STYLE_FA[p.style]) ? ('جلسهٔ ' + STYLE_FA[p.style]) : 'جلسهٔ تمرین یوگا';
+    }
+    if (!hasFa(desc)) {
+        var parts = [];
+        if (p && p.style && STYLE_FA[p.style]) parts.push('سبک ' + STYLE_FA[p.style]);
+        var mins = (p && p.durations && p.durations[0]) || 30;
+        parts.push(faNum(mins) + ' دقیقه');
+        if (p && p.poseCount) parts.push(faNum(p.poseCount) + ' حرکت');
+        desc = 'جلسهٔ آمادهٔ تمرین — ' + parts.join(' · ') +
+            '. با «پیش‌نمایش» حرکات را ببینید، سپس تمرین را در استودیو کلاسیک شروع کنید.';
+    }
+    return { title: title, desc: desc };
+}
 
 function esc(s) {
     return String(s == null ? '' : s)
@@ -810,7 +831,7 @@ var PracticeUI = {
                     lock +
                 '</div>' +
                 '<div class="yp-card-meta">' + style + lvls + '</div>' +
-                '<div class="yp-card-desc">' + esc(practiceDesc(p).slice(0, 110)) + (practiceDesc(p).length > 110 ? '…' : '') + '</div>' +
+                '<div class="yp-card-desc">' + esc(practiceDesc(p)) + '</div>' +
                 '<div class="yp-card-foot">' +
                     '<span class="yp-card-dur">' + esc((p.durations || []).map(function (d) { return faNum(d); }).join('، ') + ' دقیقه') + '</span>' +
                     instr +
@@ -1317,7 +1338,7 @@ var CoachUI = {
             return '<div class="yp-coach-card" data-yp-coach-card="' + esc(p.name) + '">' +
                 (thumb ? '<div class="yp-card-thumb" style="background-image:url(\'' + esc(thumb) + '\')"></div>' : '') +
                 '<div class="yp-card-name">🧘 ' + esc(practiceTitle(p)) + '</div>' +
-                '<div class="yp-card-desc">' + esc(practiceDesc(p).slice(0, 110)) + (practiceDesc(p).length > 110 ? '…' : '') + '</div>' +
+                '<div class="yp-card-desc">' + esc(practiceDesc(p)) + '</div>' +
                 '<div class="yp-card-meta">' +
                     (STYLE_FA[p.style] ? '<span class="yp-chip">' + esc(STYLE_FA[p.style]) + '</span>' : '') +
                     '<span class="yp-chip">' + esc((p.durations || []).map(faNum).join('/')) + ' دقیقه</span>' +
@@ -1536,6 +1557,7 @@ window.YogaSessionPlayer = YogaSessionPlayer;
 window.YogaPracticeUI = PracticeUI;
 window.YogaCoachUI = CoachUI;
 window.yogaPracticeImage = practiceImage;   /* تصویر نماینده تمرین — برای تب روزانه */
+window.yogaPracticeFa = practiceFaTexts;    /* عنوان + توضیح فارسی تمرین */
 
 /* «وارد شوید» در کارت پایان تمرین — مودال لاگین را همان‌جا باز می‌کند
    و پس از لاگین، پنل مربی/تمرین را دوباره رندر می‌کند تا آمار و استریک ظاهر شود */

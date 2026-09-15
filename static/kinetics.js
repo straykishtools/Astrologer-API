@@ -237,7 +237,14 @@ function tokens(host, str, opts) {
         var s = document.createElement('span');
         s.textContent = w;
         if (opts.hl && opts.hl.test && opts.hl.test(w)) s.classList.add('hl');
-        s.style.animationDelay = (i * step).toFixed(3) + 's';
+        if (opts.instant) {          // متن قبلاً دیده شده — فقط هایلایت، بدون موج
+            s.style.animation = 'none';
+            s.style.opacity = '1';
+            s.style.filter = 'none';
+            s.style.transform = 'none';
+        } else {
+            s.style.animationDelay = (i * step).toFixed(3) + 's';
+        }
         host.appendChild(s);
         /* فاصلهٔ واقعی بین کلمات: وابسته به CSS نبودن + کپی‌پیست درست
            (در کانتینر flex با gap، گره‌های صرفاً-فاصله رندر نمی‌شوند) */

@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from logging import getLogger
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.responses import StreamingResponse
 import os
 import httpx
 from pydantic import BaseModel
@@ -248,6 +249,36 @@ class AnalysisRequest(BaseModel):
     vedic_summary: str = ""
 
 
+def _analysis_prompt(request: AnalysisRequest) -> str:
+    return f"""
+You are an experienced Vedic astrologer. Write a warm, simple, and concrete Persian (Farsi) analysis of the birth chart below.
+
+**Raw Chart Data:**
+{request.context}
+
+{request.vedic_summary}
+
+Output HTML with exactly these 5 short sections (no intro, no repetition, no generic filler — every sentence must refer to THIS chart):
+
+<h4>🌟 شخصیت و روان</h4> (برج خورشید، ماه، رایزینگ — حداکثر ۴ جمله)
+<h4>💼 شغل و تحصیل</h4> (خانه ۱۰، ۶، ۲ + مریخ و خورشید)
+<h4>❤️ عشق و روابط</h4> (خانه ۷ و ۵ + ماه و ونوس)
+<h4>⛰️ چالش و فرصت</h4> (سیارات دشوار و نحوهٔ تبدیلشان به فرصت)
+<h4>✨ جمع‌بندی</h4> (۳ توصیهٔ عملی + یک جملهٔ امیدبخش)
+
+Keep the ENTIRE analysis under 500 Persian words. Tone: friendly, non-judgmental, no absolute predictions.
+"""
+
+
+def _analysis_models() -> list:
+    """هم مدل‌های تحلیل (primary + fallback) — استریم و غیراستریم یکی‌اند."""
+    models = [{"name": os.getenv("AI_MODEL", "qwen3.8-flash"), "max_tokens": 4096}]
+    fb = os.getenv("AI_MODEL_FALLBACK", "")   # qwen3.8-flash + میمو (mimo)
+    if fb and fb != models[0]["name"]:
+        models.append({"name": fb, "max_tokens": 4096})
+    return models
+
+
 def _extract_analysis_content(response_text: str) -> str:
     """
     Extract the assistant content from an OpenAI-compatible response.
@@ -299,21 +330,52 @@ def _extract_analysis_content(response_text: str) -> str:
     return ""
 
 
-def _sanitize_ai_text(content: str, *, strip_tags: bool = False) -> str:
+def _sanitize_ai_text(content: str, mode: str = "chat") -> str:
     """تمیزکاری خروجی مدل برای فارسی.
 
     ⚠ برخی مدل‌ها (qwen/میمو) به‌جای فاصله «_» می‌گذارند؛ حذفِ مستقیمِ _
     کلمات فارسی را به هم می‌چسباند → اول تبدیل به فاصله، بعد حذف مارک‌داون.
-    strip_tags: برای چت (رندرِ متن‌خالص) برچسب‌های HTML هم پاک می‌شوند؛
-    برای تحلیل چارت نه چون خروجی با innerHTML نشان داده می‌شود.
+
+    mode="chat"      : رندر متن‌خالص → برچسب‌های HTML و کاراکترهای مارک‌داون پاک می‌شوند.
+    mode="analysis"  : خروجی با innerHTML رندر می‌شود → فقط «_»→فاصله؛
+                       حذف > یا # تگ‌های HTML و رنگ‌های hex را می‌شکست.
     """
     import re as _re
-    if strip_tags:
-        content = _re.sub(r"<[^>]+>", " ", content)
     content = content.replace("_", " ")
-    content = _re.sub(r"[#*`>]+", "", content)
+    if mode == "chat":
+        content = _re.sub(r"<[^>]+>", " ", content)
+        content = _re.sub(r"[#*`>]+", "", content)
     content = _re.sub(r"[ \t]{2,}", " ", content)
     return content.strip()
+
+
+def _stream_sanitizer(mode: str = "chat"):
+    """نسخهٔ تکه‌ایِ _sanitize_ai_text برای استریم SSE.
+
+    برچسب‌های <...> می‌توانند روی مرز دو تکه نصفه بمانند، پس با یک
+    state-machine کوچک بین تکه‌ها follow می‌شوند.
+    """
+    state = {"in_tag": False}
+
+    def feed(piece: str) -> str:
+        out = []
+        for ch in piece:
+            if state["in_tag"]:
+                if ch == ">":
+                    state["in_tag"] = False
+                continue
+            if mode == "chat":
+                if ch == "<":
+                    state["in_tag"] = True
+                    continue
+                if ch in "#*`>":
+                    continue
+            if ch == "_":
+                ch = " "
+            out.append(ch)
+        return "".join(out)
+
+    return feed
 
 
 def _is_valid_analysis(content: str) -> bool:
@@ -339,47 +401,118 @@ def _is_valid_analysis(content: str) -> bool:
     return True
 
 
-async def _call_model(client, api_key, prompt, model, messages=None):
-    """Call a single model. Prefers the direct AI provider configured via
-    env (AI_API_BASE + AI_API_KEY + AI_MODEL), falls back to the local
-    proxy when only DEEPSEEK_API_KEY is set. If `messages` is given, it is
-    used verbatim (conversation/chat); otherwise the astrologer-analysis
-    system+user pair is built from `prompt`."""
+def _model_request(api_key, model, messages=None, prompt=None, stream=False):
+    """Build (url, headers, payload) for one OpenAI-compatible call.
+    Prefers the direct AI provider configured via env (AI_API_BASE +
+    AI_API_KEY + AI_MODEL), falls back to the local proxy when only
+    DEEPSEEK_API_KEY is set. If `messages` is given, it is used verbatim
+    (conversation/chat); otherwise the astrologer-analysis system+user
+    pair is built from `prompt`. stream=True → SSE mode at the provider."""
     msgs = messages or [
         {"role": "system", "content": "You are a professional astrologer. Write detailed Persian astrological analysis using HTML."},
         {"role": "user", "content": prompt},
     ]
     base = os.getenv("AI_API_BASE")
     if base:
-        # direct provider (OpenAI-compatible)
-        return await client.post(
-            base.rstrip("/") + "/chat/completions",
-            headers={
-                "Authorization": f"Bearer {os.getenv('AI_API_KEY', api_key)}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": model["name"],   # نام مدل از فراخوان می‌آید (AI_MODEL/AI_MODEL_FALLBACK)
-                "messages": msgs,
-                "temperature": 0.75,
-                "max_tokens": model["max_tokens"],
-                "stream": False,
-            }
-        )
-    # legacy local proxy path
-    return await client.post(
-        "http://localhost:20128/v1/chat/completions",
-        headers={
+        url = base.rstrip("/") + "/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {os.getenv('AI_API_KEY', api_key)}",
+            "Content-Type": "application/json",
+        }
+    else:
+        url = "http://localhost:20128/v1/chat/completions"
+        headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-        },
-        json={
-            "model": model["name"],
-            "messages": msgs,
-            "temperature": 0.75,
-            "max_tokens": model["max_tokens"],
-            "stream": False,
         }
+    payload = {
+        "model": model["name"],   # نام مدل از فراخوان می‌آید (AI_MODEL/AI_MODEL_FALLBACK)
+        "messages": msgs,
+        "temperature": 0.75,
+        "max_tokens": model["max_tokens"],
+        "stream": stream,
+    }
+    return url, headers, payload
+
+
+async def _call_model(client, api_key, prompt, model, messages=None):
+    url, headers, payload = _model_request(api_key, model, messages, prompt)
+    return await client.post(url, headers=headers, json=payload)
+
+
+# read=150s: مدل‌های reasoning ممکن است پیش از اولین توکن بی‌صدا «فکر» کنند
+_STREAM_TIMEOUT = httpx.Timeout(240.0, connect=15.0, read=150.0)
+
+
+async def _sse_relay(models, *, messages=None, prompt=None, mode="chat"):
+    """SSE relay: opens a streaming call to the model(s) and re-emits
+    sanitized text pieces as `data: {"c": ...}` lines, then
+    `data: {"done": true, "model": ...}` (or `{"err": ...}` if nothing
+    streamed at all). Falls over to the next model only if the previous
+    one failed before its first piece."""
+    import json as _json
+    api_key = os.getenv("AI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
+    got = False
+
+    def evt(obj):
+        return "data: " + _json.dumps(obj, ensure_ascii=False) + "\n\n"
+
+    for m in models:
+        # sanitizerِ تازه برای هر مدل: اگر مدلی قبل از اولین تکهٔ موفق مرد،
+        # stateِ نیمه‌برچسبش نباید تکه‌های مدل بعدی را ببلعد
+        feed = _stream_sanitizer(mode)
+        try:
+            url, headers, payload = _model_request(api_key, m, messages, prompt, stream=True)
+            async with httpx.AsyncClient(timeout=_STREAM_TIMEOUT, follow_redirects=True) as client:
+                async with client.stream("POST", url, headers=headers, json=payload) as resp:
+                    if resp.status_code != 200:
+                        logger.warning("[SSE] %s -> HTTP %s", m["name"], resp.status_code)
+                        continue
+                    async for line in resp.aiter_lines():
+                        if not line.startswith("data:"):
+                            continue
+                        data = line[5:].strip()
+                        if data == "[DONE]":
+                            break
+                        try:
+                            chunk = _json.loads(data)
+                        except Exception:
+                            continue
+                        choice = (chunk.get("choices") or [{}])[0]
+                        delta = choice.get("delta") or {}
+                        piece = delta.get("content") or (choice.get("message") or {}).get("content") or ""
+                        if not piece:
+                            continue
+                        clean = feed(piece)
+                        if not clean:
+                            continue
+                        got = True
+                        yield evt({"c": clean})
+            if got:
+                yield evt({"done": True, "model": m["name"]})
+                return
+        except Exception as e:
+            logger.warning("[SSE] %s: %s", m["name"], type(e).__name__)
+            if got:   # نصفِ پاسخ رفته — عوض‌کردن مدل یعنی متن دوتایی
+                yield evt({"done": True, "model": m["name"], "partial": True})
+                return
+    if not got:
+        yield evt({"err": "پاسخ از هوش مصنوعی دریافت نشد"})
+
+
+@router.post("/api/v5/deepseek-analysis/stream")
+async def analyze_chart_stream(request: AnalysisRequest):
+    """نسخهٔ استریمیِ تفسیر چارت — HTML تکه‌تکه می‌آید و مرورگر
+    همان لحظه نشان می‌دهد؛ پایان «در حال دریافت تفسیر…» همین‌جا است."""
+    api_key = os.getenv("AI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="سرویس تحلیل هوش مصنوعی پیکربندی نشده است")
+    if not (request.context or "").strip():
+        raise HTTPException(status_code=422, detail="context خالی است")
+    return StreamingResponse(
+        _sse_relay(_analysis_models(), prompt=_analysis_prompt(request), mode="analysis"),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
@@ -394,52 +527,12 @@ async def analyze_chart(request: AnalysisRequest):
     if not api_key:
         raise HTTPException(status_code=503, detail="سرویس تحلیل هوش مصنوعی پیکربندی نشده است")
 
-    prompt = f"""
-You are an experienced astrologer specializing in Vedic astrology.
+    prompt = _analysis_prompt(request)
 
-Based on the birth chart data below, write a complete, accurate, and readable analysis in Persian (Farsi).
+    models = _analysis_models()
 
-**IMPORTANT:** Write simply and clearly so everyone can understand.
-
-**Raw Chart Data:**
-{request.context}
-
-{request.vedic_summary}
-
----
-
-## Analysis Structure:
-
-### 1. General Personality and Psychological Traits
-Based on Sun, Moon, and Rising sign
-
-### 2. Career and Education
-Based on Sun, Mars, Houses 10, 6, 2
-
-### 3. Romantic and Social Relationships
-Based on Moon, Venus, Houses 7, 5, 12
-
-### 4. Challenges and Opportunities
-Challenging planets and ways to turn challenges into opportunities
-
-### 5. Practical Recommendations and Summary
-5 practical tips + inspiring conclusion
-
----
-
-**Notes:** Do not repeat. Use HTML. Keep the tone warm and friendly.
-"""
-
-    models = [
-        {"name": os.getenv("AI_MODEL", "qwen3.8-flash"), "max_tokens": 16384},
-    ]
-    _fb = os.getenv("AI_MODEL_FALLBACK", "")   # ترکیب: qwen3.8-flash + میمو (mimo)
-    if _fb and _fb != models[0]["name"]:
-        models.append({"name": _fb, "max_tokens": 16384})
-
-    # تحلیلِ ۱۶هزارتوکنیِ فارسی روی مدلِ رایگان کند است؛ ۱۸۰ ثانیه کم بود.
-    # timeout تفکیکی: اتصال/خواندنِ اولیه سریع شکست بخورد ولی تولید طولانی جا داشته باشد.
-    _to = httpx.Timeout(300.0, connect=15.0)
+    # timeout تفکیکی: اتصال سریع شکست بخورد ولی تولید طولانی جا داشته باشد
+    _to = httpx.Timeout(180.0, connect=15.0)
     async with httpx.AsyncClient(timeout=_to, follow_redirects=True) as client:
         errors = []
         for model in models:
@@ -465,7 +558,7 @@ Challenging planets and ways to turn challenges into opportunities
                     logger.info("[ANALYSIS] Success with %s (%d chars)", model["name"], len(content))
                     # ⚠ همان تمیزکاریِ چت: «_»های مدل → فاصله، تا کلمات فارسی
                     # به هم نچسبند. HTML حذف نمی‌شود چون خروجی با innerHTML رندر می‌شود.
-                    return {"analysis": _sanitize_ai_text(content, strip_tags=False)}
+                    return {"analysis": _sanitize_ai_text(content, mode="analysis")}
 
                 err_msg = f"{model['name']} -> invalid response ({len(content)} chars)"
                 logger.warning("[ANALYSIS] %s", err_msg)
@@ -510,10 +603,9 @@ ASTRO_SYSTEM = (
 )
 
 
-@router.post("/api/v5/astro-chat")
-async def astro_chat(request: AstroChatRequest):
-    """کوتاه‌مکالمه با اخترشناسِ AI. از همان پروایدر/پراکسیِ تحلیل استفاده می‌کند
-    (env: AI_API_BASE/AI_API_KEY/AI_MODEL یا DEEPSEEK_API_KEY + localhost:20128)."""
+def _chat_request(request: AstroChatRequest):
+    """اعتبارسنجی + ساخت (messages, models) برای چت.
+    بین endpoint معمولی و استریمی مشترک است."""
     api_key = os.getenv("AI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
     if not api_key:
         raise HTTPException(status_code=503, detail="سرویس هوش مصنوعی پیکربندی نشده است")
@@ -539,6 +631,25 @@ async def astro_chat(request: AstroChatRequest):
     _fb = os.getenv("AI_MODEL_FALLBACK", "")   # qwen ↔ میمو — چت هم ترکیبی
     if _fb and _fb != models[0]["name"]:
         models.append({"name": _fb, "max_tokens": 1500})
+    return messages, models, api_key, msg
+
+
+@router.post("/api/v5/astro-chat/stream")
+async def astro_chat_stream(request: AstroChatRequest):
+    """نسخهٔ استریمیِ چت — تکه‌های پاسخ همان لحظهٔ تولید می‌رسند (SSE)."""
+    messages, models, _, _ = _chat_request(request)
+    return StreamingResponse(
+        _sse_relay(models, messages=messages, mode="chat"),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@router.post("/api/v5/astro-chat")
+async def astro_chat(request: AstroChatRequest):
+    """کوتاه‌مکالمه با اخترشناسِ AI. از همان پروایدر/پراکسیِ تحلیل استفاده می‌کند
+    (env: AI_API_BASE/AI_API_KEY/AI_MODEL یا DEEPSEEK_API_KEY + localhost:20128)."""
+    messages, models, api_key, msg = _chat_request(request)
     async with httpx.AsyncClient(timeout=90.0, follow_redirects=True) as client:
         last_err = "ارتباط با مدل برقرار نشد"
         for model in models:
@@ -549,7 +660,7 @@ async def astro_chat(request: AstroChatRequest):
                     last_err = "پاسخ مدل ناموفق بود"
                     continue
                 content = _sanitize_ai_text(
-                    _extract_analysis_content(resp.text), strip_tags=True)
+                    _extract_analysis_content(resp.text), mode="chat")
                 if not content:
                     last_err = "پاسخ مدل خالی بود"
                     continue

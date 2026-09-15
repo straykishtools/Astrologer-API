@@ -766,7 +766,7 @@
 .yp-stat span { font-size: 12px; opacity: .75; }
 .yp-coach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
 .yp-coach-card { background: var(--card-bg, #141a2a); border: 1px solid rgba(184,160,90,.25); border-radius: 12px; padding: 16px; }
-.yp-card-desc { font-size: 12px; opacity: .75; margin: 6px 0 10px; line-height: 1.7; }
+.yp-card-desc { font-size: 12px; opacity: .75; margin: 6px 0 10px; line-height: 1.7; white-space: pre-line; }
 .yp-card-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
 .yp-card-actions { display: flex; gap: 8px; }
 .yp-coach-detail { margin-top: 12px; border-top: 1px dashed rgba(184,160,90,.25); padding-top: 10px; }
@@ -902,7 +902,7 @@
     background: linear-gradient(180deg, transparent 40%, rgba(7,12,31,.55));
 }
 .yp-detail-body { padding: 20px 24px 24px; }
-.yp-detail-desc { font-size: 14px; line-height: 2.1; opacity: .92; margin: 0 0 16px; }
+.yp-detail-desc { font-size: 14px; line-height: 2.1; opacity: .92; margin: 0 0 16px; white-space: pre-line; }
 .yp-detail-stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
 .yp-detail-stat { flex: 1 1 140px; text-align: center; padding: 14px 8px; background: rgba(7,12,31,.45); border: 1px solid var(--line); border-radius: 12px; }
 .yp-detail-stat b { display: block; font-size: 19px; color: var(--gold-300, #b8a05a); }

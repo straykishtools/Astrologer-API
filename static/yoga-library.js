@@ -629,15 +629,18 @@ function renderDailyPanel() {
                 return '<div class="yoga-rec-reason">' + C.esc(r) + '</div>';
             }).join('');
             var recThumb = '';
+            /* عنوان و توضیح همیشه فارسی — اگر API نام انگلیسی داد، از نام/توضیح استاندارد ساخته می‌شود */
+            var faTexts = { title: p.displayName || p.name, desc: p.description || '' };
+            try { if (window.yogaPracticeFa) faTexts = window.yogaPracticeFa(p); } catch (e) {}
             try { if (window.yogaPracticeImage) recThumb = window.yogaPracticeImage(p, 'thumb'); } catch (e) {}
             recBox.innerHTML =
                 '<div class="yoga-rec-card">' +
                     '<div class="yoga-rec-head">' +
                         (recThumb
-                            ? '<div class="yoga-rec-thumb" style="background-image:url(\'' + C.escAttr(recThumb) + '\')" role="img" aria-label="' + C.escAttr(p.displayName || p.name) + '"></div>'
+                            ? '<div class="yoga-rec-thumb" style="background-image:url(\'' + C.escAttr(recThumb) + '\')" role="img" aria-label="' + C.escAttr(faTexts.title) + '"></div>'
                             : '<span class="yoga-rec-emoji">🧘</span>') +
-                        '<div><div class="yoga-rec-name">' + C.esc(p.displayName || p.name) + '</div>' +
-                        '<div class="yoga-rec-meta">' + C.esc((p.description || '').slice(0, 120)) + (p.description && p.description.length > 120 ? '…' : '') + '</div></div>' +
+                        '<div><div class="yoga-rec-name">' + C.esc(faTexts.title) + '</div>' +
+                        '<div class="yoga-rec-meta">' + C.esc(faTexts.desc) + '</div></div>' +
                     '</div>' +
                     '<div class="yoga-rec-durs">' + durHtml + '</div>' +
                     '<div class="yoga-rec-reasons">' + reasonsHtml + '</div>' +

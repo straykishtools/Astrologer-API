@@ -222,29 +222,76 @@ function makeAstroTalker(stream, greet) {
 
     var HL = /(ماه|خورشید|مریخ|ونوس|زحل|برج|خانه|نیت|اوراکل|یوگا|تمرین|آسانا|تنفس|مدیتیشن|کارما|سطح)/;
 
+    function fallbackReply(text) {
+        return 'کیهان در پاسخ به «' + text.slice(0, 24) + '»: امروز انرژیِ ماه را با آرامش پیش ببر ✦';
+    }
+
     function ask(text) {
         addBubble('user', text);
         var typing = addTyping();
+        var acc = '', got = false;
+        var wordsEl = null, bubbleEl = null;   // حباب زندهٔ استریم
 
         /* اگر همین نشست چارت گرفته، زمینه‌اش بی‌صدا اضافه می‌شود — کاربر چیزی نمی‌فرستد */
         var ctx = '';
         try { ctx = (window.currentContext || '').slice(0, 2000); } catch (e) {}
-        fetch('/api/v5/astro-chat', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, history: history.slice(-6), context: ctx })
-        })
-        .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('http')); })
-        .then(function (d) {
-            var reply = (d && d.reply) || '';
-            if (!reply) reply = 'کیهان پاسخی نداشت — دوباره بپرس ✦';
+        var body = JSON.stringify({ message: text, history: history.slice(-6), context: ctx });
+
+        function settle(reply) {
             history.push({ role: 'user', content: text });
             history.push({ role: 'assistant', content: reply });
             typing.remove();
-            addAiBubble(reply, HL);
+            if (bubbleEl) {
+                // متن زنده آمد؛ حالا کلمات با موجِ یک‌دفعه مرتب می‌شوند
+                Kinetics.tokens(wordsEl, reply, { hl: HL, instant: true });
+            } else {
+                addAiBubble(reply, HL);
+            }
+        }
+
+        // مرورگر/بیلد قدیمی بدون پشتیبانی استریم → JSON معمولی
+        if (typeof ReadableStream === 'undefined' || !window.readAIStream) {
+            fetch('/api/v5/astro-chat', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body
+            })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('http')); })
+            .then(function (d) { settle((d && d.reply) || 'کیهان پاسخی نداشت — دوباره بپرس ✦'); })
+            .catch(function () { settle(fallbackReply(text)); });
+            return;
+        }
+
+        fetch('/api/v5/astro-chat/stream', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body
+        })
+        .then(function (r) {
+            if (!r.ok || !r.body) { var e = new Error('http'); e.http = true; throw e; }
+            return readAIStream(r, function (piece) {
+                acc += piece;
+                if (!got) {
+                    got = true;
+                    typing.remove();
+                    var row = document.createElement('div');
+                    row.className = 'cc-msg cc-msg--ai';
+                    bubbleEl = document.createElement('div');
+                    bubbleEl.className = 'cc-bubble';
+                    wordsEl = document.createElement('span');
+                    wordsEl.className = 'cc-words';
+                    bubbleEl.appendChild(wordsEl);
+                    row.appendChild(bubbleEl);
+                    stream.appendChild(row);
+                }
+                wordsEl.textContent = acc;   // متنِ زنده، بدون انیمیشنِ کلمه‌ای
+                scrollDown();
+            });
+        })
+        .then(function () {
+            if (!acc) { if (typing.parentNode) typing.remove(); addAiBubble('کیهان پاسخی نداشت — دوباره بپرس ✦', HL); return; }
+            settle(acc);
         })
         .catch(function () {
-            typing.remove();
-            addAiBubble('کیهان در پاسخ به «' + text.slice(0, 24) + '»: امروز انرژیِ ماه را با آرامش پیش ببر ✦', /(ماه|نیت|آرامش)/);
+            if (typing.parentNode) typing.remove();
+            if (got && acc) { settle(acc); }          // نصفه آمده — همان را نگه می‌داریم
+            else settle(fallbackReply(text));
         });
     }
     if (greet) addAiBubble('سلام — کاسمیک اوراکل در خدمتِ پرسش‌های کیهانی و یوگاییِ توست ✦', /(اوراکل|کیهانی|یوگا)/);

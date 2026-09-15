@@ -2198,13 +2198,9 @@ async function displayResult(data, context, svgContent) {
     await showStaggered();
 
     if (context) {
-        try {
-            const analysis = await getDeepSeekAnalysisFromBackend(context, vedic);
-            document.getElementById('deepseek-box').innerHTML = analysis;
-        } catch (err) {
-            document.getElementById('deepseek-box').innerHTML =
-                `<div style="color:#e87474;">⚠️ خطا: ${err.message}</div>`;
-        }
+        // استریم: تفسیر همان لحظهٔ تولید روی صفحه می‌نشیند
+        const _dsBox = document.getElementById('deepseek-box');
+        if (_dsBox) streamChartAnalysis(_dsBox, context, vedic);
     }
 
     // ---- فعال‌سازی بزرگنمایی SVG ----
@@ -2256,34 +2252,121 @@ async function displayResult(data, context, svgContent) {
 // ================================================================
 //   DEEPSEEK FROM BACKEND
 // ================================================================
-async function getDeepSeekAnalysisFromBackend(contextText, vedicData) {
-    let vedicSummary = "";
-    if (vedicData && Object.keys(vedicData).length > 0) {
-        vedicSummary = "\n\n**📜 اطلاعات تکمیلی ودیک (Vedic):**\n";
-        const planetOrder = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu'];
-        const sorted = Object.keys(vedicData).sort((a, b) => {
-            const ia = planetOrder.indexOf(a);
-            const ib = planetOrder.indexOf(b);
-            return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-        });
-        for (const planet of sorted) {
-            const d = vedicData[planet];
-            if (!d) continue;
-            const pf = translate(planet);
-            const sf = translate(d.sign) || '';
-            const hs = d.house || '?';
-            const ls = d.lordship || [];
-            const fn = d.functional_nature || {};
-            const nature = fn.nature || 'Neutral';
-            const st = d.planetary_strength || {};
-            const nk = d.nakshatra || {};
-            vedicSummary += `\n- **${pf}** در برج ${sf}، خانه ${hs}`;
-            if (ls.length) vedicSummary += `\n  🏠 صاحب خانه‌های ${ls.join('، ')}`;
-            vedicSummary += `\n  ⭐ طبیعت: ${nature}`;
-            if (st.status) vedicSummary += `\n  💪 قدرت: ${st.status}`;
-            if (nk.name_fa) vedicSummary += `\n  🌙 ناکشاترا: ${nk.name_fa} — ${nk.interpretation || ''}`;
+function buildVedicSummary(vedicData) {
+    if (!vedicData || Object.keys(vedicData).length === 0) return "";
+    let vedicSummary = "\n\n**📜 اطلاعات تکمیلی ودیک (Vedic):**\n";
+    const planetOrder = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu'];
+    const sorted = Object.keys(vedicData).sort((a, b) => {
+        const ia = planetOrder.indexOf(a);
+        const ib = planetOrder.indexOf(b);
+        return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+    for (const planet of sorted) {
+        const d = vedicData[planet];
+        if (!d) continue;
+        const pf = translate(planet);
+        const sf = translate(d.sign) || '';
+        const hs = d.house || '?';
+        const ls = d.lordship || [];
+        const fn = d.functional_nature || {};
+        const nature = fn.nature || 'Neutral';
+        const st = d.planetary_strength || {};
+        const nk = d.nakshatra || {};
+        vedicSummary += `\n- **${pf}** در برج ${sf}، خانه ${hs}`;
+        if (ls.length) vedicSummary += `\n  🏠 صاحب خانه‌های ${ls.join('، ')}`;
+        vedicSummary += `\n  ⭐ طبیعت: ${nature}`;
+        if (st.status) vedicSummary += `\n  💪 قدرت: ${st.status}`;
+        if (nk.name_fa) vedicSummary += `\n  🌙 ناکشاترا: ${nk.name_fa} — ${nk.interpretation || ''}`;
+    }
+    return vedicSummary;
+}
+
+/* ── خواننده SSE — پارسِ رله بک‌اند: data: {"c"|"done"|"err"} ──
+   (بین script.js و kinetics-cosmic.js مشترک؛ روی window globally) */
+async function readAIStream(resp, onPiece) {
+    const reader = resp.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '', errMsg = null, sawDone = false;
+    for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let nl;
+        while ((nl = buf.indexOf('\n')) >= 0) {
+            const line = buf.slice(0, nl).trim();
+            buf = buf.slice(nl + 1);
+            if (!line.startsWith('data:')) continue;
+            let obj;
+            try { obj = JSON.parse(line.slice(5)); } catch (_) { continue; }
+            if (obj.c) onPiece(obj.c);
+            else if (obj.err) errMsg = obj.err;
+            else if (obj.done) sawDone = true;
         }
     }
+    if (!sawDone && !errMsg) errMsg = 'اتصال پیش از پایان پاسخ قطع شد';
+    if (errMsg) throw new Error(errMsg);
+}
+
+/* تفسیر چارت به‌صورت استریم + ثانیه‌شمار زنده تا اولین تکه */
+async function streamChartAnalysis(box, contextText, vedicData) {
+    const vedicSummary = buildVedicSummary(vedicData);
+    const retry = () => streamChartAnalysis(box, contextText, vedicData);
+    const t0 = Date.now();
+    box.innerHTML = '<span style="color:#5a526e;">⏳ در حال دریافت تفسیر چارت… <b id="dsElapsed">0</b></span>';
+    const tick = setInterval(() => {
+        const el = box.querySelector('#dsElapsed');
+        if (el) el.textContent = Math.round((Date.now() - t0) / 1000) + ' ثانیه';
+        else clearInterval(tick);
+    }, 1000);
+
+    // مرورگر/سرورِ قدیمی بدون پشتیبانی استریم → همان مسیر JSON
+    if (typeof ReadableStream === 'undefined' || !window.readAIStream) {
+        try {
+            const analysis = await getDeepSeekAnalysisFromBackend(contextText, vedicData);
+            clearInterval(tick);
+            box.innerHTML = analysis;
+        } catch (err) {
+            clearInterval(tick);
+            renderAnalysisErr(box, err.message, retry);
+        }
+        return;
+    }
+
+    let acc = '', got = false;
+    try {
+        const resp = await fetch('/api/v5/deepseek-analysis/stream', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ context: contextText, vedic_summary: vedicSummary })
+        });
+        if (!resp.ok || !resp.body) {
+            let d = 'پاسخ ناموفق از سرور';
+            try { d = (await resp.json()).detail || d; } catch (_) {}
+            throw new Error(d);
+        }
+        await readAIStream(resp, (piece) => {
+            acc += piece;
+            if (!got) { got = true; clearInterval(tick); }
+            // باز‌رندر کامل: تگِ نیمه در آخرین innerHTML خودکار بسته می‌شود
+            box.innerHTML = acc + '<span style="color:#5a526e;">▌</span>';
+        });
+        clearInterval(tick);
+        box.innerHTML = acc || '<span style="color:#e87474;">پاسخی دریافت نشد.</span>';
+    } catch (err) {
+        clearInterval(tick);
+        if (got) box.innerHTML = acc;           // نصفه آمده — همان را نگه می‌داریم
+        else renderAnalysisErr(box, err.message || 'خطا در ارتباط با هوش مصنوعی', retry);
+    }
+}
+
+function renderAnalysisErr(box, msg, retry) {
+    box.innerHTML = '<div style="color:#e87474;">⚠️ ' + msg + '</div>' +
+        '<button type="button" class="analysis-box ds-retry" style="margin-top:10px;padding:8px 18px;border-radius:12px;border:1px solid rgba(221,192,112,.45);background:rgba(16,26,61,.6);color:#f3e5b8;font-family:inherit;font-size:13px;cursor:pointer;">🔄 تلاش مجدد</button>';
+    const btn = box.querySelector('.ds-retry');
+    if (btn) btn.addEventListener('click', retry);
+}
+
+async function getDeepSeekAnalysisFromBackend(contextText, vedicData) {
+    let vedicSummary = buildVedicSummary(vedicData);
 
     try {
         const resp = await fetch('/api/v5/deepseek-analysis', {
