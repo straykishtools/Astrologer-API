@@ -139,6 +139,7 @@ class ChangePassword(BaseModel):
 # آن‌ها را بشناسند.
 from app.models.base import Base  # noqa: E402,F401
 from app.models.chart import ChartHistory, SavedChart  # noqa: E402,F401
+from app.models.analysis_job import AnalysisJob  # noqa: E402,F401
 from app.models.plan import Plan  # noqa: E402,F401
 from app.models.setting import AppSetting  # noqa: E402,F401
 from app.models.tarot import TarotHistory  # noqa: E402,F401

@@ -22,7 +22,8 @@ from .routers import (
     numerology_router, biorhythm_router, chinese_zodiac_router,
     daily_question_router, hafez_router, geo_router,
     nasa_router, auth_router, settings_router,
-    user as user_router, yoga as yoga_router, audio_router
+    user as user_router, yoga as yoga_router, audio_router,
+    analysis_jobs
 )
 from .config.settings import settings
 from .middleware.secret_key_checker_middleware import SecretKeyCheckerMiddleware
@@ -88,6 +89,7 @@ app = FastAPI(
 app.include_router(charts.router, tags=["Charts"])
 app.include_router(data.router, tags=["Chart Data"])
 app.include_router(context.router, tags=["AI Context"])
+app.include_router(analysis_jobs.router)
 app.include_router(moon_phase.router, tags=["Moon Phase"])
 app.include_router(misc.router, tags=["Miscellaneous"])
 app.include_router(mizaj.router, tags=["Mizaj"])

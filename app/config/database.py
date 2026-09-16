@@ -69,6 +69,26 @@ async def create_all():
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(_ensure_lightweight_columns)
+
+
+def _ensure_lightweight_columns(sync_conn):
+    """ADD COLUMN برای جداولی که create_all روی نسخهٔ موجودشان ستون تازه
+    نمی‌افزاید. idempotent — اگر ستون هست، PRAGMA رد می‌شود. (Alembic در
+    prod مرجع است؛ این فقط راه‌اندازی بی‌دردسرِ دیتابیس‌های توسعهٔ موجود است.)"""
+    from sqlalchemy import text
+
+    for table, col, decl in (
+        ("analysis_jobs", "birth_key", "VARCHAR(24)"),
+        ("analysis_jobs", "subject_json", "TEXT"),
+    ):
+        try:
+            cols = {r[1] for r in sync_conn.exec_driver_sql(f"PRAGMA table_info({table})").fetchall()}
+            if col not in cols:
+                sync_conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {decl}"))
+        except Exception:
+            # جدول هنوز نیست (create_all همین حالا می‌سازد) یا خطای بی‌ضرر — نادیده
+            pass
 
 
 # Default plan catalog — same values the Alembic seed migration (and the

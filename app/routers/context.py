@@ -265,18 +265,17 @@ def _analysis_prompt(request: AnalysisRequest) -> str:
     context = _cap(request.context, 6000)
     vedic = _cap(request.vedic_summary, 2000)
 
-    return f"""نقش: منجم ودیک باتجربهٔ «کاسمیک اوراکل». بر اساس داده‌ی زیر یک تحلیل گرم، ساده و کاملاً مشخصِ همین چارت بنویس (نه یک متن کلی که برای هر چارتی صادق باشه).
+    return f"""نقش: منجم ودیک باتجربهٔ «کاسمیک اوراکل». داده‌ی زیر از یک چارت واقعی و کامل (شامل سیارات، خانه‌ها، توزیع عناصر/کیفیت‌ها، و فهرست زاویه‌ها) استخراج شده. بر همین اساس یک تحلیل گرم، ساده و کاملاً مشخصِ همین چارت بنویس.
 
-اول از همه بلوک <ai_brief> رو بخون — ستون‌فقراتِ تفسیره: لیست زاویه‌های واقعی، سه‌گانه (خورشید/ماه/طالع)، حاکم چارت، توازن عنصر/کیفیت، خانه‌های خالی با حاکم‌شون. سپس جزئیات رو از <chart> بردار.
+قواعد استفاده از داده (خیلی مهم — رعایت‌نشدن‌شون باعث تحلیل نادرست می‌شه):
+۱. فقط از زاویه‌هایی که در تگ‌های <aspects> یا aspects_top آمده استفاده کن. هیچ زاویه‌ای که در داده نیست رو اختراع نکن.
+۲. اول سه‌گانه‌ی اصلی (خورشید، ماه، طالع/Ascendant) رو به‌عنوان پایه‌ی شخصیت در نظر بگیر.
+۳. از <element_distribution> و <quality_distribution> (یا element/quality_balance در ai_brief) برای گفتن این‌که کدوم عنصر (آتش/آب/هوا/خاک) و کدوم کیفیت (ثابت/متغیر/اصلی) در این چارت غالبه استفاده کن.
+۴. اگر خانه‌ای در تگ <planets> هیچ سیاره‌ای نداشت (خانه‌ی خالی)، به‌جای نادیده‌گرفتنش، بگو نشانه‌ی روی آن خانه چطور آن حوزه از زندگی رو فعال می‌کنه — طبق جدول حاکمان: حمل=مریخ، ثور=زهره، جوزا=عطارد، سرطان=ماه، اسد=خورشید، سنبله=عطارد، میزان=زهره، عقرب=مریخ (یا پلوتو)، قوس=مشتری، جدی=زحل، دلو=زحل (یا اورانوس)، حوت=مشتری (یا نپتون).
+۵. زاویه‌ها رو با اولویتِ کمترین orb و مربوط‌ترین سیارات انتخاب کن؛ فقط ۴ تا ۶ زاویه‌ی معنادارترین رو ذکر کن.
+۶. تنش‌ها رو فرصت رشد معرفی کن، نه تهدید. هرگز کل چارت رو با یک زاویه‌ی سخت قضاوت نکن.
 
-قواعد تفسیر (دقیق رعایت شوند):
-- شروع از سه‌گانه؛ حاکم چارت (chart_ruler) عدسهٔ خوانشِ کل چارته.
-- فقط از زاویه‌های فهرست‌شده در ai_brief استفاده کن — هرگز زاویه‌ای اختراع نکن. orb کوچک‌تر = اثر قوی‌تر.
-- کمبود/فراوانی عنصر رو در نظر بگیر (مثلاً Water کم → سبک بیان احساسی)، نه فقط برج خورشیدی.
-- خانهٔ خالی «بد» نیست؛ از روی برج و حاکمِ همون خانه تفسیرش کن.
-- کل چارت رو بر پایهٔ یک زاویهٔ سخت قضاوت نکن.
-
-داده‌ی چارت:
+داده‌ی خام چارت:
 {context}
 
 {vedic}
@@ -289,7 +288,8 @@ def _analysis_prompt(request: AnalysisRequest) -> str:
 <h4>⛰️ چالش و فرصت</h4> (فقط تربیع/مقابله‌های فهرست‌شده با کمترین orb + راه تبدیلشون به فرصت)
 <h4>✨ جمع‌بندی</h4> (۳ توصیهٔ عملی مشخص + یک جملهٔ امیدبخش)
 
-کل متن زیر ۵۰۰ کلمهٔ فارسی. لحن: صمیمی، بدون قضاوت، بدون پیش‌گویی قطعی."""
+کل متن زیر ۵۰۰ کلمهٔ فارسی. لحن: صمیمی، بدون قضاوت، بدون پیش‌گویی قطعی.
+نام نشان‌ها را فقط با این معادل‌های استاندارد بنویس (هرگز شکلِ عجیب یا لاتین نساز): Aries=حمل، Taurus=ثور، Gemini=جوزا، Cancer=سرطان، Leo=اسد، Virgo=سنبله، Libra=میزان، Scorpio=عقرب، Sagittarius=قوس، Capricorn=جدی، Aquarius=دلو، Pisces=حوت. سیارات: Mercury=عطارد، Venus=زهره، Mars=مریخ، Jupiter=مشتری، Saturn=زحل، Uranus=اورانوس، Neptune=نپتون، Pluto=پلوتو، North Node=گره شمالی."""
 
 
 def _analysis_models() -> list:
@@ -331,7 +331,11 @@ def _extract_analysis_content(response_text: str) -> str:
                 data = None
         if isinstance(data, dict):
             msg = data.get("choices", [{}])[0].get("message", {})
-            return msg.get("content") or msg.get("reasoning") or ""
+            # ⚠ عمداً بدونِ `or msg.get("reasoning")`: با max_tokens=600 روی
+            # هر سه مدل b.ai تست شد — همه contentِ واقعی برمی‌گردانند؛
+            # برداشتن reasoning مونولوگ انگلیسیِ مدل را به‌عنوان تفسیر
+            # فارسی به کاربر نشان می‌داد
+            return msg.get("content") or ""
     except Exception:
         pass
 
@@ -479,9 +483,11 @@ async def _sse_relay(models, *, messages=None, prompt=None, mode="chat"):
     `data: {"done": true, "model": ...}` (or `{"err": ...}` if nothing
     streamed at all). Falls over to the next model only if the previous
     one failed before its first piece."""
+    import asyncio
     import json as _json
     api_key = os.getenv("AI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
     got = False
+    reason = "no attempt"   # برای پیام خطای تشخیصی (علتِ بی‌پاسخی)
 
     def evt(obj):
         return "data: " + _json.dumps(obj, ensure_ascii=False) + "\n\n"
@@ -496,37 +502,65 @@ async def _sse_relay(models, *, messages=None, prompt=None, mode="chat"):
                 async with client.stream("POST", url, headers=headers, json=payload) as resp:
                     if resp.status_code != 200:
                         logger.warning("[SSE] %s -> HTTP %s", m["name"], resp.status_code)
+                        reason = f"{m['name']} HTTP {resp.status_code}"
                         continue
-                    async for line in resp.aiter_lines():
-                        if not line.startswith("data:"):
-                            continue
-                        data = line[5:].strip()
-                        if data == "[DONE]":
-                            break
-                        try:
-                            chunk = _json.loads(data)
-                        except Exception:
-                            continue
-                        choice = (chunk.get("choices") or [{}])[0]
-                        delta = choice.get("delta") or {}
-                        piece = delta.get("content") or (choice.get("message") or {}).get("content") or ""
-                        if not piece:
-                            continue
-                        clean = feed(piece)
-                        if not clean:
-                            continue
-                        got = True
-                        yield evt({"c": clean})
+                    # ⚑ heartbeat: مدل‌های tier رایگان قبل از اولین توکن ۳۰-۹۰
+                    # ثانیه بی‌صدا «فکر» می‌کنند؛ بدون ترافیک، پروکسی‌های
+                    # میانی (Railway/CDN) اتصال را می‌بُرند. هر ۱۵s یک SSE
+                    # کامنت (خطِ ":") می‌فرستیم — پارسر فرانت نادیده می‌گیرد.
+                    # ⚠ عمداً بدون wait_for: لغوکردنِ anext وسط read،
+                    # iterator پاسخ httpx را خراب می‌کند — تسک دست‌نخورده
+                    # بین دورها نگه داشته می‌شود.
+                    it = resp.aiter_lines().__aiter__()
+                    pending = None
+                    try:
+                        while True:
+                            if pending is None:
+                                pending = asyncio.ensure_future(it.__anext__())
+                            done, _ = await asyncio.wait((pending,), timeout=15.0)
+                            if not done:
+                                yield ": keep-alive\n\n"
+                                continue
+                            task, pending = pending, None
+                            try:
+                                line = task.result()
+                            except StopAsyncIteration:
+                                break
+                            if not line.startswith("data:"):
+                                continue
+                            data = line[5:].strip()
+                            if data == "[DONE]":
+                                break
+                            try:
+                                chunk = _json.loads(data)
+                            except Exception:
+                                continue
+                            choice = (chunk.get("choices") or [{}])[0]
+                            delta = choice.get("delta") or {}
+                            piece = delta.get("content") or (choice.get("message") or {}).get("content") or ""
+                            if not piece:
+                                continue
+                            clean = feed(piece)
+                            if not clean:
+                                continue
+                            got = True
+                            yield evt({"c": clean})
+                    finally:
+                        if pending is not None:
+                            pending.cancel()
             if got:
                 yield evt({"done": True, "model": m["name"]})
                 return
         except Exception as e:
+            reason = f"{m['name']} {type(e).__name__}"
             logger.warning("[SSE] %s: %s", m["name"], type(e).__name__)
             if got:   # نصفِ پاسخ رفته — عوض‌کردن مدل یعنی متن دوتایی
                 yield evt({"done": True, "model": m["name"], "partial": True})
                 return
     if not got:
-        yield evt({"err": "پاسخ از هوش مصنوعی دریافت نشد"})
+        hint = " (سرویس هوش مصنوعی از این دستگاه در دسترس نیست — VPN/پروکسی یا مسیر 9Router را چک کنید)" \
+            if "Connect" in reason or "Timeout" in reason else ""
+        yield evt({"err": f"پاسخ از هوش مصنوعی دریافت نشد [{reason}]{hint}"})
 
 
 @router.post("/api/v5/deepseek-analysis/stream")
@@ -552,18 +586,21 @@ async def analyze_chart(request: AnalysisRequest):
     Uses AI_API_BASE/AI_API_KEY/AI_MODEL env when set (direct provider),
     else falls back to DEEPSEEK_API_KEY + local proxy.
     """
+    return await _run_analysis(request)
+
+
+async def _run_analysis(request: AnalysisRequest) -> dict:
+    """تفسیر چارت روی همهٔ مدل‌ها (primary + fallback) — قابل‌استفادهٔ
+    مجدد: هم endpoint غیراستریم و هم runnerِ job از همین‌جا می‌خوانند."""
     api_key = os.getenv("AI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
     if not api_key:
         raise HTTPException(status_code=503, detail="سرویس تحلیل هوش مصنوعی پیکربندی نشده است")
 
     prompt = _analysis_prompt(request)
-
     models = _analysis_models()
 
     # timeout تفکیکی: اتصال سریع شکست بخورد ولی تولید جا داشته باشد.
-    # با max_tokens=1600 (به‌جای ۴۰۹۶ قبلی) تولید معمولاً خیلی زودتر از این
-    # سقف تمام می‌شود؛ ۹۰ ثانیه صرفاً حاشیه‌ی امنِ حالت‌های کند شبکه/مدل است.
-    _to = httpx.Timeout(90.0, connect=15.0)
+    _to = httpx.Timeout(180.0, connect=15.0)
     async with httpx.AsyncClient(timeout=_to, follow_redirects=True) as client:
         errors = []
         for model in models:

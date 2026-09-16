@@ -1415,7 +1415,14 @@ var _origBuildSubject = null;
 function buildBirthForm() {
     var tropTip = makeHelpIcon('tropical');
     var sidTip = makeHelpIcon('sidereal');
-    return '<div class="form-grid">'+
+    /* 📚 dropdown چارت‌های قبلیِ همین کاربر — با انتخابشان فرم پر می‌شود،
+       موتور دوباره محاسبه می‌کند و تفسیرِ از‌پیش‌نوشته‌شده (بدون AI تازه)
+       از سرور برمی‌گردد. لیست در loadMyBirthCharts پُر می‌شود. */
+    return '<div id="myBirthChartsWrap" style="display:none;margin:0 0 14px;padding:10px 12px;border:1px solid #2a3560;border-radius:12px;background:rgba(11,14,26,.45)">'+
+        '<label for="myBirthChartsSel" style="display:block;margin-bottom:6px;font-size:13px;color:#b0c4e0">📚 چارت‌های قبلیِ من</label>'+
+        '<select id="myBirthChartsSel" style="width:100%;padding:10px;border-radius:8px;border:1px solid #2a3560;background:#0b0e1a;color:#fff;font-family:inherit;font-size:13px"><option value="">— انتخاب کنید —</option></select>'+
+        '</div>'+
+        '<div class="form-grid">'+
         '<div class="form-group"><label>\u{1f464} \u0646\u0627\u0645</label><input type="text" id="userName" value="\u06a9\u0627\u0631\u0628\u0631"></div>'+
         '<div class="form-group"><label>\u{1f4c5} \u062a\u0627\u0631\u06cc\u062e \u062a\u0648\u0644\u062f</label>'+makeDatePickerTrigger('birthDatePicker', {label:'تاریخ تولد', calendarType:'shamsi', digits:'fa'})+'</div>'+
         '<div class="form-group"><label>\u23f0 \u0633\u0627\u0639\u062a</label><select id="birthHour">'+makeHourOptions()+'</select></div>'+
@@ -1574,6 +1581,12 @@ function doSwitchTab(tab) {
     document.getElementById('result').style.display = 'none';
     document.getElementById('status').style.display = 'none';
     attachSharedInputListeners();
+    /* ورود به تب چارت با تاریخ ثبت‌شده → خودکار محاسبه/تفسیر را شروع کن
+       (بدون کلیک). فقط یک‌بار هر نشست؛ محاسبات موتور تازه، تفسیر از کش. */
+    if (tab === 'birth') {
+        setTimeout(tryAutoBirthChart, 400);
+        setTimeout(loadMyBirthCharts, 250);
+    }
     // بادبزن ۱۲ حیوان — فقط در تب زودیاک
     if (tab === 'zodiac' && typeof _zcInitFan === 'function') {
         setTimeout(_zcInitFan, 50);
@@ -1739,6 +1752,12 @@ calcBtn.addEventListener('click', async function() {
             else if (window.openLoginModal) window.openLoginModal();
             return;
         }
+    }
+    /* اگر تفسیر چارتِ تاریخِ قبلی آمادهٔ ثبت‌نشده باشد، اول درباره‌اش بپرس */
+    if (window.AnalysisJobs) {
+        var _newKey = '';
+        try { _newKey = AnalysisJobs.keyFor(buildSubject('')) || ''; } catch (_) {}
+        try { await AnalysisJobs.guardNewChart(_newKey); } catch (_) {}
     }
     var resultDiv = document.getElementById('result');
     var statusDiv = document.getElementById('status');
@@ -1939,6 +1958,9 @@ document.addEventListener('DOMContentLoaded', loadSharedChart);
 async function handleBirthChart() {
     var subject = buildSubject('');
     if (!subject) throw new Error('تاریخ تولد را انتخاب کنید.');
+    /* کلید یکتای این تاریخ تولد — مبنای dedup تفسیر AI (محاسبات موتور همیشه تازه) */
+    window.__ajKey = (window.AnalysisJobs && AnalysisJobs.keyFor) ? AnalysisJobs.keyFor(subject) : '';
+    window.__ajSubject = subject;   // برای subject_json → dropdown چارت‌های من
     var payloadData = { subject: subject };
     var data = await fetchWithCache('/api/v5/chart-data/birth-chart', payloadData);
     currentData = data;
@@ -1953,6 +1975,98 @@ async function handleBirthChart() {
     } catch (_) {}
     await displayResult(data, currentContext, svgText);
     addShareButton('birth', { p1: buildSubject('') });
+}
+
+/* ── Auto-birth-chart (2026-09-16): ورود به تب با تاریخ ثبت‌شده →
+   بدون کلیک «دریافت چارت»، همان جریان calcBtn اجرا شود. محاسبات موتور
+   (SVG/سیارات) تازه می‌ماند؛ تفسیر AI با کلیدِ تاریخ از کش برمی‌گردد.
+   یک‌بار در نشست؛ prefillِ پروفایل هم بعد از اعمالِ تاریخ صداش می‌زند. ── */
+var _autoBirthDone = false;
+function tryAutoBirthChart() {
+    if (_autoBirthDone || currentTab !== 'birth' || !calcBtn) return;
+    var prof = null;
+    try { prof = JSON.parse(localStorage.getItem('cosmic_profile') || 'null'); } catch (_) {}
+    var g = null;
+    try { g = _gregorianBirth(); } catch (_) {}
+    var hasProfileBirth = !!(prof && prof.birth_year && prof.birth_month && prof.birth_day);
+    var hasRealLocal = !!(g && !(g.year === 2001 && g.month === 1 && g.day === 1));
+    if (!hasProfileBirth && !hasRealLocal) return;
+    _autoBirthDone = true;
+    calcBtn.click();
+}
+/* ورود/ثبت‌نام که شد: prefill دوباره + تلاش auto */
+window.addEventListener('cosmic:auth', function () {
+    _autoBirthDone = false;
+    try { prefillProfileFromServer(); } catch (_) {}
+    setTimeout(tryAutoBirthChart, 1200);   // بعد از رسیدن پاسخ profile
+    setTimeout(loadMyBirthCharts, 1400);
+});
+
+/* ── dropdown «چارت‌های قبلیِ من» (2026-09-16) ──
+   لیست از /analysis-jobs/mine (سمت سرور — روی هر دستگاه/مرورگری کار
+   می‌کند). انتخاب یک مورد = پرکردن فرم با همان subject + اجرای عادی
+   calcBtn: موتور/SVG تازه محاسبه می‌شود و تفسیر AI به‌خاطر dedup با
+   birth_key از همان کشِ سرور برمی‌گردد (بدون تولید دوباره). */
+var _myBirthCharts = [];
+async function loadMyBirthCharts() {
+    var sel = document.getElementById('myBirthChartsSel');
+    var wrap = document.getElementById('myBirthChartsWrap');
+    if (!sel || !wrap) return;
+    try {
+        var h = {};
+        var t = _profileToken();
+        if (t) h['Authorization'] = 'Bearer ' + t;
+        else if (window.getGuestFingerprint) h['X-Guest-Fingerprint'] = window.getGuestFingerprint();
+        else { wrap.style.display = 'none'; return; }
+        var r = await fetch('/api/v5/analysis-jobs/mine', { headers: h });
+        if (!r.ok) { wrap.style.display = 'none'; return; }
+        var d = await r.json();
+        var items = (d && d.items ? d.items : []).filter(function (x) { return x.subject && x.status !== 'error'; });
+        if (!items.length) { wrap.style.display = 'none'; return; }
+        _myBirthCharts = items;
+        var html = '<option value="">— انتخاب کنید —</option>';
+        items.forEach(function (x, i) {
+            var s = x.subject;
+            var j = s.year, jm = s.month, jd = s.day;
+            try { if (window.JalaliDate) { var g2j = JalaliDate.gregorianToJalali(s.year, s.month, s.day); if (g2j && g2j.jy) { j = g2j.jy; jm = g2j.jm; jd = g2j.jd; } } } catch (_) {}
+            var when = j + '/' + jm + '/' + jd;
+            var lbl = (x.title || s.name || 'چارت') + ' · ' + when + (x.has_interp ? ' ✓تفسیر' : ' ⏳در صف');
+            html += '<option value="' + i + '">' + lbl.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;') + '</option>';
+        });
+        sel.innerHTML = html;
+        wrap.style.display = 'block';
+        sel.onchange = function () {
+            var idx = parseInt(sel.value, 10);
+            sel.value = '';
+            if (isNaN(idx) || !_myBirthCharts[idx]) return;
+            fillFormFromSavedSubject(_myBirthCharts[idx].subject);
+        };
+    } catch (_) { wrap.style.display = 'none'; }
+}
+function fillFormFromSavedSubject(s) {
+    if (!s) return;
+    _autoBirthDone = true;   // ورود دستی‌ست؛ auto-کلیک خودکار دوباره اجرا نشود
+    var jd = null;
+    try { if (window.JalaliDate) jd = JalaliDate.gregorianToJalali(s.year, s.month, s.day); } catch (_) {}
+    sharedInputs.name = s.name || sharedInputs.name;
+    if (jd && jd.jy) sharedInputs.birthDate = { year: jd.jy, month: jd.jm, day: jd.jd };
+    if (s.hour != null) sharedInputs.birthHour = s.hour;
+    if (s.minute != null) sharedInputs.birthMinute = s.minute;
+    if (typeof s.latitude === 'number') sharedInputs.latitude = s.latitude;
+    if (typeof s.longitude === 'number') sharedInputs.longitude = s.longitude;
+    if (s.city) sharedInputs.city = s.city;
+    if (s.timezone) {
+        var keys = Object.keys(TZ_OFFSET_TO_IANA || {});
+        for (var i = 0; i < keys.length; i++) {
+            if (TZ_OFFSET_TO_IANA[keys[i]] === s.timezone) { sharedInputs.timezone = keys[i]; break; }
+        }
+    }
+    persistSharedInputsLocal();
+    applySharedInputs();
+    var nm = document.getElementById('userName'); if (nm && s.name) nm.value = s.name;
+    var cityEl = document.getElementById('cityName') || document.querySelector('#birthCitySelector input');
+    if (cityEl && s.city) cityEl.value = s.city;
+    if (calcBtn) calcBtn.click();
 }
 
 async function handleSynastry() {
@@ -2198,9 +2312,21 @@ async function displayResult(data, context, svgContent) {
     await showStaggered();
 
     if (context) {
-        // استریم: تفسیر همان لحظهٔ تولید روی صفحه می‌نشیند
         const _dsBox = document.getElementById('deepseek-box');
-        if (_dsBox) streamChartAnalysis(_dsBox, context, vedic);
+        if (_dsBox && window.AnalysisJobs) {
+            /* هر context جدید = job جدیدِ ماندگار سمت سرور (حتی بعد از رفرش).
+               اگر برای همین تاریخ تولد قبلاً تفسیر نوشته شده، همان نمایش
+               داده می‌شود و AI دوباره صدا زده نمی‌شود (داخل submit چک می‌شود). */
+            var _nm = '';
+            try { _nm = (buildSubject('') || {}).name || ''; } catch (_) {}
+            AnalysisJobs.submit(context, vedic, _nm, window.__ajKey || '', window.__ajSubject || null).catch(function () {
+                _dsBox.innerHTML = '<div style="color:#e87474;">⚠️ ثبت درخواست تفسیر ناموفق بود</div>';
+            });
+            _dsBox.innerHTML = AnalysisJobs.busyHtml(window.__ajKey);
+            AnalysisJobs.renderIfOpen();   // اگر کشِ done داشت، فوراً جای busy را می‌گیرد
+        } else if (_dsBox) {
+            streamChartAnalysis(_dsBox, context, vedic);   // fallback بدون ماژول job
+        }
     }
 
     // ---- فعال‌سازی بزرگنمایی SVG ----
@@ -4820,10 +4946,22 @@ function prefillProfileFromServer() {
         .then(function (p) {
             if (!p || !p.birth_year) return;
             cacheProfileBirth(p);
-            // Server stores Gregorian. Only apply if the user hasn't picked a
-            // date locally in the meantime (local input wins while typing).
-            if (sharedInputs.birthDate && sharedInputs.birthDate.year) return;
-            sharedInputs.birthDate = { year: p.birth_year, month: p.birth_month || 1, day: p.birth_day || 1 };
+            /* ⚑ تاریخِ سرور برنده است (تصمیم ۲۰۲۶-۰۹-۱۶): پیش‌فرضِ ۱۳۸۰ picker
+               روی تاریخِ ثبت‌شده غلبه نمی‌کند. فقط اگر کاربر همین نشست تاریخِ
+               متفاوتی دستي زده باشد (نشانِه: فرم با مقدارِ غیرپیش‌فرض پر شده)،
+               بهش دست نمی‌زنیم. */
+            var cur = sharedInputs.birthDate;
+            var isDefault = !cur || !cur.year || (cur.year === 1380 && cur.month === 1 && cur.day === 1);
+            var sameAsProfile = cur && String(cur.year) === String(p.birth_year) && cur.month === (p.birth_month || 1) && cur.day === (p.birth_day || 1);
+            var serverDate = { year: p.birth_year, month: p.birth_month || 1, day: p.birth_day || 1 };
+            var local = (function () { try { return JSON.parse(localStorage.getItem('cosmic_shared_inputs') || 'null'); } catch (_) { return null; } })();
+            var localDate = local && local.birthDate;
+            var localEdited = localDate && !(localDate.year === 1380 && localDate.month === 1 && localDate.day === 1);
+            if (isDefault && !sameAsProfile && !localEdited) {
+                sharedInputs.birthDate = serverDate;
+                persistSharedInputsLocal();
+                if (formContainer && formContainer.innerHTML.trim() !== '') applySharedInputs();
+            }
             if (p.name && !sharedInputs.name) sharedInputs.name = p.name;
             if (p.city && !sharedInputs.city) sharedInputs.city = p.city;
             if (typeof p.latitude === 'number') sharedInputs.latitude = p.latitude;
@@ -4837,6 +4975,7 @@ function prefillProfileFromServer() {
             }
             persistSharedInputsLocal();
             if (formContainer && formContainer.innerHTML.trim() !== '') applySharedInputs();
+            tryAutoBirthChart();   // تاریخِ سرور تازه اعمال شد → محاسبهٔ خودکار
         })
         .catch(function () {});
 }

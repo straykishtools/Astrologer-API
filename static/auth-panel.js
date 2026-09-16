@@ -567,6 +567,9 @@ function runAfterLoginHooks() {
     hooks.forEach(function (fn) {
         try { fn(); } catch (e) { try { console.warn('afterLogin hook failed', e); } catch (_) {} }
     });
+    // رویداد عمومی «ورود انجام شد» — script.js prefillِ پروفایل و محاسبهٔ
+    // خودکار چارت تولد را با همین دوباره تلاش می‌کند
+    try { window.dispatchEvent(new Event('cosmic:auth')); } catch (_) {}
 }
 
 // ─── Register ───
