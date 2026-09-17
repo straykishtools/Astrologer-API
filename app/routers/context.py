@@ -451,6 +451,11 @@ def _model_request(api_key, model, messages=None, prompt=None, stream=False):
         headers = {
             "Authorization": f"Bearer {os.getenv('AI_API_KEY', api_key)}",
             "Content-Type": "application/json",
+            # gatewayهای پشت Cloudflare (مثل xkiro) درخواست‌هایی با UA پیش‌فرض
+            # پایتون (`python-httpx/...`) را با ۴۰۳ بلاک می‌کنند؛ یک UA شبیه
+            # مرورگر مشکل را حل می‌کند.
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "application/json",
         }
     else:
         url = "http://localhost:20128/v1/chat/completions"
