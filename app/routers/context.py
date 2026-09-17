@@ -47,7 +47,6 @@ from kerykeion import AstrologicalSubjectFactory
 logger = getLogger(__name__)
 router = APIRouter()
 
-
 @router.post("/api/v5/context/subject", response_model=SubjectContextResponseModel)
 async def subject_context(
     birth_data_request: BirthDataRequestModel, request: Request
@@ -70,7 +69,6 @@ async def subject_context(
     except Exception as exc:
         return await handle_exception(exc, request)
 
-
 @router.post("/api/v5/context/birth-chart", response_model=ContextResponseModel)
 async def natal_context(
     request_body: BirthChartDataRequestModel, request: Request
@@ -89,7 +87,6 @@ async def natal_context(
         return JSONResponse(content=context_payload(chart_data), status_code=200)
     except Exception as exc:
         return await handle_exception(exc, request)
-
 
 @router.post("/api/v5/context/synastry", response_model=ContextResponseModel)
 async def synastry_context(
@@ -110,7 +107,6 @@ async def synastry_context(
     except Exception as exc:
         return await handle_exception(exc, request)
 
-
 @router.post("/api/v5/context/composite", response_model=ContextResponseModel)
 async def composite_context(
     request_body: CompositeChartDataRequestModel, request: Request
@@ -130,7 +126,6 @@ async def composite_context(
     except Exception as exc:
         return await handle_exception(exc, request)
 
-
 @router.post("/api/v5/context/transit", response_model=ContextResponseModel)
 async def transit_context(
     request_body: TransitChartDataRequestModel, request: Request
@@ -149,7 +144,6 @@ async def transit_context(
         return JSONResponse(content=context_payload(chart_data), status_code=200)
     except Exception as exc:
         return await handle_exception(exc, request)
-
 
 @router.post("/api/v5/context/solar-return", response_model=ReturnContextResponseModel)
 async def solar_return_context(
@@ -173,7 +167,6 @@ async def solar_return_context(
     except Exception as exc:
         return await handle_exception(exc, request)
 
-
 @router.post("/api/v5/context/lunar-return", response_model=ReturnContextResponseModel)
 async def lunar_return_context(
     request_body: PlanetaryReturnDataRequestModel, request: Request
@@ -195,7 +188,6 @@ async def lunar_return_context(
         return JSONResponse(content=payload, status_code=200)
     except Exception as exc:
         return await handle_exception(exc, request)
-
 
 @router.post("/api/v5/now/context", response_model=SubjectContextResponseModel)
 async def now_context(
@@ -248,7 +240,6 @@ class AnalysisRequest(BaseModel):
     context: str
     vedic_summary: str = ""
 
-
 def _cap(text: str, limit: int) -> str:
     """ورودی مدل رو به یک سقف کاراکتری می‌بره — چارت خام و خلاصهٔ ودیک
     گاهی چندهزار کاراکتر متن XML/دیتای غیرضروری دارن که فقط پرامپت رو
@@ -258,42 +249,13 @@ def _cap(text: str, limit: int) -> str:
         return text
     return text[:limit].rsplit("\n", 1)[0] + "\n…"
 
-
 def _analysis_prompt(request: AnalysisRequest) -> str:
     # سقف‌ها عمداً سخاوتمندانه‌ان (چارت خام معمولاً زیر این حدهاست) ولی جلوی
     # پرامپت‌های غیرعادی بزرگ رو می‌گیرن که فقط باعث کندی می‌شن.
     context = _cap(request.context, 6000)
     vedic = _cap(request.vedic_summary, 2000)
-
-    return f"""نقش: منجم ودیک باتجربهٔ «کاسمیک اوراکل». داده‌ی زیر از یک چارت واقعی و کامل (شامل سیارات، خانه‌ها، توزیع عناصر/کیفیت‌ها، و فهرست زاویه‌ها) استخراج شده. بر همین اساس یک تحلیل گرم، ساده و کاملاً مشخصِ همین چارت بنویس.
-
-قواعد استفاده از داده (خیلی مهم — رعایت‌نشدن‌شون باعث تحلیل نادرست می‌شه):
-۱. فقط از زاویه‌هایی که در تگ‌های <aspects> یا aspects_top آمده استفاده کن. هیچ زاویه‌ای که در داده نیست رو اختراع نکن.
-۲. اول سه‌گانه‌ی اصلی (خورشید، ماه، طالع/Ascendant) رو به‌عنوان پایه‌ی شخصیت در نظر بگیر.
-۳. از <element_distribution> و <quality_distribution> (یا element/quality_balance در ai_brief) برای گفتن این‌که کدوم عنصر (آتش/آب/هوا/خاک) و کدوم کیفیت (ثابت/متغیر/اصلی) در این چارت غالبه استفاده کن.
-۴. اگر خانه‌ای در تگ <planets> هیچ سیاره‌ای نداشت (خانه‌ی خالی)، به‌جای نادیده‌گرفتنش، بگو نشانه‌ی روی آن خانه چطور آن حوزه از زندگی رو فعال می‌کنه — طبق جدول حاکمان: حمل=مریخ، ثور=زهره، جوزا=عطارد، سرطان=ماه، اسد=خورشید، سنبله=عطارد، میزان=زهره، عقرب=مریخ (یا پلوتو)، قوس=مشتری، جدی=زحل، دلو=زحل (یا اورانوس)، حوت=مشتری (یا نپتون).
-۵. زاویه‌ها رو با اولویتِ کمترین orb و مربوط‌ترین سیارات انتخاب کن؛ فقط ۴ تا ۶ زاویه‌ی معنادارترین رو ذکر کن.
-۶. تنش‌ها رو فرصت رشد معرفی کن، نه تهدید. هرگز کل چارت رو با یک زاویه‌ی سخت قضاوت نکن.
-
-داده‌ی خام چارت:
-{context}
-
-{vedic}
-
-خروجی رو دقیقاً با همین ۵ تیتر HTML بنویس (بدون مقدمه، بدون تکرار، بدون جمله‌ی کلی — هر جمله باید مستقیماً به یک سیاره/خانه/زاویهٔ همین چارت اشاره کنه):
-
-<h4>🌟 شخصیت و روان</h4> (سه‌گانه + حاکم چارت — حداکثر ۵ جمله)
-<h4>💼 شغل و تحصیل</h4> (خانه‌ی ۱۰، ۶، ۲ + زاویه‌های واقعی مرتبط از فهرست)
-<h4>❤️ عشق و روابط</h4> (خانه‌ی ۷ و ۵ + زاویه‌های ماه/زهره از فهرست)
-<h4>⛰️ چالش و فرصت</h4> (فقط تربیع/مقابله‌های فهرست‌شده با کمترین orb + راه تبدیلشون به فرصت)
-<h4>✨ جمع‌بندی</h4> (۳ توصیهٔ عملی مشخص + یک جملهٔ امیدبخش)
-
-کل متن زیر ۵۰۰ کلمهٔ فارسی. لحن: صمیمی، بدون قضاوت، بدون پیش‌گویی قطعی.
-نام نشان‌ها را فقط با این معادل‌های استاندارد بنویس (هرگز شکلِ عجیب یا لاتین نساز): Aries=حمل، Taurus=ثور، Gemini=جوزا، Cancer=سرطان، Leo=اسد، Virgo=سنبله، Libra=میزان، Scorpio=عقرب، Sagittarius=قوس، Capricorn=جدی، Aquarius=دلو، Pisces=حوت. سیارات: Mercury=عطارد، Venus=زهره، Mars=مریخ، Jupiter=مشتری، Saturn=زحل، Uranus=اورانوس، Neptune=نپتون، Pluto=پلوتو، North Node=گره شمالی."""
-
-
-def _analysis_models() -> list:
-    """مدل‌های تحلیل (primary + fallback).
+    from app.utils.analysis_prompts import build_analysis_prompt as _build
+    return _build(context, vedic)
 
     max_tokens از ۴۰۹۶ به ۱۶۰۰ کاهش پیدا کرد: ۵۰۰ کلمهٔ فارسی + تگ‌های HTML
     حدود ۹۰۰-۱۱۰۰ توکنه؛ ۴۰۹۶ فقط روی مدل‌های reasoning باعث می‌شد بودجه
@@ -301,12 +263,11 @@ def _analysis_models() -> list:
     نوشتنِ متن نهایی تموم می‌شد) برسه. temperature هم پایین‌تر اومده تا
     ساختار ۵ بخشی رو محکم‌تر رعایت کنه (کاهش نیاز به retry روی خروجی نامعتبر).
     """
-    models = [{"name": os.getenv("AI_MODEL", "qwen3.8-flash"), "max_tokens": 1600, "temperature": 0.6}]
-    fb = os.getenv("AI_MODEL_FALLBACK", "")   # qwen3.8-flash + میمو (mimo)
+    models = [{"name": os.getenv("AI_MODEL", "qwen3.8-flash"), "max_tokens": 2400, "temperature": 0.5}]
+    fb = os.getenv("AI_MODEL_FALLBACK", "")
     if fb and fb != models[0]["name"]:
-        models.append({"name": fb, "max_tokens": 1600, "temperature": 0.6})
+        models.append({"name": fb, "max_tokens": 2400, "temperature": 0.5})
     return models
-
 
 def _extract_analysis_content(response_text: str) -> str:
     """
@@ -362,7 +323,6 @@ def _extract_analysis_content(response_text: str) -> str:
 
     return ""
 
-
 def _sanitize_ai_text(content: str, mode: str = "chat") -> str:
     """تمیزکاری خروجی مدل برای فارسی.
 
@@ -380,7 +340,6 @@ def _sanitize_ai_text(content: str, mode: str = "chat") -> str:
         content = _re.sub(r"[#*`>]+", "", content)
     content = _re.sub(r"[ \t]{2,}", " ", content)
     return content.strip()
-
 
 def _stream_sanitizer(mode: str = "chat"):
     """نسخهٔ تکه‌ایِ _sanitize_ai_text برای استریم SSE.
@@ -410,7 +369,6 @@ def _stream_sanitizer(mode: str = "chat"):
 
     return feed
 
-
 def _is_valid_analysis(content: str) -> bool:
     """
     Validate that the content is a real astrological analysis, not a
@@ -432,7 +390,6 @@ def _is_valid_analysis(content: str) -> bool:
         if pat in lower:
             return False
     return True
-
 
 def _model_request(api_key, model, messages=None, prompt=None, stream=False):
     """Build (url, headers, payload) for one OpenAI-compatible call.
@@ -472,15 +429,12 @@ def _model_request(api_key, model, messages=None, prompt=None, stream=False):
     }
     return url, headers, payload
 
-
 async def _call_model(client, api_key, prompt, model, messages=None):
     url, headers, payload = _model_request(api_key, model, messages, prompt)
     return await client.post(url, headers=headers, json=payload)
 
-
 # read=150s: مدل‌های reasoning ممکن است پیش از اولین توکن بی‌صدا «فکر» کنند
 _STREAM_TIMEOUT = httpx.Timeout(240.0, connect=15.0, read=150.0)
-
 
 async def _sse_relay(models, *, messages=None, prompt=None, mode="chat"):
     """SSE relay: opens a streaming call to the model(s) and re-emits
@@ -567,7 +521,6 @@ async def _sse_relay(models, *, messages=None, prompt=None, mode="chat"):
             if "Connect" in reason or "Timeout" in reason else ""
         yield evt({"err": f"پاسخ از هوش مصنوعی دریافت نشد [{reason}]{hint}"})
 
-
 @router.post("/api/v5/deepseek-analysis/stream")
 async def analyze_chart_stream(request: AnalysisRequest):
     """نسخهٔ استریمیِ تفسیر چارت — HTML تکه‌تکه می‌آید و مرورگر
@@ -583,7 +536,6 @@ async def analyze_chart_stream(request: AnalysisRequest):
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
-
 @router.post("/api/v5/deepseek-analysis")
 async def analyze_chart(request: AnalysisRequest):
     """
@@ -592,7 +544,6 @@ async def analyze_chart(request: AnalysisRequest):
     else falls back to DEEPSEEK_API_KEY + local proxy.
     """
     return await _run_analysis(request)
-
 
 async def _run_analysis(request: AnalysisRequest) -> dict:
     """تفسیر چارت روی همهٔ مدل‌ها (primary + fallback) — قابل‌استفادهٔ
@@ -651,17 +602,14 @@ async def _run_analysis(request: AnalysisRequest) -> dict:
             detail=f"All models failed. Errors: {'; '.join(errors)}"
         )
 
-
 class ChatTurn(BaseModel):
     role: str
     content: str
-
 
 class AstroChatRequest(BaseModel):
     message: str
     history: list[ChatTurn] = []
     context: str = ""
-
 
 ASTRO_SYSTEM = (
     "تو استاد عرفانی معنوی کیهانی «کاسمیک» هستی. با کاربر مثل یک دوست آگاه و "
@@ -676,7 +624,6 @@ ASTRO_SYSTEM = (
     "اگر دربارهٔ نجوم صحبت می‌کنی، به نمادهای زودیاک/سیارات مربوط بمون و "
     "وعدهٔ قطعیِ پیش‌گویی نده."
 )
-
 
 def _chat_request(request: AstroChatRequest):
     """اعتبارسنجی + ساخت (messages, models) برای چت.
@@ -708,7 +655,6 @@ def _chat_request(request: AstroChatRequest):
         models.append({"name": _fb, "max_tokens": 1500})
     return messages, models, api_key, msg
 
-
 @router.post("/api/v5/astro-chat/stream")
 async def astro_chat_stream(request: AstroChatRequest):
     """نسخهٔ استریمیِ چت — تکه‌های پاسخ همان لحظهٔ تولید می‌رسند (SSE)."""
@@ -718,7 +664,6 @@ async def astro_chat_stream(request: AstroChatRequest):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
-
 
 @router.post("/api/v5/astro-chat")
 async def astro_chat(request: AstroChatRequest):
