@@ -39,3 +39,19 @@ def test_all_queued_cues_reach_start(sched):
 def test_no_drops_across_sequential_steps(sched):
     """Three full step cycles (newStep + cue, waiting between) — all play."""
     assert sched["crossStepStarts"] == 3, sched
+
+
+def test_mid_playback_cue_does_not_reschedule_the_sounding_cue(sched):
+    """A cue that arrives while the previous cue is still audible must not
+    re-schedule (duplicate) it, and the cues queued behind it must each play
+    exactly once, in order.
+
+    This is the 00:12 regression of every flow practice: the hold teaches
+    Child Wide (a 7.56s instruction) and the hold's first breath cue arrives
+    100ms later. Because the play lock was released in the load callback
+    instead of at the end of the cue, the engine found the SOUNDING
+    instruction at queue[0] and scheduled it a second time — the instruction
+    was spoken twice and the breath cue slid in behind it.
+    """
+    assert sched["chainLog"] == ["long_a.ogg", "next_b.ogg", "next_c.ogg"], sched
+    assert sched["chainStarts"] == 3, sched

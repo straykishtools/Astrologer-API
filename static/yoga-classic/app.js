@@ -774,7 +774,13 @@ const Player = {
             this.breathPhase = ((idx + startPhase) % 2 === 0) ? 'inhale' : 'exhale';
           }
           if (DB.settings.voice && this.current.audibleCount) Audio2.number(idx + 1);
-          else if (DB.settings.voice && !this.current.timed) {
+          else if (DB.settings.voice && !this.current.timed && idx === 0) {
+            /* ONE breath cue per hold — at its first beat, carrying the
+               breath inherited from the preceding move. Voicing it on
+               every breath turned each hold into a 4-second «دم/بازدم»
+               metronome (the 32s count="8" warm-up hold fired 8 cues
+               between 0:12 and 0:40 instead of one). The on-screen breath
+               circle still follows every breath via _updatePhase(). */
             Audio2.play(this.breathPhase === 'inhale' ? 'general_inhale.ogg' : 'general_exhale.ogg', { gap: 0.2 });
           }
           /* the phrase cue ('and soften') lands right AFTER the first

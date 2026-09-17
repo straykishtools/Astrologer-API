@@ -88,10 +88,34 @@ const Audio2 = (function () {
       Overlap guard: ONE chain only. Any schedule started before the
       latest newStep() is dead on arrival — checked again immediately
       before src.start(), the last possible moment. */
+  /* ── the play lock ────────────────────────────────────────────
+     _busy means «the head of the queue is scheduled and still
+     sounding». It must stay TRUE for the whole playback, not just
+     while the buffer loads: releasing it in the load callback let a
+     cue that arrived while the previous one was still audible re-enter
+     _scheduleNext(), find the SAME queue[0] (a cue is only shifted when
+     it ends) and schedule it a second time — the bug where a long pose
+     instruction was spoken twice and the new cue slid in behind it. */
+  let _busy = false;
+  let _timer = null;                    // safety release when onended never fires
+  function _clearTimer() { if (_timer) { clearTimeout(_timer); _timer = null; } }
+  /** free the lock and pull the next cue — the head only moves here.
+      Idempotent per cue: onended and the safety timer may both fire. */
+  function _finish(next, gen) {
+    if (gen !== schedGen || next._ended) return;   // superseded by a newer step
+    next._ended = true;
+    _clearTimer();
+    _busy = false;
+    if (queue[0] === next) queue.shift();
+    /* advance the anchor past the REAL end of this file */
+    const c = actx();
+    if (c) playhead = Math.max(playhead, c.currentTime + next.gap);
+    _scheduleNext();
+  }
   let schedGen = 0;                    // bumped by newStep()
   function _scheduleNext() {
     const c = actx(); if (!c) return;
-    if (_busy) return;
+    if (_busy) return;                 // a cue owns the chain until it ends
     const next = queue[0];
     if (!next) { queuedDur = 0; playhead = 0; return; }
     if (next.token !== currentToken) {             // stale — drop & advance
@@ -109,11 +133,11 @@ const Audio2 = (function () {
       /* a newer newStep() happened while loading → this chain is dead;
          never touch _busy/queue of the CURRENT chain */
       if (myGen !== schedGen) return;
-      _busy = false;
       if (!buf || next.token !== currentToken) {   // load failed, or step changed
         /* only drop OUR cue — never a newer one pushed by a fresh
            newStep()+cueStep after this one went stale */
         if (queue[0] === next) queue.shift();
+        _busy = false;
         _scheduleNext();
         return;
       }
@@ -129,20 +153,19 @@ const Audio2 = (function () {
       if (myGen !== schedGen || next.token !== currentToken) {
         try { src.stop(); } catch (e) {}
         liveSources.delete(src);
+        _busy = false;
         return;
       }
       src.start(base);
-      src.onended = () => {
-        liveSources.delete(src);
-        if (next.token !== currentToken) return;   // stale cue ended silently
-        queue.shift();
-        /* advance the anchor past the REAL end of this file */
-        playhead = Math.max(playhead, c.currentTime + next.gap);
-        _scheduleNext();
-      };
+      /* ONLY the end of this cue (or the safety timer, if a suspended
+         context swallows onended) frees the chain for the next one */
+      src.onended = () => { liveSources.delete(src); _finish(next, myGen); };
+      _timer = setTimeout(
+        () => { liveSources.delete(src); _finish(next, myGen); },
+        Math.max(250, (base - c.currentTime + realDur + 0.25) * 1000),
+      );
     });
   }
-  let _busy = false;
 
   /** New step → ONE sound policy: kill everything queued AND everything
       currently sounding, so cues never pile up or overlap. */
@@ -157,6 +180,7 @@ const Audio2 = (function () {
       try { src.onended = null; src.stop(); } catch (e) {}
     });
     liveSources.clear();
+    _clearTimer();
     _busy = false;
   }
   /** hard cut — used on stop()/pause()/quit where silence is wanted */

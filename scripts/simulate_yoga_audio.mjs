@@ -117,23 +117,41 @@ const posesTxt = await readFile(resolve(ASSETS, 'poses.xml'), 'utf8');
 const movesTxt = await readFile(resolve(ASSETS, 'moves.xml'), 'utf8');
 const sessTxt = await readFile(resolve(ASSETS, practice + '.session'), 'utf8');
 
+/* child-element text (baseName / soundInstructionName are elements in the
+   XML, not attributes — reading them as attributes left every pose with a
+   name-derived key, so instruction cues could never resolve) */
+const tagText = (xml, tag) => {
+  const m = new RegExp('<' + tag + '\\b[^>]*>([^<]*)</' + tag + '>', 'i').exec(xml);
+  return m ? m[1].trim() : '';
+};
+/* walkInner() is called on a string and returns its FIRST matched element
+   (the <poses>/<moves> root), so the children must be walked from its inner
+   XML — otherwise these loops never matched a single pose/move. */
+const rootInner = (xml) => {
+  const r = walkInner(xml)[0];
+  return r && r.inner !== undefined ? r.inner : xml;
+};
 const poseByName = {};
-for (const p of walkInner(posesTxt)) {
+for (const p of walkInner(rootInner(posesTxt))) {
   if (p.tag !== 'pose') continue;
   if (!p.attrs.name) continue;
   poseByName[p.attrs.name] = {
     name: p.attrs.name,
-    baseName: p.attrs.baseName || p.attrs.name,
-    excludeTimeline: p.attrs.excludeFromTimeline === 'true',
+    baseName: p.attrs.baseName || tagText(p.inner, 'baseName') || p.attrs.name,
+    soundInstruction: p.attrs.soundInstruction || tagText(p.inner, 'soundInstructionName'),
+    excludeTimeline: String(p.attrs.excludefromtimeline || p.attrs.excludeFromTimeline) === 'true',
   };
 }
 const moveByName = {};
-for (const m of walkInner(movesTxt)) {
+for (const m of walkInner(rootInner(movesTxt))) {
   if (m.tag !== 'move') continue;
   if (!m.attrs.name) continue;
-  let toPose = null;
+  /* moves.xml declares the target as an ATTRIBUTE (toPose="Child Wide").
+     Reading only a <toPose name="…"> child left toPose (and therefore every
+     hold's pose) null, so pose-instruction cues never reached the timeline. */
+  let toPose = m.attrs.toPose || null;
   for (const c of walkInner(m.inner)) {
-    if (c.tag === 'toPose') toPose = c.attrs.name;
+    if (c.tag === 'toPose') toPose = c.attrs.name || toPose;
   }
   moveByName[m.attrs.name] = {
     name: m.attrs.name,
@@ -311,22 +329,38 @@ function hasRaw(f) { return AUDIO_DUR[f] != null; }
 
 const allCues = []; // {t, file, dur, gap, step}
 
-function teachPose(poseName, t) {
+function teachPose(poseName, t, stepDur) {
   if (!poseName || visited.has(poseName)) return;
   const p = poseByName[poseName];
   if (p && p.excludeTimeline) { visited.add(poseName); return; }
   visited.add(poseName);
   if (p) visited.add('base:' + (p.baseName || poseName));
-  const base = (p?.baseName || poseName).toLowerCase().replace(/_/g, '_');
-  // try ins / ins_2 / ins_3
-  const cands = [
-    'pose_instructions_' + base + '_ins.ogg',
-    'pose_instructions_' + base + '_ins_2.ogg',
-    'pose_instructions_' + base + '_ins_3.ogg',
-    'pose_instructions_' + base + '_ins_4.ogg',
-  ];
+  const base = String((p && p.baseName) || poseName).toLowerCase();
+  /* same probe order as data.js poseInstructionCandidates(): the XML's
+     explicit instruction key first, then the baseName-derived one */
+  const cands = [];
+  if (p && p.soundInstruction) {
+    const si = String(p.soundInstruction).toLowerCase();
+    cands.push('pose_instructions_' + si + '.ogg');
+    ['_2', '_3', '_4'].forEach((s) => {
+      cands.push('pose_instructions_' + si + s + '.ogg');
+      cands.push('pose_instructions_' + si + s + '_l.ogg');
+      cands.push('pose_instructions_' + si + s + '_r.ogg');
+    });
+    cands.push('pose_instructions_' + si + '_l.ogg');
+    cands.push('pose_instructions_' + si + '_r.ogg');
+  }
+  const k = 'pose_instructions_' + base + '_ins';
+  cands.push(k + '.ogg');
+  ['_2', '_3', '_4'].forEach((s) => {
+    cands.push(k + s + '.ogg');
+    cands.push(k + s + '_l.ogg');
+    cands.push(k + s + '_r.ogg');
+  });
+  cands.push(k + '_l.ogg');
+  cands.push(k + '_r.ogg');
   const file = cands.find(hasRaw);
-  if (file) allCues.push({ t, file, dur: AUDIO_DUR[file], gap: 0, step: { type: 'pose-instruction', pose: poseName } });
+  if (file) allCues.push({ t, file, dur: AUDIO_DUR[file], gap: 0, step: { type: 'pose-instruction', pose: poseName, duration: stepDur || 0 } });
 }
 
 function cueStep(s, t) {
@@ -346,8 +380,8 @@ function cueStep(s, t) {
       }
       break;
     }
-    case 'pose': teachPose(s.name, t); break;
-    case 'hold': if (s.pose) teachPose(s.pose, t); break;
+    case 'pose': teachPose(s.name, t, s.duration); break;
+    case 'hold': if (s.pose) teachPose(s.pose, t, s.duration); break;
   }
 }
 
@@ -396,11 +430,10 @@ for (const s of out) {
           else if (n % 2 === 0) file = 'general_inhale.ogg';
           else file = 'general_exhale.ogg';
           if (hasRaw(file)) allCues.push({ t: ts, file, dur: AUDIO_DUR[file], gap: 0.25, step: s });
-        } else if (!s.timed) {
-          const phase = ((i + startPhase) % 2 === 0) ? 'inhale' : 'exhale';
-          const f = phase === 'inhale' ? 'general_inhale.ogg' : 'general_exhale.ogg';
-          if (hasRaw(f)) allCues.push({ t: ts, file: f, dur: AUDIO_DUR[f], gap: 0.2, step: s });
         }
+        /* later breaths stay silent: app.js tick() voices the breath cue only
+           at the hold's first beat (idx === 0) — one cue per hold, not a
+           4-second «دم/بازدم» metronome */
       }
     }
   }
@@ -455,3 +488,18 @@ for (let i = 1; i < allCues.length; i++) {
   }
 }
 if (!overlaps) console.log('  none detected');
+
+// a cue longer than its own step loses its tail: the next step calls
+// Audio2.newStep(), which stops everything still sounding
+console.log('');
+console.log('# CUES LONGER THAN THEIR STEP (tail cut by newStep)');
+let truncated = 0;
+for (const c of allCues) {
+  if (c.t > +horizon) break;
+  const stepDur = c.step.duration || 0;
+  if (stepDur > 0 && c.dur > stepDur + 0.001) {
+    console.log(`  CUT @${c.t.toFixed(2)}s: ${c.file} is ${c.dur.toFixed(2)}s in a ${stepDur.toFixed(2)}s step — ${(c.dur - stepDur).toFixed(2)}s lost`);
+    truncated++;
+  }
+}
+if (!truncated) console.log('  none detected');

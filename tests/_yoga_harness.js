@@ -153,6 +153,11 @@ global.localStorage = {
 global.fetch = async (url, opts) => {
   const method = (opts && opts.method) || 'GET';
   const clean = String(url).split('?')[0];
+  if (clean.indexOf('/yoga-cue/') === 0) {
+    /* remember which file the next decoded buffer belongs to — the mock
+       AudioContext only ever sees the ArrayBuffer, never the URL */
+    global.__audio.lastUrl = clean.slice('/yoga-cue/'.length) + '.ogg';
+  }
   const full = path.join(REPO_ROOT, clean);
   try {
     const content = fs.readFileSync(full, 'utf8');
@@ -172,10 +177,13 @@ global.fetch = async (url, opts) => {
   }
 };
 
-/* Mock WebAudio for the audio-scheduling test: counts every cue that
-   reaches src.start() and simulates onended so the FIFO queue advances.
-   decodeAudioData is async (setTimeout) to reproduce the newStep race. */
-global.__audio = { starts: 0, connects: 0 };
+/* Mock WebAudio for the audio-scheduling tests: counts every cue that
+   reaches src.start(), records WHICH file it was, and simulates onended so
+   the FIFO queue advances. clampMs caps how long a cue "sounds" (15ms by
+   default so the suite stays fast); a test can raise it to keep a cue
+   audible while the next one is enqueued. durFor maps a file to its decoded
+   length so the real re-anchoring path is exercised. */
+global.__audio = { starts: 0, connects: 0, log: [], lastUrl: null, clampMs: 15, durFor: {} };
 global.AudioContext = class {
   constructor() { this.currentTime = 0; this.state = 'running'; this.destination = {}; }
   resume() { this.state = 'running'; return Promise.resolve(); }
@@ -186,14 +194,19 @@ global.AudioContext = class {
     const src = { buffer: null, onended: null, connect() { global.__audio.connects++; } };
     src.start = () => {
       global.__audio.starts++;
+      global.__audio.log.push((src.buffer && src.buffer.__url) || '?');
       const dur = (src.buffer && src.buffer.duration) || 0.05;
-      const ms = Math.max(1, Math.min(15, dur * 1000));
+      const ms = Math.max(1, Math.min(global.__audio.clampMs || 15, dur * 1000));
       setTimeout(() => { if (typeof src.onended === 'function') src.onended(); }, ms);
     };
     return src;
   }
   createOscillator() { return { type: 'sine', frequency: { value: 200 }, connect() {}, start() {}, stop() {} }; }
-  decodeAudioData(ab, ok) { setTimeout(() => ok({ duration: 0.5 }), 1); }
+  decodeAudioData(ab, ok) {
+    const key = global.__audio.lastUrl || '';
+    const dur = (global.__audio.durFor && global.__audio.durFor[key]) || 0.5;
+    setTimeout(() => ok({ duration: dur, __url: key }), 1);
+  }
 };
 
 /* load the real browser scripts (they export onto window === global) */
@@ -315,7 +328,26 @@ async function runAudioSched() {
   await wait(120);
   const crossStepStarts = global.__audio.starts;
 
-  console.log(JSON.stringify({ raceStarts, sequentialStarts, crossStepStarts }));
+  /* mid-playback: cue B arrives while cue A is STILL sounding. A must not be
+     re-scheduled (spoken twice) and B/C must each play exactly once, in
+     order. Regression: the play lock used to be released as soon as A's
+     buffer finished decoding, so _scheduleNext() found the sounding cue at
+     queue[0] and scheduled it again — the 7.5s Child Wide instruction was
+     spoken twice and the breath cue slid in behind it. */
+  global.__audio.starts = 0; global.__audio.log = [];
+  global.__audio.clampMs = 600;                    /* keep A audible while B arrives */
+  global.__audio.durFor = { 'long_a.ogg': 0.55, 'next_b.ogg': 0.4, 'next_c.ogg': 0.4 };
+  Audio2.newStep();
+  Audio2.play('long_a.ogg');
+  await wait(150);                                 /* A is still sounding here */
+  Audio2.play('next_b.ogg');
+  Audio2.play('next_c.ogg');
+  await wait(2000);
+  const chainStarts = global.__audio.starts;
+  const chainLog = global.__audio.log.slice();
+  global.__audio.clampMs = 15; global.__audio.durFor = {};
+
+  console.log(JSON.stringify({ raceStarts, sequentialStarts, crossStepStarts, chainStarts, chainLog }));
 }
 
 /* Yoga Core alias guard: name-first alias resolution must never resolve a
@@ -352,6 +384,73 @@ async function runYogaCore() {
     });
   });
   console.log(JSON.stringify({ collision, renames, faSamples, wrongName, wrongNameList, unresolvedAlias, unresolvedList }));
+}
+
+/* First-minute cue budget: walk the RESOLVED steps with the app's cue rules
+   (voice on, level 0 = the app default, RAW_FILES from the real inventory)
+   and count every cue the first 60 seconds would schedule.
+   The session XML is the source of truth for what may be spoken:
+     • move                → one voice file, else its <breath> fallback
+     • hold                → ONE breath cue at its first beat (or breath
+                             numbers when audibleCount, nothing when timed)
+                             + its phrase cue
+     • first visit of a pose → one instruction (excludefromtimeline: none)
+   Regression this pins: voicing a cue on EVERY breath of a hold. ocean's
+   32-second count="8" warm-up hold fired 8 inhale/exhale cues (0:12 … 0:40)
+   instead of one. holdBreaths is the sum of the holds' breath counts, so a
+   test can prove the cue count stays below it. */
+async function runCueBudget() {
+  await DataReady;
+  const { moveAudioCandidates, poseInstructionCandidates, RAW_FILES } = global;
+  const inv = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'static/yoga-classic/inventory.json'), 'utf8'));
+  RAW_FILES.clear();
+  (inv.raw || []).forEach(f => RAW_FILES.add(f));
+  const HORIZON = 60;
+  const out = [];
+  for (const p of Data.practices) {
+    const durs = p.durations || [30, 45, 60];
+    const { steps } = resolveSession(p.session, 0, 0, durs[0]);
+    const visited = new Set();
+    let t = 0, moveVoice = 0, moveBreath = 0, holds = 0, timedHolds = 0, holdBreaths = 0;
+    let breathCues = 0, numberCues = 0, phraseCues = 0, instructions = 0;
+    const teach = (poseName) => {
+      if (!poseName || visited.has(poseName)) return;
+      const pp = Data.poseByName[poseName];
+      if (pp && pp.excludeTimeline) { visited.add(poseName); return; }
+      visited.add(poseName);
+      if (pp) visited.add('base:' + (pp.baseName || poseName));
+      if (poseInstructionCandidates(poseName).some(f => RAW_FILES.has(f))) instructions++;
+    };
+    for (const s of steps) {
+      if (t >= HORIZON) break;
+      if (s.type === 'move') {
+        const mv = Data.moveByName[s.name];
+        const key = (mv && mv.soundName) || s.name;
+        if (moveAudioCandidates(key, s.side).some(f => RAW_FILES.has(f))) moveVoice++;
+        else if (mv && (mv.breath === 'inhale' || mv.breath === 'exhale')) moveBreath++;
+      } else if (s.type === 'pose') {
+        teach(s.name);
+      } else if (s.type === 'hold') {
+        holds++;
+        if (s.timed) timedHolds++;
+        holdBreaths += s.count || 0;
+        if (s.pose) teach(s.pose);
+        if (s.audibleCount) numberCues += s.count;
+        else if (!s.timed) breathCues++;
+        if (s.phrase && s.phrase !== 'none') phraseCues++;
+      }
+      t += s.duration || 0;
+    }
+    out.push({
+      /* slot 0 = the app's first choice (30 minutes for the flow practices,
+         2 sun-salutation rounds for the repetition-based ones) */
+      practice: p.name, slot: durs[0], seconds: +t.toFixed(2),
+      moveVoice, moveBreath, holds, timedHolds, holdBreaths,
+      breathCues, numberCues, phraseCues, instructions,
+      total: moveVoice + moveBreath + breathCues + numberCues + phraseCues + instructions,
+    });
+  }
+  console.log(JSON.stringify(out));
 }
 
 /* Audio-anchor probe: for every practice × duration, walk the resolved
@@ -471,6 +570,7 @@ async function runCalConvert() {
     if (mode === 'coverage') await runCoverage();
     else if (mode === 'timing') await runTiming(JSON.parse(process.argv[3] || '[]'));
     else if (mode === 'audio-sched') await runAudioSched();
+    else if (mode === 'cue-budget') await runCueBudget();
     else if (mode === 'yogacore') await runYogaCore();
     else if (mode === 'refs') await runRefs();
     else if (mode === 'anchors') await runAnchors();
