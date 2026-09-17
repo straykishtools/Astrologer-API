@@ -1,65 +1,74 @@
-// ================================================================
-//   SERVICE WORKER — نوتیف‌های تعاملی Cosmic Oracle
-//   دکمه‌های اکشن بدون باز کردن اپ + کلیک با payload
-// ================================================================
+/* sw.js — service worker برای PWA «اختر»
+   فقط /static/** را Cache-First می‌کند. صفحات HTML شبکه‌ای می‌مانند.
+   نسخه‌ی کش در CACHE_NAME: بعد از هر تغییر اساسی، v را بالا ببر.
+*/
+'use strict';
 
-var VERSION = 'v1';
+const CACHE_NAME = 'akhtar-static-v1';
+const STATIC_PREFIX = '/static/';
+// فایل‌های ضروری برای حالت آفلاین (pre-cache در install)
+const PRECACHE = [
+    '/static/icons/akhtar-wordmark.svg',
+    '/static/style.css',
+    '/static/kinetics.css',
+    '/static/script.js',
+    '/static/kinetics.js',
+    '/static/kinetics-cosmic.js',
+    '/static/kinetics-ui.js',
+    '/static/manifest.json',
+];
 
-self.addEventListener('install', function (e) {
-    self.skipWaiting();
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) =>
+            // pre-cache ولی شکست نخوریم اگر یکی نبود (مثلاً فایل تغییر نام داده)
+            Promise.all(
+                PRECACHE.map((url) =>
+                    cache.add(url).catch(() => null)
+                )
+            )
+        ).then(() => self.skipWaiting())
+    );
 });
 
-self.addEventListener('activate', function (e) {
-    e.waitUntil(clients.claim());
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((keys) =>
+            Promise.all(
+                keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+            )
+        ).then(() => self.clients.claim())
+    );
 });
 
-// ─── نمایش نوتیف (از صفحه فراخوانی می‌شود) ───
-self.addEventListener('message', function (e) {
-    var d = e.data || {};
-    if (d.type === 'SHOW_NOTIFICATION') {
-        var opts = {
-            body: d.body || '',
-            icon: d.icon || '/static/images/ui/logo.svg',
-            badge: d.icon || '/static/images/ui/logo.svg',
-            tag: d.tag || ('co-' + Date.now()),
-            renotify: true,
-            data: { url: d.url || '/', action: d.action || null },
-            vibrate: [80, 40, 80]
-        };
-        // دکمه‌های اکشن — تعاملی بدون باز کردن اپ
-        if (d.actions && d.actions.length) {
-            opts.actions = d.actions; // [{action:'x', title:'...'}]
-        }
-        if (d.requireInteraction) opts.requireInteraction = true;
-        self.registration.showNotification(d.title || 'Cosmic Oracle', opts);
-    }
+self.addEventListener('message', (event) => {
+    if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// ─── کلیک روی بدنه/دکمه‌های نوتیف ───
-self.addEventListener('notificationclick', function (e) {
-    var notif = e.notification;
-    var action = e.action; // '' یعنی کلیک روی خودِ بدنه
-    var data = notif.data || {};
-    notif.close();
+self.addEventListener('fetch', (event) => {
+    const req = event.request;
+    // فقط GET
+    if (req.method !== 'GET') return;
+    // فقط /static/**
+    const url = new URL(req.url);
+    if (url.origin !== self.location.origin) return;
+    if (!url.pathname.startsWith(STATIC_PREFIX)) return;
 
-    e.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
-            // اگر اکشنِ خاصی داشت (مثلاً «دفتر ثبت کن»)، به URLِ خاصی برو
-            var targetUrl = data.url || '/';
-            if (action === 'open-dashboard') targetUrl = '/#/dashboard';
-            else if (action === 'open-tarot') targetUrl = '/#/app/tarot';
-            else if (action === 'open-yoga') targetUrl = '/#/yoga';
-            else if (action === 'open-tools') targetUrl = '/#/app/birth';
-
-            // تبِ موجود را فوکوس کن یا تبِ جدید باز کن
-            for (var i = 0; i < clientList.length; i++) {
-                var client = clientList[i];
-                if ('focus' in client) {
-                    client.navigate(targetUrl).catch(function(){});
-                    return client.focus();
-                }
+    // Cache-First با fallback به شبکه
+    event.respondWith(
+        caches.open(CACHE_NAME).then(async (cache) => {
+            const cached = await cache.match(req);
+            if (cached) {
+                // در پس‌زمینه تازه کن (stale-while-revalidate ملایم)
+                fetch(req).then((res) => {
+                    if (res && res.ok) cache.put(req, res.clone());
+                }).catch(() => {});
+                return cached;
             }
-            return clients.openWindow(targetUrl);
+            return fetch(req).then((res) => {
+                if (res && res.ok) cache.put(req, res.clone());
+                return res;
+            });
         })
     );
 });

@@ -988,7 +988,8 @@ async def calculate_return_chart_data(
         if request_body.iso_datetime:
             return_subject = await asyncio.to_thread(
                 return_factory.next_return_from_iso_formatted_time,
-                request_body.iso_datetime, return_type,
+                request_body.iso_datetime,
+                return_type=return_type,
             )  # type: ignore[arg-type]
         elif request_body.month:
             if request_body.year is None:
@@ -998,7 +999,7 @@ async def calculate_return_chart_data(
                 request_body.year,
                 request_body.month,
                 request_body.day or 1,
-                return_type,
+                return_type=return_type,
             )
         else:
             if request_body.year is None:
@@ -1007,7 +1008,8 @@ async def calculate_return_chart_data(
                 )
             return_subject = await asyncio.to_thread(
                 return_factory.next_return_from_date,
-                request_body.year, 1, 1, return_type,
+                request_body.year, 1, 1,
+                return_type=return_type,
             )
     except KerykeionException:
         raise

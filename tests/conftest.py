@@ -144,6 +144,20 @@ def assert_api_svg_valid(svg: str, *, expect_css_variables: bool = True) -> None
 
 
 @pytest.fixture(autouse=True)
+def _force_test_env(monkeypatch: pytest.MonkeyPatch):
+    """هر تست ENV_TYPE=test رو تضمین کنه مگر اینکه خودش override کنه.
+
+    بعضی تست‌ها (مثل test_rate_limit_middleware) مستقیم os.environ["ENV_TYPE"]
+    رو با monkeypatch عوض می‌کنن که teardown خودش restore می‌کنه. ولی یه
+    جاهایی (مثل conftest قبلی فقط در import time ست می‌کرد) ENV_TYPE از session
+    قبلی leaked می‌شد. این autouse fixture برای هر تست ENV_TYPE=test رو تضمین
+    می‌کنه.
+    """
+    monkeypatch.setenv("ENV_TYPE", "test")
+    yield
+
+
+@pytest.fixture(autouse=True)
 def freeze_time(monkeypatch: pytest.MonkeyPatch):
     """Congela la sorgente del tempo usata dagli endpoint `now/*`.
 

@@ -1,21 +1,35 @@
 {
-    "name": "Cosmic Oracle — رصدخانه‌ی کیهانی",
-    "short_name": "Cosmic Oracle",
-    "description": "چارت تولد حرفه‌ای، فال حافظ و تاروت، بیوریتم، مزاج‌شناسی و وضعیت زنده‌ی آسمان و زمین",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#070c1f",
-    "theme_color": "#0c1430",
-    "lang": "fa",
-    "dir": "rtl",
-    "orientation": "portrait-primary",
-    "icons": [
-        {
-            "src": "/static/images/ui/logo.svg",
-            "sizes": "any",
-            "type": "image/svg+xml",
-            "purpose": "any"
-        }
-    ],
-    "categories": ["lifestyle", "health", "entertainment"]
+  "name": "اختر — رصدخانه‌ی کیهانی",
+  "short_name": "اختر",
+  "description": "چارت تولد، فال حافظ و تاروت، یوگا، عددشناسی، مزاج‌شناسی و وضعیت زنده‌ی آسمان",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070c1f",
+  "theme_color": "#c9a227",
+  "categories": ["lifestyle", "health", "entertainment"],
+  "icons": [
+    {
+      "src": "/static/icons/akhtar-wordmark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/akhtar-wordmark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "چارت تولد",     "url": "/?tab=birth&utm_source=pwa",    "icons": [{ "src": "/static/icons/akhtar-wordmark.svg", "sizes": "any", "type": "image/svg+xml" }] },
+    { "name": "فال حافظ",     "url": "/?tab=hafez&utm_source=pwa",    "icons": [{ "src": "/static/icons/akhtar-wordmark.svg", "sizes": "any", "type": "image/svg+xml" }] },
+    { "name": "تاروت",        "url": "/?tab=tarot&utm_source=pwa",    "icons": [{ "src": "/static/icons/akhtar-wordmark.svg", "sizes": "any", "type": "image/svg+xml" }] },
+    { "name": "یوگا",         "url": "/?tab=yoga&utm_source=pwa",     "icons": [{ "src": "/static/icons/akhtar-wordmark.svg", "sizes": "any", "type": "image/svg+xml" }] },
+    { "name": "عددشناسی",    "url": "/?tab=numerology&utm_source=pwa","icons": [{ "src": "/static/icons/akhtar-wordmark.svg", "sizes": "any", "type": "image/svg+xml" }] }
+  ]
 }

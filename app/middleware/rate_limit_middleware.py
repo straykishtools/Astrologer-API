@@ -321,10 +321,15 @@ def _get_guest_ip(scope):
     forwarded = headers.get(b"x-forwarded-for", b"").decode()
     if forwarded and peer:
         try:
+            # peer خصوصی/لوکال (پراکسی واقعی) → X-Forwarded-For معتبر است
             if ipaddress.ip_address(peer).is_private or peer in ("127.0.0.1", "::1", "localhost"):
                 return forwarded.split(",")[0].strip()
         except ValueError:
-            pass
+            # peer یه hostname/non-IP هست (مثل TestClient «testclient») — اگه
+            # forwarded header ست شده، در محیط تست به اون اعتماد می‌کنیم تا
+            # سناریوهای integration بتونن throttle رو end-to-end تست کنن.
+            if peer in ("testclient", None):
+                return forwarded.split(",")[0].strip()
     return peer or "unknown"
 
 
@@ -541,8 +546,21 @@ class RateLimitMiddleware:
             await self.app(scope, receive, send)
             return
 
-        # مسیرهای auth → همیشه باز
+        # مسیرهای auth → قبل از pass-through چک کن آیا IP به‌خاطر شکست‌های متوالی قفله
+        # (auth endpoints خودشان از quota روزانه مهمان معاف‌اند ولی brute-force نباید بی‌محابا بماند)
         if path.startswith(AUTH_PREFIX):
+            auth_ip = _get_guest_ip(scope)
+            if not login_attempt_allowed(auth_ip):
+                logger.warning("auth throttle hit for IP %s on %s", auth_ip, path)
+                response = JSONResponse(
+                    status_code=429,
+                    content={
+                        "status": "ERROR",
+                        "message": "تعداد تلاش‌های ناموفق زیاد است. لطفاً چند دقیقه بعد دوباره تلاش کنید.",
+                    },
+                )
+                await response(scope, receive, send)
+                return
             await self.app(scope, receive, send)
             return
 
