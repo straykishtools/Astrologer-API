@@ -257,18 +257,6 @@ def _analysis_prompt(request: AnalysisRequest) -> str:
     from app.utils.analysis_prompts import build_analysis_prompt as _build
     return _build(context, vedic)
 
-    max_tokens از ۴۰۹۶ به ۱۶۰۰ کاهش پیدا کرد: ۵۰۰ کلمهٔ فارسی + تگ‌های HTML
-    حدود ۹۰۰-۱۱۰۰ توکنه؛ ۴۰۹۶ فقط روی مدل‌های reasoning باعث می‌شد بودجه
-    صرفِ «فکرکردنِ» بی‌ثمر بشه و پاسخ دیر (یا حتی خالی، اگر بودجه قبل از
-    نوشتنِ متن نهایی تموم می‌شد) برسه. temperature هم پایین‌تر اومده تا
-    ساختار ۵ بخشی رو محکم‌تر رعایت کنه (کاهش نیاز به retry روی خروجی نامعتبر).
-    """
-    models = [{"name": os.getenv("AI_MODEL", "qwen3.8-flash"), "max_tokens": 2400, "temperature": 0.5}]
-    fb = os.getenv("AI_MODEL_FALLBACK", "")
-    if fb and fb != models[0]["name"]:
-        models.append({"name": fb, "max_tokens": 2400, "temperature": 0.5})
-    return models
-
 def _extract_analysis_content(response_text: str) -> str:
     """
     Extract the assistant content from an OpenAI-compatible response.
